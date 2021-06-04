@@ -425,3 +425,28 @@ class DeliveryItemMerch(models.Model):
 
     def __str__(self):
         return self.merchInventory.name
+
+
+class Branch(models.Model):
+    accountGroup = models.ManyToManyField(AccountGroup, blank = True)
+    subGroup = models.ManyToManyField(AccountSubGroup, blank = True)
+    accountChild = models.ManyToManyField(AccountChild, blank = True)
+    party = models.ManyToManyField(Party, blank = True)
+    journal = models.ManyToManyField(Journal, blank = True)
+    journalEntries = models.ManyToManyField(JournalEntries, blank = True)
+    warehouse = models.ManyToManyField(Warehouse, blank = True)
+    merchInventory = models.ManyToManyField(MerchandiseInventory, blank = True)
+    purchaseOrder = models.ManyToManyField(PurchaseOrder, blank = True)
+    poitemsMerch = models.ManyToManyField(POItemsMerch, blank = True)
+    salesContract = models.ManyToManyField(SalesContract, blank = True)
+    scitemsMerch = models.ManyToManyField(SCItemsMerch, blank = True)
+    driver = models.ManyToManyField(Driver, blank = True)
+    truck = models.ManyToManyField(Truck, blank = True)
+    deliveries = models.ManyToManyField(Deliveries, blank = True)
+    deliveriesDestination = models.ManyToManyField(DeliveryDestinations, blank = True)
+    deliveryPhotos = models.ManyToManyField(DeliveryPhotos, blank = True)
+    deliveryitemsGroup = models.ManyToManyField(DeliveryItemsGroup, blank = True)
+    deliveryitemsMerch = models.ManyToManyField(DeliveryItemMerch, blank = True)
+
+    def __str__(self):
+        return self.name
