@@ -34,6 +34,7 @@ class User(AbstractUser):
     dateResigned = models.DateField(null = True, blank = True)
     department = models.CharField(max_length=50, null = True, blank = True)
     mobile = models.CharField(max_length=15, null = True, blank = True)
+    branch = models.ForeignKey('Branch', on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name = "User"
