@@ -1,0 +1,427 @@
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.hashers import (
+    check_password, is_password_usable, make_password,
+)
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models.aggregates import Min
+
+#CHOICES
+parties = [
+    ('Customer', 'Customer'),
+    ('Vendor', 'Vendor')
+]
+
+normally = [
+    ('Debit', 'Debit'),
+    ('Credit', 'Credit'),
+]
+
+# Create your models here.
+class User(AbstractUser):
+    authLevel = models.CharField(max_length=50, null = True, blank = True)
+    position = models.CharField(max_length=20, null = True, blank = True)
+    image = models.ImageField(default='/static/media/icons/person.png', upload_to='profile-pictures/', null = True, blank = True)
+    idUser = models.CharField(max_length=50, null = True, blank = True)
+    status = models.CharField(max_length=50, null = True, blank = True)
+    rate = models.DecimalField(max_digits=6, decimal_places=2, null = True, blank = True,  default= 0.0)
+    dob = models.DateField(null = True, blank = True)
+    sss = models.CharField(max_length=50, null = True, blank = True)
+    phic = models.CharField(max_length=50, null = True, blank = True)
+    hdmf = models.CharField(max_length=50, null = True, blank = True)
+    tin = models.CharField(max_length=50, null = True, blank = True)
+    dateEmployed = models.DateField(null = True, blank = True)
+    dateResigned = models.DateField(null = True, blank = True)
+    department = models.CharField(max_length=50, null = True, blank = True)
+    mobile = models.CharField(max_length=15, null = True, blank = True)
+
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+
+    def __str__(self):
+        return self.username
+
+class Register(models.Model):
+    username = models.CharField(max_length=50, null=True, blank=True)
+    first_name = models.CharField(max_length=50, null = True, blank = True)
+    last_name = models.CharField(max_length=50, null = True, blank = True)
+    email = models.EmailField(null = True, blank = True)
+    password = models.CharField(max_length=255, null=True, blank=True)
+    password1 = models.CharField(max_length=255, null = True, blank = True)
+    password2 = models.CharField(max_length=255, null = True, blank = True)
+    authLevel = models.CharField(max_length=50, null = True, blank = True)
+    position = models.CharField(max_length=20, null = True, blank = True)
+    image = models.ImageField(default='default.jpg', upload_to='profile_pics', null = True, blank = True)
+    idUser = models.CharField(max_length=50, null = True, blank = True)
+    status = models.CharField(max_length=50, null = True, blank = True)
+    rate = models.DecimalField(max_digits=6, decimal_places=2, null = True, blank = True,  default= 0.0)
+    dob = models.DateField(null = True, blank = True)
+    sss = models.CharField(max_length=50, null = True, blank = True)
+    phic = models.CharField(max_length=50, null = True, blank = True)
+    hdmf = models.CharField(max_length=50, null = True, blank = True)
+    tin = models.CharField(max_length=50, null = True, blank = True)
+    dateEmployed = models.DateField(null = True, blank = True)
+    dateResigned = models.DateField(null = True, blank = True)
+    department = models.CharField(max_length=50, null = True, blank = True)
+    mobile = models.CharField(max_length=15, null = True, blank = True)
+
+    USERNAME_FIELD = 'username'
+
+    class Meta:
+        verbose_name = "Register"
+        verbose_name_plural = "Registers"
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+        self.password1 = make_password(raw_password)
+        self.password2 = make_password(raw_password)
+
+    def __str__(self):
+        return str(self.pk) + self.first_name + " " + self.last_name
+
+class AccountGroup(models.Model):
+    code = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
+    normally = models.CharField(max_length=50, choices=normally)
+    permanence = models.CharField(max_length=50)
+    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,  default= 0.0)
+
+    class Meta:
+        verbose_name = "Account Group"
+        verbose_name_plural = "Account Groups"
+
+    def __str__(self):
+        return self.name + " " + self.code
+
+class AccountSubGroup(models.Model):
+    code = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    accountGroup = models.ForeignKey(AccountGroup, related_name="accountsubgroup", on_delete=models.PROTECT, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Account Sub-Group"
+        verbose_name_plural = "Account Sub-Groups"
+
+    def __str__(self):
+        return self.name + " " + self.code
+
+class AccountChild(models.Model):
+    code = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
+    accountSubGroup = models.ForeignKey(AccountSubGroup,related_name="accountchild", on_delete=models.PROTECT, null=True, blank=True)
+    me = models.ForeignKey('self', related_name="accountchild", null=True,blank=True, on_delete=models.PROTECT)
+    contra = models.BooleanField(null = True, blank=True, default=False)
+    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,default= 0.0)
+    description = models.TextField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Child Account"
+        verbose_name_plural = "Child Accounts"
+
+    def __str__(self):
+        return self.name + " " + self.code
+
+    def me_too(self):
+        return (self.accountchild.all())
+
+class Party(models.Model):
+    name = models.CharField(max_length=256)
+    type = models.CharField(max_length=100, choices=parties)
+    accountChild = models.ForeignKey(AccountChild, related_name="party", on_delete=models.PROTECT, null=True, blank=True)
+    shippingAddress = models.CharField(max_length=512, blank=True, null=True)
+    officeAddress = models.CharField(max_length=512, blank=True, null=True)
+    landline = models.CharField(max_length=50, blank=True, null=True)
+    mobile = models.CharField(max_length=50, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    contactPerson = models.CharField(max_length=128, blank=True, null=True)
+    bank = models.CharField(max_length=256, blank=True, null=True)
+    bankNo = models.CharField(max_length=50, blank=True, null=True)
+    tin = models.CharField(max_length=50, blank=True, null=True)
+    crte = models.BooleanField(blank=True, null = True)
+    prefferedPayment = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Party"
+        verbose_name_plural = "Parties"
+
+    def __str__(self):
+        return self.name + " " + self.type
+
+class Journal(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    journalDate = models.DateField()
+    remarks = models.TextField(null=True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, related_name= "journalCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name= "journalApprovedBy")
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Journal'
+        verbose_name_plural = "Journals"
+
+    def __str__(self):
+        return self.code
+
+class JournalEntries(models.Model):
+    journal = models.ForeignKey(Journal, related_name="journalentries", on_delete=models.PROTECT, null=True, blank=True)
+    normally = models.CharField(max_length=50, choices=normally)
+    accountChild = models.ForeignKey(AccountChild, related_name="journalentries", on_delete=models.PROTECT, null=True, blank=True)
+    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,default= 0)
+    balance = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,default= 0)
+
+    class Meta:
+        verbose_name = "Journal Entry"
+        verbose_name_plural = "Journal Entries"
+
+    def __str__(self):
+        return self.journal.code + " " + self.normally + " " + self.child_account.name
+
+class Warehouse(models.Model):
+    name = models.CharField(max_length=256)
+    address = models.CharField(max_length=512)
+
+    class Meta:
+        verbose_name = "Warehouse"
+        verbose_name_plural = "Warehouses"
+
+    def __str__(self):
+        return self.name
+
+class MerchandiseInventory(models.Model):
+    code = models.CharField(max_length=50)
+    name = models.CharField(max_length=50)
+    length =  models.DecimalField(max_digits=20, decimal_places=5)
+    width =  models.DecimalField(max_digits=20, decimal_places=5)
+    thickness =  models.DecimalField(max_digits=20, decimal_places=5)
+    purchasingPrice =  models.DecimalField(max_digits=18, decimal_places=5)
+    sellingPrice =  models.DecimalField(max_digits=18, decimal_places=5)
+    vol = models.DecimalField(max_digits=10, decimal_places=5, null=True, blank=True)
+    pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null=True, blank=True)
+    qtyT = models.IntegerField()
+    qtyR = models.IntegerField()
+    qtyA = models.IntegerField()
+    um = models.CharField(max_length=50)
+    description = models.TextField(null=True, blank=True)
+    turnover = models.DecimalField(max_digits=10, decimal_places=5, null = True, blank=True)
+    warehouse = models.ManyToManyField(Warehouse, related_name="merchandiseinventory", blank=True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, default=0.00,)
+
+    class Meta:
+        verbose_name = "Merchandise Inventory"
+        verbose_name_plural = "Merchandise Inventories"
+
+    def __str__(self):
+        return self.name + " " + self.code
+
+class PurchaseOrder(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    datePurchased = models.DateField()
+    party = models.ForeignKey(Party, related_name="purchaseorder", on_delete=models.PROTECT)
+    # purchaseRequest = models.IntegerField()
+    atcCode = models.CharField(max_length=50, blank=True, null=True)
+    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+    amountPaid = models.DecimalField(max_digits=18, decimal_places=5)
+    amountDue = models.DecimalField(max_digits=18, decimal_places=5)
+    paymentMethod = models.CharField(max_length=50)
+    paymentPeriod = models.CharField(max_length=50)
+    chequeNo = models.CharField(max_length=50, null=True, blank=True)
+    dueDate = models.DateField(null = True, blank = True)
+    bank = models.CharField(max_length=50, blank=True, null=True)
+    remarks = models.TextField(null = True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "poCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "poApprovedBy")
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    approved = models.BooleanField(null = True, default=False)
+    journal = models.ForeignKey(Journal, related_name="purchaseorder", on_delete=models.PROTECT, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Purchase Order"
+        verbose_name_plural = "Purchase Orders"
+
+    def __str__(self):
+        return self.code
+
+class POItemsMerch(models.Model):
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poitemsmerch",on_delete=models.PROTECT, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="poitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.PositiveIntegerField()
+    purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
+    totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
+    inputVat = models.DecimalField(max_digits=20, decimal_places=5)
+    delivered = models.BooleanField(null = True, default=False)
+
+    class Meta:
+        verbose_name = 'PO Items Merch'
+        verbose_name_plural = "PO Items Merchs"
+
+    def __str__(self):
+        return self.merchInventory.name
+
+class SalesContract(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    dateSold = models.DateField()
+    party = models.ForeignKey(Party, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
+    salesOrder = models.IntegerField()
+    atcCode = models.CharField(max_length=50)
+    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5)
+    amountPaid = models.DecimalField(max_digits=18, decimal_places=5, null = True)
+    amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)
+    paymentMethod = models.CharField(max_length=50)
+    paymentPeriod = models.CharField(max_length=50)
+    chequeNo = models.CharField(max_length=50, null=True)
+    dueDate = models.DateField(null = True, blank = True)
+    bank = models.CharField(max_length=50)
+    remarks = models.TextField(null = True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "tempscCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "tempscApprovedBy")
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    approved = models.BooleanField(null = True)
+    journal = models.ForeignKey(Journal, related_name="tempsalescontract", on_delete=models.PROTECT, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Sales Contract"
+        verbose_name_plural = "Sales Contract"
+
+    def __str__(self):
+        return self.code
+
+class TempSalesContract(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    dateSold = models.DateField()
+    party = models.ForeignKey(Party, related_name="tempsalescontract", on_delete=models.PROTECT, null=True, blank=True)
+    subTotal = models.DecimalField(max_digits=15, decimal_places=5, validators=[MinValueValidator(0)])
+    discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "scCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "scApprovedBy")
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    journal = models.ForeignKey(Journal, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
+    approved = models.BooleanField(default=False)
+    
+
+class TempSCItemsMerch(models.Model):
+    salesContract = models.ForeignKey(TempSalesContract, related_name='tempscitemsmerch', on_delete=models.PROTECT)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="tempscitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.IntegerField()
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
+
+class TempSCOtherFees(models.Model):
+    salesContract = models.ForeignKey(TempSalesContract, related_name='tempscotherfees', on_delete=models.PROTECT)
+    fee = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
+    description = models.CharField(max_length=255)
+
+class SCItemsMerch(models.Model):
+    salesContract = models.ForeignKey(SalesContract, related_name="scitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="scitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.IntegerField()
+    purchasingPrice = models.DecimalField(max_digits=8, decimal_places=5)
+    totalPrice = models.DecimalField(max_digits=10, decimal_places=5)
+    outputVat = models.DecimalField(max_digits=5, decimal_places=5)
+    delivered = models.BooleanField(null = True)
+
+    class Meta:
+        verbose_name = "SC Items Merch"
+        verbose_name_plural = "SC Items Merchs"
+
+    def __str__(self):
+        return self.merchInventory.name
+
+class Driver(models.Model):
+    driverID = models.CharField(max_length=50, default='0')
+    firstName = models.CharField(max_length=50)
+    lastName = models.CharField(max_length=50)
+    status = models.CharField(max_length=20, default='Available')
+    
+    class Meta:
+        verbose_name = "Driver"
+        verbose_name_plural = "Drivers"
+
+    def __str__(self):
+        return self.firstName + " " + self.lastName
+
+class Truck(models.Model):
+    plate = models.CharField(max_length=50)
+    brand = models.CharField(max_length=50)
+    model = models.CharField(max_length=50)
+    driver = models.ForeignKey(Driver, on_delete=models.PROTECT, null=True, blank=True)
+    status = models.CharField(max_length=50, null = True)
+    currentDelivery = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Truck"
+        verbose_name_plural = "Trucks"
+
+    def __str__(self):
+        return self.brand + "-" + self.model + " " + self.plate
+
+class Deliveries(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated =  models.DateTimeField()
+    truck = models.ForeignKey(Truck, related_name="deliveries", on_delete=models.PROTECT, null=True, blank=True)
+    driver = models.ForeignKey(Driver, related_name="deliveries", on_delete=models.PROTECT, null=True, blank=True)
+    scheduleStart = models.DateTimeField(null=True, blank=True)
+    scheduleEnd = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Delivery"
+        verbose_name_plural = "Deliveries"
+
+    def __str__(self):
+        return self.code
+
+class DeliveryDestinations(models.Model):
+    deliveries = models.ForeignKey(Deliveries, related_name='deliverydestinations', on_delete=models.PROTECT, null=True, blank=True)
+    destination = models.CharField(max_length=500, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Delivery Destination"
+        verbose_name_plural = "Delivery Destinations"
+
+    def __str__(self):
+        return self.destination + ' ' + self.deliveries.code
+
+class DeliveryPhotos(models.Model):
+    deliveries = models.ForeignKey(Deliveries, related_name="deliveryphotos", on_delete=models.PROTECT, null=True, blank=True)
+    picture = models.ImageField(null=True, blank=True, upload_to="delivery_photos")
+
+    class Meta:
+        verbose_name = "Delivery Photo"
+        verbose_name_plural = "Delivery Photos"
+
+    def __str__(self):
+        return self.deliveries.code
+
+class DeliveryItemsGroup(models.Model):
+    deliveries = models.ForeignKey(Deliveries, related_name="deliveryitemsgroup", on_delete=models.PROTECT, null=True, blank=True)
+    deliveryType = models.CharField(max_length=50)
+    referenceNo = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = "Delivery Item Group"
+        verbose_name_plural = "Delivery Item Groups"
+
+    def __str__(self):
+        return self.deliveries.code
+
+class DeliveryItemMerch(models.Model):
+    deliveryItemsGroup = models.ForeignKey(DeliveryItemsGroup, related_name="deliveryitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="deliveryitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    qty = models.IntegerField()
+
+    class Meta:
+        verbose_name = "Delivery Item Merch"
+        verbose_name_plural = "Delivery Item Merchs"
+
+    def __str__(self):
+        return self.merchInventory.name
