@@ -19,9 +19,9 @@
         </div>
         <!-- TABLES -->
         <div>
-            <table v-for="account in accounts" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-5">
+            <table class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-5">
                 <thead class="thead-dark">
-                    <th colspan="99" class="font-size-18">[[account.name]]</th>
+                    <th colspan="99" class="font-size-18">Group Account Name</th>
                 </thead>
                 <thead>
                     <th>Code</th>
@@ -31,13 +31,12 @@
                     <th>Balance</th>
                 </thead>
                 <tbody>
-                    <tr v-for="item in account.accountChild">
-                        <td>[[account.code]]-[[item.accountSubGroup.code]]-[[item.code]]</td>
-                        <td>[[item.name]]</td>
-                        <td v-if="item.me!=null">[[item.me.name]]</td>
-                        <td v-else></td>
-                        <td>[[item.accountSubGroup.name]]</td>
-                        <td>[[item.amount]]</td>
+                    <tr>
+                        <td>01-001-001</td>
+                        <td>Child Account</td>
+                        <td>Linked Account</td>
+                        <td>Subgroup</td>
+                        <td>Amount pesos</td>
                     </tr>
                 </tbody>
             </table>
@@ -59,10 +58,10 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="sub-group">Choose Account Sub-group</label>
-                                <select v-model="accountModal.accountSubGroup" name="sub-group" class="form-control py-0">
+                                <select name="sub-group" class="form-control py-0">
                                     <option value="" selected disabled class="gray">Choose Account Sub-group</option>
-                                    <optgroup v-for="item in accounts" :label="item.name">
-                                        <option v-for="subGroup in item.subGroup" :value="subGroup.id">[[subGroup.name]]</option>
+                                    <optgroup>
+                                        <option>subgroup name</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -74,15 +73,15 @@
                             <label for="code">Code</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text">[[accountModal.groupCode]]</span>
+                                    <span class="input-group-text">text</span>
                                 </div>
-                                <input v-model="accountModal.code" type="text" class="form-control box-shadow-off" name="code" placeholder="Enter Code" style="margin-top: 0px;">
+                                <input type="text" class="form-control box-shadow-off" name="code" placeholder="Enter Code" style="margin-top: 0px;">
                             </div>
                         </div>
                         <div class="col col-7 pl-2">
                             <div class="form-group">
                                 <label for="name">Name</label>
-                                <input v-model="accountModal.name" type="text" class="form-control" name="name" placeholder="Enter Name">
+                                <input type="text" class="form-control" name="name" placeholder="Enter Name">
                             </div>
                         </div>
                     </div>
@@ -91,7 +90,7 @@
                         <div class="col col-12">
                             <div class="form-group">
                                 <label for="description">description</label>
-                                <input v-model="accountModal.description" type="text" name="description" class="form-control" placeholder="Enter Description">
+                                <input type="text" name="description" class="form-control" placeholder="Enter Description">
                             </div>
                         </div>
                     </div>
@@ -99,7 +98,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-check mb-2">
-                                <input v-model="accountModal.contra" type="checkbox" class="form-check-input" name="contra">
+                                <input type="checkbox" class="form-check-input" name="contra">
                                 <label class="form-check-label font-semibold" for="contra">Contra Account</label>
                             </div>
                         </div>
@@ -108,7 +107,7 @@
                     <div class="row py-3 b-radius-10 order-card">
                         <div class="col col-12">
                             <div class="form-check">
-                                <input v-model="accountModal.linkToAccount" type="checkbox" class="form-check-input" name="linkToAccount">
+                                <input type="checkbox" class="form-check-input" name="linkToAccount">
                                 <label for="linkToAccount" class="form-check-label font-semibold">Link to an Account</label>
                             </div>
                         </div>
@@ -116,10 +115,10 @@
                         <div class="col col-12" id="linkToAccountContainer" style="display: none;">
                             <div class="form-group mt-2">
                                 <label for="specificAccount">Specific Account</label>
-                                <select v-model="accountModal.me" name="specificAccount" class="form-control py-0" >
+                                <select name="specificAccount" class="form-control py-0" >
                                     <option value="" selected disabled class="gray">Choose Account</option>
-                                    <optgroup v-for="item in subGroup" :label="item.name">
-                                        <option v-for="child in item.accountChild" :value="child.id">[[child.name]]</option>
+                                    <optgroup>
+                                        <option>child name</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -127,7 +126,7 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col">
-                            <button class="btn btn-primary mt-2" @click="submitAccount()">Add Account</button>
+                            <button class="btn btn-primary mt-2">Add Account</button>
                         </div>
                     </div>
                 </div>
@@ -150,9 +149,9 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="group">Choose Group Account</label>
-                                <select v-model="subGroupModal.accountGroup" name="group" class="form-control py-0">
+                                <select name="group" class="form-control py-0">
                                     <option class="gray" value='' selected disabled>Select Account Group</option>
-                                    <option v-for="item in accounts" :value="item.id">[[item.name]]</option>
+                                    <option>item name</option>
                                 </select>
                             </div>
                         </div>
@@ -162,15 +161,15 @@
                             <label for="">Code</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text">[[subGroupModal.groupCode]]</span>
+                                    <span class="input-group-text">code</span>
                                 </div>
-                                <input v-model="subGroupModal.code" type="text" class="form-control box-shadow-off" name="code" placeholder="Enter Code" style="margin-top: 0px;">
+                                <input type="text" class="form-control box-shadow-off" name="code" placeholder="Enter Code" style="margin-top: 0px;">
                             </div>
                         </div>
                         <div class="col-7 pl-2">
                             <div class="form-group">
                                 <label for="name">Name</label>
-                                <input v-model="subGroupModal.name" type="text" name="name" class="form-control" placeholder="Enter Name">
+                                <input type="text" name="name" class="form-control" placeholder="Enter Name">
                             </div>
                         </div>
                     </div>
@@ -179,22 +178,20 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="description">Description</label>
-                                <input v-model="subGroupModal.description" type="text" name="description" class="form-control" placeholder="Enter Description">
+                                <input type="text" name="description" class="form-control" placeholder="Enter Description">
                             </div>
                         </div>
                     </div>
 
                     <div class="row mt-4">
                         <div class="col">
-                            <button class="btn btn-primary mt-2" @click="submitSubGroup()">Add Sub-group Account</button>
+                            <button class="btn btn-primary mt-2">Add Sub-group Account</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <pre>[[ $data ]]</pre>
 </div>
 
 {% endblock %}
@@ -205,150 +202,6 @@
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: '#app',
-
-        data:{
-            config:{
-                headers: {
-                    "X-CSRFToken": getCookie('csrftoken')
-                }
-            },
-            accountModal:{
-                accountSubGroup: '',
-                code: null,
-                name: null,
-                description: null,
-                contra: false,
-                linkToAccount: false,
-                me: null,
-                groupCode: ''
-            },
-            subGroupModal:{
-                accountGroup: '',
-                code: null,
-                name: null,
-                description: null,
-                groupCode: ''
-            },
-            accounts: [],
-            subGroup: [],
-            group: [],
-            child: [],
-        },
-        computed:{
-            linkToAccount(){
-                return this.accountModal.linkToAccount
-            },
-            groupCodeAccount(){
-                return this.accountModal.accountSubGroup
-            },
-            groupCodeSub(){
-                return this.subGroupModal.accountGroup
-            },
-        },
-        watch:{
-            linkToAccount(){
-                var x = document.getElementById('linkToAccountContainer')
-                if(this.accountModal.linkToAccount == false){
-                    x.style.display = 'none'
-                    this.accountModal.me = null
-                } else {
-                    x.style.display = 'block'
-                }
-            },
-            groupCodeAccount(id){
-                object = this.subGroup.find(x=>x.id===id)
-                this.accountModal.groupCode = `${object.accountGroup.code}-${object.code}-`
-            },
-            groupCodeSub(id){
-                object = this.group.find(x=>x.id===id)
-                this.subGroupModal.groupCode = `${object.code}-`
-            },
-        },
-        methods:{
-            accountModalInitial(){
-                return{
-                    accountSubGroup: '',
-                    code: null,
-                    name: null,
-                    description: null,
-                    contra: false,
-                    linkToAccount: false,
-                    me: null,
-                    groupCode: ''
-                }
-            },
-            subGroupModalInitial(){
-                return{
-                    accountGroup: '',
-                    code: null,
-                    name: null,
-                    description: null,
-                    groupCode: ''
-                }
-            },
-            loadData(){
-                axios.get('/api/nested-group/').then(res=>this.accounts=res.data);
-                axios.get('/api/nested-sub/').then(res=>this.subGroup=res.data);
-                axios.get('/api/group/').then(res=>this.group=res.data);
-                axios.get('/api/child/').then(res=>this.child=res.data);
-            },
-            submitAccount(){
-                axios.post(
-                    '/api/child/',
-                    this.accountModal,
-                    this.config
-                )
-                .then(res=>{
-                    this.loadData()
-                    var name = this.accountModal.name
-                    Swal.fire({
-                        title: "Account successfully added.",
-                        html: "<b>" + name + "</b>" + " added as account.",
-                        icon: "success",
-                    });
-                })
-                .then(
-                    res=>this.accountModal = this.accountModalInitial()
-                )
-                .catch(err=>{
-                    Swal.fire({
-                        title: "Something went wrong",
-                        html: err,
-                        icon: 'error'
-                    })
-                })
-            },
-            submitSubGroup(){
-                axios.post(
-                    '/api/sub-group/',
-                    this.subGroupModal,
-                    this.config
-                )
-                .then(res=>{
-                    this.loadData()
-                    var name = this.subGroupModal.name
-                    Swal.fire({
-                        title: "Sub-group Successfully added.",
-                        html: "<b>" + name + "</b>" + " added as sub-group.",
-                        icon: "success",
-                    })
-                    
-                })
-                .then(
-                    res=>this.subGroupModal = this.subGroupModalInitial()
-                )
-                .catch(err=>{
-                    Swal.fire({
-                        title: "Someting went wrong",
-                        html: err,
-                        icon: 'error'
-                    })
-                })
-            }
-        },
-        mounted(){
-            this.loadData()
-        }
     })
 </script>
 
