@@ -1,0 +1,46 @@
+{% extends 'base-template.html' %}
+{% block title %}Login{% endblock %}
+
+{% block header %}
+<style>
+    body{
+        background: url('/static/media/photos/iv-bg.png');
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="justify-content-center">
+        <div class="flex flex-center flex-column">
+            <div class="mt-5">
+                <span class="font-bold display-3">MMS</span>
+            </div>
+
+            <div class="label font-size-18 font-semibold">
+                <span>Mansei Management System</span>
+            </div>
+
+            <form action="/login/" method="POST" class="form-container b-radius-15 box-shadow-medium py-4 px-4 mt-5" style="background-color: white;">{%csrf_token%}
+                <span class="font-semibold font-size-40">Login</span>
+
+                <div class="form-group mt-4 mb-4">
+                    <label for="username" class="font-semibold">Username</label>
+                    <input type="text" name="username" class="form-control b-radius-5" placeholder="Enter Username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" class="form-control b-radius-5" placeholder="Enter Password">
+                </div>
+
+                <button type="submit" class="btn btn-block btn-primary mt-5 mb-3 font-semibold b-radius-5">Login</button>
+
+                <a href="/register/">Register</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

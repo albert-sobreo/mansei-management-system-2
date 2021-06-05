@@ -21,7 +21,7 @@ normally = [
 class User(AbstractUser):
     authLevel = models.CharField(max_length=50, null = True, blank = True)
     position = models.CharField(max_length=20, null = True, blank = True)
-    image = models.ImageField(default='/static/media/icons/person.png', upload_to='profile-pictures/', null = True, blank = True)
+    image = models.ImageField(default='profile-pictures/person.png', upload_to='profile-pictures/', null = True, blank = True)
     idUser = models.CharField(max_length=50, null = True, blank = True)
     status = models.CharField(max_length=50, null = True, blank = True)
     rate = models.DecimalField(max_digits=6, decimal_places=2, null = True, blank = True,  default= 0.0)
@@ -429,6 +429,7 @@ class DeliveryItemMerch(models.Model):
 
 
 class Branch(models.Model):
+    name = models.CharField(max_length=255)
     accountGroup = models.ManyToManyField(AccountGroup, blank = True)
     subGroup = models.ManyToManyField(AccountSubGroup, blank = True)
     accountChild = models.ManyToManyField(AccountChild, blank = True)

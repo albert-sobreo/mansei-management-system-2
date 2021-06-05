@@ -1,0 +1,47 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+    {% block title %}{% endblock %}
+    </title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/fontawesome.all.css">
+    {% block header_links %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="/static/js/nav-gas.js"></script>
+    <script src="/static/js/nav-imps.js"></script>
+    <script src="/static/js/nav-ems.js"></script>
+    <script src="/static/js/profile-card.js"></script>
+    <script src="/static/js/app-card.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-vue/2.21.2/bootstrap-vue.min.js" integrity="sha512-Z0dNfC81uEXC2iTTXtE0rM18I3ATkwn1m8Lxe0onw/uPEEkCmVZd+H8GTeYGkAZv50yvoSR5N3hoy/Do2hNSkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-json-excel@0.3.0/dist/vue-json-excel.umd.min.js"></script>
+    <script src="/static/js/validateNumber.js"></script>
+    {% block header_scripts %}{% endblock %}
+    {% block header%}{% endblock %}
+</head>
+<body>
+    {% block body %}{% endblock %}
+    <script src="/static/js/getcookie.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/resources/jquery.dataTables.min.js"></script>
+    <script src="/static/js/resources/dataTables.bootstrap4.min.js"></script>
+    <script src="/static/js/resources/dataTables.buttons.min.js"></script>
+    <script src="/static/js/resources/buttons.flash.min.js"></script>
+    <script src="/static/js/resources/jszip.min.js"></script>
+    <script src="/static/js/resources/buttons.html5.min.js"></script>
+    <script src="/static/js/resources/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    {% block scripts %}{% endblock %}
+    <script src="/static/js/nav-scripts.js"></script>
+</body>
+</html>
