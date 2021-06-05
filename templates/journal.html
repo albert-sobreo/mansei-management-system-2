@@ -1,0 +1,401 @@
+{% extends 'base-template.html' %}
+{% block title %}Journal{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-journal" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Journal</span>
+            <button type="button" class="btn btn-primary mx-1" data-toggle="modal" data-target="#addJournalEntry">Add Journal Entry</button>
+            <button type="button" class="btn btn-secondary mx-1" @click="roundingToggler()">Round Numbers</button>
+        </div>
+
+        {{ request.user.branch.journal.all }}
+        <!-- TABLE -->
+        {% for journal in request.user.branch.journal.all %}
+        <table class="table table-sm box-shadow-medium b-radius-15 mt-2 mb-5">
+            <thead class="thead-dark">
+                <th style="border: 0;" class="pl-5">Accounts</th>
+                <th style="border: 0;">Debit</th>
+                <th style="border: 0;" class="pr-5">Credit</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2" class="pl-5" style="background: #f6f6f6">
+                        <span class="font-bold font-size-14">{{journal.journalDate}}</span>
+                    </td>
+                    <td class="pr-5 text-right" style="background: #f6f6f6;">
+                        <span class="font-bold font-size-14 text-right">{{journal.code}}</span>
+                    </td>
+                </tr>
+                {% for je in journal.journalentries.all %}
+                <tr>
+                    <td class="pl-5">{{je.accountChild.name}}</td>
+                    <!-- ADD IF ELSE HERE FOR DEBIT AND CREDIT -->
+                    {% if je.normally == 'Debit' %}
+                    <td>₱[[formatPrice('{{je.amount}}')]]</td>
+                    <td></td>
+                    
+                    {% elif je.normally == 'Credit' %}
+                    <td></td>
+                    <td>₱[[formatPrice('{{je.amount}}')]]</td>
+                    {% endif %}
+                    
+                </tr>
+                {% endfor %}
+
+                <tr>
+                    <td class="px-5 font-italic font-regular text-center" colspan="99">
+                        {{journal.remarks}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        {% endfor %}
+
+        <!-- MODAL -->
+        <div class="modal fade" id="addJournalEntry">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content b-radius-15 px-3 py-2">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add Journal Entry</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <!-- START -->
+                        <div class="row">
+                            <div class="col col-3 pr-2">
+                                <div class="form-group">
+                                    <label>Date</label>
+                                    <input v-model="addJournalModal.date" type="date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col col-3 px-2">
+                                <div class="form-group">
+                                    <label>Retroactive <span class="font-size-10 gray">optional</span></label>
+                                    <input v-model="addJournalModal.retroactive" type="date" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="col-3 px-2"></div>
+                            <div class="col-3 pl-2">
+                                <div class="form-group">
+                                    <label>Reference No.</label>
+                                    <input type="text" class="form-control" placeholder="Enter Reference No." :value="addJournalModal.code" @input="addJournalModal.code = $event.target.value.toUpperCase()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DEBIT -->
+                        <div class="row">
+                            <div class="col col-7">
+                                <label>Debit Account</label>
+                            </div>
+                            <div class="col col-5">
+                                <label>Amount</label>
+                            </div>
+                        </div>
+                        <div class="row" v-for="(line, index) in addJournalModal.debit">
+                            <div class="col col-7 pr-2">
+                                <select v-model="line.accountChild" class="form-control">
+                                    {% for debit in request.user.branch.subGroup.all %}
+                                    <option value="" selected disabled class="gray">Choose Account</option>
+                                    <optgroup label="{{debit.name}}">
+                                        {% for child in debit.accountchild.all %}
+                                        <option value="{{child.pk}}">{{child.name}}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                            <div class="col pl-2">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="line.amount" type="text" class="form-control box-shadow-off" style="margin-top: 0px;">
+                                </div>                            
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-minus-circle stop text-shadow-small" @click="removeDebit(index)"></i>
+                            </div>
+                        </div>
+                        <div class="row" >
+                            <div class="col">
+                                <button @click="addLineDebit()" class="btn btn-warning my-2">+ Add new debit</button>
+                            </div>
+                        </div>
+
+                        <!-- CREDIT -->
+                        <div class="row">
+                            <div class="col col-7">
+                                <label>Credit Account</label>
+                            </div>
+                            <div class="col col-5">
+                                <label>Amount</label>
+                            </div>
+                        </div>
+                        <div class="row" v-for="(line, index) in addJournalModal.credit">
+                            <div class="col col-7 pr-2">
+                                <select v-model="line.accountChild" class="form-control">
+                                    {% for credit in request.user.branch.subGroup.all %}
+                                    <option value="" selected disabled class="gray">Choose Account</option>
+                                    <optgroup label="{{credit.name}}">
+                                        {% for child in credit.accountchild.all %}
+                                        <option value="{{child.pk}}">{{child.name}}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col pl-2">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="line.amount" type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;">
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-minus-circle stop text-shadow-small" @click="removeCredit(index)"></i>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button @click="addLineCredit()" class="btn btn-warning my-2">+ Add new credit</button>
+                            </div>
+                        </div>
+
+                        <!-- DESCRIPTION -->
+                        <div class="row">
+                            <div class="col">
+                                <label>Description</label>
+                                <textarea v-model="addJournalModal.remarks" class="form-control" id="" cols="30" rows="2" placeholder="Enter Description"></textarea>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col col-6 text-right font-bold font-size-14"></div>
+                            <div class="col col-3 pr-2">
+                                <label>Debit</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="addJournalModal.tDebit" type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
+                                </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
+                            </div>
+                            <div class="col col-3 pl-2">
+                                <label>Credit</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="addJournalModal.tCredit" type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
+                                </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col col-12">
+                                <div class="d-flex flex-row-reverse">
+                                    <button @click="submitJournal()" class="btn btn-primary mt-2" id="save" disabled>Add Journal Entry</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+        data:{
+            config: {
+                headers:{
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            today: new Date().toISOString().split('T')[0],
+
+            addJournalModal: {
+                date: new Date().toISOString().split('T')[0],
+                datetimeCreated: new Date().toISOString(),
+                retroactive: null,
+                code: '{{new_code}}',
+                debit: [{
+                    accountChild: '',
+                    amount: null,
+                    normally: 'Debit',
+                }],
+                credit: [{
+                    accountChild: '',
+                    amount: null,
+                    normally: 'Credit',
+                }],
+                remarks: null,
+                tDebit: null,
+                tCredit: null,
+            },
+            journals: [],
+            subGroups: [],
+            toggle: false,
+        },
+
+        computed:{
+            totalCostDebit(){
+                return this.addJournalModal.debit.map(line=>line.amount)
+            },
+            totalCostCredit(){
+                return this.addJournalModal.credit.map(line=>line.amount)
+            },
+            tDebit(){
+                return this.addJournalModal.tDebit
+            },
+            tCredit(){
+                return this.addJournalModal.tCredit
+            }
+        },
+        watch:{
+            totalCostDebit(){
+                this.addJournalModal.tDebit = (this.totalCostDebit.reduce((a,b)=>Number(a)+Number(b), 0)).toFixed(5)
+            },
+            totalCostCredit(){
+                this.addJournalModal.tCredit = (this.totalCostCredit.reduce((a,b)=>Number(a)+Number(b), 0)).toFixed(5)
+            },
+            tDebit(){
+                var x = document.getElementById('save')
+                if (this.tDebit == this.addJournalModal.tCredit){
+                    x.disabled = false
+                } else {
+                    x.disabled = true
+                }
+            },
+            tCredit(){
+                var x = document.getElementById('save')
+                if (this.tCredit == this.addJournalModal.tDebit){
+                    x.disabled = false
+                } else {
+                    x.disabled = true
+                }
+            }
+        },
+        methods:{
+            addLineDebit(){
+                this.addJournalModal.debit.push({
+                    accountChild: '',
+                    amount: null,
+                    normally: 'Debit',
+                })
+            },
+            addLineCredit(){
+                this.addJournalModal.credit.push({
+                    accountChild: '',
+                    amount: null,
+                    normally: 'Credit',
+                })
+            },
+            formatDateTime(value){
+                const months = [
+                    'January',
+                    'February',
+                    'March',
+                    'April',
+                    'May',
+                    'June',
+                    'July',
+                    'August',
+                    'September',
+                    'October',
+                    'November',
+                    'December'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+            removeDebit (index) {
+                this.$delete(this.addJournalModal.debit, index)
+            },
+            removeCredit(index){
+                this.$delete(this.addJournalModal.credit, index)
+            },
+            submitJournal(){
+                axios.post('/save-journal/', this.addJournalModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                //.then(res=>this.loadData())
+                //.then(res=>this.addJournalModal = this.addJournalModalInitial())
+                //.catch(err=>console.log(err));
+            },
+            addJournalModalInitial(){
+                return {
+                    date: new Date().toISOString().split('T')[0],
+                    retroactive: null,
+                    code: '{{new_code}}',
+                    debit: [{
+                        accountChild: '',
+                        amount: null,
+                        normally: 'Debit',
+                    }],
+                    credit: [{
+                        accountChild: '',
+                        amount: null,
+                        normally: 'Credit',
+                    }],
+                    remarks: null,
+                    tDebit: null,
+                    tCredit: null,
+                }
+            },
+            formatPrice(value) {
+                if (this.toggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(2).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            roundingToggler(){
+                this.toggle = !this.toggle
+            }
+        },
+    })
+</script>
+
+{% endblock %}

@@ -4,6 +4,7 @@ from django.db.models import query
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
+from rest_framework.views import APIView
 from ..forms import *
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout

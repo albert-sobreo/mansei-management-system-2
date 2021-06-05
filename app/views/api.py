@@ -1,0 +1,37 @@
+from decimal import Decimal
+from django import views
+from django.db.models import query
+from django.http.response import Http404
+from rest_framework import viewsets
+from ..serializers import *
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+import rest_framework.status as status
+
+from ..models import *
+
+from rest_framework.permissions import IsAuthenticated
+
+from datetime import datetime
+
+
+
+
+
+
+########## CHART OF ACCOUNTS ##########
+class AccountGroupAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AccountGroupSZ
+    queryset = AccountGroup.objects.all().order_by('code')
+
+class AccountChildAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AccountChildSZ
+    queryset = AccountChild.objects.all().order_by('code')
+
+class AccountSubGroupAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SubGroupSZ
+    queryset = AccountSubGroup.objects.all().order_by('code')

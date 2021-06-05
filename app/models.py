@@ -156,7 +156,7 @@ class Journal(models.Model):
     journalDate = models.DateField()
     remarks = models.TextField(null=True, blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, related_name= "journalCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name= "journalApprovedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "journalApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -178,7 +178,7 @@ class JournalEntries(models.Model):
         verbose_name_plural = "Journal Entries"
 
     def __str__(self):
-        return self.journal.code + " " + self.normally + " " + self.child_account.name
+        return self.journal.code + " " + self.normally + " " + self.accountChild.name
 
 class Warehouse(models.Model):
     name = models.CharField(max_length=256)
