@@ -22,4 +22,6 @@ urlpatterns = [
     path('journal/', login_required(views.JournalView.as_view())),
     path('save-journal/', login_required(views.SaveJournal.as_view())),
     path('ledger/', login_required(views.LedgerView.as_view())),
+    path('save-account-child/', login_required(views.SaveAccountChild.as_view())),
+    path('save-account-group/', login_required(views.SaveAccountGroup.as_view()))
 ]

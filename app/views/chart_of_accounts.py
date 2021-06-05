@@ -1,3 +1,4 @@
+import json
 from django import views
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import query
@@ -12,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from rest_framework import viewsets
 from ..models import *
+import sweetify
 
 @login_required
 def chartOfAccountsView(request):
@@ -20,3 +22,46 @@ def chartOfAccountsView(request):
 class ChartOfAccountsView(View):
     def get(self, request):
         return render(request, 'chart_of_accounts.html')
+
+class SaveAccountChild(APIView):
+    def post(self, request, format=None):
+        jsonChild = request.data
+
+        accountChild = AccountChild()
+
+        accountChild.accountSubGroup = AccountSubGroup.objects.get(pk=jsonChild['accountSubGroup'])
+        accountChild.code = jsonChild['code']
+        accountChild.name = jsonChild['name']
+        accountChild.description = jsonChild['description']
+        accountChild.contra = jsonChild['contra']
+        try:
+            accountChild.me = AccountChild.objects.get(pk=jsonChild['me'])
+        except Exception as e:
+            print(e)
+
+        accountChild.save()
+
+        request.user.branch.accountChild.add(accountChild)
+
+        sweetify.sweetalert(request, icon='success', title='Success!', text='{} has added to {}'.format(accountChild.name, accountChild.accountSubGroup.name), persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+class SaveAccountGroup(APIView):
+    def post(self, request, format=None):
+        jsonSubGroup = request.data
+
+        subGroup = AccountSubGroup()
+
+        subGroup.accountGroup = AccountGroup.objects.get(pk=jsonSubGroup['accountGroup'])
+        subGroup.code = jsonSubGroup['code']
+        subGroup.name = jsonSubGroup['name']
+        subGroup.description = jsonSubGroup['description']
+
+        subGroup.save()
+
+        request.user.branch.subGroup.add(subGroup)
+        sweetify.sweetalert(request, icon='success', title='Success!', text="{} has added to {}".format(subGroup.name, subGroup.accountGroup.name), persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+
+
