@@ -14,7 +14,7 @@ from rest_framework import viewsets
 from ..serializers import *
 from ..models import *
 import sweetify
-
+from datetime import date as now
 class VendorView(View):
     def get(self, request):
         context = {
@@ -32,21 +32,52 @@ class CustomerView(View):
 class SaveParty(APIView):
     def post(self, request, format=None):
         jsonParty = request.data
+        
+        childAR = AccountChild()
+        childAP = AccountChild()
 
-        # child = AccountChild()
-        # child.code
-        # child.name
+        user = request.user
 
-        # child.accountSubGroup = AccountSubGroup.objects.get(name=)
+        try:
+            subGroupAR = request.user.branch.subGroup.get(name="Accounts Receivable")
+            ARcode = subGroupAR.accountchild.latest('pk')
+            current_AR = int(ARcode.code)
+            current_AR += 1
+            new_AR = str(current_AR).zfill(3)
 
-        # child.me
-        # child.contra
-        # child.amount 
-        # child.description
+        except Exception as e:
+            print(e)
+            new_AR = '001'
+
+        try:
+            subGroupAP = request.user.branch.subGroup.get(name="Accounts Payables")
+            APcode = subGroupAP.accountchild.latest('pk')
+            current_AP = int(APcode.code)
+            current_AP += 1
+            new_AP = str(current_AP).zfill(3)
+
+        except Exception as e:
+            print(e)
+            new_AP = '001'
+
+        childAR.code = new_AR 
+        childAR.name = 'Trade Receivable - ' + jsonParty['name']
+        childAR.accountSubGroup = AccountSubGroup.objects.get(name='Accounts Receivable')
+        childAR.me = AccountChild.objects.get(name='Trade Receivable')
+        childAR.amount = 0.0
+        childAR.description = " "
+        childAR.save()
+
+        childAP.code = new_AP
+        childAP.name = 'Trade Payables - ' + jsonParty['name']
+        childAP.accountSubGroup = AccountSubGroup.objects.get(name='Accounts Payables')
+        childAP.me = AccountChild.objects.get(name='Trade Payables')
+        childAP.amount = 0.0
+        childAP.description = ""
+        childAP.save()
 
         party = Party()
-
-        # party.accountChild = AccountChild.objects.get(name=jsonParty['accountChild'])
+        
         party.name = jsonParty['name']
         party.type = jsonParty['type']
         party.shippingAddress = jsonParty['shippingAddress']
@@ -60,12 +91,13 @@ class SaveParty(APIView):
         party.tin = jsonParty['tin']
         party.crte = jsonParty['crte']
         party.prefferedPayment = jsonParty['prefferedPayment']
-        # try:
-        #     party.me = Party.objects.get(pk=jsonParty['me'])
-        # except Exception as e:
-        #     print(e)
 
         party.save()
+
+        request.user.branch.accountChild.add(childAR)
+        request.user.branch.accountChild.add(childAP)
+        party.accountChild.add(childAR)
+        party.accountChild.add(childAP)
 
         request.user.branch.party.add(party)
 

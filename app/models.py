@@ -130,7 +130,7 @@ class AccountChild(models.Model):
 class Party(models.Model):
     name = models.CharField(max_length=256)
     type = models.CharField(max_length=100, choices=parties)
-    accountChild = models.ForeignKey(AccountChild, related_name="party", on_delete=models.PROTECT, null=True, blank=True)
+    accountChild = models.ManyToManyField(AccountChild, related_name="party")
     shippingAddress = models.CharField(max_length=512, blank=True, null=True)
     officeAddress = models.CharField(max_length=512, blank=True, null=True)
     landline = models.CharField(max_length=50, blank=True, null=True)
