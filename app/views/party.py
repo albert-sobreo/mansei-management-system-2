@@ -17,7 +17,10 @@ import sweetify
 
 class VendorView(View):
     def get(self, request):
-        return render(request, 'vendors.html')
+        context = {
+            'vendors': request.user.branch.party.filter(type='Vendor')
+        }
+        return render(request, 'vendors.html', context)
 
 class CustomerView(View):
     def get(self, request):
