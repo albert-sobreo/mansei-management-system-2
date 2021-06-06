@@ -24,9 +24,6 @@ urlpatterns = [
     path('ledger/', login_required(views.LedgerView.as_view())),
     path('save-account-child/', login_required(views.SaveAccountChild.as_view())),
     path('save-account-group/', login_required(views.SaveAccountGroup.as_view())),
-<<<<<<< HEAD
-=======
     path('customers/', login_required(views.CustomerView.as_view())),
     path('vendors/', login_required(views.VendorView.as_view())),
->>>>>>> 9e2c32aa273d3ba9bf1de24a0eeb7ec10680d681
 ]
