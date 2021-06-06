@@ -49,7 +49,6 @@ class SaveParty(APIView):
             print(e)
             new_AR = '001'
 
-<<<<<<< HEAD
         try:
             subGroupAP = request.user.branch.subGroup.get(name="Accounts Payables")
             APcode = subGroupAP.accountchild.latest('pk')
@@ -68,10 +67,6 @@ class SaveParty(APIView):
         childAR.amount = 0.0
         childAR.description = " "
         childAR.save()
-=======
-        party = Party()
-        
->>>>>>> f619b062e1bbf96bcf903edc23aba02225bbce37
 
         childAP.code = new_AP
         childAP.name = 'Trade Payables - ' + jsonParty['name']
