@@ -33,9 +33,13 @@ class SaveParty(APIView):
     def post(self, request, format=None):
         jsonParty = request.data
 
-        party = Party()
+        child = AccountChild()
+        
 
-        party.accountChild = AccountChild.objects.get(name=jsonParty['accountChild'])
+        party = Party()
+        
+
+        party.accountChild = child
         party.name = jsonParty['name']
         party.type = jsonParty['type']
         party.shippingAddress = jsonParty['shippingAddress']
