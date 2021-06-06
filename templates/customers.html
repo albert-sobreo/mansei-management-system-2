@@ -28,7 +28,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><span class="link" data-toggle="modal" data-target="#customerModal">{{customer.name}}</span></td>
+                    <td><span @click="viewCustomer({{customer.pk}})" class="link" data-toggle="modal" data-target="#customerModal">{{customer.name}}</span></td>
                     <td>{{customer.email}}</td>
                     <td>{{customer.mobile}}</td>
                     <td>{{customer.contactPerson}}</td>
@@ -400,9 +400,9 @@
         },
 
         methods: {
-            viewCustomer(name){
-                customerObject = //ADD CUSTOMER API HERE
-                this.customerModal = customerObject
+            viewCustomer(id){
+                axios.get(`/api/customer-transaction/${id}`)
+                .then(res=>this.customerModal=res.data)
             },
             addCustomerModalInitial(){
                 return{
