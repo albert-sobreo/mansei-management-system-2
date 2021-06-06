@@ -43,8 +43,6 @@ class CustomerTransactionAPI(viewsets.ModelViewSet):
     queryset = Party.objects.filter(type = 'Customer').order_by('name')
 
 
-
-
 ########## VENDOR ##########
 class VendorAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
