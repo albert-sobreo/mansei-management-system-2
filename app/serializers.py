@@ -1,6 +1,8 @@
 from rest_framework import fields, serializers
 from .models import *
 
+########## CHART OF ACCOUNTS ##########
+
 class AccountGroupSZ(serializers.ModelSerializer):
     class Meta:
         model = AccountGroup
@@ -15,6 +17,8 @@ class AccountChildSZ(serializers.ModelSerializer):
     class Meta:
         model = AccountChild
         fields = '__all__'
+
+########## PARTY ##########
 
 class PartySZ(serializers.ModelSerializer):
     class Meta:

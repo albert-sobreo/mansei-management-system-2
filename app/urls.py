@@ -13,6 +13,12 @@ router.register(r"group", views.AccountGroupAPI, 'group')
 router.register(r"sub-group", views.AccountSubGroupAPI, 'sub-group')
 router.register(r"child", views.AccountChildAPI, 'child')
 
+########## PARTY ##########
+router.register(r"customer", views.CustomerAPI, 'customer')
+router.register(r"customer-transaction", views.CustomerTransactionAPI, 'customer-transaction')
+router.register(r"vendor", views.VendorAPI, 'vendor')
+router.register(r"vendor-transaction", views.VendorTransactionAPI, 'vendor-transaction')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -26,4 +32,5 @@ urlpatterns = [
     path('save-account-group/', login_required(views.SaveAccountGroup.as_view())),
     path('customers/', login_required(views.CustomerView.as_view())),
     path('vendors/', login_required(views.VendorView.as_view())),
+    path('save-party/', login_required(views.SaveParty.as_view())),
 ]

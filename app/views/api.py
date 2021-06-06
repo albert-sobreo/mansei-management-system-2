@@ -37,11 +37,6 @@ class CustomerAPI(viewsets.ModelViewSet):
     serializer_class = PartySZ
     queryset = Party.objects.filter(type = 'Customer').order_by('name')
 
-class CustomerNestedAPI(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    serializer_class = PartyNestedSZ
-    queryset = Party.objects.filter(type = 'Customer').order_by('name')
-
 class CustomerTransactionAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PartyNestedTransactionSZ
@@ -54,11 +49,6 @@ class CustomerTransactionAPI(viewsets.ModelViewSet):
 class VendorAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PartySZ
-    queryset = Party.objects.filter(type = 'Vendor').order_by('name')
-
-class VendorNestedAPI(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    serializer_class = PartyNestedSZ
     queryset = Party.objects.filter(type = 'Vendor').order_by('name')
 
 class VendorTransactionAPI(viewsets.ModelViewSet):
