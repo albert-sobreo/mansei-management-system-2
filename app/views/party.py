@@ -13,7 +13,6 @@ from rest_framework import viewsets
 from ..serializers import *
 from ..models import *
 from rest_framework.views import APIView
-import json
 import sweetify
 
 class VendorView(View):
