@@ -5,6 +5,7 @@ from django.http.response import JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
 from ..forms import *
+from rest_framework.views import APIView
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.decorators import login_required
@@ -12,7 +13,6 @@ from django.views.decorators.cache import never_cache
 from rest_framework import viewsets
 from ..serializers import *
 from ..models import *
-from rest_framework.views import APIView
 import sweetify
 
 class VendorView(View):
@@ -21,7 +21,10 @@ class VendorView(View):
 
 class CustomerView(View):
     def get(self, request):
-        return render(request, 'customers.html')
+        context = {
+            'customers': request.user.branch.party.filter(type='Customer')
+        }
+        return render(request, 'customers.html', context)
 
 class SaveParty(APIView):
     def post(self, request, format=None):
