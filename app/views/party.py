@@ -33,13 +33,21 @@ class SaveParty(APIView):
     def post(self, request, format=None):
         jsonParty = request.data
 
-        child = AccountChild()
-        
+        # child = AccountChild()
+        # child.code
+        # child.name
+
+        # child.accountSubGroup = AccountSubGroup.objects.get(name=)
+
+        # child.me
+        # child.contra
+        # child.amount 
+        # child.description
 
         party = Party()
         
 
-        party.accountChild = child
+        # party.accountChild = AccountChild.objects.get(name=jsonParty['accountChild'])
         party.name = jsonParty['name']
         party.type = jsonParty['type']
         party.shippingAddress = jsonParty['shippingAddress']
@@ -53,14 +61,14 @@ class SaveParty(APIView):
         party.tin = jsonParty['tin']
         party.crte = jsonParty['crte']
         party.prefferedPayment = jsonParty['prefferedPayment']
-        try:
-            party.me = Party.objects.get(pk=jsonParty['me'])
-        except Exception as e:
-            print(e)
+        # try:
+        #     party.me = Party.objects.get(pk=jsonParty['me'])
+        # except Exception as e:
+        #     print(e)
 
         party.save()
 
         request.user.branch.party.add(party)
 
-        sweetify.sweetalert(request, icon='success', title='Success!', text='{} has added to {}'.format(party.name, party.accountChild.name), persistent='Dismiss')
+        sweetify.sweetalert(request, icon='success', title='Success!', text='{} has been added as {}'.format(party.name, party.type), persistent='Dismiss')
         return JsonResponse(0, safe=False)
