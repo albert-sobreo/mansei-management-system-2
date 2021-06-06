@@ -15,11 +15,6 @@ from rest_framework.permissions import IsAuthenticated
 
 from datetime import datetime
 
-
-
-
-
-
 ########## CHART OF ACCOUNTS ##########
 class AccountGroupAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -35,3 +30,38 @@ class AccountSubGroupAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SubGroupSZ
     queryset = AccountSubGroup.objects.all().order_by('code')
+
+########## CUSTOMER ##########
+class CustomerAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PartySZ
+    queryset = Party.objects.filter(type = 'Customer').order_by('name')
+
+class CustomerNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PartyNestedSZ
+    queryset = Party.objects.filter(type = 'Customer').order_by('name')
+
+class CustomerTransactionAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PartyNestedTransactionSZ
+    queryset = Party.objects.filter(type = 'Customer').order_by('name')
+
+
+
+
+########## VENDOR ##########
+class VendorAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PartySZ
+    queryset = Party.objects.filter(type = 'Vendor').order_by('name')
+
+class VendorNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PartyNestedSZ
+    queryset = Party.objects.filter(type = 'Vendor').order_by('name')
+
+class VendorTransactionAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PartyNestedTransactionSZ
+    queryset = Party.objects.filter(type = 'Vendor').order_by('name')
