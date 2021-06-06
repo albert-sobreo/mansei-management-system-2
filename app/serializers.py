@@ -44,6 +44,7 @@ class PartyNestedTransactionSZ(serializers.ModelSerializer):
     purchaseorder = PurchaseOrderSZ(read_only = True, many = True)
     salescontract = SalesContractSZ(read_only = True, many = True)
     class Meta:
+        model = Party
         fields = '__all__'
         depth = 1
   
