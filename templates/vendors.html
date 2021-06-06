@@ -28,7 +28,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><span class="link">{{vendor.name}}</span></td>
+                    <td><span @click="viewVendor({{vendor.pk}})" data-toggle="modal" data-target="#vendorModal" class="link">{{vendor.name}}</span></td>
                     <td>{{vendor.email}}</td>
                     <td>{{vendor.mobile}}</td>
                     <td>{{vendor.contactPerson}}</td>
@@ -399,9 +399,9 @@
         },
 
         methods:{
-            viewVendor(name){
-                vendorObject = this.$root.$refs.table.items.find(x=>x.name===name)
-                this.vendorModal = vendorObject
+            viewVendor(id){
+                axios.get(`/api/vendor-transaction/${id}`)
+                .then(res=>this.vendorModal=res.data)
             },
             addVendorModalInitial(){
                 return{
