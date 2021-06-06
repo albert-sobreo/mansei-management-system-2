@@ -1,11 +1,11 @@
 {% extends "base-template.html" %}
-{% block title %}Customers{% endblock %}
+{% block title %}Vendors{% endblock %}
 
 {% block body %}
 
 <div id="app" v-cloak>
     <!-- NAVIGATION BAR -->
-    <navbar-gas active="nav-customers" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <navbar-gas active="nav-vendors" photo="/media/{{request.user.image}}"></navbar-gas>
     <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
     <app-card></app-card>
 
@@ -13,38 +13,37 @@
     <div class="container">
         <!-- TITLE BUTTONS -->
         <div class="d-flex align-items-center mb-3">
-            <span class="font-size-18 font-bold mr-1">Customers</span>
+            <span class="font-size-18 font-bold mr-1">Vendors</span>
         </div>
 
         <!-- TABLE -->
-        <!-- <customer-table></customer-table> -->
-        {% for customer in customers.all %}
+        <!-- <vendor-table></vendor-table> -->
+        {% for vendor in vendors.all %}
         <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
             <thead class="thead-dark">
-                <th>Customer</th>
+                <th>Vendor</th>
                 <th>Email</th>
                 <th>Mobile</th>
                 <th>Contact Person</th>
             </thead>
             <tbody>
                 <tr>
-                    <td><span class="link" data-toggle="modal" data-target="#customerModal">{{customer.name}}</span></td>
-                    <td>{{customer.email}}</td>
-                    <td>{{customer.mobile}}</td>
-                    <td>{{customer.contactPerson}}</td>
+                    <td><span class="link">{{vendor.name}}</span></td>
+                    <td>{{vendor.email}}</td>
+                    <td>{{vendor.mobile}}</td>
+                    <td>{{vendor.contactPerson}}</td>
                 </tr>
             </tbody>
         </table>
         {% endfor %}
-
-        <!-- VIEW CUSTOMER MODAL -->
-        <div class="modal fade" id="customerModal">
+        <!-- VIEW VENDOR MODAL -->
+        <div class="modal fade" id="vendorModal">
             <div class="modal-dialog">
                 <div class="modal-content b-radius-15">
                     <div class="modal-body">
                         <div class="row my-5">
                             <div class="col-12 d-flex justify-content-center">
-                                <h1 class="font-bold">[[customerModal.name]]</h1>
+                                <h1 class="font-bold">[[vendorModal.name]]</h1>
                             </div>
                         </div>
 
@@ -52,16 +51,16 @@
                         
                         <div class="row">
                             <div class="col-12">
-                                <span class="font-bold font-sizes-14">Customer Profile</span>
+                                <span class="font-bold font-sizes-14">Vendor Profile</span>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col d-flex flex-wrap mb-3">
-                                <div class="modal-info-container"><i class="fas fa-user mr-2 icon-gray"></i><span class="font-semibold">[[customerModal.contactPerson]]</span></div>
-                                <div class="modal-info-container"><i class="fas fa-phone-alt mr-2 icon-gray"></i><span class="font-semibold">[[customerModal.landline]]</span></div>
-                                <div class="modal-info-container"><i class="fas fa-mobile mr-2 icon-gray"></i><span class="font-semibold">[[customerModal.mobile]]</span></div>
-                                <div class="modal-info-container"><i class="fas fa-envelope mr-2 icon-gray"></i><span class="font-semibold">[[customerModal.email]]</span></div>
+                                <div class="modal-info-container"><i class="fas fa-user mr-2 icon-gray"></i><span class="font-semibold">[[vendorModal.contactPerson]]</span></div>
+                                <div class="modal-info-container"><i class="fas fa-phone-alt mr-2 icon-gray"></i><span class="font-semibold">[[vendorModal.landline]]</span></div>
+                                <div class="modal-info-container"><i class="fas fa-mobile mr-2 icon-gray"></i><span class="font-semibold">[[vendorModal.mobile]]</span></div>
+                                <div class="modal-info-container"><i class="fas fa-envelope mr-2 icon-gray"></i><span class="font-semibold">[[vendorModal.email]]</span></div>
                             </div>
                         </div>
 
@@ -73,8 +72,8 @@
 
                         <div class="row">
                             <div class="col d-flex flex-wrap mb-3">
-                                <div class="modal-info-container"><i class="fas fa-university mr-2 icon-gray"></i><span class="font-semibold">[[customerModal.bank]]</span></div>
-                                <div class="modal-info-container"><i class="fas fa-credit-card mr-2 icon-gray"></i><span class="font-semibold">[[customerModal.bankNo]]</span></div>
+                                <div class="modal-info-container"><i class="fas fa-university mr-2 icon-gray"></i><span class="font-semibold">[[vendorModal.bank]]</span></div>
+                                <div class="modal-info-container"><i class="fas fa-credit-card mr-2 icon-gray"></i><span class="font-semibold">[[vendorModal.bankNo]]</span></div>
                             </div>
                         </div>
 
@@ -86,7 +85,7 @@
 
                         <div class="row">
                             <div class="col d-flex flex-wrap mb-3">
-                                <div class="modal-info-container"><i class="fas fa-map-marker-alt mr-2 icon-gray"></i><span class="font-semibold">[[customerModal.shippingAddress]]</span></div>
+                                <div class="modal-info-container"><i class="fas fa-map-marker-alt mr-2 icon-gray"></i><span class="font-semibold">[[vendorModal.shippingAddress]]</span></div>
                             </div>
                         </div>
 
@@ -98,7 +97,7 @@
 
                         <div class="row">
                             <div class="col d-flex flex-wrap mb-3">
-                                <div class="modal-info-container"><i class="fas fa-map-marker-alt mr-2 icon-gray"></i><span class="font-semibold">[[customerModal.officeAddress]]</span></div>
+                                <div class="modal-info-container"><i class="fas fa-map-marker-alt mr-2 icon-gray"></i><span class="font-semibold">[[vendorModal.officeAddress]]</span></div>
                             </div>
                         </div>
 
@@ -110,8 +109,8 @@
 
                         <div class="row">
                             <div class="col d-flex flex-wrap mb-3">
-                                <div class="modal-info-container"><img src="/static/media/icons/tin.svg" alt="" class="mr-2"><span class="font-semibold">[[customerModal.tin]]</span></div>
-                                <div class="modal-info-container"><i class="fas fa-info-circle mr-2 icon-gray"></i><span class="font-semibold" v-if="customerModal.crte">With CRTE</span><span class="font-semibold" v-else>Without CRTE</span></div>
+                                <div class="modal-info-container"><img src="/static/media/icons/tin.svg" alt="" class="mr-2"><span class="font-semibold">[[vendorModal.tin]]</span></div>
+                                <div class="modal-info-container"><i class="fas fa-info-circle mr-2 icon-gray"></i><span class="font-semibold" v-if="vendorModal.crte">With CRTE</span><span class="font-semibold" v-else>Without CRTE</span></div>
                             </div>
                         </div>
 
@@ -123,13 +122,13 @@
 
                         <div class="row">
                             <div class="col d-flex flex-wrap mb-3">
-                                <div class="modal-info-container"><span class="font-semibold">[[customerModal.prefferedPayment]]</span></div>
+                                <div class="modal-info-container"><span class="font-semibold">[[vendorModal.prefferedPayment]]</span></div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col">
-                                <button class="btn btn-primary col">Edit Customer</button>
+                                <button class="btn btn-primary col">Edit Vendor</button>
                             </div>
                         </div>
 
@@ -165,13 +164,13 @@
             </div>
         </div>
 
-        <!-- ADD CUSTOMER MODAL -->
-        <div class="modal fade" id="addCustomerModal">
+        <!-- ADD VENDOR MODAL -->
+        <div class="modal fade" id="addVendorModal">
             <div class="modal-dialog">
                 <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
                     <div class="modal-body">
                         <div class="mb-4">
-                            <span class="modal-title">Add Customer</span>
+                            <span class="modal-title">Add Vendor</span>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -181,7 +180,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label>Name</label>
-                                    <input type="text" v-model="addCustomerModal.name" class="form-control" placeholder="Enter Customer Name">
+                                    <input type="text" v-model="addVendorModal.name" class="form-control" placeholder="Enter Vendor Name">
                                 </div>
                             </div>
                         </div>
@@ -190,7 +189,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label>Shipping Address</label>
-                                    <input type="text" v-model="addCustomerModal.shippingAddress" class="form-control" placeholder="Enter Shipping Address">
+                                    <input type="text" v-model="addVendorModal.shippingAddress" class="form-control" placeholder="Enter Shipping Address">
                                 </div>
                             </div>
                         </div>
@@ -199,7 +198,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label>Office Address</label>
-                                    <input type="text" v-model="addCustomerModal.officeAddress" class="form-control" placeholder="Enter Office Address">
+                                    <input type="text" v-model="addVendorModal.officeAddress" class="form-control" placeholder="Enter Office Address">
                                 </div>
                             </div>
                         </div>
@@ -208,13 +207,13 @@
                             <div class="col-6 pr-2">
                                 <div class="form-group">
                                     <label>Landline</label>
-                                    <input type="tel" v-model="addCustomerModal.landline" class="form-control" placeholder="Enter Landline">
+                                    <input type="tel" v-model="addVendorModal.landline" class="form-control" placeholder="Enter Landline">
                                 </div>
                             </div>
                             <div class="col-6 pl-2">
                                 <div class="form-group">
                                     <label>Mobile No.</label>
-                                    <input type="tel" v-model="addCustomerModal.mobile" class="form-control" placeholder="Enter Mobile No.">
+                                    <input type="tel" v-model="addVendorModal.mobile" class="form-control" placeholder="Enter Mobile No.">
                                 </div>
                             </div>
                         </div>
@@ -223,7 +222,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="email" v-model="addCustomerModal.email" class="form-control" placeholder="Enter Email">
+                                    <input type="email" v-model="addVendorModal.email" class="form-control" placeholder="Enter Email">
                                 </div>
                             </div>
                         </div>
@@ -232,7 +231,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label>Contact Person</label>
-                                    <input type="text" v-model="addCustomerModal.contactPerson" class="form-control" placeholder="Enter Contact Person">
+                                    <input type="text" v-model="addVendorModal.contactPerson" class="form-control" placeholder="Enter Contact Person">
                                 </div>
                             </div>
                         </div>
@@ -241,7 +240,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label>Bank</label>
-                                    <input type="text" v-model="addCustomerModal.bank" class="form-control" placeholder="Enter Bank">
+                                    <input type="text" v-model="addVendorModal.bank" class="form-control" placeholder="Enter Bank">
                                 </div>
                             </div>
                         </div>
@@ -249,8 +248,8 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label>Bank No. / Customer Account No.</label>
-                                    <input type="text" v-model="addCustomerModal.bankNo" class="form-control" placeholder="Enter Bank No.">
+                                    <label>Bank No. / Vendor Account No.</label>
+                                    <input type="text" v-model="addVendorModal.bankNo" class="form-control" placeholder="Enter Bank No.">
                                 </div>
                             </div>
                         </div>
@@ -259,7 +258,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label>TIN</label>
-                                    <input type="text" v-model="addCustomerModal.tin" class="form-control" placeholder="Enter TIN">
+                                    <input type="text" v-model="addVendorModal.tin" class="form-control" placeholder="Enter TIN">
                                 </div>
                             </div>
                         </div>
@@ -267,7 +266,7 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-check mb-2">
-                                    <input type="checkbox" v-model="addCustomerModal.crte" class="form-check-input">
+                                    <input type="checkbox" v-model="addVendorModal.crte" class="form-check-input">
                                     <label class="form-check-label font-semibold">With CRTE</label>
                                 </div>
                             </div>
@@ -277,7 +276,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label>Preferred Payment Method</label>
-                                    <select v-model="addCustomerModal.prefferedPayment" class="form-control py-0">
+                                    <select v-model="addVendorModal.prefferedPayment" class="form-control py-0">
                                         <option value="" selected disabled class="gray">Choose Preferred Payment Method</option>
                                         <option value="Cash">Cash</option>
                                         <option value="On Account">Account</option>
@@ -289,7 +288,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <button class="btn btn-primary mt-2 col" @click="submitAddCustomer()">Add Customer</button>
+                                <button class="btn btn-primary mt-2 col" @click="submitAddVendor()">Add Vendor</button>
                             </div>
                         </div>
                     </div>
@@ -297,7 +296,7 @@
             </div>
         </div>
     </div>
-    <pre>[[ $data ]]</pre>
+
 </div>
 
 {% endblock %}
@@ -358,16 +357,16 @@
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
-        el: '#app',
+        el: "#app",
 
-        data:{
+        data: {
             config: {
                 headers: {
                     "X-CSRFToken": getCookie('csrftoken')
                 }
             },
 
-            customerModal: {
+            vendorModal:{
                 name: null,
                 shippingAddress: null,
                 officeAddress: null,
@@ -382,9 +381,9 @@
                 prefferedPayment: null
             },
 
-            addCustomerModal:{
+            addVendorModal:{
                 name: null,
-                type: 'Customer',
+                type: 'Vendor',
                 shippingAddress: null,
                 officeAddress: null,
                 landline: null,
@@ -396,51 +395,51 @@
                 tin: null,
                 crte: null,
                 prefferedPayment: ''
-            },
+            }
         },
 
-        methods: {
-            viewCustomer(name){
-                customerObject = //ADD CUSTOMER API HERE
-                this.customerModal = customerObject
+        methods:{
+            viewVendor(name){
+                vendorObject = this.$root.$refs.table.items.find(x=>x.name===name)
+                this.vendorModal = vendorObject
             },
-            addCustomerModalInitial(){
+            addVendorModalInitial(){
                 return{
-                name: null,
-                type: 'Customer',
-                shippingAddress: null,
-                officeAddress: null,
-                landline: null,
-                mobile: null,
-                email: null,
-                contactPerson: null,
-                bank: null,
-                bankNo: null,
-                tin: null,
-                crte: null,
-                prefferedPayment: ''
+                    name: null,
+                    type: 'Vendor',
+                    shippingAddress: null,
+                    officeAddress: null,
+                    landline: null,
+                    mobile: null,
+                    email: null,
+                    contactPerson: null,
+                    bank: null,
+                    bankNo: null,
+                    tin: null,
+                    crte: null,
+                    prefferedPayment: ''
                 }
             },
-            submitAddCustomer(){
-                axios.post('/api/customer/', this.addCustomerModal, this.config)
+            submitAddVendor(){
+                axios.post('/api/vendor/', this.addVendorModal, this.config)
                 .then(res=>{
                     this.$root.$refs.table.loadData()
-                    var name = this.addCustomerModal.name
+                    var name = this.addVendorModal.name
                     Swal.fire({
-                        title: "Customer successfully added.",
-                        html: "<b>"+name+"</b>" + " added as customer.",
+                        title: "Vendor successfully added.",
+                        html: "<b>"+name+"</b>" + " added as vendor.",
                         icon: "success",
-                    });
-                })
-                .then(res=>this.addCustomerModal = this.addCustomerModalInitial())
-                .catch(err=>{
-                    Swal.fire({
-                        title: "Something went wrong",
-                        html: err,
-                        icon: "error"
+                    })
+                    .then(res=>this.addVendorModal = this.addVendorModalInitial())
+                    .catch(err=>{
+                        Swal.fire({
+                            title: "Something went wrong",
+                            html: err,
+                            icon: 'error'
+                        })
                     })
                 })
-            },
+            }
         },
 
         created() {
@@ -448,7 +447,5 @@
         },
     })
 </script>
-
-
 
 {% endblock %}
