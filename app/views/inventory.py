@@ -38,7 +38,9 @@ class AddMerchInventoryAPI(APIView):
         a.um = "Per Piece"
         a.totalCost = 0.0
         a.save()
-        a.warehouse.add(request.data['warehouse'])
+        for warehouse in request.data['warehouse']:
+            a.warehouse.add(warehouse)
+
         request.user.branch.merchInventory.add(a)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
