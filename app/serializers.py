@@ -2,7 +2,6 @@ from rest_framework import fields, serializers
 from .models import *
 
 ########## CHART OF ACCOUNTS ##########
-
 class AccountGroupSZ(serializers.ModelSerializer):
     class Meta:
         model = AccountGroup
@@ -18,8 +17,12 @@ class AccountChildSZ(serializers.ModelSerializer):
         model = AccountChild
         fields = '__all__'
 
-########## PARTY ##########
 
+
+
+
+
+########## PARTY ##########
 class PartySZ(serializers.ModelSerializer):
     class Meta:
         model = Party
@@ -47,4 +50,13 @@ class PartyNestedTransactionSZ(serializers.ModelSerializer):
         model = Party
         fields = '__all__'
         depth = 1
-  
+
+
+
+
+
+########## WAREHOUSE ##########
+class WarehouseSZ(serializers.ModelSerializer):
+    class Meta: 
+        model = Warehouse
+        fields = '__all__'

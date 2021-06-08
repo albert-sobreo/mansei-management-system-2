@@ -20,6 +20,9 @@ router.register(r"customer-transaction", views.CustomerTransactionAPI, 'customer
 router.register(r"vendor", views.VendorAPI, 'vendor')
 router.register(r"vendor-transaction", views.VendorTransactionAPI, 'vendor-transaction')
 
+########## WAREHOUSE ##########
+router.register(r"warehouse", views.WarehouseAPI, 'warehouse')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),

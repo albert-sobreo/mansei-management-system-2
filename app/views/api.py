@@ -53,3 +53,9 @@ class VendorTransactionAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PartyNestedTransactionSZ
     queryset = Party.objects.filter(type = 'Vendor').order_by('name')
+
+########## WAREHOUSE ##########
+class WarehouseAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = WarehouseSZ
+    queryset = Warehouse.objects.all()

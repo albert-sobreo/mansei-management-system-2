@@ -353,20 +353,7 @@
                 $("#loader").hide()
                 $('#table').show()
             }
-        });
-
-
-      
-
-
-
-
-        //MULTI-SELECT
-        $('option').mousedown(function(e) {
-            e.preventDefault();
-            $(this).prop('selected', !$(this).prop('selected'));
-            return false;
-        });
+        });        
     });
 </script>
 
@@ -445,6 +432,14 @@
         created() {
             this.$root.$refs.app = this;
         },
+        mounted(){
+            //MULTI-SELECT
+            $('option').mousedown(function(e) {
+                e.preventDefault();
+                $(this).prop('selected', !$(this).prop('selected'));
+                return false;
+            });
+        }
     })
 </script>
 
