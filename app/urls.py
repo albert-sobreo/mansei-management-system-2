@@ -1,3 +1,4 @@
+from app.views.inventory import AddMerchInventoryAPI
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.urls import urlpatterns
@@ -33,5 +34,6 @@ urlpatterns = [
     path('customers/', login_required(views.CustomerView.as_view())),
     path('vendors/', login_required(views.VendorView.as_view())),
     path('save-party/', login_required(views.SaveParty.as_view())),
-    path('merchinventory/', login_required(views.MerchInventoryView.as_view()))
+    path('merchinventory/', login_required(views.MerchInventoryView.as_view())),
+    path('addmerchinventory/', login_required(views.AddMerchInventoryAPI.as_view()))
 ]
