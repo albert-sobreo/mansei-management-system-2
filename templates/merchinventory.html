@@ -62,7 +62,7 @@
                 <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
                     <div class="modal-body">
                         <div class="mb-4">
-                            <span class="modal-title">Add Item Inventory</span>
+                            <span class="modal-title">Initialize Item</span>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -71,15 +71,21 @@
                             <div class="col px-1">
                                 <div class="form-group">
                                     <label>Item Code</label>
-                                    <input v-model="invModal.code" type="text" class="form-control">
+                                    <input v-model="invModal.code" type="text" class="form-control" placeholder="Enter Code">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col px-1">
+                            <div class="col-6 px-1">
                                 <div class="form-group">
-                                    <label>Item name</label>
-                                    <input v-model="invModal.name" type="text" class="form-control">
+                                    <label>Item Classification</label>
+                                    <input v-model="invModal.classification" type="text" class="form-control" placeholder="Enter Classification">
+                                </div>
+                            </div>
+                            <div class="col-6 px-1">
+                                <div class="form-group">
+                                    <label for="Item type">Item Type</label>
+                                    <input v-model="invModal.type" type="text" class="form-control" placeholder="Enter Type">
                                 </div>
                             </div>
                         </div>
@@ -87,19 +93,19 @@
                             <div class="col-4 px-1">
                                 <div class="form-group">
                                     <label>Length</label>
-                                    <input v-model="invModal.length" type="number" class="form-control">
+                                    <input v-model="invModal.length" type="number" class="form-control" placeholder="Enter Length">
                                 </div>
                             </div>
                             <div class="col-4 px-1">
                                 <div class="form-group">
                                     <label>Width</label>
-                                    <input v-model="invModal.width" type="number" class="form-control">
+                                    <input v-model="invModal.width" type="number" class="form-control" placeholder="Enter Width">
                                 </div>
                             </div>
                             <div class="col-4 px-1">
                                 <div class="form-group">
                                     <label>Thickness</label>
-                                    <input v-model="invModal.thickness" type="number" class="form-control">
+                                    <input v-model="invModal.thickness" type="number" class="form-control" placeholder="Enter Thickness">
                                 </div>
                             </div>
                         </div>
@@ -107,22 +113,21 @@
                             <div class="col-6 px-1">
                                 <div class="form-group">
                                     <label>Purchasing Price</label>
-                                    <input v-model="invModal.purchasingPrice" type="number" step="0.01" class="form-control">
+                                    <input v-model="invModal.purchasingPrice" type="number" step="0.01" class="form-control" placeholder="Enter Purchasing Price">
                                 </div>
                             </div>
                             <div class="col-6 px-1">
                                 <div class="form-group">
                                     <label>Selling Price</label>
-                                    <input v-model="invModal.sellingPrice" type="number" step="0.01" class="form-control">
+                                    <input v-model="invModal.sellingPrice" type="number" step="0.01" class="form-control" placeholder="Enter Selling Price">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col px-1">
                                 <div class="form-group">
-                                    <label>Warehouse</label>
+                                    <label>Choose Warehouse</label>
                                     <select v-model="invModal.warehouse" class="form-control" multiple>
-                                        <option value="" selected disabled>Choose Warehouse</option>
                                         <option v-for="item in warehouse" :value="item.id">[[item.name]]</option>
                                     </select>
                                 </div>
@@ -160,7 +165,8 @@
 
             invModal: {
                 code: null,
-                name: null,
+                classification: null,
+                type: null,
                 length: null,
                 width: null,
                 thickness: null,
@@ -172,7 +178,6 @@
                 um: 'Per Piece',
                 warehouse: [],
                 totalCost: 0
-                
             },
             warehouse: [],
             sizeUM: false,
@@ -209,29 +214,25 @@
                 this.roundToggle = !this.roundToggle
             },
             loadData(){
-                axios.get('/api/warehouse/')
+                axios.get('/addmerchinventory/')
                 .then(res=>this.warehouse = res.data)
             },
             submit(){
                 axios.post('/api/merchinventory/', this.invModal, this.config)
-                .then(res=>this.$root.$refs.table.loadData())
-                .then(res=>{
-                    Swal.fire({
-                        title: "Item Added",
-                        icon: 'success'
-                    })
-                })
-                .catch(err=>{
-                    console.log(err.request)
-                    Swal.fire({
-                        title: "Something went wrong.",
-                        html: err.request.response,
-                        icon: 'error',
-                    })
-                })
+                .then(res=>res.data==0?location.reload():'')
             }
         },
         mounted(){
+            this.loadData();
+            //MULTI-SELECT
+            
+            setTimeout(()=>{
+                $('option').mousedown(function(e) {
+                    e.preventDefault();
+                    $(this).prop('selected', !$(this).prop('selected'));
+                    return false;
+                });
+            }, 1000)
             
         }
     })
@@ -252,7 +253,7 @@
                     className: 'btn btn-warning btn-table',
                     titleAttr: 'Add Inventory',
                     action: function(){
-                        $("#addInventoryModal").modal('show')
+                        $("#addInventory").modal('show')
                     }
                 },
                 {
@@ -289,30 +290,31 @@
                         app.roundToggler()
                     }
                 }
-            ],
-            dom: {
-                button: {
-                    className: 'btn'
+                ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
                 }
-            }
-        },
-        "initComplete": function(){
-            $("#loader-container").hide()
-            $("#loader").hide()
-            $('#table').show()
-        },
-    });
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            },
+        
+        });
 
 
 
 
 
-    //MULTI-SELECT
-    $('option').mousedown(function(e) {
-        e.preventDefault();
-        $(this).prop('selected', !$(this).prop('selected'));
-        return false;
-    });  
+        //MULTI-SELECT
+        $('option').mousedown(function(e) {
+            e.preventDefault();
+            $(this).prop('selected', !$(this).prop('selected'));
+            return false;
+        });  
     });
 </script>
 
