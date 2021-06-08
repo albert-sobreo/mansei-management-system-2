@@ -38,5 +38,7 @@ urlpatterns = [
     path('vendors/', login_required(views.VendorView.as_view())),
     path('save-party/', login_required(views.SaveParty.as_view())),
     path('merchinventory/', login_required(views.MerchInventoryView.as_view())),
-    path('addmerchinventory/', login_required(views.AddMerchInventoryAPI.as_view()))
+    path('addmerchinventory/', login_required(views.AddMerchInventoryAPI.as_view())),
+    path('warehouse/', login_required(views.WarehouseView.as_view())),
+    path('addwarehouse/', login_required(views.AddWarehoseAPI.as_view()))
 ]
