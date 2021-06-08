@@ -33,4 +33,5 @@ urlpatterns = [
     path('customers/', login_required(views.CustomerView.as_view())),
     path('vendors/', login_required(views.VendorView.as_view())),
     path('save-party/', login_required(views.SaveParty.as_view())),
+    path('merchinventory/', login_required(views.MerchInventoryView.as_view()))
 ]

@@ -5,3 +5,4 @@ from .journal import *
 from .ledger import *
 from .api import *
 from .party import *
+from .inventory import *
