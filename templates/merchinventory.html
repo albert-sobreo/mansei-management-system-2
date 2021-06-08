@@ -128,7 +128,9 @@
                                 <div class="form-group">
                                     <label>Choose Warehouse</label>
                                     <select v-model="invModal.warehouse" class="form-control" multiple>
-                                        <option v-for="item in warehouse" :value="item.id">[[item.name]]</option>
+                                        <!-- <option v-for="item in warehouse" :value="item.id">[[item.name]]</option> -->
+                                        <option value="asdf">asdf</option>
+                                        <option value="fdsa">fdsa</option>
                                     </select>
                                 </div>
                             </div>
@@ -223,17 +225,11 @@
             }
         },
         mounted(){
-            this.loadData();
-            //MULTI-SELECT
-            
-            setTimeout(()=>{
-                $('option').mousedown(function(e) {
-                    e.preventDefault();
-                    $(this).prop('selected', !$(this).prop('selected'));
-                    return false;
-                });
-            }, 1000)
-            
+            this.loadData();       
+            $('option').mousedown(function(e) {
+                $(this).prop('selected', !$(this).prop('selected'));
+                return false;
+            });
         }
     })
 </script>
@@ -304,17 +300,6 @@
             },
         
         });
-
-
-
-
-
-        //MULTI-SELECT
-        $('option').mousedown(function(e) {
-            e.preventDefault();
-            $(this).prop('selected', !$(this).prop('selected'));
-            return false;
-        });  
     });
 </script>
 

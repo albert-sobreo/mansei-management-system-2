@@ -216,7 +216,7 @@ class MerchandiseInventory(models.Model):
         verbose_name_plural = "Merchandise Inventories"
 
     def __str__(self):
-        return self.name + " " + self.code
+        return self.code
 
 class PurchaseOrder(models.Model):
     code = models.CharField(max_length=50)
