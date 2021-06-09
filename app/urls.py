@@ -30,6 +30,10 @@ router.register(r'purchase-order-non-approved', views.PurchaseApprovalNonApprove
 router.register(r'purchase-order-approved', views.PurchaseApprovalApprovedAPI, 'purchase-order-approved')
 router.register(r'purchase-order', views.PurchaseOrderAPI, 'purchase-order')
 
+router.register(r'sales-contract-non-approved', views.SalesContractApprovalNonApprovedAPI, 'sales-contract-non-approved')
+router.register(r'sales-contract-approved', views.SalesContractApprovalApprovedAPI, 'sales-contract-approved')
+router.register(r'sales-contract', views.SalesContractAPI, 'sales-contract')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -57,7 +61,8 @@ urlpatterns = [
     path('purchase-order-list/', login_required(views.POListView.as_view())),
     path('sales-contract/', login_required(views.SalesContractView.as_view())),
     path('sc-list/', login_required(views.SCListView.as_view())),
-    path('save-sales-contract/', login_required(views.SaveSalesContract.as_view())),
+    path('save-temp-sc/', login_required(views.SaveSalesContract.as_view())),
     path('sc-nonapproved/', login_required(views.SCnonapprovedView.as_view())),
     path('sc-approved/', login_required(views.SCapprovedView.as_view())),
+    path('sales-contract-list/', login_required(views.SCListView.as_view()))
 ]

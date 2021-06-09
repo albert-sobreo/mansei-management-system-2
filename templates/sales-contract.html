@@ -48,9 +48,9 @@
                 </div>
                 <div class="col col-2 px-2">
                     <label>Tax Type</label>
-                    <select class="form-control">
+                    <select v-model='salesContract.taxType' class="form-control">
                         <option value="" selected disabled>Choose Tax Type</option>
-                        <option value="vat">VAT</option>
+                        <option value="VAT">VAT</option>
                     </select>
                 </div>
                 <div class="col col-2 pl-2">
@@ -258,14 +258,14 @@
                 }
             },
             salesContract: {
-                code: null,
+                code: '{{new_code}}',
                 date: new Date().toISOString().split('T')[0],
                 dateTimeCreated: new Date().toISOString(),
                 customer: '',
                 taxType: '',
                 taxRate: '',
                 items: [{
-                    code: '',
+                    code: null,
                     remaining: null,
                     quantity: null,
                     ppc: null,
@@ -456,24 +456,11 @@
             },
             submit(){
                 axios.post('/save-temp-sc/', this.salesContract, this.config)
-                .then(res=>this.salesContract = this.salesContractInitial())
-                .then(res=>{
-                    Swal.fire({
-                        title: "Sales Contract Successfully Requested.",
-                        icon: 'success',
-                    })
-                })
-                .catch(err=>{
-                    Swal.fire({
-                        title: "Something went wrong",
-                        html: err.message,
-                        icon: 'error'
-                    })
-                })
+                .then(res=>res.data==0?location.reload():'')
             },
             salesContractInitial(){
                 return {
-                    code: null,
+                    code: '{{new_code}}',
                     date: new Date().toISOString().split('T')[0],
                     dateTimeCreated: new Date().toISOString(),
                     customer: '',
