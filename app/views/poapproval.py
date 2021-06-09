@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from app.models import PurchaseOrder, Journal, JournalEntries, AccountChild
+from ..models import PurchaseOrder, Journal, JournalEntries, AccountChild
 from django import views
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import query
