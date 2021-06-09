@@ -1,6 +1,17 @@
 from rest_framework import fields, serializers
 from .models import *
 
+########## USER ###########
+class UserSZ(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
+
+
+
+
 ########## CHART OF ACCOUNTS ##########
 class AccountGroupSZ(serializers.ModelSerializer):
     class Meta:
@@ -71,3 +82,42 @@ class MerchandiseInventorySZ(serializers.ModelSerializer):
     class Meta:
         model = MerchandiseInventory
         fields = '__all__'
+
+class MerchandiseInventoryNestedSZ(serializers.ModelSerializer):
+    warehouse = WarehouseSZ(read_only=True, many=True)
+    class Meta:
+        model = MerchandiseInventory
+        fields = '__all__'
+
+
+
+
+
+########## JOURNAL ##########
+class JournalSZ(serializers.ModelSerializer):
+    class Meta:
+        model = Journal
+        fields = '__all__'
+
+
+
+
+
+########## PURCHASE ORDER ##########
+class POItemsMerchNestedSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = POItemsMerch
+        fields = '__all__'  
+        
+class PurchaseOrderNestedSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    createdBy = UserSZ(read_only=True)
+    approvedBy = UserSZ(read_only=True)
+    journal = JournalSZ(read_only=True)
+    poitemsmerch = POItemsMerchNestedSZ(read_only=False, many=True)
+
+    class Meta:
+        model = PurchaseOrder
+        fields = '__all__'
+        depth = 1

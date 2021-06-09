@@ -22,14 +22,13 @@
         <div class="d-flex align-items-center mb-3">
             <span class="font-size-18 font-bold mr-1">Purchase Order</span>
         </div>
-
         <!-- PURCHASE -->
         <div>
             <!-- REFERENCE NO AND DATES -->
             <div class="row">
                 <div class="col col-3 pr-2">
                     <label>Reference No.</label>
-                    <input v-model="purchaseOrder.code" type="text" class="form-control" name="code" placeholder="Enter Reference No.">
+                    <input v-model="purchaseOrder.code" type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
                 </div>
                 <div class="col col-2 px-2">
                     <label>Date</label>
@@ -74,7 +73,7 @@
                         <label for="order-quantity" class="m-0">Order Qty</label>
                     </div>
                     <div class="col-2 px-1">
-                        <label for="order-quantity" class="m-0">Purchasing Price</label>
+                        <label for="order-quantity" class="m-0">Purchasing Price <span class="font-size-10 gray">Total</span></label>
                     </div>
                     <div class="col-2 px-1">
                         <label for="cost-per-item" class="m-0">Input VAT</label>
@@ -251,7 +250,7 @@
                     </div>
                 </div>
             </div>
-            <div @click="submit()" class="container-extend border container-extend btn-bottom">
+            <div @click="checkForm()" class="container-extend border container-extend btn-bottom">
                 Save
             </div>
         </div>
@@ -279,7 +278,7 @@
                 'Manufacturing'
             ],
             purchaseOrder:{
-                code: null,
+                code: '{{new_code}}',
                 date: new Date().toISOString().split('T')[0],
                 dateTimeCreated: new Date().toISOString(),
                 retroactive: null,
@@ -311,6 +310,7 @@
             },
             vendor: [],
             merchandiseInventory: [],
+            errors: []
 
         },
         computed: {
@@ -371,6 +371,46 @@
                     })
                 })
             },
+
+            checkForm(e){
+                if (
+                    this.purchaseOrder.code &&
+                    this.purchaseOrder.date &&
+                    this.purchaseOrder.vendor &&
+                    this.purchaseOrder.amountPaid &&
+                    this.purchaseOrder.paymentMethod &&
+                    this.purchaseOrder.paymentPeriod 
+                    ){
+
+                    this.submit()
+                    return false
+                }
+
+                if (!this.purchaseOrder.code){
+                    this.errors.push('Code Required')
+                }
+                if (!this.purchaseOrder.date){
+                    this.errors.push('Date Required')
+                }
+                if (!this.purchaseOrder.vendor){
+                    this.errors.push('Vendor Required')
+                }
+                if (!this.purchaseOrder.amountPaid){
+                    this.errors.push('Amount Paid Required')
+                }
+                if (!this.purchaseOrder.paymentMethod){
+                    this.errors.push("Payment Method Required")
+                }
+                if (!this.purchaseOrder.paymentPeriod){
+                    this.errors.push('Payment Period Required')
+                }
+
+                Swal.fire({
+                    title: "Unfilled Inputs",
+                    html: this.errors.join('<br>'),
+                    icon: 'warning'
+                })
+            },
             
             formatPrice(val){
                 val = Number(val).toFixed(2)
@@ -383,7 +423,7 @@
 
             purchaseOrderInitial(){
                 return{
-                    code: null,
+                    code: '{{new_code}}',
                     date: new Date().toISOString().split('T')[0],
                     dateTimeCreated: new Date().toISOString(),
                     retroactive: null,
@@ -443,22 +483,7 @@
             submit(){
                 if(this.purchaseOrder.amountDue >= this.purchaseOrder.amountPaid){
                     axios.post('/save-purchase-order/', this.purchaseOrder, this.config)
-                    .then(res=>this.loadData())
-                    .then(res=>this.purchaseOrder = this.purchaseOrderInitial())
-                    .then(res=>{
-                        Swal.fire({
-                            title: "Purchase Order Saved",
-                            icon: 'success',
-                        })
-                    })
-                    .catch(err=>{
-                        console.log(err.response)
-                        Swal.fire({
-                            title: "Something went wrong.",
-                            html: 'Make sure all necessary fields are filled.',
-                            icon: 'warning'
-                        })
-                    })
+                    .then(res=>res.data==0?location.reload():'')
                 } else {
                     Swal.fire({
                         title: 'Something went wrong',
