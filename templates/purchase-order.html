@@ -385,7 +385,7 @@
                     this.submit()
                     return false
                 }
-
+                this.errors = []
                 if (!this.purchaseOrder.code){
                     this.errors.push('Code Required')
                 }

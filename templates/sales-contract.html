@@ -234,7 +234,7 @@
                     </div>
                 </div>
             </div>
-            <div @click="submit()" class="container-extend border container-extend btn-bottom">
+            <div @click="checkForm()" class="container-extend border container-extend btn-bottom">
                 Save
             </div>
         </div>
@@ -286,6 +286,7 @@
             },
             merchItems: [],
             customers: [],
+            errors: []
 
         },
 
@@ -357,6 +358,48 @@
 
                 axios.get('/api/customer/')
                 .then(res=>this.customers = res.data)
+            },
+
+            checkForm(){
+                if (
+                    this.salesContract.code &&
+                    this.salesContract.date &&
+                    this.salesContract.customer &&
+                    this.salesContract.taxType &&
+                    this.salesContract.taxRate &&
+                    this.salesContract.subTotal &&
+                    this.salesContract.discount
+                    ){
+                    this.submit()
+                    return false
+                }
+                if(!this.salesContract.code){
+                    this.errors.push('Code Required')
+                }
+                if(!this.salesContract.date){
+                    this.errors.push('Date Required')
+                }
+                if(!this.salesContract.customer){
+                    this.errors.push('Customer Required')
+                }
+                if(!this.salesContract.taxType){
+                    this.errors.push('Tax Type Required')
+                }
+                if(!this.salesContract.taxRate){
+                    this.errors.push('Tax Rate Required')
+                }
+                if(!this.salesContract.subTotal){
+                    this.errors.push('Sub Total Required')
+                }
+                if(!this.salesContract.discount){
+                    this.errors.push('Discount Required')
+                }
+
+                Swal.fire({
+                    title: "Unfilled Inputs",
+                    html: this.errors.join('<br>'),
+                    icon: 'warning'
+                })
             },
             
             addItemLine(){
