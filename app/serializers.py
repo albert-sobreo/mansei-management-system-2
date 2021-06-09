@@ -60,3 +60,14 @@ class WarehouseSZ(serializers.ModelSerializer):
     class Meta: 
         model = Warehouse
         fields = '__all__'
+
+
+
+
+
+
+########## MERCH INVENTORY ##########
+class MerchandiseInventorySZ(serializers.ModelSerializer):
+    class Meta:
+        model = MerchandiseInventory
+        fields = '__all__'

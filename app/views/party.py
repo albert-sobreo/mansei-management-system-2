@@ -15,6 +15,7 @@ from ..serializers import *
 from ..models import *
 import sweetify
 from datetime import date as now
+
 class VendorView(View):
     def get(self, request):
         context = {

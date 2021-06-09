@@ -59,3 +59,9 @@ class WarehouseAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = WarehouseSZ
     queryset = Warehouse.objects.all()
+
+########## MERCH INVENTORY ##########
+class MerchandiseInventoryAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = MerchandiseInventorySZ
+    queryset = MerchandiseInventory.objects.all()

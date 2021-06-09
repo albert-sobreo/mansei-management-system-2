@@ -1,4 +1,3 @@
-from app.views.inventory import AddMerchInventoryAPI
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.urls import urlpatterns
@@ -23,6 +22,9 @@ router.register(r"vendor-transaction", views.VendorTransactionAPI, 'vendor-trans
 ########## WAREHOUSE ##########
 router.register(r"warehouse", views.WarehouseAPI, 'warehouse')
 
+########## MERCH INVENTORY ##########
+router.register(r"merchinventory", views.MerchandiseInventoryAPI, 'merchinvetory')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -40,5 +42,6 @@ urlpatterns = [
     path('merchinventory/', login_required(views.MerchInventoryView.as_view())),
     path('addmerchinventory/', login_required(views.AddMerchInventoryAPI.as_view())),
     path('warehouse/', login_required(views.WarehouseView.as_view())),
-    path('addwarehouse/', login_required(views.AddWarehoseAPI.as_view()))
+    path('addwarehouse/', login_required(views.AddWarehoseAPI.as_view())),
+    path('purchase-order/', login_required(views.PurchaseOrderView.as_view())),
 ]
