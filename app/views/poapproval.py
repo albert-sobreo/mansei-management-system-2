@@ -71,7 +71,7 @@ class POApprovalAPI(APIView):
         je.accountChild.save()
         je.balance = je.accountChild.amount
         je.save()
-        request.user.branch.journal.add(je)
+        request.user.branch.journalEntries.add(je)
 
         je = JournalEntries()
 
@@ -85,7 +85,7 @@ class POApprovalAPI(APIView):
                 je.accountChild.save()
                 je.balance = je.accountChild.amount
                 je.save()
-                request.user.branch.journal.add(je)
+                request.user.branch.journalEntries.add(je)
             elif purchase.paymentMethod == 'Cash in Bank':
                 je.journal = j
                 je.normally = 'Credit'
@@ -95,7 +95,7 @@ class POApprovalAPI(APIView):
                 je.accountChild.save()
                 je.balance = je.accountChild.amount
                 je.save()
-                request.user.branch.journal.add(je)
+                request.user.branch.journalEntries.add(je)
         elif purchase.paymentPeriod == 'Partial Payment':
             if purchase.paymentMethod == 'Cash on Hand':
                 je.journal = j
@@ -106,7 +106,7 @@ class POApprovalAPI(APIView):
                 je.accountChild.save()
                 je.balance = je.accountChild.amount
                 je.save()
-                request.user.branch.journal.add(je)
+                request.user.branch.journalEntries.add(je)
 
                 payables = JournalEntries()
 
@@ -118,7 +118,7 @@ class POApprovalAPI(APIView):
                 je.accountChild.save()
                 payables.balance = je.accountChild.amount
                 payables.save()
-                request.user.branch.journal.add(payables)
+                request.user.branch.journalEntries.add(payables)
 
             elif purchase.paymentMethod == 'Cash in Bank':
                 je.journal = j
@@ -129,7 +129,7 @@ class POApprovalAPI(APIView):
                 je.accountChild.save()
                 je.balance = je.accountChild.amount
                 je.save()
-                request.user.branch.journal.add(je)
+                request.user.branch.journalEntries.add(je)
 
                 payables = JournalEntries()
 
@@ -141,7 +141,7 @@ class POApprovalAPI(APIView):
                 je.accountChild.save()
                 payables.balance = je.accountChild.amount
                 payables.save()
-                request.user.branch.journal.add(payables)
+                request.user.branch.journalEntries.add(payables)
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
