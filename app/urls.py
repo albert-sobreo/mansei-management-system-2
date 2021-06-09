@@ -64,5 +64,6 @@ urlpatterns = [
     path('save-temp-sc/', login_required(views.SaveSalesContract.as_view())),
     path('sc-nonapproved/', login_required(views.SCnonapprovedView.as_view())),
     path('sc-approved/', login_required(views.SCapprovedView.as_view())),
-    path('sales-contract-list/', login_required(views.SCListView.as_view()))
+    path('sales-contract-list/', login_required(views.SCListView.as_view())),
+    path('sales-contract/<int:pk>/', login_required(views.SCApprovalAPI.as_view()))
 ]

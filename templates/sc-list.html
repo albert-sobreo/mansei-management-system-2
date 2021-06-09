@@ -306,33 +306,6 @@
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
             },
-            approveSC(id){
-                $("#scModal").modal('hide')
-                this.updateSC = this.scModal
-                this.updateSC.approved = true
-                this.updateSC.party = this.updateSC.party.id
-                this.updateSC.createdBy = this.updateSC.createdBy.id
-                this.updateSC.datetimeApproved = new Date().toISOString()
-
-                try{
-                    this.updateSC.approvedBy = this.updateSC.approvedBy.id
-                }
-                catch(e){
-                    
-                }
-
-                axios.put(`/sales-contract/${id}/`, this.updateSC, this.config)
-                .then(res=>this.$root.$refs.table.loadData())
-                .catch(err=>{
-                    console.log(this.updateSC)
-                    console.log(err.request)
-                    Swal.fire({
-                        title: 'Something went wrong.',
-                        html: err,
-                        icon: 'error'
-                    })
-                })
-            }
         },
         created(){
             this.$root.$refs.app = this
