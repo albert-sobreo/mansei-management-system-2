@@ -121,3 +121,26 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
         model = PurchaseOrder
         fields = '__all__'
         depth = 1
+
+
+
+
+
+########## SALES CONTRACT ##########
+class SCItemsMerchNestedSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = TempSCItemsMerch
+        fields= '__all__'
+
+class SalesContractNestedSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    createdBy = UserSZ(read_only=True)
+    approvedBy = UserSZ(read_only=True)
+    journal = JournalSZ(read_only=True)
+    tempscitemsmerch = SCItemsMerchNestedSZ(read_only=True, many=True)
+
+    class Meta:
+        model = TempSalesContract
+        fields = '__all__'
+        depth = 1

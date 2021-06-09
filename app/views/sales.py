@@ -58,33 +58,35 @@ class SaveSalesContract(APIView):
 
         sc.code = salesContract['code']
         sc.datetimeCreated = salesContract['dateTimeCreated']
-
-        if salesContract['retroactive']:
-            sc.dateSold = salesContract['retroactive']
-        else:
-            sc.dateSold = salesContract['date']
+        sc.dateSold = salesContract['date']
 
         sc.party = Party.objects.get(pk=salesContract['customer'])
         
-        for atc in salesContract['atc']:
-            sc.atcCode = atc['code']
-            sc.amountWithheld = atc['amountWithheld']
+        # for atc in salesContract['atc']:
+        #     sc.atcCode = atc['code']
+        #     sc.amountWithheld = atc['amountWithheld']
         
-        sc.amountPaid = Decimal(salesContract['amountPaid'])
-        sc.amountDue = Decimal(salesContract['amountDue'])
+        sc.subTotal = salesContract['subTotal']
+        if salesContract['discountType'] == 'percent':
+            sc.discountPercent = salesContract['totalDiscount']
+        elif salesContract['discountType'] == 'peso':
+            sc.discountPeso = salesContract['totalDiscount']
+
+        sc.taxPeso = salesContract['tax']
+        sc.totalCost = salesContract['total']
         
-        sc.paymentMethod = salesContract['paymentMethod']
-        sc.paymentPeriod = salesContract['paymentPeriod']
-        sc.chequeNo = salesContract['chequeNo']
-        sc.dueDate = salesContract['dueDate']
-        sc.bank = salesContract['bank']
-        sc.remarks = salesContract['remarks']
+        # sc.paymentMethod = salesContract['paymentMethod']
+        # sc.paymentPeriod = salesContract['paymentPeriod']
+        # sc.chequeNo = salesContract['chequeNo']
+        # sc.dueDate = salesContract['dueDate']
+        # sc.bank = salesContract['bank']
+        # sc.remarks = salesContract['remarks']
         
         if request.user.is_authenticated:
             sc.createdBy = request.user
 
         sc.save()
-        request.user.branch.purchaseOrder.add(sc)
+        request.user.branch.salesContract.add(sc)
 
         for item in salesContract['items']:
             scitemsmerch = TempSCItemsMerch()
@@ -92,10 +94,19 @@ class SaveSalesContract(APIView):
             scitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
             scitemsmerch.remaining = item['remaining']
             scitemsmerch.qty = item['quantity']
-            scitemsmerch.totalCost = Decimal(item['totalCost'])
+            scitemsmerch.totalCost = Decimal(item['total'])
 
             print(scitemsmerch.totalCost)
             
             scitemsmerch.save()
             request.user.branch.scitemsMerch.add(scitemsmerch)
+
+        for fee in salesContract['otherFees']:
+            f = TempSCOtherFees()
+            f.salesContract = sc
+            f.fee = fee['fee']
+            f.description = fee['description']
+            f.save()
+            request.user.branch.tempSCOtherFees.add(f)
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

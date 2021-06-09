@@ -155,7 +155,7 @@ class SCapprovedView(View):
 
         user = request.user
         context = {
-            'sale': user.branch.salesContract.filter(approved=True),
+            'sales': user.branch.salesContract.filter(approved=True),
         }
         return render(request, 'sc-approved.html', context)
 
@@ -164,7 +164,7 @@ class SCnonapprovedView(View):
 
         user = request.user
         context = {
-            'sale': user.branch.salesContract.filter(approved=False),
+            'sales': user.branch.salesContract.filter(approved=False),
         }
         return render(request, 'sc-nonapproved.html', context)
 
