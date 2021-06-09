@@ -23,9 +23,9 @@ class PurchaseOrderView(View):
         user = request.user
 
         try:
-            po = user.branch.purchase_order.latest('pk')
+            po = user.branch.purchaseOrder.latest('pk')
 
-            listed_code = po.ref_id.split('-')
+            listed_code = po.code.split('-')
             listed_date = str(now.today()).split('-')
 
             current_code = int(listed_code[3])
