@@ -23,7 +23,7 @@ class POapprovedView(View):
         context = {
             'purchase': user.branch.purchaseOrder.filter(approved=True),
         }
-        return render(request, 'po-aprroved.html', context)
+        return render(request, 'po-approved.html', context)
 
 class POnonapprovedView(View):
     def get(self, request, format=None):
@@ -32,7 +32,7 @@ class POnonapprovedView(View):
         context = {
             'purchase': user.branch.purchaseOrder.filter(approved=False),
         }
-        return render(request, 'po-nonaprroved.html', context)
+        return render(request, 'po-nonapproved.html', context)
 
 class POApprovalAPI(APIView):
     def put(self, request, pk, format = None):
@@ -71,7 +71,7 @@ class POApprovalAPI(APIView):
         je.accountChild.save()
         je.balance = je.accountChild.amount
         je.save()
-        request.user.branch.journal.add(je)
+        request.user.branch.journalEntries.add(je)
 
         je = JournalEntries()
 
@@ -85,7 +85,7 @@ class POApprovalAPI(APIView):
                 je.accountChild.save()
                 je.balance = je.accountChild.amount
                 je.save()
-                request.user.branch.journal.add(je)
+                request.user.branch.journalEntries.add(je)
             elif purchase.paymentMethod == 'Cash in Bank':
                 je.journal = j
                 je.normally = 'Credit'
@@ -95,7 +95,7 @@ class POApprovalAPI(APIView):
                 je.accountChild.save()
                 je.balance = je.accountChild.amount
                 je.save()
-                request.user.branch.journal.add(je)
+                request.user.branch.journalEntries.add(je)
         elif purchase.paymentPeriod == 'Partial Payment':
             if purchase.paymentMethod == 'Cash on Hand':
                 je.journal = j
@@ -106,19 +106,19 @@ class POApprovalAPI(APIView):
                 je.accountChild.save()
                 je.balance = je.accountChild.amount
                 je.save()
-                request.user.branch.journal.add(je)
+                request.user.branch.journalEntries.add(je)
 
                 payables = JournalEntries()
 
                 payables.journal = j
                 payables.normally = "Credit"
-                payables.accountChild = AccountChild.objects.get(name="Accounts Payables")
+                payables.accountChild = purchase.party.accountChild.get(name="Trade Receivable - " + purchase.party.name)
                 payables.amount = purchase.amountDue - purchase.amountPaid
                 payables.accountChild.amount += je.amount
                 je.accountChild.save()
                 payables.balance = je.accountChild.amount
                 payables.save()
-                request.user.branch.journal.add(payables)
+                request.user.branch.journalEntries.add(payables)
 
             elif purchase.paymentMethod == 'Cash in Bank':
                 je.journal = j
@@ -129,19 +129,19 @@ class POApprovalAPI(APIView):
                 je.accountChild.save()
                 je.balance = je.accountChild.amount
                 je.save()
-                request.user.branch.journal.add(je)
+                request.user.branch.journalEntries.add(je)
 
                 payables = JournalEntries()
 
                 payables.journal = j
                 payables.normally = "Credit"
-                payables.accountChild = AccountChild.objects.get(name="Accounts Payables")
+                payables.accountChild = purchase.party.accountChild.get(name="Trade Receivable - " + purchase.party.name)
                 payables.amount = purchase.amountDue - purchase.amountPaid
                 payables.accountChild.amount += je.amount
                 je.accountChild.save()
                 payables.balance = je.accountChild.amount
                 payables.save()
-                request.user.branch.journal.add(payables)
+                request.user.branch.journalEntries.add(payables)
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
