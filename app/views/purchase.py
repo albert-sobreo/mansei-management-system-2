@@ -50,7 +50,7 @@ class POListView(View):
     def get(self, request, format=None):
         return render(request, 'po-list.html')
 
-class SavePurchseOrderView(APIView):
+class SavePurchaseOrder(APIView):
     def post(self, request, format = None):
         purchaseOrder = request.data
 

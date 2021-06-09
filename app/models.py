@@ -441,7 +441,7 @@ class Branch(models.Model):
     merchInventory = models.ManyToManyField(MerchandiseInventory, blank = True)
     purchaseOrder = models.ManyToManyField(PurchaseOrder, blank = True)
     poitemsMerch = models.ManyToManyField(POItemsMerch, blank = True)
-    salesContract = models.ManyToManyField(SalesContract, blank = True)
+    salesContract = models.ManyToManyField(TempSalesContract, blank = True)
     scitemsMerch = models.ManyToManyField(SCItemsMerch, blank = True)
     driver = models.ManyToManyField(Driver, blank = True)
     truck = models.ManyToManyField(Truck, blank = True)
