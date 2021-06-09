@@ -65,5 +65,12 @@ urlpatterns = [
     path('sc-nonapproved/', login_required(views.SCnonapprovedView.as_view())),
     path('sc-approved/', login_required(views.SCapprovedView.as_view())),
     path('sales-contract-list/', login_required(views.SCListView.as_view())),
-    path('sales-contract/<int:pk>/', login_required(views.SCApprovalAPI.as_view()))
+    path('sales-contract/<int:pk>/', login_required(views.SCApprovalAPI.as_view())),
+    path('deliveries/', login_required(views.DeliveriesView.as_view())),
+    path('trucks/', login_required(views.TruckView.as_view())),
+    path('drivers/', login_required(views.DriverView.as_view())),
+    path('truck-in-transit/', login_required(views.InTransitView.as_view())),
+    path('delivery-logs/', login_required(views.DeliveryLogsView.as_view())),
+    path('return-truck/', login_required(views.ReturnTruck.as_view())),
+    path('save-delivery/', login_required(views.SaveDelivery.as_view())),
 ]

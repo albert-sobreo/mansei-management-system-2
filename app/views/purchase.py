@@ -100,4 +100,5 @@ class SavePurchaseOrder(APIView):
             
             poitemsmerch.save()
             request.user.branch.poitemsMerch.add(poitemsmerch)
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

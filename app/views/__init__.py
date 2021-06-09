@@ -10,3 +10,4 @@ from .warehouse import *
 from .purchase import *
 from .approval import *
 from .sales import *
+from .delveries import *
