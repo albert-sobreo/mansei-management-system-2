@@ -177,10 +177,10 @@ class SCApprovalAPI(APIView):
         sale.approved = True
         sale.approvedBy = request.user
         
-        for element in purchase.poitemsmerch.all():
-            element.merchInventory.qtyA += element.qty
-            element.merchInventory.qtyT = element.merchInventory.qtyA + element.merchInventory.qtyR
-            element.merchInventory.totalCost += element.totalPrice                
+        for element in sale.tempscitemsmerch.all():
+            element.merchInventory.qtyA -= element.qty
+            element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
+            element.merchInventory.totalCost -= element.totalPrice                
             element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
             element.merchInventory.save()
 
