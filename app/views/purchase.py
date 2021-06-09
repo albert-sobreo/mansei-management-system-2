@@ -100,4 +100,4 @@ class SavePurchseOrderView(APIView):
             
             poitemsmerch.save()
             request.user.branch.poitemsMerch.add(poitemsmerch)
-        return JsonResponse('success', safe=False)
+        return JsonResponse(0, safe=False)

@@ -65,3 +65,9 @@ class MerchandiseInventoryAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = MerchandiseInventorySZ
     queryset = MerchandiseInventory.objects.all()
+
+########## ACCOUNTING APPROVALS ##########
+class PurchaseApprovalNonApprovedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PurchaseOrderNestedSZ
+    queryset = PurchaseOrder.objects.filter(approved = False).order_by('datetimeCreated').reverse()

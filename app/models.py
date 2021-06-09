@@ -262,7 +262,7 @@ class POItemsMerch(models.Model):
         verbose_name_plural = "PO Items Merchs"
 
     def __str__(self):
-        return self.merchInventory.name
+        return self.purchaseOrder.code + " - " + self.merchInventory.code
 
 class SalesContract(models.Model):
     code = models.CharField(max_length=50)

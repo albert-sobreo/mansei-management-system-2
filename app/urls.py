@@ -25,6 +25,9 @@ router.register(r"warehouse", views.WarehouseAPI, 'warehouse')
 ########## MERCH INVENTORY ##########
 router.register(r"merchinventory", views.MerchandiseInventoryAPI, 'merchinvetory')
 
+########## ACCOUNTING APPROVALS ##########
+router.register(r'purchase-order-non-approved', views.PurchaseApprovalNonApprovedAPI, 'purchase-order-non-approved')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -46,4 +49,6 @@ urlpatterns = [
     path('purchase-order/', login_required(views.PurchaseOrderView.as_view())),
     path('po-list/', login_required(views.POListView.as_view())),
     path('save-purchase-order/', login_required(views.SavePurchseOrderView.as_view())),
+    path('po-nonapproved/', login_required(views.POnonapprovedView.as_view())),
+    path('po-approved/', login_required(views.POapprovedView.as_view()))
 ]
