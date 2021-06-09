@@ -71,3 +71,8 @@ class PurchaseApprovalNonApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseOrderNestedSZ
     queryset = PurchaseOrder.objects.filter(approved = False).order_by('datetimeCreated').reverse()
+
+class PurchaseApprovalApprovedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PurchaseOrderNestedSZ
+    queryset = PurchaseOrder.objects.filter(approved = True).order_by('datetimeCreated').reverse()

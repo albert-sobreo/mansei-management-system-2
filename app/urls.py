@@ -27,6 +27,7 @@ router.register(r"merchinventory", views.MerchandiseInventoryAPI, 'merchinvetory
 
 ########## ACCOUNTING APPROVALS ##########
 router.register(r'purchase-order-non-approved', views.PurchaseApprovalNonApprovedAPI, 'purchase-order-non-approved')
+router.register(r'purchase-order-approved', views.PurchaseApprovalApprovedAPI, 'purchase-order-approved')
 
 urlpatterns = [
     path('api/', include(router.urls)),
