@@ -1,0 +1,466 @@
+{% extends 'base-template.html' %}
+{% block title %}Sales Contract{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION -->
+    <navbar-gas active="nav-sales" photo="/media/{{request.user.image}}"></navbar-gas>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAVIGATION -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/sales-contract/" class="active-gas mx-2">Create</a>
+                <a href="/sales-contract-list/" class="mx-2">SC List</a>
+            </div>
+        </div>
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Sales Contract</span>
+        </div>
+
+        <!-- SALES CONTRACT -->
+        <div>
+            <!-- REFERENCE -->
+            <div class="row">
+                <div class="col col-3 pr-2">
+                    <label>Reference No.</label>
+                    <input type="text" v-model="salesContract.code" class="form-control" name="code" placeholder="Enter Reference No.">
+                </div>
+                <div class="col col-2 px-2">
+                    <label>Date</label>
+                    <input type="date" v-model="salesContract.date" class="form-control" name="date">
+                </div>
+            </div>
+
+            <!-- CUSTOMER -->
+            <div class="row mt-2 mb-4">
+                <div class="col col-3 pr-2">
+                    <label>Customer</label>
+                    <select v-model="salesContract.customer" class="form-control">
+                        <option value="" selected disabled>Choose Customer</option>
+                        <option v-for="customer in customers" :value="customer.id">[[customer.name]]</option>
+                    </select>
+                </div>
+                <div class="col col-2 px-2">
+                    <label>Tax Type</label>
+                    <select class="form-control">
+                        <option value="" selected disabled>Choose Tax Type</option>
+                        <option value="vat">VAT</option>
+                    </select>
+                </div>
+                <div class="col col-2 pl-2">
+                    <label>Tax Rate</label>
+                    <select v-model="salesContract.taxRate" class="form-control">
+                        <option value="" selected disabled>Choose Tax Rate</option>
+                        <option value="3">3%</option>
+                        <option value="12">12%</option>
+                        <option value="30">30%</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- SALES ITEMS AND DETAILS -->
+            <div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
+                <div class="row">
+                    <div class="col px-1">
+                        <label class="m-0">Item Code - Item name - LxWxT</label>
+                    </div>
+                    <div class="col-1 px-1">
+                        <label class="m-0">On-hand</label>
+                    </div>
+                    <div class="col-1 px-1">
+                        <label class="m-0">Qty</label>
+                    </div>
+                    <div class="col-1 px-1">
+                        <label class="m-0">CBM</label>
+                    </div>
+                    <div class="col-1 px-1">
+                        <label class="m-0">Vol</label>
+                    </div>
+                    <div class="col-2 px-1">
+                        <label class="m-0">PPC <span class="gray">₱</span></label>
+                    </div>
+                    <div class="col-2 px-1">
+                        <label class="m-0">Total <span class="gray">₱</span></label>
+                    </div>
+                    <i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
+                </div>
+                <!-- V-FOR ITEMS -->
+                <div class="row" v-for="(item, index) in salesContract.items">
+                    <div class="col px-1">
+                        <select @change="getAll(item.code, index)" v-model="item.code" class="form-control">
+                            <option value="" selected disabled>Choose Item</option>
+                            <option v-for="merch in merchItems" :value="merch.id">[[merch.code]] - [[merch.name]] - [[roundNumber0(merch.length)]]x[[roundNumber0(merch.width)]]x[[roundNumber0(merch.thickness)]]</option>
+                        </select>
+                    </div>
+                    <div class="col-1 px-1">
+                        <input v-model="item.remaining" type="number" class="form-control" readonly>
+                    </div>
+                    <div class="col-1 px-1">
+                        <input v-model="item.quantity" @change="onForTotalCost(index)" type="number" class="form-control">
+                    </div>
+                    <div class="col-1 px-1">
+                        <select class="form-control">
+                            <option value="m3">M3</option>
+                        </select>
+                    </div>
+                    <div class="col-1 px-1">
+                        <input v-model="item.vol" type="number" class="form-control" readonly>
+                    </div>
+                    <div class="col-2 px-1">
+                        <input v-model="item.pricePerCubic" type="number" step="0.01" class="form-control" readonly>
+                    </div>
+                    <div class="col-2 px-1">
+                        <input v-model="item.total" type="number" step="0.01" class="form-control" readonly>
+                    </div>
+                    <i @click="removeItem(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
+                </div>
+                <!-- ADD NEW LINE -->
+                <div class="row">
+                    <div class="col px-1">
+                        <button @click="addItemLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
+                    </div>
+                </div>
+                <!-- DELIVERY FEES AND AMOUNT -->
+                <div class="row mt-2">
+                    <div class="col-6 pl-0">
+                        <div class="p-4 order-card-darker b-radius-15">
+                            <div class="row">
+                                <div class="col px-1">
+                                    <label>Other Fees</label>
+                                </div>
+                                <div class="col-7 px-1">
+                                    <label>Description</label>
+                                </div>
+                                <i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
+                            </div>
+                            <div class="row" v-for="(item, index) in salesContract.otherFees">
+                                <div class="col px-1">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input v-model="item.fee" type="number" step="0.01" class="form-control box-shadow-off">
+                                    </div>
+                                </div>
+                                <div class="col-7 px-1">
+                                    <input v-model="item.description" type="text" class="form-control">
+                                </div>
+                                <i @click="removeFee(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
+                            </div>
+                            <!-- ADD NEW LINE -->
+                            <div class="row">
+                                <div class="col px-1">
+                                    <button @click="addFeeLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- TOTALS -->
+                    <div class="col-3 offset-3 pl-0">
+                        <div class="p-4 order-card-darker b-radius-15">
+                            <div class="d-flex align-items-center">
+                                <div class="col-4 d-flex p-0 justify-content-end">
+                                    <label>Subtotal</label>
+                                </div>
+                                <div class="col-8 m-0 px-1 justify-self-end">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input v-model="salesContract.subTotal" type="number" step="0.01" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="col-4 d-flex p-0 justify-content-end">
+                                    <label>Discounts</label>
+                                </div>
+                                <div class="col-8 m-0 px-1 justify-self-end">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" v-if="salesContract.discountType=='peso'">₱</span>
+                                            <span class="input-group-text" v-else>%</span>
+                                        </div>
+                                        <input v-model="salesContract.discount" type="number" step="0.01" class="form-control box-shadow-off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="col-4 d-flex p-0 justify-content-end">
+                                    <label style="color: rgba(0,0,0,0)">Discounts</label>
+                                </div>
+                                <div class="col-8 m-0 px-1 justify-self-end">
+                                    <div class="col ml-2 form-check form-check-inline">
+                                        <input v-model="salesContract.discountType" value="percent" name="radios" type="radio" class="form-check-input">
+                                        <label class="form-check-label mr-2">%</label>
+                                        <input v-model="salesContract.discountType" value="peso" name="radios" type="radio" class="form-check-input">
+                                        <label class="form-check-label">₱</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="col-4 d-flex p-0 justify-content-end">
+                                    <label>Tax</label>
+                                </div>
+                                <div class="col-8 m-0 px-1 justify-self-end">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input v-model="salesContract.tax" type="number" step="0.01" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="col-4 d-flex p-0 justify-content-end">
+                                    <label class="font-size-14">TOTAL</label>
+                                </div>
+                                <div class="col-8 m-0 px-1 justify-self-end">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input v-model="salesContract.total" type="number" step="0.01" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div @click="submit()" class="container-extend border container-extend btn-bottom">
+                Save
+            </div>
+        </div>
+    </div>
+    <pre>[[$data]]</pre>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data:{
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            salesContract: {
+                code: null,
+                date: new Date().toISOString().split('T')[0],
+                dateTimeCreated: new Date().toISOString(),
+                customer: '',
+                taxType: '',
+                taxRate: '',
+                items: [{
+                    code: '',
+                    remaining: null,
+                    quantity: null,
+                    ppc: null,
+                    vol: null,
+                    cbm: null,
+                    total: 0,
+                }],
+                otherFees: [{
+                    fee: 0,
+                    description: null
+                }],
+                subTotal: 0,
+                discountType: 'percent',
+                discount: 0,
+                totalDiscount: 0,
+                tax: 0,
+                total: 0,
+            },
+            merchItems: [],
+            customers: [],
+
+        },
+
+        computed:{
+            itemTotal(){
+                return this.salesContract.items.map(item=>item.total)
+            },
+            otherFeesTotal(){
+                return this.salesContract.otherFees.map(item=>item.fee)
+            },
+            discount(){
+                return this.salesContract.discount
+            },
+            discountType(){
+                return this.salesContract.discountType
+            },
+            taxRate(){
+                return this.salesContract.taxRate
+            },
+            subTotal(){
+                return this.salesContract.subTotal
+            }
+        },
+
+        watch:{
+            subTotal(){
+                this.salesContract.tax = (this.salesContract.taxRate/100) * this.salesContract.subTotal
+                this.salesContract.total = this.salesContract.subTotal - this.salesContract.totalDiscount + this.salesContract.tax
+            },
+            taxRate(){
+                this.salesContract.tax = (this.salesContract.taxRate/100) * this.salesContract.subTotal
+                this.salesContract.total = this.salesContract.subTotal - this.salesContract.totalDiscount + this.salesContract.tax
+            },
+            otherFeesTotal(){
+                this.salesContract.subTotal = ((this.itemTotal.reduce((a,b)=>Number(a)+Number(b),0)) + (this.otherFeesTotal.reduce((a,b)=>Number(a)+Number(b),0)))
+                this.salesContract.total = this.salesContract.subTotal - this.salesContract.totalDiscount + this.salesContract.tax
+            },
+            itemTotal(){
+                console.log('i was here')
+                this.salesContract.subTotal = ((this.itemTotal.reduce((a,b)=>Number(a)+Number(b),0)) + (this.otherFeesTotal.reduce((a,b)=>Number(a)+Number(b),0)))
+                this.salesContract.total = this.salesContract.subTotal - this.salesContract.totalDiscount + this.salesContract.tax
+            },
+            discount(){
+                if (this.salesContract.discountType == 'percent'){
+                    this.salesContract.totalDiscount = (this.salesContract.subTotal*(this.salesContract.discount / 100))
+                    this.salesContract.total = this.salesContract.subTotal - this.salesContract.totalDiscount + this.salesContract.tax
+                }
+                else if (this.salesContract.discountType == 'peso'){
+                    this.salesContract.totalDiscount = this.salesContract.discount
+                    this.salesContract.total = this.salesContract.subTotal - this.salesContract.totalDiscount + this.salesContract.tax
+                }
+            },
+            discountType(){
+                if (this.salesContract.discountType == 'percent'){
+                    this.salesContract.totalDiscount = (this.salesContract.subTotal*(this.salesContract.discount / 100))
+                    this.salesContract.total = this.salesContract.subTotal - this.salesContract.totalDiscount + this.salesContract.tax
+                }
+                else if (this.salesContract.discountType == 'peso'){
+                    this.salesContract.totalDiscount = this.salesContract.discount
+                    this.salesContract.total = this.salesContract.subTotal - this.salesContract.totalDiscount + this.salesContract.tax
+                }
+            }
+        },
+
+        methods: {
+            loadData(){
+                axios.get('/api/merchinventory/')
+                .then(res=>this.merchItems = res.data)
+
+                axios.get('/api/customer/')
+                .then(res=>this.customers = res.data)
+            },
+            
+            addItemLine(){
+                this.salesContract.items.push({
+                    code: '',
+                    remaining: null,
+                    quantity: null,
+                    pricePerCubic: null,
+                    vol: null,
+                    cbm: null,
+                    total: 0,
+                })
+            },
+            addFeeLine(){
+                this.salesContract.otherFees.push({
+                    fee: null,
+                    description: null
+                })
+            },
+
+            getAll(id, index){
+                item = this.merchItems.find(x=>x.id==id)
+                this.salesContract.items[index].remaining = item.qtyA
+                this.salesContract.items[index].vol = this.roundNumber4(item.vol)
+                this.salesContract.items[index].pricePerCubic = this.roundNumber2(item.pricePerCubic)
+            },
+
+            removeItem(index){
+                this.$delete(this.salesContract.items, index)
+            },
+
+            removeFee(index){
+                this.$delete(this.salesContract.otherFees, index)
+            },
+
+            roundNumber0(value){
+                let val = (value/1).toFixed(0)
+                return val
+            },
+
+            roundNumber2(value) {
+                let val = (value/1).toFixed(2)
+                return val
+            },
+
+            roundNumber4(value) {
+                let val = (value/1).toFixed(4)
+                return val
+            },
+            onForTotalCost(index){
+                row = this.salesContract.items[index]
+                row.total = Number((row.vol * row.pricePerCubic * row.quantity)).toFixed(2)
+            },
+            submit(){
+                axios.post('/save-temp-sc/', this.salesContract, this.config)
+                .then(res=>this.salesContract = this.salesContractInitial())
+                .then(res=>{
+                    Swal.fire({
+                        title: "Sales Contract Successfully Requested.",
+                        icon: 'success',
+                    })
+                })
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        html: err.message,
+                        icon: 'error'
+                    })
+                })
+            },
+            salesContractInitial(){
+                return {
+                    code: null,
+                    date: new Date().toISOString().split('T')[0],
+                    dateTimeCreated: new Date().toISOString(),
+                    customer: '',
+                    taxType: '',
+                    taxRate: '',
+                    items: [{
+                        code: '',
+                        remaining: null,
+                        quantity: null,
+                        ppc: null,
+                        vol: null,
+                        cbm: null,
+                        total: 0,
+                    }],
+                    otherFees: [{
+                        fee: 0,
+                        description: null
+                    }],
+                    subTotal: 0,
+                    discountType: 'percent',
+                    discount: 0,
+                    totalDiscount: 0,
+                    tax: 0,
+                    total: 0,
+                }
+            }
+        },
+        mounted(){
+            this.loadData()
+        }
+    })
+</script>
+
+{% endblock %}
