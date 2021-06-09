@@ -181,7 +181,7 @@ class SCApprovalAPI(APIView):
             element.merchInventory.qtyA -= element.qty
             element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
             element.merchInventory.totalCost += element.totalCost                
-            element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
+            # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
             element.merchInventory.save()
 
         sale.save()
@@ -200,7 +200,7 @@ class SCApprovalAPI(APIView):
         je.journal = j
         je.normally = 'Credit'
         je.accountChild = AccountChild.objects.get(name='Merchandise Inventory')
-        je.amount = sale.amountDue
+        je.amount = sale.totalCost
         je.accountChild.amount -= je.amount
         je.accountChild.save()
         je.balance = je.accountChild.amount
@@ -209,73 +209,16 @@ class SCApprovalAPI(APIView):
 
         je = JournalEntries()
 
-        if sale.paymentPeriod == 'Full Payment':
-            if sale.paymentMethod == 'Cash on Hand':
-                je.journal = j
-                je.normally = 'Debit'
-                je.accountChild = AccountChild.objects.get(name="Cash on Hand")
-                je.amount = sale.amountPaid
-                je.accountChild.amount += je.amount
-                je.accountChild.save()
-                je.balance = je.accountChild.amount
-                je.save()
-                request.user.branch.journalEntries.add(je)
-            elif sale.paymentMethod == 'Cash in Bank':
-                je.journal = j
-                je.normally = 'Debit'
-                je.accountChild = AccountChild.objects.get(name="Cash in Bank")
-                je.amount = sale.amountPaid
-                je.accountChild.amount += je.amount
-                je.accountChild.save()
-                je.balance = je.accountChild.amount
-                je.save()
-                request.user.branch.journalEntries.add(je)
-        # elif sale.paymentPeriod == 'Partial Payment':
-        #     if sale.paymentMethod == 'Cash on Hand':
-        #         je.journal = j
-        #         je.normally = 'Debit'
-        #         je.accountChild = AccountChild.objects.get(name="Cash on Hand")
-        #         je.amount = sale.amountPaid
-        #         je.accountChild.amount += je.amount
-        #         je.accountChild.save()
-        #         je.balance = je.accountChild.amount
-        #         je.save()
-        #         request.user.branch.journalEntries.add(je)
+        je.journal = j
+        je.normally = 'Debit'
+        je.accountChild = AccountChild.objects.get(name="Cash on Hand")
+        je.amount = sale.totalCost
+        je.accountChild.amount += je.amount
+        je.accountChild.save()
+        je.balance = je.accountChild.amount
+        je.save()
+        request.user.branch.journalEntries.add(je)
 
-        #         receivables = JournalEntries()
-
-        #         receivables.journal = j
-        #         receivables.normally = "Debit"
-        #         receivables.accountChild = sale.party.accountChild.get(name="Trade Receivable - " + sale.party.name)
-        #         receivables.amount = sale.amountDue - sale.amountPaid
-        #         receivables.accountChild.amount += je.amount
-        #         je.accountChild.save()
-        #         receivables.balance = je.accountChild.amount
-        #         receivables.save()
-        #         request.user.branch.journalEntries.add(receivables)
-
-        #     elif sale.paymentMethod == 'Cash in Bank':
-        #         je.journal = j
-        #         je.normally = 'Debit'
-        #         je.accountChild = AccountChild.objects.get(name="Cash in Bank")
-        #         je.amount = sale.amountPaid
-        #         je.accountChild.amount += je.amount
-        #         je.accountChild.save()
-        #         je.balance = je.accountChild.amount
-        #         je.save()
-        #         request.user.branch.journalEntries.add(je)
-
-        #         receivables = JournalEntries()
-
-        #         receivables.journal = j
-        #         receivables.normally = "Debit"
-        #         receivables.accountChild = sale.party.accountChild.get(name="Trade Receivable - " + sale.party.name)
-        #         receivables.amount = sale.amountDue - sale.amountPaid
-        #         receivables.accountChild.amount += je.amount
-        #         je.accountChild.save()
-        #         receivables.balance = je.accountChild.amount
-        #         receivables.save()
-        #         request.user.branch.journalEntries.add(receivables)
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
