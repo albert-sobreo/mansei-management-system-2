@@ -44,4 +44,6 @@ urlpatterns = [
     path('warehouse/', login_required(views.WarehouseView.as_view())),
     path('addwarehouse/', login_required(views.AddWarehoseAPI.as_view())),
     path('purchase-order/', login_required(views.PurchaseOrderView.as_view())),
+    path('po-list/', login_required(views.POListView.as_view())),
+    path('save-purchase-order/', login_required(views.SavePurchseOrderView.as_view())),
 ]
