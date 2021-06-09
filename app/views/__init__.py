@@ -9,3 +9,4 @@ from .inventory import *
 from .warehouse import *
 from .purchase import *
 from .poapproval import *
+from .sales import *

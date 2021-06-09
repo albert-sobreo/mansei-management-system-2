@@ -51,5 +51,7 @@ urlpatterns = [
     path('save-purchase-order/', login_required(views.SavePurchseOrderView.as_view())),
     path('po-nonapproved/', login_required(views.POnonapprovedView.as_view())),
     path('po-approved/', login_required(views.POapprovedView.as_view())),
-    path('po-approval/', login_required(views.POApprovalAPI.as_view()))
+    path('po-approval/', login_required(views.POApprovalAPI.as_view())),
+    path('sales-contract/', login_required(views.SalesContractView.as_view())),
+    path('sc-list/', login_required(views.SCListView.as_view())),
 ]
