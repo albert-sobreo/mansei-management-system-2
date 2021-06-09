@@ -23,7 +23,7 @@ class POapprovedView(View):
         context = {
             'purchase': user.branch.purchaseOrder.filter(approved=True),
         }
-        return render(request, 'po-approved.html', context)
+        return render(request, 'po-aprroved.html', context)
 
 class POnonapprovedView(View):
     def get(self, request, format=None):
@@ -32,7 +32,7 @@ class POnonapprovedView(View):
         context = {
             'purchase': user.branch.purchaseOrder.filter(approved=False),
         }
-        return render(request, 'po-nonapproved.html', context)
+        return render(request, 'po-nonaprroved.html', context)
 
 class POApprovalAPI(APIView):
     def put(self, request, pk, format = None):
@@ -143,7 +143,6 @@ class POApprovalAPI(APIView):
                 payables.save()
                 request.user.branch.journal.add(payables)
         
-
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
     
