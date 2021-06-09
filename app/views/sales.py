@@ -50,54 +50,52 @@ class SCListView(View):
     def get(self, request, format=None):
         return render(request, 'sc-list.html')
 
-# class SavePurchseOrderView(APIView):
-#     def post(self, request, format = None):
-#         purchaseOrder = request.data
+class SaveSalesContract(APIView):
+    def post(self, request, format = None):
+        salesContract = request.data
 
-#         po = PurchaseOrder()
+        sc = TempSalesContract()
 
-#         po.code = purchaseOrder['code']
-#         po.datetimeCreated = purchaseOrder['dateTimeCreated']
+        sc.code = salesContract['code']
+        sc.datetimeCreated = salesContract['dateTimeCreated']
 
-#         if purchaseOrder['retroactive']:
-#             po.datePurchased = purchaseOrder['retroactive']
-#         else:
-#             po.datePurchased = purchaseOrder['date']
+        if salesContract['retroactive']:
+            sc.dateSold = salesContract['retroactive']
+        else:
+            sc.dateSold = salesContract['date']
 
-#         po.party = Party.objects.get(pk=purchaseOrder['vendor'])
+        sc.party = Party.objects.get(pk=salesContract['customer'])
         
-#         for atc in purchaseOrder['atc']:
-#             po.atcCode = atc['code']
-#             po.amountWithheld = atc['amountWithheld']
+        for atc in salesContract['atc']:
+            sc.atcCode = atc['code']
+            sc.amountWithheld = atc['amountWithheld']
         
-#         po.amountPaid = Decimal(purchaseOrder['amountPaid'])
-#         po.amountDue = Decimal(purchaseOrder['amountDue'])
+        sc.amountPaid = Decimal(salesContract['amountPaid'])
+        sc.amountDue = Decimal(salesContract['amountDue'])
         
-#         po.paymentMethod = purchaseOrder['paymentMethod']
-#         po.paymentPeriod = purchaseOrder['paymentPeriod']
-#         po.chequeNo = purchaseOrder['chequeNo']
-#         po.dueDate = purchaseOrder['dueDate']
-#         po.bank = purchaseOrder['bank']
-#         po.remarks = purchaseOrder['remarks']
+        sc.paymentMethod = salesContract['paymentMethod']
+        sc.paymentPeriod = salesContract['paymentPeriod']
+        sc.chequeNo = salesContract['chequeNo']
+        sc.dueDate = salesContract['dueDate']
+        sc.bank = salesContract['bank']
+        sc.remarks = salesContract['remarks']
         
-#         if request.user.is_authenticated:
-#             po.createdBy = request.user
+        if request.user.is_authenticated:
+            sc.createdBy = request.user
 
-#         po.save()
-#         request.user.branch.purchaseOrder.add(po)
+        sc.save()
+        request.user.branch.purchaseOrder.add(sc)
 
-#         for item in purchaseOrder['items']:
-#             poitemsmerch = POItemsMerch()
-#             poitemsmerch.purchaseOrder = po
-#             poitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
-#             poitemsmerch.remaining = item['remaining']
-#             poitemsmerch.qty = item['quantity']
-#             poitemsmerch.purchasingPrice = Decimal(item['vatable'])
-#             poitemsmerch.totalPrice = Decimal(item['totalCost'])
-#             poitemsmerch.inputVat = Decimal(item['inputVAT'])
+        for item in salesContract['items']:
+            scitemsmerch = TempSCItemsMerch()
+            scitemsmerch.salesContract = sc
+            scitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
+            scitemsmerch.remaining = item['remaining']
+            scitemsmerch.qty = item['quantity']
+            scitemsmerch.totalCost = Decimal(item['totalCost'])
 
-#             print(poitemsmerch.purchasingPrice, poitemsmerch.totalPrice, poitemsmerch.inputVat)
+            print(scitemsmerch.totalCost)
             
-#             poitemsmerch.save()
-#             request.user.branch.poitemsMerch.add(poitemsmerch)
-#         return JsonResponse(0, safe=False)
+            scitemsmerch.save()
+            request.user.branch.scitemsMerch.add(scitemsmerch)
+        return JsonResponse(0, safe=False)
