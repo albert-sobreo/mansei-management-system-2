@@ -43,6 +43,7 @@ class JournalView(View):
 
         context = {
             'new_code': new_code,
+            'journals': request.user.branch.journal.all().order_by('datetimeCreated').reverse()
         }
         return render(request, 'journal.html', context)
 

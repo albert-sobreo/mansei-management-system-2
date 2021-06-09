@@ -1,5 +1,5 @@
 {% extends 'base-template.html' %}
-{% block title %}Purchase Order | Pending{% endblock %}
+{% block title %}Purchase Order | Approved{% endblock %}
 
 {% block body %}
 
@@ -14,8 +14,8 @@
         <!-- MORE NAVIGATION -->
         <div class="d-flex font-semibold mb-2 justify-content-center">
             <div class="justify-content-center c-nav-links gas-nav">
-                <a href="/po-nonapproved/" class="active-gas mx-2">Pending</a>
-                <a href="/po-approved/" class="mx-2">Approved</a>
+                <a href="/po-nonapproved/" class="mx-2">Pending</a>
+                <a href="/po-approved/" class="active-gas mx-2">Approved</a>
             </div>
         </div>
         <!-- TITLE AND BUTTONS -->
@@ -63,7 +63,7 @@
                             </div>
                             <div class="col-3 mt-3">
                                 <label class="gray">Status</label><br>
-                                <span class="font-size-14 font-bold">Pending</span>
+                                <span class="font-size-14 font-bold">Approved</span>
                             </div>
                             <div class="col-3 mt-3">
                                 <label class="gray">Created By</label><br>
@@ -157,7 +157,7 @@
                             <table class="table table-sm table-striped">
                                 <thead>
                                     <th><span class="font-bold gray">Type</span></th>
-                                    <th><span class="font-bold gray">Item Code - Item Classifcation</span></th>
+                                    <th><span class="font-bold gray">Item Code - Item name</span></th>
                                     <th><span class="font-bold gray">Qty</span></th>
                                     <th><span class="font-bold gray">Amount</span></th>
                                     <th><span class="font-bold gray">Input VAT</span></th>
@@ -166,7 +166,7 @@
                                 <tbody>
                                     <tr v-for="item in poModal.poitemsmerch">
                                         <td>Merchandise</td>
-                                        <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
+                                        <td>[[item.merchInventory.code]] - [[item.merchInventory.name]]</td>
                                         <td>[[item.qty]]</td>
                                         <td>₱[[formatPrice(item.purchasingPrice)]]</td>
                                         <td>[[formatPrice(item.inputVat)]]%</td>
@@ -176,11 +176,7 @@
                             </table>
                         </div>
                         <!-- APPROVE BUTTON -->
-                        <div class="row">
-                            <div class="col">
-                                <button class="col btn btn-primary" @click="approvePO([[poModal.id]])">Approve</button>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -192,6 +188,7 @@
 {% endblock %}
 
 {% block scripts %}
+
 <script>
     $(document).ready(function() {
         $('#table').DataTable({
@@ -288,7 +285,7 @@
         methods: {
             viewPO(code){
                 console.log(code)
-                axios.get(`/api/purchase-order-non-approved/${code}/`)
+                axios.get(`/api/purchase-order-approved/${code}/`)
                 .then(res=>this.poModal=res.data)
             },
             roundNumber2(value) {
@@ -333,7 +330,7 @@
                 month = months[value.getMonth()]
                 date = value.getDate()
                 hour = (value.getHours() + 24) % 12 || 12; 
-                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                minute = value.getMinutes()
                 day = days[value.getDay()]
                 meridian = value.getHours() >= 12 ? 'pm' : 'am'
                 formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
@@ -348,16 +345,7 @@
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
             },
-            approvePO(id){
-                $("#poModal").modal('hide')
-                this.updatePO = this.poModal
-                this.updatePO.datetimeApproved = new Date().toISOString()
-
-                axios.put(`/po-approval/${id}/`, this.updatePO, this.config)
-                .then(res=>res.data==0?location.reload():'')
-            }
-        },
+        }
     })
 </script>
-
 {% endblock %}

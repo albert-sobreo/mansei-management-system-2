@@ -23,7 +23,7 @@ class POapprovedView(View):
         context = {
             'purchase': user.branch.purchaseOrder.filter(approved=True),
         }
-        return render(request, 'po-aprroved.html', context)
+        return render(request, 'po-approved.html', context)
 
 class POnonapprovedView(View):
     def get(self, request, format=None):
@@ -32,7 +32,7 @@ class POnonapprovedView(View):
         context = {
             'purchase': user.branch.purchaseOrder.filter(approved=False),
         }
-        return render(request, 'po-nonaprroved.html', context)
+        return render(request, 'po-nonapproved.html', context)
 
 class POApprovalAPI(APIView):
     def put(self, request, pk, format = None):
@@ -57,7 +57,7 @@ class POApprovalAPI(APIView):
         j.code = purchase.code
         j.datetimeCreated = purchase.datetimeApproved
         j.createdBy = purchase.createdBy
-        j.journalDate = purchase.datetimeApproved
+        j.journalDate = (purchase.datetimeApproved).split('T')[0]
         j.save()
         request.user.branch.journal.add(j)
 
@@ -112,7 +112,7 @@ class POApprovalAPI(APIView):
 
                 payables.journal = j
                 payables.normally = "Credit"
-                payables.accountChild = AccountChild.objects.get(name="Accounts Payables")
+                payables.accountChild = purchase.party.accountChild.get(name="Trade Receivable - " + purchase.party.name)
                 payables.amount = purchase.amountDue - purchase.amountPaid
                 payables.accountChild.amount += je.amount
                 je.accountChild.save()
@@ -135,7 +135,7 @@ class POApprovalAPI(APIView):
 
                 payables.journal = j
                 payables.normally = "Credit"
-                payables.accountChild = AccountChild.objects.get(name="Accounts Payables")
+                payables.accountChild = purchase.party.accountChild.get(name="Trade Receivable - " + purchase.party.name)
                 payables.amount = purchase.amountDue - purchase.amountPaid
                 payables.accountChild.amount += je.amount
                 je.accountChild.save()
