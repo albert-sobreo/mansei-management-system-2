@@ -353,7 +353,7 @@
                 this.updatePO = this.poModal
                 this.updatePO.datetimeApproved = new Date().toISOString()
 
-                axios.put(`/purchase-order/${id}/`, this.updatePO, this.config)
+                axios.put(`/po-approval/${id}/`, this.updatePO, this.config)
                 .then(res=>res.data==0?location.reload():'')
             }
         },

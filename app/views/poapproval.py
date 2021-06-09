@@ -57,7 +57,7 @@ class POApprovalAPI(APIView):
         j.code = purchase.code
         j.datetimeCreated = purchase.datetimeApproved
         j.createdBy = purchase.createdBy
-        j.journalDate = purchase.datetimeApproved
+        j.journalDate = (purchase.datetimeApproved).split('T')[0]
         j.save()
         request.user.branch.journal.add(j)
 
