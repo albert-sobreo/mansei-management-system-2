@@ -44,6 +44,23 @@ class TruckView(View):
         return render(request, 'trucks.html')
 
 class DriverView(View):
+    def post(self, request, format=None):
+        request.data = json.loads(request.body)
+        jsonDriver = request.data
+
+        driver = Driver()
+
+        driver.driverID = jsonDriver['driverID']
+        driver.firstName = jsonDriver['firstName']
+        driver.lastName = jsonDriver['lastName']
+        driver.status = jsonDriver['status']
+
+        driver.save()
+        request.user.branch.truck.add(driver)
+
+        sweetify.sweetalert(request, icon="success", title="Success!", text="{} {} with plate {} has been added as truck.".format(driver.driverID, driver.firstName, driver.lastName), persistent="Dismiss")
+        return JsonResponse(0, safe=False)
+
     def get(self, request, format=None):
         return render(request, 'drivers.html')
 
