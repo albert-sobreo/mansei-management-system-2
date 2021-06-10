@@ -180,3 +180,61 @@ class SpecialTruckSZ(serializers.ModelSerializer):
         model = Deliveries
         fields = "__all__"
         depth = 1
+
+########## LEDGER SPECIAL SERIALIZERS ##########
+class SubGroupForLedgerSZ(serializers.ModelSerializer):
+    accountGroup = AccountGroupSZ(read_only=True)
+    class Meta:
+        model = AccountSubGroup
+        fields = '__all__'
+
+class ChildForLedger(serializers.ModelSerializer):
+    accountSubGroup = SubGroupForLedgerSZ(read_only=True)
+    me = AccountChildSZ(read_only=True)
+    me_too = serializers.SerializerMethodField()
+    class Meta:
+        model = AccountChild
+        fields = [
+            'id',
+            'code',
+            'name',
+            'accountSubGroup',
+            'me',
+            'contra',
+            'amount',
+            'description',
+            'me_too'
+        ]
+
+    def get_me_too(self, thisObj):
+        me_too = thisObj.me_too()
+
+        return AccountChildSZ(instance=me_too, many=True).data
+
+class JournalEntriesForLedger(serializers.ModelSerializer):
+    journal = JournalSZ(read_only=True)
+    accountChild = ChildForLedger(read_only=True)
+    class Meta:
+        model = JournalEntries
+        fields = '__all__'
+
+class LedgerSZ(serializers.ModelSerializer):
+    journalEntries = serializers.SerializerMethodField()
+    accountSubGroup = SubGroupForLedgerSZ(read_only=True)
+    class Meta:
+        model = AccountChild
+        fields = [
+            'id',
+            'code',
+            'name',
+            'accountSubGroup',
+            'me',
+            'contra',
+            'amount',
+            'description',
+            'journalEntries',
+        ]
+    def get_journalEntries(self, thisObj):
+        journalEntries = thisObj.journalentries.all()
+
+        return JournalEntriesForLedger(instance=journalEntries, many=True).data

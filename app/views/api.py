@@ -139,9 +139,18 @@ class SalesContractApprovalApprovedAPI(viewsets.ModelViewSet):
 
 
 
-
 ########## SPECIAL TRUCK ##########
 class SpecialTruckAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SpecialTruckSZ
     queryset = Deliveries.objects.all()
+
+
+
+
+
+########## LEDGER ##########
+class LedgerAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = LedgerSZ
+    queryset = AccountChild.objects.all().order_by('pk')

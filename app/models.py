@@ -358,7 +358,7 @@ class Truck(models.Model):
     brand = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
     driver = models.ForeignKey(Driver, on_delete=models.PROTECT, null=True, blank=True)
-    status = models.CharField(max_length=50, null = True)
+    status = models.CharField(max_length=50, null = True, default = 'Available')
     currentDelivery = models.IntegerField(null=True, blank=True)
 
     class Meta:

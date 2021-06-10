@@ -20,7 +20,14 @@ from django.http.response import Http404
 
 class DeliveriesView(View):
     def get(self, request, format=None):
-        return render(request, 'deliveries.html')
+        
+        user = request.user
+        context = {
+            'driverAvailable': user.branch.driver.filter(status = 'Available'),
+            'truckAvailable': user.branch.truck.filter(status = 'Available')
+        }
+
+        return render(request, 'deliveries.html', context)
 
 class TruckView(View):
     def post(self, request, format=None):
@@ -66,7 +73,10 @@ class DriverView(View):
 
 class InTransitView(View):
     def get(self, request, format=None):
-        return render(request, 'truck-in-transit.html')
+        context = {
+            'trucks': request.user.branch.driver.filter(status='In-transit')
+        }
+        return render(request, 'truck-in-transit.html', context)
 
 class DeliveryLogsView(View):
     def get(self, request, format=None):

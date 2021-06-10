@@ -33,12 +33,14 @@
                 <th>Driver</th>
             </thead>
             <tbody>
+                {% for truck in trucks %}
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>{{truck.plate}}</td>
+                    <td>{{truck.brand}}</td>
+                    <td>{{truck.model}}</td>
+                    <td>{{truck.driver.firstName}} {{truck.driver.lastName}}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 

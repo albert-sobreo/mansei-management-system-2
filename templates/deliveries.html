@@ -44,14 +44,18 @@
                     <label>Truck</label>
                     <select v-model="delivery.truck" class="form-control">
                         <option value="" selected disabled>Choose Truck</option>
-                        <option v-for="truck in trucks" :value="truck.id">[[truck.plate]] [[truck.brand]] [[truck.model]]</option>
+                        {% for truck in truckAvailable %}
+                        <option value="{{truck.pk}}">{{truck.brand}} {{truck.model}}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="col col-3 px-2">
                     <label>Driver</label>
                     <select v-model="delivery.driver" class="form-control">
                         <option value="" selected disabled>Choose Driver</option>
-                        <option v-for="driver in drivers" :value="driver.id">[[driver.firstName]] [[driver.lastName]]</option>
+                        {% for driver in driverAvailable %}
+                        <option value="{{driver.pk}}">{{driver.firstName}} {{driver.lastName}}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="col col-3 px-2">
@@ -92,7 +96,7 @@
                         <!-- MORE V-FOR -->
                         <div class="form-check d-flex align-content-center" v-for="(merch, index) in item.itemList">
                             <input type="checkbox" class="form-check-input" v-model="item.transacItems[index].delivered">
-                            <label class="form-check-label font-semibold">[[merch.merchInventory.code]] - [[merch.merchInventory.name]] - [[roundNumber0(merch.merchInventory.length)]] x [[roundNumber0(merch.merchInventory.width)]] x [[roundNumber0(merch.merchInventory.thickness)]]    Qty: [[item.transacItems[index].qty]]</label>
+                            <label class="form-check-label font-semibold">[[merch.merchInventory.code]] - [[merch.merchInventory.classification]] [[merch.merchInventory.type]] - [[roundNumber0(merch.merchInventory.length)]] x [[roundNumber0(merch.merchInventory.width)]] x [[roundNumber0(merch.merchInventory.thickness)]]    Qty: [[item.transacItems[index].qty]]</label>
                         </div>
                     </div>
                 </div>
@@ -127,15 +131,16 @@
                         <div class="row">
                             <div class="col-12">
                                 <label>Attach a Photo</label>
-                                <input type="file" multiple>
+                                <input type="file" multiple> <br>
+                                <span class="font-size-10" style="color: red;">*not working yet</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- SAVE BUTTON -->
-            <div @click="submit()" class="container-extend border container-extend btn-bottom">
-                Send Delivery
+            <div @click="checkForm()" class="container-extend border container-extend btn-bottom">
+                Request Delivery
             </div>
         </div>
         <pre>[[$data]]</pre>
@@ -162,8 +167,8 @@
                 code: null,
                 date: new Date().toISOString().split('T')[0],
                 dateTimeCreated: new Date().toISOString(),
-                truck: null,
-                driver: null,
+                truck: '',
+                driver: '',
                 scheduleStart: null,
                 scheduleEnd: null,
                 items:[{
@@ -182,6 +187,7 @@
             drivers: [],
 
             sales: [],
+            errors: []
         },
         methods: {
             loadData(){
@@ -204,25 +210,45 @@
                         icon: 'error'
                     })
                 })
+            },
+            checkForm(){
+                if (
+                    this.delivery.code &&
+                    this.delivery.date &&
+                    this.delivery.truck &&
+                    this.delivery.driver &&
+                    this.delivery.scheduleStart &&
+                    this.delivery.scheduleEnd
+                ) {
+                    this.submit()
+                    return false
+                }
 
-                axios.get('/api/available-trucks/')
-                .then(res=>this.trucks=res.data)
-                .catch(err=>{
-                    Swal.fire({
-                        title: "Something went wrong.",
-                        html: err.message,
-                        icon: 'error'
-                    })
-                })
+                this.errors = []
 
-                axios.get('/api/available-drivers/')
-                .then(res=>this.drivers=res.data)
-                .catch(err=>{
-                    Swal.fire({
-                        title: "Something went wrong.",
-                        html: err.message,
-                        icon: 'error'
-                    })
+                if(!this.delivery.code){
+                    this.errors.push("Code Required")
+                }
+                if(!this.delivery.date){
+                    this.errors.push("Date Required")
+                }
+                if(!this.delivery.truck){
+                    this.errors.push("Truck Required")
+                }
+                if(!this.delivery.driver){
+                    this.errors.push("Driver Required")
+                }
+                if(!this.delivery.scheduleStart){
+                    this.errors.push("Schedule Start Required")
+                }
+                if(!this.delivery.scheduleEnd){
+                    this.errors.push("Schedule End Required")
+                }
+
+                Swal.fire({
+                    title: "Unfilled Inputs",
+                    html: this.errors.join('<br>'),
+                    icon: 'warning'
                 })
             },
             fetchItemsList(id, index, type){
@@ -266,24 +292,7 @@
             },
             submit(){
                 axios.post('/save-delivery/', this.delivery, this.config)
-                .then(res=>{
-                    Swal.fire({
-                        title: "Delivery Sent",
-                        html: "<span>Delivery successfully sent.</span>",
-                        icon: "success"
-                    })
-                })
-                .then(res=>this.delivery = this.deliveryInitial())
-                .then(res=>this.loadData())
-                .catch(err=>{
-                    console.log(err.request)
-                    console.log(err.message)
-                    Swal.fire({
-                        title: "Something went wrong.",
-                        html: err,
-                        icon: 'error',
-                    })
-                })
+                .then(res=>res.data==0?location.reload():'')
             }
         },
 
