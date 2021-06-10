@@ -35,7 +35,7 @@
             <tbody>
                 {% for truck in trucks %}
                 <tr>
-                    <td>{{truck.plate}}</td>
+                    <td @click="viewTruck('{{truck.currentDelivery}}')" class="link" data-toggle="modal" data-target="#truckModal">{{truck.plate}}</td>
                     <td>{{truck.brand}}</td>
                     <td>{{truck.model}}</td>
                     <td>{{truck.driver.firstName}} {{truck.driver.lastName}}</td>
@@ -103,7 +103,7 @@
                                 </thead>
                                 <tbody v-for="itemgroup in truckModal.deliveryitemsgroup">
                                     <tr v-for="item in itemgroup.deliveryitemsmerch">
-                                        <td>[[item.merchInventory.code]] [[item.merchInventory.name]]</td>
+                                        <td>[[item.merchInventory.code]] [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.qty]]</td>
                                     </tr>
                                 </tbody>
@@ -208,10 +208,8 @@
             }
         },
         methods: {
-            viewTruck(plate){
-                truckObject = this.$root.$refs.table.items.find(x=>x.plate == plate)
-
-                axios.get(`/api/special-truck/${truckObject.currentDelivery}`)
+            viewTruck(currentDelivery){
+                axios.get(`/api/special-truck/${currentDelivery}`)
                 .then(res=>this.truckModal = res.data)
 
                 console.log(this.truckModal)
@@ -219,7 +217,7 @@
             returnTruck(id){
                 $("#truckModal").modal('hide')
                 axios.put(`/return-truck/${id}/`, null, this.config)
-                .then(res=>this.$root.$refs.table.loadData())
+                .then(res=>res.data==0?location.reload():'')
             }
         },
 

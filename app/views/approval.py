@@ -14,6 +14,7 @@ from django.views.decorators.cache import never_cache
 from rest_framework import viewsets
 import sweetify
 from decimal import Decimal
+from datetime import datetime
 
 ################# PURCHASE #################
 
@@ -223,14 +224,32 @@ class SCApprovalAPI(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+
+
+
+        
+
 ################# DELIVERIES #################
+class DeliveriesNonApproved(View):
+    def get(self, request, format=None):
+        context = {
+            'deliveries': request.user.branch.deliveries.filter(approved=False)
+        }
+        return render(request, 'deliveriesnonapproved.html', context)
+
+class DeliveriesApproved(View):
+    def get(self, request, format=None):
+        context = {
+            'deliveries': request.user.branch.deliveries.filter(approved=True)
+        }
+        return render(request, 'deliveriesapproved.html', context)
 
 class DeliveriesApprovalAPI(APIView):
     def put(self, request, pk, format = None):
         deliveries = request.data
         d = Deliveries.objects.get(pk=pk)
 
-        d.datetimeApproved = request.date['datetimeApproved']
+        d.datetimeApproved = datetime.now()
         d.approved = True
         d.truck.status = 'In-transit'
         d.truck.driver = d.driver
@@ -239,44 +258,6 @@ class DeliveriesApprovalAPI(APIView):
         d.truck.save()
         d.driver.save()
         d.save()
-
-        # for photo in photos:
-        #     dp = DeliveryPhotos()
-        #     dp.deliveries = d
-        #     dp.picture = photo
-        #     d.save()
-
-        for dest in deliveries['destinations']:
-            destination = DeliveryDestinations()
-            destination.deliveries = d
-            destination.destination = dest['destination']
-            destination.save()
-            request.user.branch.deliveriesDestination.add(destination)
-
-        for item in deliveries['items']:
-            dItemGroup = DeliveryItemsGroup()
-            dItemGroup.deliveries = d
-            dItemGroup.deliveryType = item['type']
-            if dItemGroup.deliveryType == 'Purchase Order':
-                po = PurchaseOrder.objects.get(pk=item['code'])
-                dItemGroup.referenceNo = po.code
-
-            dItemGroup.save()
-            request.user.branch.deliveryitemsGroup.add(dItemGroup)
-
-            for itemsMerch in item['transacItems']:
-                poItems = POItemsMerch.objects.get(pk=itemsMerch['id'])
-                        
-                dim = DeliveryItemMerch()
-                dim.deliveryItemsGroup = dItemGroup
-                dim.qty = itemsMerch['qty']
-                if itemsMerch['delivered']:
-                    dim.merchInventory = MerchandiseInventory.objects.get(pk=itemsMerch['code'])
-                    poItems.delivered = True
-                    poItems.save()
-
-                dim.save()
-                request.user.branch.deliveryitemsMerch.add(dim)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

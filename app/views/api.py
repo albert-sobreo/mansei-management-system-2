@@ -154,3 +154,13 @@ class LedgerAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = LedgerSZ
     queryset = AccountChild.objects.all().order_by('pk')
+
+
+
+
+
+########## DELIVERY ##########
+class DeliveriesAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = DeliveriesSZ
+    queryset = Deliveries.objects.all()

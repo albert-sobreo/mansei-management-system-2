@@ -375,7 +375,7 @@ class Deliveries(models.Model):
     driver = models.ForeignKey(Driver, related_name="deliveries", on_delete=models.PROTECT, null=True, blank=True)
     scheduleStart = models.DateTimeField(null=True, blank=True)
     scheduleEnd = models.DateTimeField(null=True, blank=True)
-    approved = models.BooleanField(null = True)
+    approved = models.BooleanField(null = True, default=False)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
 
     class Meta:

@@ -166,7 +166,7 @@ class DeliveryItemMerchSZ(serializers.ModelSerializer):
         model = DeliveryItemMerch
         fields = '__all__'
 
-class DeliveryItemsGroup(serializers.ModelSerializer):
+class DeliveryItemsGroupSZ(serializers.ModelSerializer):
     deliveryitemsmerch = DeliveryItemMerchSZ(read_only=True, many=True)
     class Meta:
         model = DeliveryItemsGroup
@@ -175,11 +175,16 @@ class DeliveryItemsGroup(serializers.ModelSerializer):
 class SpecialTruckSZ(serializers.ModelSerializer):
     driver = DriverSZ(read_only=True)
     deliverydestinations = DeliveryDestinationSZ(read_only=True, many=True)
-    deliveryitemsgroup = DeliveryItemsGroup(read_only=True, many=True)
+    deliveryitemsgroup = DeliveryItemsGroupSZ(read_only=True, many=True)
     class Meta:
         model = Deliveries
         fields = "__all__"
         depth = 1
+
+
+
+
+
 
 ########## LEDGER SPECIAL SERIALIZERS ##########
 class SubGroupForLedgerSZ(serializers.ModelSerializer):
@@ -238,3 +243,28 @@ class LedgerSZ(serializers.ModelSerializer):
         journalEntries = thisObj.journalentries.all()
 
         return JournalEntriesForLedger(instance=journalEntries, many=True).data
+
+
+
+
+
+
+########## DELIVERY ##########
+class DeliveryItemMerchSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventorySZ(read_only=True, many=True)
+    class Meta:
+        model = DeliveryItemMerch
+        fields = '__all__'
+
+class DeliveryDestinationsSZ(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryDestinations
+        fields = '__all__'
+
+class DeliveriesSZ(serializers.ModelSerializer):
+    deliverydestinations = DeliveryDestinationsSZ(read_only=True, many=True)
+    deliveryitemsgroup = DeliveryItemsGroupSZ(read_only=True, many=True)
+    class Meta:
+        model = Deliveries
+        fields = '__all__'
+        depth = 1

@@ -95,7 +95,7 @@ class DriverView(View):
 class InTransitView(View):
     def get(self, request, format=None):
         context = {
-            'trucks': request.user.branch.driver.filter(status='In-transit')
+            'trucks': request.user.branch.truck.filter(status='In-transit')
         }
         return render(request, 'truck-in-transit.html', context)
 

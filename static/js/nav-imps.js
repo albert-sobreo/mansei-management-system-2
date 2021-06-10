@@ -52,7 +52,7 @@ Vue.component('navbar-imps', {
                     <a href="#" class="dropdown-item d-item-imps font-size-12 font-semibold">Job Orders</a>
                     <a href="#" class="dropdown-item d-item-imps font-size-12 font-semibold">Transfers</a>
                     <a href="#" class="dropdown-item d-item-imps font-size-12 font-semibold">Adjustments</a>
-                    <a href="#" class="dropdown-item d-item-imps font-size-12 font-semibold">Deliveries</a>
+                    <a href="/deliveriesnonapproved/" class="dropdown-item d-item-imps font-size-12 font-semibold">Deliveries</a>
                 </div>
             </div>
         </div>
