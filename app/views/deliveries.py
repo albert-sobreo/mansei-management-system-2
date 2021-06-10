@@ -22,12 +22,33 @@ class DeliveriesView(View):
     def get(self, request, format=None):
         
         user = request.user
+
+        try:
+            d = user.branch.deliveries.latest('pk')
+
+            listed_code = d.code.split('-')
+            listed_date = str(now.today()).split('-')
+
+            current_code = int(listed_code[3])
+
+            if listed_code[1] == listed_date[0] and listed_code[2] == listed_date[1]:
+                current_code += 1
+                new_code = 'D-{}-{}-{}'.format(listed_date[0], listed_date[1], str(current_code).zfill(4))
+            else:
+                new_code = 'D-{}-{}-0001'.format(listed_date[0], listed_date[1])
+
+        except Exception as e:
+            print(e)
+            listed_date = str(now.today()).split('-')
+            new_code = 'D-{}-{}-0001'.format(listed_date[0], listed_date[1])
+
         context = {
             'driver-available': user.branch.driver.filter(status = 'Available'),
-            'truck-available': user.branch.truck.filter(status = 'Available')
+            'truck-available': user.branch.truck.filter(status = 'Available'),
+            'new_code': new_code
         }
 
-        return render(request, 'deliveries.html')
+        return render(request, 'deliveries.html', context)
 
 class TruckView(View):
     def post(self, request, format=None):
@@ -108,6 +129,8 @@ class SaveDelivery(APIView):
         d.datetimeCreated = deliveries['dateTimeCreated']
         d.truck = Truck.objects.get(pk=deliveries['truck'])
         d.driver = Driver.objects.get(pk=deliveries['driver'])
+        d.scheduleStart = deliveries['scheduleStart']
+        d.scheduleEnd = deliveries['scheduleEnd']
 
         d.truck.status = 'In-transit'
         d.truck.driver = d.driver
