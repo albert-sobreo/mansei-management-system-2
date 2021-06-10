@@ -34,6 +34,9 @@ router.register(r'sales-contract-non-approved', views.SalesContractApprovalNonAp
 router.register(r'sales-contract-approved', views.SalesContractApprovalApprovedAPI, 'sales-contract-approved')
 router.register(r'sales-contract', views.SalesContractAPI, 'sales-contract')
 
+########## SPECIAL TRUCK ##########
+router.register(r"special-truck", views.SpecialTruckAPI, 'special-truck')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -73,4 +76,5 @@ urlpatterns = [
     path('delivery-logs/', login_required(views.DeliveryLogsView.as_view())),
     path('return-truck/', login_required(views.ReturnTruck.as_view())),
     path('save-delivery/', login_required(views.SaveDelivery.as_view())),
+    path('in-transit/', login_required(views.InTransitView.as_view()))
 ]

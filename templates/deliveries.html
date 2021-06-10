@@ -47,12 +47,20 @@
                         <option v-for="truck in trucks" :value="truck.id">[[truck.plate]] [[truck.brand]] [[truck.model]]</option>
                     </select>
                 </div>
-                <div class="col col-3 pl-2">
+                <div class="col col-3 px-2">
                     <label>Driver</label>
                     <select v-model="delivery.driver" class="form-control">
                         <option value="" selected disabled>Choose Driver</option>
                         <option v-for="driver in drivers" :value="driver.id">[[driver.firstName]] [[driver.lastName]]</option>
                     </select>
+                </div>
+                <div class="col col-3 px-2">
+                    <label>Schedule Start</label>
+                    <input v-model="delivery.scheduleStart" type="datetime-local" class="form-control">
+                </div>
+                <div class="col col-3 pl-2">
+                    <label>Schedule End</label>
+                    <input v-model="delivery.scheduleEnd" type="datetime-local" class="form-control">
                 </div>
             </div>
 
@@ -156,6 +164,8 @@
                 dateTimeCreated: new Date().toISOString(),
                 truck: null,
                 driver: null,
+                scheduleStart: null,
+                scheduleEnd: null,
                 items:[{
                     type: '',
                     code: '',
@@ -214,25 +224,6 @@
                         icon: 'error'
                     })
                 })
-            },
-            deliveryInitial(){
-                return{
-                    code: null,
-                    date: new Date().toISOString().split('T')[0],
-                    dateTimeCreated: new Date().toISOString(),
-                    truck: null,
-                    driver: null,
-                    items:[{
-                        type: '',
-                        code: '',
-                        transacItems: [],
-                        itemList: []
-                    }],
-                    destinations: [
-                        {destination: null},
-                    ],
-                    photos: [],
-                }
             },
             fetchItemsList(id, index, type){
                 if (type == "Sales Contract"){

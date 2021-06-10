@@ -134,3 +134,14 @@ class SalesContractApprovalApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesContractNestedSZ
     queryset = TempSalesContract.objects.filter(approved = True)
+
+
+
+
+
+
+########## SPECIAL TRUCK ##########
+class SpecialTruckAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SpecialTruckSZ
+    queryset = Deliveries.objects.all()

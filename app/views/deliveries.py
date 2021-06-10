@@ -94,7 +94,6 @@ class SaveDelivery(APIView):
     def post(self, request, format=None):
         deliveries = request.data
         
-        
         d = Deliveries()
 
         d.code = deliveries['code']

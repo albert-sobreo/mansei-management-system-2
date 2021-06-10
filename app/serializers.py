@@ -144,3 +144,39 @@ class SalesContractNestedSZ(serializers.ModelSerializer):
         model = TempSalesContract
         fields = '__all__'
         depth = 1
+
+
+
+
+    
+########## SPECIAL TRUCK ##########
+class DriverSZ(serializers.ModelSerializer):
+    class Meta:
+        model = Driver
+        fields = '__all__'
+
+class DeliveryDestinationSZ(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryDestinations
+        fields = "__all__"
+
+class DeliveryItemMerchSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventorySZ(read_only=True)
+    class Meta:
+        model = DeliveryItemMerch
+        fields = '__all__'
+
+class DeliveryItemsGroup(serializers.ModelSerializer):
+    deliveryitemsmerch = DeliveryItemMerchSZ(read_only=True, many=True)
+    class Meta:
+        model = DeliveryItemsGroup
+        fields = '__all__'
+
+class SpecialTruckSZ(serializers.ModelSerializer):
+    driver = DriverSZ(read_only=True)
+    deliverydestinations = DeliveryDestinationSZ(read_only=True, many=True)
+    deliveryitemsgroup = DeliveryItemsGroup(read_only=True, many=True)
+    class Meta:
+        model = Deliveries
+        fields = "__all__"
+        depth = 1
