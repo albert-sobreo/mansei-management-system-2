@@ -70,9 +70,9 @@
                     </div>
                     <div class="col-10 px-1">
                         <label class="m-0">Transaction Reference No - Date</label>
-                        <select v-model="item.code" class="form-control" @change="fetchItemsList(item.code, index, item.type)" v-if="item.type == 'Purchase Order'">
+                        <select v-model="item.code" class="form-control" @change="fetchItemsList(item.code, index, item.type)" v-if="item.type == 'Sales Contract'">
                             <option value="" selected disabled>Choose Transaction</option>
-                            <option v-for="p in purchase" :value="p.id">[[p.code]]</option>
+                            <option v-for="s in sales" :value="s.id">[[s.code]]</option>
                         </select>
                         <select v-model="item.code" class="form-control" v-else>
                             <option value="" selected disabled>Select Order Type First</option>

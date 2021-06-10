@@ -1,3 +1,4 @@
+import json
 from django import views
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import query
@@ -22,6 +23,23 @@ class DeliveriesView(View):
         return render(request, 'deliveries.html')
 
 class TruckView(View):
+    def post(self, request, format=None):
+        request.data = json.loads(request.body)
+        jsonTruck = request.data
+
+        truck = Truck()
+
+        truck.plate = jsonTruck['plate']
+        truck.brand = jsonTruck['brand']
+        truck.model = jsonTruck['model']
+        truck.status = jsonTruck['status']
+
+        truck.save()
+        request.user.branch.truck.add(truck)
+
+        sweetify.sweetalert(request, icon="success", title="Success!", text="{} {} with plate {} has been added as truck.".format(truck.brand, truck.model, truck.plate), persistent="Dismiss")
+        return JsonResponse(0, safe=False)
+
     def get(self, request, format=None):
         return render(request, 'trucks.html')
 
