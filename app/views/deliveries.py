@@ -145,13 +145,21 @@ class SaveDelivery(APIView):
             dig.save()
             request.user.branch.deliveryitemsGroup.add(dig)
 
+            
+
+
             for itemMerch in item['transacItems']:
-                dim = DeliveryItemMerch()
-                dim.deliveryItemsGroup = dig
-                dim.merchInventory = MerchandiseInventory.objects.get(pk=itemMerch['code'])
-                dim.qty = itemMerch['qty']
-                dim.save()
-                request.user.branch.deliveryitemsMerch.add(dim)
+                if itemMerch['delivered']:
+                    if item['type'] == 'Sales Contract':
+                        scitemsmerch = TempSCItemsMerch.objects.get(pk=itemMerch['id'])
+                        scitemsmerch.delivered = True
+                        scitemsmerch.save()
+                    dim = DeliveryItemMerch()
+                    dim.deliveryItemsGroup = dig
+                    dim.merchInventory = MerchandiseInventory.objects.get(pk=itemMerch['code'])
+                    dim.qty = itemMerch['qty']
+                    dim.save()
+                    request.user.branch.deliveryitemsMerch.add(dim)
         
         for dest in deliveries['destinations']:
             destination = DeliveryDestinations()

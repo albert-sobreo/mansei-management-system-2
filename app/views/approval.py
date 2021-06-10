@@ -249,6 +249,7 @@ class DeliveriesApprovalAPI(APIView):
         deliveries = request.data
         d = Deliveries.objects.get(pk=pk)
 
+
         d.datetimeApproved = datetime.now()
         d.approved = True
         d.truck.status = 'In-transit'
