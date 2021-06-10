@@ -132,52 +132,9 @@ class SaveDelivery(APIView):
         d.scheduleStart = deliveries['scheduleStart']
         d.scheduleEnd = deliveries['scheduleEnd']
 
-        d.truck.status = 'In-transit'
-        d.truck.driver = d.driver
-        d.driver.status = 'In-transit'
-
-        d.truck.save()
-        d.driver.save()
-
         d.save()
+        request.user.branch.purchaseOrder.add(d)
 
-        d.truck.currentDelivery = d.pk
-        d.truck.save()
-
-        # for photo in photos:
-        #     dp = DeliveryPhotos()
-        #     dp.deliveries = d
-        #     dp.picture = photo
-        #     d.save()
-
-        for dest in deliveries['destinations']:
-            destination = DeliveryDestinations()
-            destination.deliveries = d
-            destination.destination = dest['destination']
-            destination.save()
-
-        for item in deliveries['items']:
-            dItemGroup = DeliveryItemsGroup()
-            dItemGroup.deliveries = d
-            dItemGroup.deliveryType = item['type']
-            if dItemGroup.deliveryType == 'Purchase Order':
-                po = PurchaseOrder.objects.get(pk=item['code'])
-                dItemGroup.referenceNo = po.code
-
-            dItemGroup.save()
-
-            for itemsMerch in item['transacItems']:
-                poItems = POItemsMerch.objects.get(pk=itemsMerch['id'])
-                
-                dim = DeliveryItemMerch()
-                dim.deliveryItemsGroup = dItemGroup
-                dim.qty = itemsMerch['qty']
-                if itemsMerch['delivered']:
-                    dim.merchInventory = MerchandiseInventory.objects.get(pk=itemsMerch['code'])
-                    poItems.delivered = True
-                    poItems.save()
-
-
-                dim.save()
+        
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
