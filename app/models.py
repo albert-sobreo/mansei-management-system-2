@@ -316,6 +316,7 @@ class TempSCItemsMerch(models.Model):
     remaining = models.IntegerField()
     qty = models.IntegerField()
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
+    delivered = models.BooleanField(null = True, default=False)
 
 class TempSCOtherFees(models.Model):
     salesContract = models.ForeignKey(TempSalesContract, related_name='tempscotherfees', on_delete=models.PROTECT)

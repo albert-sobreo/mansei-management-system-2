@@ -1,0 +1,305 @@
+{% extends "base-template.html" %}
+{% block title %}Deliveries{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-imps active="nav-deliveries" photo="/media/{{request.user.image}}"></navbar-imps>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAVIGATION -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links imps-nav">
+                <a href="/deliveries/" class="active-imps mx-2">Send Deliveries</a>
+                <a href="/trucks/" class="mx-2">Trucks</a>
+                <a href="/drivers/" class="mx-2">Drivers</a>
+                <a href="/in-transit/" class="mx-2">In-transit</a>
+            </div>
+        </div>
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Deliveries</span>
+        </div>
+        <!-- DELIVERIES -->
+        <div class="mb-4">
+            <!-- REFERENCE NO AND DATES -->
+            <div class="row">
+                <div class="col col-3 pr-2">
+                    <label>Reference No.</label>
+                    <input v-model="delivery.code" type="text" class="form-control" name="code" placeholder="Enter Reference No.">
+                </div>
+                <div class="col col-2 pl-2">
+                    <label>Date</label>
+                    <input v-model="delivery.date" type="date" class="form-control" name="date">
+                </div>
+            </div>
+
+            <!-- TRUCK AND DRIVER -->
+            <div class="row mt-2 mb-4">
+                <div class="col col-3 pr-2">
+                    <label>Truck</label>
+                    <select v-model="delivery.truck" class="form-control">
+                        <option value="" selected disabled>Choose Truck</option>
+                        <option v-for="truck in trucks" :value="truck.id">[[truck.plate]] [[truck.brand]] [[truck.model]]</option>
+                    </select>
+                </div>
+                <div class="col col-3 pl-2">
+                    <label>Driver</label>
+                    <select v-model="delivery.driver" class="form-control">
+                        <option value="" selected disabled>Choose Driver</option>
+                        <option v-for="driver in drivers" :value="driver.id">[[driver.firstName]] [[driver.lastName]]</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ORDER CARD -->
+            <div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
+                <!-- V-FOR ITEMS -->
+                <div class="row order-card-darker mb-1 p-4 b-radius-10 position-relative" v-for="(item, index) in delivery.items">
+                    <i @click="removeItem(index)" class="position-absolute fas fa-minus-circle stop text-shadow-small" style="line-height: 30px; top:-5px; right: 5px"></i>
+                    <div class="col-2 px-1">
+                        <label class="m-0">Order Type</label>
+                        <select v-model="item.type" class="form-control">
+                            <option value="" selected disabled>Choose Type</option>
+                            <option value="Sales Contract">Sales Contract</option>
+                        </select>
+                    </div>
+                    <div class="col-10 px-1">
+                        <label class="m-0">Transaction Reference No - Date</label>
+                        <select v-model="item.code" class="form-control" @change="fetchItemsList(item.code, index, item.type)" v-if="item.type == 'Purchase Order'">
+                            <option value="" selected disabled>Choose Transaction</option>
+                            <option v-for="p in purchase" :value="p.id">[[p.code]]</option>
+                        </select>
+                        <select v-model="item.code" class="form-control" v-else>
+                            <option value="" selected disabled>Select Order Type First</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12">
+                        <label>Select Transaction Items for delivery</label>
+                        <!-- MORE V-FOR -->
+                        <div class="form-check d-flex align-content-center" v-for="(merch, index) in item.itemList">
+                            <input type="checkbox" class="form-check-input" v-model="item.transacItems[index].delivered">
+                            <label class="form-check-label font-semibold">[[merch.merchInventory.code]] - [[merch.merchInventory.name]] - [[roundNumber0(merch.merchInventory.length)]] x [[roundNumber0(merch.merchInventory.width)]] x [[roundNumber0(merch.merchInventory.thickness)]]    Qty: [[item.transacItems[index].qty]]</label>
+                        </div>
+                    </div>
+                </div>
+                <!-- ADD NEW LINE -->
+                <div class="row">
+                    <div class="col px-1">
+                        <button @click="addItemLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
+                    </div>
+                </div>
+
+                <div class="row my-4">
+                    <div class="col-4 order-card-darker mr-2 p-4 b-radius-10">
+                        <div class="row">
+                            <div class="col-12">
+                                <label>Destinations</label>
+                            </div>
+                        </div>
+                        <div class="row" v-for="(dest, index) in delivery.destinations">
+                            <div class="col">
+                                <input v-model="dest.destination" type="text" class="form-control col" placeholder="Enter Destination">
+                            </div>
+
+                            <i @click="removeDestination(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 35px;"></i>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col">
+                                <button @click="addDestinationLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 order-card-darker ml-2 p-4 b-radius-10">
+                        <div class="row">
+                            <div class="col-12">
+                                <label>Attach a Photo</label>
+                                <input type="file" multiple>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- SAVE BUTTON -->
+            <div @click="submit()" class="container-extend border container-extend btn-bottom">
+                Send Delivery
+            </div>
+        </div>
+        <pre>[[$data]]</pre>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data:{
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+
+            delivery: {
+                code: null,
+                date: new Date().toISOString().split('T')[0],
+                dateTimeCreated: new Date().toISOString(),
+                truck: null,
+                driver: null,
+                items:[{
+                    type: '',
+                    code: '',
+                    transacItems: [],
+                    itemList: []
+                }],
+                destinations: [
+                    {destination: null},
+                ],
+                photos: [],
+            },
+
+            trucks: [],
+            drivers: [],
+
+            sales: [],
+        },
+        methods: {
+            loadData(){
+                axios.get('/api/purchase-order-approved/')
+                .then(res=>this.purchase=res.data)
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: err.message,
+                        icon: 'error'
+                    })
+                })
+
+                axios.get('/api/sales-contract-approved/')
+                .then(res=>this.sales=res.data)
+                .catch(err=>{
+                    Swalf.fire({
+                        title: "Something went wrong.",
+                        html: err.message,
+                        icon: 'error'
+                    })
+                })
+
+                axios.get('/api/available-trucks/')
+                .then(res=>this.trucks=res.data)
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: err.message,
+                        icon: 'error'
+                    })
+                })
+
+                axios.get('/api/available-drivers/')
+                .then(res=>this.drivers=res.data)
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: err.message,
+                        icon: 'error'
+                    })
+                })
+            },
+            deliveryInitial(){
+                return{
+                    code: null,
+                    date: new Date().toISOString().split('T')[0],
+                    dateTimeCreated: new Date().toISOString(),
+                    truck: null,
+                    driver: null,
+                    items:[{
+                        type: '',
+                        code: '',
+                        transacItems: [],
+                        itemList: []
+                    }],
+                    destinations: [
+                        {destination: null},
+                    ],
+                    photos: [],
+                }
+            },
+            fetchItemsList(id, index, type){
+                if (type == "Sales Contract"){
+                    item = this.sales.find(x=>x.id==id)
+                    var d = (item.tempscitemsmerch).filter(x=>x.delivered==false)
+                    this.delivery.items[index].itemList = d
+                    this.delivery.items[index].transacItems = [];
+                    this.delivery.items[index].itemList.forEach((item)=>{
+                        this.delivery.items[index].transacItems.push({
+                            delivered: false,
+                            code: item.merchInventory.id,
+                            qty: item.qty,
+                            id: item.id
+                        })
+                    })
+                }
+            },
+            roundNumber0(value){
+                let val = (value/1).toFixed(0)
+                return val
+            },
+            addItemLine(){
+                this.delivery.items.push({
+                    type: '',
+                    code: '',
+                    transacItems: [],
+                    itemList: []
+                })
+            },
+            addDestinationLine(){
+                this.delivery.destinations.push({
+                    destination: null,
+                })
+            },
+            removeItem(index){
+                this.$delete(this.delivery.items, index)
+            },
+            removeDestination(index){
+                this.$delete(this.delivery.destinations, index)
+            },
+            submit(){
+                axios.post('/save-delivery/', this.delivery, this.config)
+                .then(res=>{
+                    Swal.fire({
+                        title: "Delivery Sent",
+                        html: "<span>Delivery successfully sent.</span>",
+                        icon: "success"
+                    })
+                })
+                .then(res=>this.delivery = this.deliveryInitial())
+                .then(res=>this.loadData())
+                .catch(err=>{
+                    console.log(err.request)
+                    console.log(err.message)
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: err,
+                        icon: 'error',
+                    })
+                })
+            }
+        },
+
+        mounted(){
+            this.loadData()
+        }
+    })
+</script>
+
+{% endblock %}

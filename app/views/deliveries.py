@@ -15,7 +15,7 @@ from ..serializers import *
 from ..models import *
 import sweetify
 from datetime import date as now
-from django.http.response import Http404,
+from django.http.response import Http404
 
 class DeliveriesView(View):
     def get(self, request, format=None):
