@@ -17,6 +17,11 @@ normally = [
     ('Credit', 'Credit'),
 ]
 
+permanence = [
+    ('Real', 'Real'),
+    ('Nominal', 'Nominal'),
+]
+
 # Create your models here.
 class User(AbstractUser):
     authLevel = models.CharField(max_length=50, null = True, blank = True)
@@ -85,7 +90,7 @@ class AccountGroup(models.Model):
     code = models.CharField(max_length=50)
     name = models.CharField(max_length=50)
     normally = models.CharField(max_length=50, choices=normally)
-    permanence = models.CharField(max_length=50)
+    permanence = models.CharField(max_length=50, choices=permanence)
     amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,  default= 0.0)
 
     class Meta:
