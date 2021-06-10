@@ -376,6 +376,7 @@ class Deliveries(models.Model):
     scheduleStart = models.DateTimeField(null=True, blank=True)
     scheduleEnd = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True)
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Delivery"
