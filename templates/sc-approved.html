@@ -243,12 +243,24 @@
                 atcCode: null,
                 amountWithheld: null,
             },
-            updateSC:{}
+            updateSC:{},
+            roundToggle: false,
         },
         methods: {
             viewSC(code){
                 axios.get(`/api/sales-contract-non-approved/${code}/`)
                 .then(res=>this.scModal=res.data)
+            },
+            roundNumber2(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(2).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            roundToggler(){
+                this.roundToggle = !this.roundToggle
             },
             formatDateTime(value){
                 const months = [

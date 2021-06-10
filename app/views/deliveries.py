@@ -43,8 +43,8 @@ class DeliveriesView(View):
             new_code = 'D-{}-{}-0001'.format(listed_date[0], listed_date[1])
 
         context = {
-            'driver-available': user.branch.driver.filter(status = 'Available'),
-            'truck-available': user.branch.truck.filter(status = 'Available'),
+            'driverAvailable': user.branch.driver.filter(status = 'Available'),
+            'truckAvailable': user.branch.truck.filter(status = 'Available'),
             'new_code': new_code
         }
 
@@ -94,7 +94,10 @@ class DriverView(View):
 
 class InTransitView(View):
     def get(self, request, format=None):
-        return render(request, 'truck-in-transit.html')
+        context = {
+            'trucks': request.user.branch.driver.filter(status='In-transit')
+        }
+        return render(request, 'truck-in-transit.html', context)
 
 class DeliveryLogsView(View):
     def get(self, request, format=None):
@@ -121,7 +124,6 @@ class ReturnTruck(APIView):
 class SaveDelivery(APIView):
     def post(self, request, format=None):
         deliveries = request.data
-        
         
         d = Deliveries()
 

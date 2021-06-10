@@ -24,7 +24,8 @@ class JournalView(View):
         user = request.user
 
         try:
-            j = user.branch.journal.latest('pk')
+            j = user.branch.journal.filter(code__regex=r'J-')
+            j = j.latest('pk')
             listed_code = j.code.split('-')
             listed_date = str(now.today()).split('-')
 

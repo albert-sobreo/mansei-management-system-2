@@ -13,6 +13,9 @@ router.register(r"group", views.AccountGroupAPI, 'group')
 router.register(r"sub-group", views.AccountSubGroupAPI, 'sub-group')
 router.register(r"child", views.AccountChildAPI, 'child')
 
+########## LEDGER URLS ##########
+router.register(r"ledger", views.LedgerAPI, 'ledger')
+
 ########## PARTY ##########
 router.register(r"customer", views.CustomerAPI, 'customer')
 router.register(r"customer-transaction", views.CustomerTransactionAPI, 'customer-transaction')
@@ -33,6 +36,9 @@ router.register(r'purchase-order', views.PurchaseOrderAPI, 'purchase-order')
 router.register(r'sales-contract-non-approved', views.SalesContractApprovalNonApprovedAPI, 'sales-contract-non-approved')
 router.register(r'sales-contract-approved', views.SalesContractApprovalApprovedAPI, 'sales-contract-approved')
 router.register(r'sales-contract', views.SalesContractAPI, 'sales-contract')
+
+########## SPECIAL TRUCK ##########
+router.register(r"special-truck", views.SpecialTruckAPI, 'special-truck')
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -73,4 +79,5 @@ urlpatterns = [
     path('delivery-logs/', login_required(views.DeliveryLogsView.as_view())),
     path('return-truck/', login_required(views.ReturnTruck.as_view())),
     path('save-delivery/', login_required(views.SaveDelivery.as_view())),
+    path('in-transit/', login_required(views.InTransitView.as_view()))
 ]
