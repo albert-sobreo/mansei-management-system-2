@@ -238,6 +238,7 @@ class DeliveriesApprovalAPI(APIView):
         d.truck.currentDelivery = d.pk
         d.truck.save()
         d.driver.save()
+        d.save()
 
         # for photo in photos:
         #     dp = DeliveryPhotos()
@@ -250,7 +251,7 @@ class DeliveriesApprovalAPI(APIView):
             destination.deliveries = d
             destination.destination = dest['destination']
             destination.save()
-            request.user.branch.journalEntries.add(destination)
+            request.user.branch.deliveriesDestination.add(destination)
 
         for item in deliveries['items']:
             dItemGroup = DeliveryItemsGroup()
@@ -261,7 +262,7 @@ class DeliveriesApprovalAPI(APIView):
                 dItemGroup.referenceNo = po.code
 
             dItemGroup.save()
-            request.user.branch.journalEntries.add(dItemGroup)
+            request.user.branch.deliveryitemsGroup.add(dItemGroup)
 
             for itemsMerch in item['transacItems']:
                 poItems = POItemsMerch.objects.get(pk=itemsMerch['id'])
@@ -275,7 +276,7 @@ class DeliveriesApprovalAPI(APIView):
                     poItems.save()
 
                 dim.save()
-                request.user.branch.journalEntries.add(dim)
+                request.user.branch.deliveryitemsMerch.add(dim)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
