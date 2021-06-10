@@ -135,8 +135,30 @@ class SaveDelivery(APIView):
         d.scheduleEnd = deliveries['scheduleEnd']
 
         d.save()
-        request.user.branch.purchaseOrder.add(d)
+        request.user.branch.deliveries.add(d)
 
+        for item in deliveries['items']:
+            dig = DeliveryItemsGroup()
+            dig.deliveries = d
+            dig.deliveryType = item['type']
+            dig.referenceNo = item['code']
+            dig.save()
+            request.user.branch.deliveryitemsGroup.add(dig)
+
+            for itemMerch in item['transacItems']:
+                dim = DeliveryItemMerch()
+                dim.deliveryItemsGroup = dig
+                dim.merchInventory = MerchandiseInventory.objects.get(pk=itemMerch['code'])
+                dim.qty = itemMerch['qty']
+                dim.save()
+                request.user.branch.deliveryitemsMerch.add(dim)
+        
+        for dest in deliveries['destinations']:
+            destination = DeliveryDestinations()
+            destination.deliveries = d
+            destination.destination = dest['destination']
+            destination.save()
+            request.user.branch.deliveriesDestination.add(destination)
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

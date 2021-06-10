@@ -429,7 +429,7 @@ class DeliveryItemMerch(models.Model):
         verbose_name_plural = "Delivery Item Merchs"
 
     def __str__(self):
-        return self.merchInventory.name
+        return self.merchInventory.code + ' ' + self.merchInventory.classification + ' ' + self.merchInventory.type
 
 
 class Branch(models.Model):
