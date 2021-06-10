@@ -58,7 +58,7 @@ class DriverView(View):
         driver.save()
         request.user.branch.truck.add(driver)
 
-        sweetify.sweetalert(request, icon="success", title="Success!", text="{} {} with plate {} has been added as truck.".format(driver.driverID, driver.firstName, driver.lastName), persistent="Dismiss")
+        sweetify.sweetalert(request, icon="success", title="Success!", text="{} {} with ID of {} has been added as driver.".format(driver.firstName, driver.lastName, driver.driverID), persistent="Dismiss")
         return JsonResponse(0, safe=False)
 
     def get(self, request, format=None):
