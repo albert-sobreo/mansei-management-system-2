@@ -20,6 +20,13 @@ from django.http.response import Http404
 
 class DeliveriesView(View):
     def get(self, request, format=None):
+        
+        user = request.user
+        context = {
+            'driver-available': user.branch.driver.filter(status = 'Available'),
+            'truck-available': user.branch.truck.filter(status = 'Available')
+        }
+
         return render(request, 'deliveries.html')
 
 class TruckView(View):
