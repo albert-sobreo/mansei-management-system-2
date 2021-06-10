@@ -135,7 +135,7 @@ class SaveDelivery(APIView):
         d.scheduleEnd = deliveries['scheduleEnd']
 
         d.save()
-        request.user.branch.purchaseOrder.add(d)
+        request.user.branch.deliveries.add(d)
 
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
