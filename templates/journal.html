@@ -20,22 +20,22 @@
 
         <!-- TABLE -->
         {% for journal in journals %}
-        <table class="table table-sm box-shadow-medium b-radius-15 mt-2 mb-5">
+        <table class="table table-borderless table-striped table-sm box-shadow-medium b-radius-15 mt-2 mb-5">
             <thead class="thead-dark">
+                <th colspan="2" class="pl-5" style="border-top: 0">
+                    <span class="font-bold font-size-18">{{journal.journalDate}}</span>
+                </th>
+                <th class="pr-5 text-right" style="border-top: 0">
+                    <span class="font-bold font-size-18 text-right">{{journal.code}}</span>
+                </th>
+            </thead>
+            <thead>
                 <th style="border: 0;" class="pl-5">Accounts</th>
                 <th style="border: 0;">Debit</th>
                 <th style="border: 0;" class="pr-5">Credit</th>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="2" class="pl-5" style="background: #f6f6f6">
-                        <span class="font-bold font-size-14">{{journal.journalDate}}</span>
-                    </td>
-                    <td class="pr-5 text-right" style="background: #f6f6f6;">
-                        <span class="font-bold font-size-14 text-right">{{journal.code}}</span>
-                    </td>
-                </tr>
-                {% for je in journal.journalentries.all %}
+                {% for je in journal.journalentries.all|dictsortreversed:"normally" %}
                 <tr>
                     <td class="pl-5">{{je.accountChild.name}}</td>
                     <!-- ADD IF ELSE HERE FOR DEBIT AND CREDIT -->
