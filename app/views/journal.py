@@ -80,11 +80,19 @@ class SaveJournal(APIView):
 
             if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
                 je.accountChild.amount += je.amount
+                je.accountChild.accountSubGroup.amount += je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount += je.amount
                 je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
                 je.balance = je.accountChild.amount
             else:
                 je.accountChild.amount -= je.amount
+                je.accountChild.accountSubGroup.amount -= je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
                 je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
                 je.balance = je.accountChild.amount
             je.save()
             
@@ -100,11 +108,19 @@ class SaveJournal(APIView):
 
             if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
                 je.accountChild.amount += je.amount
+                je.accountChild.accountSubGroup.amount += je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount += je.amount
                 je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
                 je.balance = je.accountChild.amount
             else:
                 je.accountChild.amount -= je.amount
+                je.accountChild.accountSubGroup.amount -= je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
                 je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
                 je.balance = je.accountChild.amount 
             je.save()
             request.user.branch.journalEntries.add(je)
