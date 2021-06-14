@@ -117,8 +117,8 @@ class POApprovalAPI(APIView):
                 payables.accountChild = purchase.party.accountChild.get(name="Trade Payables - " + purchase.party.name)
                 payables.amount = purchase.amountDue - purchase.amountPaid
                 payables.accountChild.amount += je.amount
-                je.accountChild.save()
-                payables.balance = je.accountChild.amount
+                payables.accountChild.save()
+                payables.balance = payables.accountChild.amount
                 payables.save()
                 request.user.branch.journalEntries.add(payables)
 
@@ -140,8 +140,8 @@ class POApprovalAPI(APIView):
                 payables.accountChild = purchase.party.accountChild.get(name="Trade Payables - " + purchase.party.name)
                 payables.amount = purchase.amountDue - purchase.amountPaid
                 payables.accountChild.amount += je.amount
-                je.accountChild.save()
-                payables.balance = je.accountChild.amount
+                payables.accountChild.save()
+                payables.balance = payables.accountChild.amount
                 payables.save()
                 request.user.branch.journalEntries.add(payables)
         

@@ -481,7 +481,7 @@
                 this.$delete(this.purchaseOrder.items, index)
             },
             submit(){
-                if(this.purchaseOrder.amountDue >= this.purchaseOrder.amountPaid){
+                if(Number(this.purchaseOrder.amountDue) >= Number(this.purchaseOrder.amountPaid)){
                     axios.post('/save-purchase-order/', this.purchaseOrder, this.config)
                     .then(res=>res.data==0?location.reload():'')
                 } else {
