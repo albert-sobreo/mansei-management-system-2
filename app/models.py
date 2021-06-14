@@ -100,6 +100,7 @@ class AccountSubGroup(models.Model):
     name = models.CharField(max_length=100)
     accountGroup = models.ForeignKey(AccountGroup, related_name="accountsubgroup", on_delete=models.PROTECT, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,  default= 0.0)
 
     class Meta:
         verbose_name = "Account Sub-Group"
