@@ -60,7 +60,7 @@
                             <div class="col-3 mt-3">
                                 <label class="gray">Status</label><br>
                                 <span class="font-size-14 font-bold approved" v-if="scModal.approved">Approved</span>
-                                <span class="font-size-14 font-bold approved" v-else>Pending</span>
+                                <span class="font-size-14 font-bold pending" v-else>Pending</span>
                             </div>
                             <div class="col-3 mt-3">
                                 <label class="gray">Created By</label><br>
@@ -143,6 +143,8 @@
                                 </tbody>
                             </table>
                         </div>
+                        <a href="/sc-approved/" v-if="scModal.approved">Go to approvals</a>
+                        <a href="/sc-nonapproved" v-else>Go to approvals</a>
                     </div>
                 </div>
             </div>

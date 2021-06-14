@@ -64,7 +64,7 @@
                             <div class="col-3 mt-3">
                                 <label class="gray">Status</label><br>
                                 <span class="font-size-14 font-bold approved" v-if="poModal.approved">Approved</span>
-                                <span class="font-size-14 font-bold approved" v-else>Pending</span>
+                                <span class="font-size-14 font-bold pending" v-else>Pending</span>
                             </div>
                             <div class="col-3 mt-3">
                                 <label class="gray">Created By</label><br>
@@ -320,7 +320,7 @@
                 month = months[value.getMonth()]
                 date = value.getDate()
                 hour = (value.getHours() + 24) % 12 || 12; 
-                minute = value.getMinutes()
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
                 day = days[value.getDay()]
                 meridian = value.getHours() >= 12 ? 'pm' : 'am'
                 formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`

@@ -95,7 +95,7 @@
                     <div class="col px-1">
                         <select @change="getAll(item.code, index)" v-model="item.code" class="form-control">
                             <option value="" selected disabled>Choose Item</option>
-                            <option v-for="merch in merchItems" :value="merch.id">[[merch.code]] - [[merch.name]] - [[roundNumber0(merch.length)]]x[[roundNumber0(merch.width)]]x[[roundNumber0(merch.thickness)]]</option>
+                            <option v-for="merch in merchItems" :value="merch.id">[[merch.code]] - [[merch.classification]] [[merch.type]] - [[roundNumber0(merch.length)]]x[[roundNumber0(merch.width)]]x[[roundNumber0(merch.thickness)]]</option>
                         </select>
                     </div>
                     <div class="col-1 px-1">

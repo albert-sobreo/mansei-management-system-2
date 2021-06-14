@@ -73,7 +73,7 @@
                         <label for="order-quantity" class="m-0">Order Qty</label>
                     </div>
                     <div class="col-2 px-1">
-                        <label for="order-quantity" class="m-0">Purchasing Price <span class="font-size-10 gray">Total</span></label>
+                        <label for="order-quantity" class="m-0">Purchasing Price <span class="font-size-10 gray">per qty</span></label>
                     </div>
                     <div class="col-2 px-1">
                         <label for="cost-per-item" class="m-0">Input VAT</label>
@@ -104,7 +104,7 @@
                         <input v-model="item.remaining" type="number" class="form-control" readonly>
                     </div>
                     <div class="col-1 px-1">
-                        <input v-model="item.quantity" type="number" class="form-control" min="0">
+                        <input v-model="item.quantity" @change="onForTotalCost(index)" type="number" class="form-control" min="0">
                     </div>
                     <div class="col-2 px-1">
                         <div class="input-group">
@@ -474,7 +474,7 @@
 
             onForTotalCost(index){
                 row = this.purchaseOrder.items[index]
-                row.totalCost = Number((row.vatable * (1+(row.inputVAT/100)).toFixed(4))).toFixed(4)
+                row.totalCost = Number((row.vatable * row.quantity * (1+(row.inputVAT/100)).toFixed(4))).toFixed(4)
             },
 
             remove (index) {
