@@ -70,7 +70,11 @@ class POApprovalAPI(APIView):
         je.accountChild = AccountChild.objects.get(name='Merchandise Inventory')
         je.amount = purchase.amountDue
         je.accountChild.amount += je.amount
+        je.accountChild.accountSubGroup.amount += je.amount
+        je.accountChild.accountSubGroup.accountGroup.amount += je.amount
         je.accountChild.save()
+        je.accountChild.accountSubGroup.save()
+        je.accountChild.accountSubGroup.accountGroup.save()
         je.balance = je.accountChild.amount
         je.save()
         request.user.branch.journalEntries.add(je)
@@ -84,7 +88,11 @@ class POApprovalAPI(APIView):
                 je.accountChild = AccountChild.objects.get(name="Cash on Hand")
                 je.amount = purchase.amountPaid
                 je.accountChild.amount -= je.amount
+                je.accountChild.accountSubGroup.amount -= je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
                 je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
                 je.balance = je.accountChild.amount
                 je.save()
                 request.user.branch.journalEntries.add(je)
@@ -94,7 +102,11 @@ class POApprovalAPI(APIView):
                 je.accountChild = AccountChild.objects.get(name="Cash in Bank")
                 je.amount = purchase.amountPaid
                 je.accountChild.amount -= je.amount
+                je.accountChild.accountSubGroup.amount -= je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
                 je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
                 je.balance = je.accountChild.amount
                 je.save()
                 request.user.branch.journalEntries.add(je)
@@ -105,7 +117,11 @@ class POApprovalAPI(APIView):
                 je.accountChild = AccountChild.objects.get(name="Cash on Hand")
                 je.amount = purchase.amountPaid
                 je.accountChild.amount -= je.amount
+                je.accountChild.accountSubGroup.amount -= je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
                 je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
                 je.balance = je.accountChild.amount
                 je.save()
                 request.user.branch.journalEntries.add(je)
@@ -117,8 +133,12 @@ class POApprovalAPI(APIView):
                 payables.accountChild = purchase.party.accountChild.get(name="Trade Payables - " + purchase.party.name)
                 payables.amount = purchase.amountDue - purchase.amountPaid
                 payables.accountChild.amount += je.amount
+                payables.accountChild.accountSubGroup.amount += je.amount
+                payables.accountChild.accountSubGroup.accountGroup.amount += je.amount
                 payables.accountChild.save()
-                payables.balance = payables.accountChild.amount
+                payables.accountChild.accountSubGroup.save()
+                payables.accountChild.accountSubGroup.accountGroup.save()
+                payables.balance = je.accountChild.amount
                 payables.save()
                 request.user.branch.journalEntries.add(payables)
 
@@ -128,7 +148,11 @@ class POApprovalAPI(APIView):
                 je.accountChild = AccountChild.objects.get(name="Cash in Bank")
                 je.amount = purchase.amountPaid
                 je.accountChild.amount -= je.amount
+                je.accountChild.accountSubGroup.amount -= je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
                 je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
                 je.balance = je.accountChild.amount
                 je.save()
                 request.user.branch.journalEntries.add(je)
@@ -140,8 +164,12 @@ class POApprovalAPI(APIView):
                 payables.accountChild = purchase.party.accountChild.get(name="Trade Payables - " + purchase.party.name)
                 payables.amount = purchase.amountDue - purchase.amountPaid
                 payables.accountChild.amount += je.amount
+                payables.accountChild.accountSubGroup.amount += je.amount
+                payables.accountChild.accountSubGroup.accountGroup.amount += je.amount
                 payables.accountChild.save()
-                payables.balance = payables.accountChild.amount
+                payables.accountChild.accountSubGroup.save()
+                payables.accountChild.accountSubGroup.accountGroup.save()
+                payables.balance = je.accountChild.amount
                 payables.save()
                 request.user.branch.journalEntries.add(payables)
         
