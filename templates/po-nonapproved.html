@@ -101,6 +101,10 @@
                                 <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountDue)]]</span>
                             </div>
                             <div class="col-3 mt-3">
+                                <label class="gray">Total Amount</label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountTotal)]]</span>
+                            </div>
+                            <div class="col-3 mt-3">
                                 <label class="gray">Amount Paid</label><br>
                                 <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountPaid)]]</span>
                             </div>
@@ -272,6 +276,7 @@
 
                 amountDue: null,
                 amountPaid: null,
+                amountTotal: null,
                 paymentMethod: null,
                 paymentPeriod: null,
                 chequeNo: null,

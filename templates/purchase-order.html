@@ -139,24 +139,38 @@
                     <!-- ATC AND MORE -->
                     <div class="col-6 pl-0">
                         <div class="p-4 order-card-darker b-radius-15">
-                            <div class="row" v-for="(line, index) in purchaseOrder.atc">
+                            <div class="row">
                                 <div class="col-3 px-1">
                                     <label>ATC Code</label>
-                                    <select v-model="line.code" class="form-control">
-                                        
+                                </div>
+                                <div class="col-3 px-1">
+                                    <label>Amount Due</label>
+                                </div>
+                                <div class="col-3 px-1">
+                                    <label>Tax Rate</label>
+                                </div>
+                                <div class="col-3 px-1">
+                                    <label>Amount Withheld</label>
+                                </div>
+                            </div>
+                            <div class="row" v-for="(line, index) in purchaseOrder.atc">
+                                <div class="col-3 px-1">
+                                    <select v-model="line.code" class="form-control" @change="setATCRate(line.code, index)">
+                                        <option value="">None</option>
+                                        <optgroup v-for="atcGroup in formattedATCList" :label="atcGroup.name">
+                                            <option v-for="atc in atcGroup.list" :value="atc.id">[[atc.code]]</option>
+                                        </optgroup>
                                     </select>
                                 </div>
                                 <div class="col-3 px-1">
-                                    <label>Amount</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
                                         </div>
-                                        <input v-model="line.amount" type="number" step="0.02" class="form-control box-shadow-off">
+                                        <input v-model="line.amount" type="number" step="0.02" class="form-control box-shadow-off" readonly>
                                     </div>
                                 </div>
                                 <div class="col-3 px-1">
-                                    <label>Tax Rate</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">%</span>
@@ -165,13 +179,17 @@
                                     </div>
                                 </div>
                                 <div class="col-3 px-1">
-                                    <label>Amount Withheld</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
                                         </div>
                                         <input v-model="line.amountWithheld" type="number" step="0.02" class="form-control box-shadow-off" readonly>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col px-1">
+                                    <button @click="addATC()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
                                 </div>
                             </div>
                             <!-- REMARKS -->
@@ -187,13 +205,24 @@
                     <div class="col-6 pr-0">
                         <div class="p-4 order-card-darker b-radius-15">
                             <div class="row">
-                                <div class="col-6 px-1">
+                                <div class="col px-1">
                                     <label>Amount Due</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
                                         </div>
                                         <input type="text" :value="formatPrice(purchaseOrder.amountDue)" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 px-1">
+                                    <label>Total</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input type="text" :value="formatPrice(purchaseOrder.amountTotal)" class="form-control box-shadow-off" readonly>
                                     </div>
                                 </div>
                                 <div class="col-6 px-1">
@@ -254,6 +283,11 @@
                 Save
             </div>
         </div>
+        <form hidden action="/import-atc/" enctype="multipart/form-data" method="POST">{%csrf_token%}
+            <label>import atc list</label><br>
+            <input type="file" name="excel"><br>
+            <button>Import</button>
+        </form>
     </div>
     <pre>[[ $data ]]</pre>
 </div>
@@ -293,14 +327,15 @@
                     totalCost: null
                 }],
                 atc: [{
-                    code: null,
-                    amount: null,
-                    taxRate: null,
-                    amountWithheld: null,
+                    code: '',
+                    amount: 0,
+                    taxRate: 0,
+                    amountWithheld: 0,
                 }],
 
                 remarks: null,
                 amountDue: '0',
+                amountTotal: 0,
                 amountPaid: null,
                 paymentMethod: '',
                 paymentPeriod: null,
@@ -310,6 +345,8 @@
             },
             vendor: [],
             merchandiseInventory: [],
+            atcList: [],
+            formattedATCList: [],
             errors: []
 
         },
@@ -323,12 +360,20 @@
             },
             amountDue2(){
                 return Number(this.purchaseOrder.amountDue)
-            }
+            },
+            amountWithheld(){
+                return this.purchaseOrder.atc.map(item=>item.amountWithheld)
+            },
         },
 
         watch: {
             amountDue(){
                 this.purchaseOrder.amountDue = (this.amountDue.reduce((a, b)=>Number(a)+Number(b), 0)).toFixed(5)
+                this.purchaseOrder.atc.forEach(item=>{
+                    item.amount = Number(this.purchaseOrder.amountDue).toFixed(2)
+                })
+
+                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
             },
 
             amountDue2(){
@@ -345,7 +390,10 @@
                 } else {
                     this.purchaseOrder.paymentPeriod = 'Partial Payment'
                 }
-            }
+            },
+            amountWithheld(){
+                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+            },
         },
 
         methods:{
@@ -356,7 +404,7 @@
                 .catch(err=>{
                     Swal.fire({
                         title: "Something went wrong.",
-                        html: err,
+                        html: 'vendor failed to fetch',
                         icon: 'error'
                     })
                 })
@@ -366,7 +414,39 @@
                 .catch(err=>{
                     Swal.fire({
                         title: "Something went wrong.",
-                        html: err,
+                        html: 'inventory failed to fetch',
+                        icon: 'error'
+                    })
+                })
+
+                axios.get('/api/atc/')
+                .then(res=>this.atcList=res.data)
+                .then(res=>{
+                    var wiTempList = []
+                    var wcTempList = []
+
+                    this.atcList.forEach((item, index)=>{
+                        if(item.code.includes('WI')){
+                            wiTempList.push(item)
+                        } else {
+                            wcTempList.push(item)
+                        }
+                        this.formattedATCList = [
+                            {
+                                name: 'Individual',
+                                list: wiTempList
+                            },
+                            {
+                                name: 'Corporation',
+                                list: wcTempList
+                            }
+                        ]
+                    })
+                })
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: 'atc failed to fetch',
                         icon: 'error'
                     })
                 })
@@ -380,10 +460,37 @@
                     this.purchaseOrder.amountPaid &&
                     this.purchaseOrder.paymentMethod &&
                     this.purchaseOrder.paymentPeriod 
-                    ){
-
-                    this.submit()
-                    return false
+                    )
+                {
+                    var success=true
+                    for(var item in this.purchaseOrder.items){
+                        if(
+                            !item.type &&
+                            !item.code &&
+                            !item.quantity &&
+                            !item.vatable &&
+                            !item.totalCost
+                        )
+                        {
+                            success=false
+                        }
+                    }
+                    for(var item in this.purchaseOrder.atc){
+                        if(
+                            !item.code &&
+                            !item.amount &&
+                            !item.taxRate &&
+                            !item.amountWithheld
+                        )
+                        {
+                            success=false
+                        }
+                    }
+                    
+                    if(success){
+                        this.submit()
+                        return false
+                    }
                 }
                 this.errors = []
                 if (!this.purchaseOrder.code){
@@ -405,6 +512,39 @@
                     this.errors.push('Payment Period Required')
                 }
 
+                this.purchaseOrder.items.forEach((item, index)=>{
+                    if(!item.type){
+                        this.errors.push('Item Type Required at index: ' + String(index+1))
+                    }
+                    if(!item.code){
+                        this.errors.push('Item Code Required at index: ' + String(index+1))
+                    }
+                    if(!item.quantity){
+                        this.errors.push('Item Quantity Required at index: ' + String(index+1))
+                    }
+                    if(!item.vatable){
+                        this.errors.push('Purchasing Price Required at index: ' + String(index+1))
+                    }
+                    if(!item.totalCost){
+                        this.errors.push('Total Cost Required at index: ' + String(index+1))
+                    }
+                })
+
+                this.purchaseOrder.atc.forEach((item, index)=>{
+                    if(!item.code){
+                        this.errors.push('ATC Code Required at index: ' + String(index+1))
+                    }
+                    if(!item.amount){
+                        this.errors.push('ATC Amount Required at index: ' + String(index+1))
+                    }
+                    if(!item.taxRate){
+                        this.errors.push('ATC Tax Rate Required at index: ' + String(index+1))
+                    }
+                    if(!item.amountWithheld){
+                        this.errors.push('ATC Amount Withheld Required at index: ' + String(index+1))
+                    }
+                })
+
                 Swal.fire({
                     title: "Unfilled Inputs",
                     html: this.errors.join('<br>'),
@@ -421,40 +561,6 @@
                 return val
             },
 
-            purchaseOrderInitial(){
-                return{
-                    code: '{{new_code}}',
-                    date: new Date().toISOString().split('T')[0],
-                    dateTimeCreated: new Date().toISOString(),
-                    retroactive: null,
-                    vendor: '',
-                    items: [{
-                        type: '',
-                        code: '',
-                        remaining: null,
-                        quantity: null,
-                        vatable: 0.00,
-                        inputVAT: 0,
-                        totalCost: null
-                    }],
-                    atc: [{
-                        code: null,
-                        amount: null,
-                        taxRate: null,
-                        amountWithheld: null,
-                    }],
-                
-                    remarks: null,
-                    amountDue: '0',
-                    amountPaid: null,
-                    paymentMethod: '',
-                    paymentPeriod: null,
-                    chequeNo: null,
-                    dueDate: null,
-                    bank: null,
-                    }
-            },
-
             addLine(){
                 this.purchaseOrder.items.push({
                     type: '',
@@ -464,6 +570,15 @@
                     vatable: 0.00,
                     inputVAT: 0,
                     totalCost: null
+                })
+            },
+
+            addATC(){
+                this.purchaseOrder.atc.push({
+                    code: '',
+                    amount: Number(this.amountDue).toFixed(2),
+                    taxRate: 0,
+                    amountWithheld: 0,
                 })
             },
 
@@ -481,17 +596,23 @@
                 this.$delete(this.purchaseOrder.items, index)
             },
             submit(){
-                if(Number(this.purchaseOrder.amountDue) >= Number(this.purchaseOrder.amountPaid)){
+                if(Number(this.purchaseOrder.amountTotal) >= Number(this.purchaseOrder.amountPaid)){
                     axios.post('/save-purchase-order/', this.purchaseOrder, this.config)
                     .then(res=>res.data==0?location.reload():'')
                 } else {
                     Swal.fire({
                         title: 'Something went wrong',
-                        html: "Amount Paid should be less than or equal to Amount Due.",
+                        html: "Total should be less than or equal to Amount Due.",
                         icon: 'warning'
                     })
                 }
                 
+            },
+            setATCRate(code, index){
+                object = this.atcList.find(x=>x.id==code)
+                this.purchaseOrder.atc[index].taxRate = ((object.rate)*100).toFixed(2)
+
+                this.purchaseOrder.atc[index].amountWithheld = (((this.purchaseOrder.atc[index].taxRate)/100) * this.purchaseOrder.atc[index].amount).toFixed(2)
             }
         },
         mounted(){

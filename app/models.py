@@ -81,6 +81,14 @@ class Register(models.Model):
     def __str__(self):
         return str(self.pk) + self.first_name + " " + self.last_name
 
+class ATC(models.Model):
+    code = models.CharField(max_length=10)
+    rate = models.DecimalField(max_digits=10, decimal_places=5)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.code
+
 class AccountGroup(models.Model):
     code = models.CharField(max_length=50)
     name = models.CharField(max_length=50)
@@ -225,10 +233,11 @@ class PurchaseOrder(models.Model):
     datePurchased = models.DateField()
     party = models.ForeignKey(Party, related_name="purchaseorder", on_delete=models.PROTECT)
     # purchaseRequest = models.IntegerField()
-    atcCode = models.CharField(max_length=50, blank=True, null=True)
+    atcCode = models.ForeignKey(ATC, on_delete=models.PROTECT, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
     amountPaid = models.DecimalField(max_digits=18, decimal_places=5)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5)
+    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
     paymentMethod = models.CharField(max_length=50)
     paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True, blank=True)
@@ -271,7 +280,7 @@ class SalesContract(models.Model):
     dateSold = models.DateField()
     party = models.ForeignKey(Party, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
     salesOrder = models.IntegerField()
-    atcCode = models.CharField(max_length=50)
+    atcCode = models.ForeignKey(ATC, on_delete=models.PROTECT, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=18, decimal_places=5)
     amountPaid = models.DecimalField(max_digits=18, decimal_places=5, null = True)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)

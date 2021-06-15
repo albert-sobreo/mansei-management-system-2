@@ -33,6 +33,17 @@ class AccountChildSZ(serializers.ModelSerializer):
 
 
 
+########## ATC ##########
+class ATCSZ(serializers.ModelSerializer):
+    class Meta:
+        model = ATC
+        fields = '__all__'
+
+
+
+
+
+
 ########## PARTY ##########
 class PartySZ(serializers.ModelSerializer):
     class Meta:
