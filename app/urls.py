@@ -43,6 +43,9 @@ router.register(r"special-truck", views.SpecialTruckAPI, 'special-truck')
 ########## DELIVERIES ##########
 router.register(r"deliveries", views.DeliveriesAPI, 'deliveries')
 
+########## ATC ##########
+router.register(r"atc", views.ATCAPI, 'atc')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -86,5 +89,6 @@ urlpatterns = [
     path('deliveriesnonapproved/', login_required(views.DeliveriesNonApproved.as_view())),
     path('deliveriesapproved/', login_required(views.DeliveriesApproved.as_view())),
     path('approve-deliveries/<int:pk>/', login_required(views.DeliveriesApprovalAPI.as_view())),
-    path('return-truck/<int:pk>/', login_required(views.ReturnTruck.as_view()))
+    path('return-truck/<int:pk>/', login_required(views.ReturnTruck.as_view())),
+    path('import-atc/', login_required(views.ImportATC.as_view()))
 ]

@@ -164,3 +164,14 @@ class DeliveriesAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = DeliveriesSZ
     queryset = Deliveries.objects.all()
+
+
+
+
+
+
+########## ATC ##########
+class ATCAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ATCSZ
+    queryset = ATC.objects.all()

@@ -356,6 +356,9 @@
                 this.$delete(this.addJournalModal.credit, index)
             },
             submitJournal(){
+                var x = document.getElementById('save')
+                x.disabled = true
+
                 axios.post('/save-journal/', this.addJournalModal, this.config)
                 .then(res=>res.data==0?location.reload():'')
                 //.then(res=>this.loadData())
