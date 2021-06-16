@@ -361,6 +361,9 @@
             amountDue2(){
                 return Number(this.purchaseOrder.amountDue)
             },
+            amountTotal(){
+                return Number(this.purchaseOrder.amountTotal)
+            },
             amountWithheld(){
                 return this.purchaseOrder.atc.map(item=>item.amountWithheld)
             },
@@ -376,8 +379,8 @@
                 this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
             },
 
-            amountDue2(){
-                if (this.amountPaid == this.amountDue2){
+            amountTotal(){
+                if (this.amountPaid == this.amountTotal){
                     this.purchaseOrder.paymentPeriod = 'Full Payment'
                 } else {
                     this.purchaseOrder.paymentPeriod = 'Partial Payment'
@@ -385,7 +388,7 @@
             },
 
             amountPaid(){
-                if (this.amountPaid == this.amountDue2){
+                if (this.amountPaid == this.amountTotal){
                     this.purchaseOrder.paymentPeriod = 'Full Payment'
                 } else {
                     this.purchaseOrder.paymentPeriod = 'Partial Payment'
@@ -453,6 +456,8 @@
             },
 
             checkForm(e){
+                var success1 = false
+                var success2 = false
                 if (
                     this.purchaseOrder.code &&
                     this.purchaseOrder.date &&
@@ -462,34 +467,41 @@
                     this.purchaseOrder.paymentPeriod 
                     )
                 {
-                    var success=true
-                    for(var item in this.purchaseOrder.items){
+                    for(var item of this.purchaseOrder.items){
+                        console.log(item.type, item.code, item.quantity, item.vatable, item.totalCost)
                         if(
-                            !item.type &&
-                            !item.code &&
-                            !item.quantity &&
-                            !item.vatable &&
-                            !item.totalCost
+                            item.type &&
+                            item.code &&
+                            item.quantity &&
+                            item.vatable &&
+                            item.totalCost
                         )
                         {
-                            success=false
+                            success1=true
+                            console.log('i was here', success1)
+                        } else {
+                            success1 = false
+                            break
                         }
                     }
-                    for(var item in this.purchaseOrder.atc){
+                    for(var item of this.purchaseOrder.atc){
                         if(
-                            !item.code &&
-                            !item.amount &&
-                            !item.taxRate &&
-                            !item.amountWithheld
+                            item.code &&
+                            item.amount &&
+                            item.taxRate &&
+                            item.amountWithheld
                         )
                         {
-                            success=false
+                            success2=true
+                            console.log('i was here 2', success2)
+                        } else {
+                            success2=false
+                            break
                         }
                     }
-                    
-                    if(success){
+                    if(success1 && success2){
                         this.submit()
-                        return false
+                        return
                     }
                 }
                 this.errors = []

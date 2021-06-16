@@ -468,6 +468,7 @@ class Branch(models.Model):
     deliveryPhotos = models.ManyToManyField(DeliveryPhotos, blank = True)
     deliveryitemsGroup = models.ManyToManyField(DeliveryItemsGroup, blank = True)
     deliveryitemsMerch = models.ManyToManyField(DeliveryItemMerch, blank = True)
+    poatc = models.ManyToManyField(POatc, blank=True)
 
     def __str__(self):
         return self.name
