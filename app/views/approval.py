@@ -80,6 +80,20 @@ class POApprovalAPI(APIView):
         request.user.branch.journalEntries.add(je)
 
         je = JournalEntries()
+        wep = JournalEntries()
+        wep.journal = j
+        wep.normally = 'Credit'
+        wep.accountChild = AccountChild.objects.get(name="Withholding Expanded Payables")
+        wep.amount = purchase.poatc.amountWithheld
+        wep.accountChild.amount = wep.amount
+        wep.accountChild.accountSubGroup.amount -= wep.amount
+        wep.accountChild.accountSubGroup.accountGroup.amount -= wep.amount
+        wep.accountChild.save()
+        wep.accountChild.accountSubGroup.save()
+        wep.accountChild.accountSubGroup.accountGroup.save()
+        wep.balance = wep.accountChild.amount
+        wep.save()
+        request.user.branch.journalEntries.add(wep)
 
         if purchase.paymentPeriod == 'Full Payment':
             if purchase.paymentMethod == 'Cash on Hand':
@@ -131,7 +145,7 @@ class POApprovalAPI(APIView):
                 payables.journal = j
                 payables.normally = "Credit"
                 payables.accountChild = purchase.party.accountChild.get(name="Trade Payables - " + purchase.party.name)
-                payables.amount = purchase.amountDue - purchase.amountPaid
+                payables.amount = purchase.amountTotal - purchase.amountPaid
                 payables.accountChild.amount += je.amount
                 payables.accountChild.accountSubGroup.amount += je.amount
                 payables.accountChild.accountSubGroup.accountGroup.amount += je.amount
@@ -162,7 +176,7 @@ class POApprovalAPI(APIView):
                 payables.journal = j
                 payables.normally = "Credit"
                 payables.accountChild = purchase.party.accountChild.get(name="Trade Payables - " + purchase.party.name)
-                payables.amount = purchase.amountDue - purchase.amountPaid
+                payables.amount = purchase.amountTotal - purchase.amountPaid
                 payables.accountChild.amount += je.amount
                 payables.accountChild.accountSubGroup.amount += je.amount
                 payables.accountChild.accountSubGroup.accountGroup.amount += je.amount

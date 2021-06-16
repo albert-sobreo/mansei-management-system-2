@@ -65,14 +65,17 @@ class SavePurchaseOrder(APIView):
             po.datePurchased = purchaseOrder['date']
 
         po.party = Party.objects.get(pk=purchaseOrder['vendor'])
-        
+
+        atc = POatc()
+
         for atc in purchaseOrder['atc']:
-            po.atcCode = atc['code']
-            po.amountWithheld = atc['amountWithheld']
+            atc.code = atc['code']
+            atc.amountWithheld = atc['amountWithheld']
+            atc.purchaseOrder = atc['purchaseOrder']
         
         po.amountPaid = Decimal(purchaseOrder['amountPaid'])
         po.amountDue = Decimal(purchaseOrder['amountDue'])
-        
+        po.amountTotal = Decimal(purchaseOrder['amountTotal'])
         po.paymentMethod = purchaseOrder['paymentMethod']
         po.paymentPeriod = purchaseOrder['paymentPeriod']
         po.chequeNo = purchaseOrder['chequeNo']

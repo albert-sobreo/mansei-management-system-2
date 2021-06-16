@@ -233,8 +233,6 @@ class PurchaseOrder(models.Model):
     datePurchased = models.DateField()
     party = models.ForeignKey(Party, related_name="purchaseorder", on_delete=models.PROTECT)
     # purchaseRequest = models.IntegerField()
-    atcCode = models.ForeignKey(ATC, on_delete=models.PROTECT, null=True, blank=True)
-    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
     amountPaid = models.DecimalField(max_digits=18, decimal_places=5)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5)
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
@@ -273,6 +271,12 @@ class POItemsMerch(models.Model):
 
     def __str__(self):
         return self.purchaseOrder.code + " - " + self.merchInventory.code
+
+class POatc(models.Model):
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poatc",on_delete=models.PROTECT, null=True, blank=True)
+    code = models.ForeignKey(ATC, related_name="poatc",on_delete=models.PROTECT, null=True, blank=True)
+    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+    
 
 class SalesContract(models.Model):
     code = models.CharField(max_length=50)
