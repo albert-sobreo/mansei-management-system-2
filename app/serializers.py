@@ -115,6 +115,12 @@ class JournalSZ(serializers.ModelSerializer):
 
 
 ########## PURCHASE ORDER ##########
+class POatcSZ(serializers.ModelSerializer):
+    code = ATCSZ(read_only=True)
+    class Meta: 
+        model = POatc
+        fields = '__all__'
+
 class POItemsMerchNestedSZ(serializers.ModelSerializer):
     merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
     class Meta:
@@ -127,6 +133,7 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
     approvedBy = UserSZ(read_only=True)
     journal = JournalSZ(read_only=True)
     poitemsmerch = POItemsMerchNestedSZ(read_only=False, many=True)
+    poatc = POatcSZ(read_only=True, many=True)
 
     class Meta:
         model = PurchaseOrder

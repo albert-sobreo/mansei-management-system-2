@@ -68,10 +68,7 @@ class SavePurchaseOrder(APIView):
 
         atc = POatc()
 
-        for atc in purchaseOrder['atc']:
-            atc.code = atc['code']
-            atc.amountWithheld = atc['amountWithheld']
-            atc.purchaseOrder = atc['purchaseOrder']
+        
         
         po.amountPaid = Decimal(purchaseOrder['amountPaid'])
         po.amountDue = Decimal(purchaseOrder['amountDue'])
@@ -88,6 +85,14 @@ class SavePurchaseOrder(APIView):
 
         po.save()
         request.user.branch.purchaseOrder.add(po)
+
+        for jsonatc in purchaseOrder['atc']:
+            print(jsonatc)
+            atc.code = ATC.objects.get(pk=jsonatc['code'])
+            atc.amountWithheld = jsonatc['amountWithheld']
+            atc.purchaseOrder = po
+            atc.save()
+            request.user.branch.poatc.add(atc)
 
         for item in purchaseOrder['items']:
             poitemsmerch = POItemsMerch()

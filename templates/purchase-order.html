@@ -34,9 +34,16 @@
                     <label>Date</label>
                     <input v-model="purchaseOrder.date" type="date" class="form-control" name="date">
                 </div>
-                <div class="col col-2 pl-2">
+                <div class="col col-2 px-2">
                     <label><span>Retroactive</span>&nbsp;<span class="font-size-10 gray">(optional)</span></label>
                     <input v-model="purchaseOrder.retroactive" type="date" class="form-control" name="retroactiveDate">
+                </div>
+                <div class="col col-2 pl-2">
+                    <label>Purchase Request</label>
+                    <select name="pr" class="form-control">
+                        <option value="-1" selected disabled>Choose Request</option>
+                        <option value="">None</option>
+                    </select>
                 </div>
             </div>
             <!-- VENDOR -->
@@ -48,11 +55,23 @@
                         <option v-for="v in vendor" :value="v.id">[[v.name]]</option>
                     </select>
                 </div>
+                <div class="col col-2 px-2">
+                    <label>Tax Type</label>
+                    <select v-model="purchaseOrder.taxType" class="form-control">
+                        <option value="" selected disabled>Choose Tax Type</option>
+                        <option value="VAT">VAT</option>
+                        <option value="Percentage">Percentage</option>
+                    </select>
+                </div>
                 <div class="col col-2 pl-2">
-                    <label>Purchase Request</label>
-                    <select name="pr" class="form-control">
-                        <option value="-1" selected disabled>Choose Request</option>
-                        <option value="">None</option>
+                    <label for="">Tax Rate</label>
+                    <select v-model="purchaseOrder.taxRate" class="form-control">
+                        <option value="" selected disabled>Choose Tax Rate</option>
+                        <option value="0">0%</option>
+                        <option value="1">1%</option>
+                        <option value="3">3%</option>
+                        <option value="12">12%</option>
+                        <option value="30">30%</option>
                     </select>
                 </div>
             </div>
@@ -74,9 +93,6 @@
                     </div>
                     <div class="col-2 px-1">
                         <label for="order-quantity" class="m-0">Purchasing Price <span class="font-size-10 gray">per qty</span></label>
-                    </div>
-                    <div class="col-2 px-1">
-                        <label for="cost-per-item" class="m-0">Input VAT</label>
                     </div>
                     <div class="col-2 px-1">
                         <label for="Total Cost" class="m-0">Total Cost</label>
@@ -114,14 +130,6 @@
                             <input v-model="item.vatable" @change="onForTotalCost(index)" type="number" step="0.01" class="form-control box-shadow-off" min="0">
                         </div>
                     </div>
-                    <div class="col-2 px-1">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">%</span>
-                            </div>
-                            <input v-model="item.inputVAT" type="number" @change="onForTotalCost(index)" step="0.01" class="form-control box-shadow-off" min="0">
-                        </div>
-                    </div>
                     <div class="col-2 pl-1">
                         <input type="text" :value="formatPrice(item.totalCost)" class="form-control" readonly>
                     </div>
@@ -144,7 +152,7 @@
                                     <label>ATC Code</label>
                                 </div>
                                 <div class="col-3 px-1">
-                                    <label>Amount Due</label>
+                                    <label>Tax Base</label>
                                 </div>
                                 <div class="col-3 px-1">
                                     <label>Tax Rate</label>
@@ -183,17 +191,12 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
                                         </div>
-                                        <input v-model="line.amountWithheld" type="number" step="0.02" class="form-control box-shadow-off" readonly>
+                                        <input :value="formatPrice(line.amountWithheld)" type="number" step="0.02" class="form-control box-shadow-off" readonly>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col px-1">
-                                    <button @click="addATC()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
-                                </div>
-                            </div>
                             <!-- REMARKS -->
-                            <div class="row">
+                            <div class="row mt-2">
                                 <div class="col-12 px-1">
                                     <label>Remarks</label>
                                     <textarea v-model="purchaseOrder.remarks" cols="30" rows="2" class="form-control" placeholder="Enter Remarks (Optional)"></textarea>
@@ -206,12 +209,32 @@
                         <div class="p-4 order-card-darker b-radius-15">
                             <div class="row">
                                 <div class="col px-1">
-                                    <label>Amount Due</label>
+                                    <label>Sub-Total</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
                                         </div>
                                         <input type="text" :value="formatPrice(purchaseOrder.amountDue)" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 px-1">
+                                    <label>Tax <span class="gray font-size-10">Inclusive</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input :value="formatPrice(purchaseOrder.taxPeso)" type="text" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-6 px-1">
+                                    <label>Withholding Tax</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input :value="formatPrice(purchaseOrder.withholdingTax)" type="text" class="form-control box-shadow-off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -235,7 +258,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row mt-4">
                                 <div class="col-12 px-1">
                                     <label>Payment Method</label>
                                 </div>
@@ -317,6 +340,8 @@
                 dateTimeCreated: new Date().toISOString(),
                 retroactive: null,
                 vendor: '',
+                taxType: '',
+                taxRate: '',
                 items: [{
                     type: '',
                     code: '',
@@ -332,7 +357,8 @@
                     taxRate: 0,
                     amountWithheld: 0,
                 }],
-
+                taxPeso: 0,
+                withholdingTax: 0,
                 remarks: null,
                 amountDue: '0',
                 amountTotal: 0,
@@ -361,9 +387,15 @@
             amountDue2(){
                 return Number(this.purchaseOrder.amountDue)
             },
+            amountTotal(){
+                return Number(this.purchaseOrder.amountTotal)
+            },
             amountWithheld(){
                 return this.purchaseOrder.atc.map(item=>item.amountWithheld)
             },
+            taxRate(){
+                return Number(this.purchaseOrder.taxRate)
+            }
         },
 
         watch: {
@@ -374,10 +406,13 @@
                 })
 
                 this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                this.purchaseOrder.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
+                this.purchaseOrder.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                this.purchaseOrder.atc[0].amountWithheld = ((this.purchaseOrder.atc[0].taxRate) / 100) * this.purchaseOrder.amountDue
             },
 
-            amountDue2(){
-                if (this.amountPaid == this.amountDue2){
+            amountTotal(){
+                if (this.amountPaid == this.amountTotal){
                     this.purchaseOrder.paymentPeriod = 'Full Payment'
                 } else {
                     this.purchaseOrder.paymentPeriod = 'Partial Payment'
@@ -385,7 +420,7 @@
             },
 
             amountPaid(){
-                if (this.amountPaid == this.amountDue2){
+                if (this.amountPaid == this.amountTotal){
                     this.purchaseOrder.paymentPeriod = 'Full Payment'
                 } else {
                     this.purchaseOrder.paymentPeriod = 'Partial Payment'
@@ -393,7 +428,13 @@
             },
             amountWithheld(){
                 this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                this.purchaseOrder.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
+                this.purchaseOrder.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
             },
+            taxRate(){
+                this.purchaseOrder.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
+                this.purchaseOrder.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+            }
         },
 
         methods:{
@@ -453,46 +494,73 @@
             },
 
             checkForm(e){
+<<<<<<< HEAD
                 var success=true
+=======
+                var success1 = false
+                var success2 = false
+>>>>>>> 947af0eeff4b72fade0b6ae60c245d8813733a16
                 if (
                     this.purchaseOrder.code &&
                     this.purchaseOrder.date &&
                     this.purchaseOrder.vendor &&
                     this.purchaseOrder.amountPaid &&
                     this.purchaseOrder.paymentMethod &&
-                    this.purchaseOrder.paymentPeriod 
+                    this.purchaseOrder.paymentPeriod &&
+                    this.purchaseOrder.taxType &&
+                    this.purchaseOrder.taxRate
                     )
                 {
+<<<<<<< HEAD
                     
                     for(var item in this.purchaseOrder.items){
+=======
+                    for(var item of this.purchaseOrder.items){
+                        console.log(item.type, item.code, item.quantity, item.vatable, item.totalCost)
+>>>>>>> 947af0eeff4b72fade0b6ae60c245d8813733a16
                         if(
-                            !item.type &&
-                            !item.code &&
-                            !item.quantity &&
-                            !item.vatable &&
-                            !item.totalCost
+                            item.type &&
+                            item.code &&
+                            item.quantity &&
+                            item.vatable &&
+                            item.totalCost
                         )
                         {
+<<<<<<< HEAD
                             success=false
                             console.log(success,'for1')
+=======
+                            success1=true
+                            console.log('i was here', success1)
+                        } else {
+                            success1 = false
+                            break
+>>>>>>> 947af0eeff4b72fade0b6ae60c245d8813733a16
                         }
                     }
-                    for(var item in this.purchaseOrder.atc){
+                    for(var item of this.purchaseOrder.atc){
                         if(
-                            !item.code &&
-                            !item.amount &&
-                            !item.taxRate &&
-                            !item.amountWithheld
+                            item.code &&
+                            item.amount &&
+                            item.taxRate &&
+                            item.amountWithheld
                         )
                         {
+<<<<<<< HEAD
                             success=false
                             console.log(success,'for2')
+=======
+                            success2=true
+                            console.log('i was here 2', success2)
+                        } else {
+                            success2=false
+                            break
+>>>>>>> 947af0eeff4b72fade0b6ae60c245d8813733a16
                         }
                     }
-                    
-                    if(success){
+                    if(success1 && success2){
                         this.submit()
-                        return false
+                        return
                     }
                 }
                 this.errors = []
@@ -514,6 +582,12 @@
                 }
                 if (!this.purchaseOrder.paymentPeriod){
                     this.errors.push('Payment Period Required')
+                }
+                if (!this.purchaseOrder.taxType){
+                    this.errors.push('Tax Type Required')
+                }
+                if (!this.purchaseOrder.taxRate){
+                    this.errors.push('Tax Rate Required')
                 }
 
                 this.purchaseOrder.items.forEach((item, index)=>{
@@ -593,7 +667,7 @@
 
             onForTotalCost(index){
                 row = this.purchaseOrder.items[index]
-                row.totalCost = Number((row.vatable * row.quantity * (1+(row.inputVAT/100)).toFixed(4))).toFixed(4)
+                row.totalCost = Number(row.vatable * row.quantity).toFixed(4)
             },
 
             remove (index) {

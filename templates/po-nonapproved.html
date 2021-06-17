@@ -135,19 +135,15 @@
                         <div class="order-card row my-2">
                             <div class="col-3 my-3">
                                 <label class="gray">ATC Code</label><br>
-                                <span class="font-size-14 font-bold">[[this.poModal.atcCode]]</span>
-                            </div>
-                            <div class="col-3 my-3">
-                                <label class="gray">Amount</label><br>
-                                <span class="font-size-14 font-bold"></span>
+                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">[[atc.code.code]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Tax Rate</label><br>
-                                <span class="font-size-14 font-bold"></span>
+                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">[[formatPrice(atc.code.rate*100)]]%</span>
                             </div>       
                             <div class="col-3 my-3">
                                 <label class="gray">Amount Withheld</label><br>
-                                <span class="font-size-14 font-bold">[[this.poModal.amountWithheld]]</span>
+                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">₱[[formatPrice(atc.amountWithheld)]]</span>
                             </div>  
                         </div>
 
@@ -283,8 +279,14 @@
                 dueDate: null,
                 remarks: null,
 
-                atcCode: null,
-                amountWithheld: null,
+                poatc: [{
+                    amountWithheld: null,
+                    code: {
+                        code: null,
+                        rate: null
+                    }
+
+                }]
             },
             updatePO:{},
             roundToggle: false,

@@ -236,6 +236,7 @@ class PurchaseOrder(models.Model):
     amountPaid = models.DecimalField(max_digits=18, decimal_places=5)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5)
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5)
     paymentMethod = models.CharField(max_length=50)
     paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True, blank=True)
@@ -469,6 +470,7 @@ class Branch(models.Model):
     deliveryPhotos = models.ManyToManyField(DeliveryPhotos, blank = True)
     deliveryitemsGroup = models.ManyToManyField(DeliveryItemsGroup, blank = True)
     deliveryitemsMerch = models.ManyToManyField(DeliveryItemMerch, blank = True)
+    poatc = models.ManyToManyField(POatc, blank=True)
 
     def __str__(self):
         return self.name

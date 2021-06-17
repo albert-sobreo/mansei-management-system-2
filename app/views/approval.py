@@ -84,7 +84,9 @@ class POApprovalAPI(APIView):
         wep.journal = j
         wep.normally = 'Credit'
         wep.accountChild = AccountChild.objects.get(name="Withholding Expanded Payables")
-        wep.amount = purchase.poatc.amountWithheld
+        # wep.amount = purchase.poatc.amountWithheld
+        for poatc in purchase.poatc.all():
+            wep.amount = poatc.amountWithheld
         wep.accountChild.amount = wep.amount
         wep.accountChild.accountSubGroup.amount -= wep.amount
         wep.accountChild.accountSubGroup.accountGroup.amount -= wep.amount
