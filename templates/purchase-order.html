@@ -453,6 +453,7 @@
             },
 
             checkForm(e){
+                var success=true
                 if (
                     this.purchaseOrder.code &&
                     this.purchaseOrder.date &&
@@ -462,7 +463,7 @@
                     this.purchaseOrder.paymentPeriod 
                     )
                 {
-                    var success=true
+                    
                     for(var item in this.purchaseOrder.items){
                         if(
                             !item.type &&
@@ -473,6 +474,7 @@
                         )
                         {
                             success=false
+                            console.log(success,'for1')
                         }
                     }
                     for(var item in this.purchaseOrder.atc){
@@ -484,6 +486,7 @@
                         )
                         {
                             success=false
+                            console.log(success,'for2')
                         }
                     }
                     
@@ -493,6 +496,7 @@
                     }
                 }
                 this.errors = []
+                success = true
                 if (!this.purchaseOrder.code){
                     this.errors.push('Code Required')
                 }

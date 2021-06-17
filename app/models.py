@@ -247,6 +247,7 @@ class PurchaseOrder(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default=False)
     journal = models.ForeignKey(Journal, related_name="purchaseorder", on_delete=models.PROTECT, null=True, blank=True)
+    fullyPaid = models.BooleanField(null = True, default = False)
 
     class Meta:
         verbose_name = "Purchase Order"
@@ -283,11 +284,10 @@ class SalesContract(models.Model):
     datetimeCreated = models.DateTimeField()
     dateSold = models.DateField()
     party = models.ForeignKey(Party, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
-    salesOrder = models.IntegerField()
-    atcCode = models.ForeignKey(ATC, on_delete=models.PROTECT, null=True, blank=True)
-    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5)
+    #salesOrder = models.IntegerField()
     amountPaid = models.DecimalField(max_digits=18, decimal_places=5, null = True)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)
+    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
     paymentMethod = models.CharField(max_length=50)
     paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True)
@@ -299,6 +299,7 @@ class SalesContract(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True)
     journal = models.ForeignKey(Journal, related_name="tempsalescontract", on_delete=models.PROTECT, null=True, blank=True)
+    fullyPaid = models.BooleanField(null = True, default = False)
 
     class Meta:
         verbose_name = "Sales Contract"
