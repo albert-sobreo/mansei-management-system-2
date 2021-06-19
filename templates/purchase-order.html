@@ -494,12 +494,8 @@
             },
 
             checkForm(e){
-<<<<<<< HEAD
-                var success=true
-=======
                 var success1 = false
                 var success2 = false
->>>>>>> 947af0eeff4b72fade0b6ae60c245d8813733a16
                 if (
                     this.purchaseOrder.code &&
                     this.purchaseOrder.date &&
@@ -511,13 +507,8 @@
                     this.purchaseOrder.taxRate
                     )
                 {
-<<<<<<< HEAD
-                    
-                    for(var item in this.purchaseOrder.items){
-=======
                     for(var item of this.purchaseOrder.items){
                         console.log(item.type, item.code, item.quantity, item.vatable, item.totalCost)
->>>>>>> 947af0eeff4b72fade0b6ae60c245d8813733a16
                         if(
                             item.type &&
                             item.code &&
@@ -526,16 +517,11 @@
                             item.totalCost
                         )
                         {
-<<<<<<< HEAD
-                            success=false
-                            console.log(success,'for1')
-=======
                             success1=true
                             console.log('i was here', success1)
                         } else {
                             success1 = false
                             break
->>>>>>> 947af0eeff4b72fade0b6ae60c245d8813733a16
                         }
                     }
                     for(var item of this.purchaseOrder.atc){
@@ -546,16 +532,11 @@
                             item.amountWithheld
                         )
                         {
-<<<<<<< HEAD
-                            success=false
-                            console.log(success,'for2')
-=======
                             success2=true
                             console.log('i was here 2', success2)
                         } else {
                             success2=false
                             break
->>>>>>> 947af0eeff4b72fade0b6ae60c245d8813733a16
                         }
                     }
                     if(success1 && success2){
