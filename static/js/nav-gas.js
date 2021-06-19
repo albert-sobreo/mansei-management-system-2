@@ -48,7 +48,7 @@ Vue.component('navbar-gas', {
             <div class="btn-group mx-3">
                 <a id="nav-purchase" href="#" class="" data-toggle="dropdown">Purchase</a>
                 <div class="dropdown-menu b-radius-5 py-0">
-                    <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Purchase Request</a>
+                    <a href="/purchase-request/" class="dropdown-item d-item-gas font-size-12 font-semibold">Purchase Request</a>
                     <a href="/purchase-order/" class="dropdown-item d-item-gas font-size-12 font-semibold">Purchase Order</a>
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Receiving Report</a>
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Inward Inventory</a> 

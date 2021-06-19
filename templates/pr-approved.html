@@ -1,5 +1,5 @@
 {% extends 'base-template.html' %}
-{% block title %}Purchase Request | Pending{% endblock %}
+{% block title %}Purchase Request | Approved{% endblock %}
 
 {% block body %}
 
@@ -14,8 +14,8 @@
         <!-- MORE NAVIGATION -->
         <div class="d-flex font-semibold mb-2 justify-content-center">
             <div class="justify-content-center c-nav-links gas-nav">
-                <a href="/pr-nonapproved/" class="active-gas mx-2">Pending</a>
-                <a href="/pr-approved/" class="mx-2">Approved</a>
+                <a href="/pr-nonapproved/" class="mx-2">Pending</a>
+                <a href="/pr-approved/" class="active-gas mx-2">Approved</a>
             </div>
         </div>
 
@@ -56,7 +56,7 @@
                             </div>
                             <div class="col-6 mt-3">
                                 <label class='gray'>Status</label><br>
-                                <span class="font-size-14 font-bold">Pending</span>
+                                <span class="font-size-14 font-bold">Approved</span>
                             </div>
                             <!-- LVL 2 -->
                             <div class="col-6 my-3">

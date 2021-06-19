@@ -12,3 +12,4 @@ from .approval import *
 from .sales import *
 from .deliveries import *
 from .imports import *
+from .pr import *
