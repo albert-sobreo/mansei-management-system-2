@@ -226,6 +226,7 @@ class MerchandiseInventory(models.Model):
 
     def __str__(self):
         return self.code
+    
 
 class PurchaseRequest(models.Model):
     code = models.CharField(max_length=50)
@@ -442,6 +443,14 @@ class SCItemsMerch(models.Model):
 
     def __str__(self):
         return self.merchInventory.name
+
+class VendorQuotesMerch(models.Model):
+    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="vendorquotesmerch",on_delete=models.PROTECT, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="vendorquotesmerch", on_delete=models.PROTECT, null=True, blank=True)
+
+class VendorQuotesItemsMerch(models.Model):
+    price = models.DecimalField(max_digits=18, decimal_places=5)
+    party = models.ForeignKey(Party, related_name="vendorquotesitemsmerch", on_delete=models.PROTECT)
 
 class Driver(models.Model):
     driverID = models.CharField(max_length=50, default='0')
