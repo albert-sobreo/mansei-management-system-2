@@ -22,7 +22,7 @@ class PRapprovedView(View):
 
         user = request.user
         context = {
-            'prequest': user.branch.purchaseRequest.filter(approved=True),
+            'purchase': user.branch.purchaseRequest.filter(approved=True),
         }
         return render(request, 'pr-approved.html', context)
 
@@ -31,7 +31,7 @@ class PRnonapprovedView(View):
 
         user = request.user
         context = {
-            'prequest': user.branch.purchaseRequest.filter(approved=False),
+            'purchase': user.branch.purchaseRequest.filter(approved=False),
         }
         return render(request, 'pr-nonapproved.html', context)
 

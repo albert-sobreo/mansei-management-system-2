@@ -95,5 +95,6 @@ urlpatterns = [
     path('deliveriesapproved/', login_required(views.DeliveriesApproved.as_view())),
     path('approve-deliveries/<int:pk>/', login_required(views.DeliveriesApprovalAPI.as_view())),
     path('return-truck/<int:pk>/', login_required(views.ReturnTruck.as_view())),
-    path('import-atc/', login_required(views.ImportATC.as_view()))
+    path('import-atc/', login_required(views.ImportATC.as_view())),
+    path('purchase-request/', login_required(views.PurchaseRequestView.as_view()))
 ]
