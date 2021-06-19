@@ -35,6 +35,19 @@ class PRnonapprovedView(View):
         }
         return render(request, 'pr-nonapproved.html', context)
 
+class PRApprovalAPI(APIView):
+    def put(self, request, pk, format = None):
+
+        prequest = PurchaseRequest.objects.get(pk=pk)
+
+        prequest.datetimeApproved = request.data['datetimeApproved']
+        prequest.approved = True
+        prequest.approvedBy = request.user
+        prequest.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
 ################# PURCHASE ORDER #################
 
 class POapprovedView(View):

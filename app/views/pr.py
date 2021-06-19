@@ -1,5 +1,4 @@
 from django import views
-from django.core.exceptions import NON_FIELD_EprORS
 from django.db.models import query
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
@@ -87,3 +86,12 @@ class SavePurchaseRequest(APIView):
             request.user.branch.pritemsmerch.add(pritemsmerch)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class VendorQuotes(APIView):
+    def get(self, request, format = None):
+
+        items = MerchandiseInventory.objects.get(pk = request.data['id'])
+        
+        for party in Party.objects.filter(type = 'Vendor'):
+            if items.poitemsmerch.filter(purchaseOrder__party = party.pk).count():
+                json = []
