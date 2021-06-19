@@ -227,12 +227,41 @@ class MerchandiseInventory(models.Model):
     def __str__(self):
         return self.code
 
+class PurchaseRequest(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    dateRequested = models.DateField()
+    dateNeeded = models.DateField()
+    department = models.CharField(max_length=50)
+    intendedFor = models.CharField(max_length=200)
+
+    class Meta:
+        verbose_name = "Purchase Request"
+        verbose_name_plural = "Purchase Requests"
+
+    def __str__(self):
+        return self.code
+
+
+class PRItemsMerch(models.Model):
+    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="pritemsmerch",on_delete=models.PROTECT, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="pritemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.PositiveIntegerField()
+
+    class Meta:
+        verbose_name = 'PR Items Merch'
+        verbose_name_plural = "PR Items Merchs"
+
+    def __str__(self):
+        return self.purchaseRequest.code + " - " + self.merchInventory.code
+
 class PurchaseOrder(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     datePurchased = models.DateField()
     party = models.ForeignKey(Party, related_name="purchaseorder", on_delete=models.PROTECT)
-    # purchaseRequest = models.IntegerField()
+    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="purchaseorder",on_delete=models.PROTECT, null=True, blank=True)
     amountPaid = models.DecimalField(max_digits=18, decimal_places=5)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5)
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
@@ -280,6 +309,58 @@ class POatc(models.Model):
     code = models.ForeignKey(ATC, related_name="poatc",on_delete=models.PROTECT, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
     
+class ReceivingReport(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    dateReceived = models.DateField()
+    party = models.ForeignKey(Party, related_name="receivingreport", on_delete=models.PROTECT)
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="receivingreport",on_delete=models.PROTECT, null=True, blank=True)
+    amountPaid = models.DecimalField(max_digits=18, decimal_places=5)
+    amountDue = models.DecimalField(max_digits=18, decimal_places=5)
+    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    taxType = models.CharField(max_length=20, null = True, blank = True)
+    taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5)
+    paymentMethod = models.CharField(max_length=50)
+    paymentPeriod = models.CharField(max_length=50)
+    chequeNo = models.CharField(max_length=50, null=True, blank=True)
+    dueDate = models.DateField(null = True, blank = True)
+    bank = models.CharField(max_length=50, blank=True, null=True)
+    remarks = models.TextField(null = True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "rrCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "rrApprovedBy")
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    approved = models.BooleanField(null = True, default=False)
+    journal = models.ForeignKey(Journal, related_name="receivingreport", on_delete=models.PROTECT, null=True, blank=True)
+    fullyPaid = models.BooleanField(null = True, default = False)
+
+    class Meta:
+        verbose_name = "Receiving Report"
+        verbose_name_plural = "Receiving Reports"
+
+    def __str__(self):
+        return self.code
+
+class RRItemsMerch(models.Model):
+    receivingReport = models.ForeignKey(ReceivingReport, related_name="rritemsmerch",on_delete=models.PROTECT, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="rritemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.PositiveIntegerField()
+    purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
+    totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
+    delivered = models.BooleanField(null = True, default=False)
+
+    class Meta:
+        verbose_name = 'RR Items Merch'
+        verbose_name_plural = "RR Items Merchs"
+
+    def __str__(self):
+        return self.receivingReport.code + " - " + self.merchInventory.code
+
+class RRatc(models.Model):
+    receivingReport = models.ForeignKey(ReceivingReport, related_name="rratc",on_delete=models.PROTECT, null=True, blank=True)
+    code = models.ForeignKey(ATC, related_name="rratc",on_delete=models.PROTECT, null=True, blank=True)
+    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
 
 class SalesContract(models.Model):
     code = models.CharField(max_length=50)
