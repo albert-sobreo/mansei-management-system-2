@@ -234,6 +234,11 @@ class PurchaseRequest(models.Model):
     dateNeeded = models.DateField()
     department = models.CharField(max_length=50)
     intendedFor = models.CharField(max_length=200)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "prCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "prApprovedBy")
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    approved = models.BooleanField(null = True, default=False)
+    
 
     class Meta:
         verbose_name = "Purchase Request"

@@ -16,7 +16,26 @@ import sweetify
 from decimal import Decimal
 from datetime import datetime
 
-################# PURCHASE #################
+################# PURCHASE REQUEST #################
+class PRapprovedView(View):
+    def get(self, request, format=None):
+
+        user = request.user
+        context = {
+            'prequest': user.branch.purchaseRequest.filter(approved=True),
+        }
+        return render(request, 'pr-approved.html', context)
+
+class PRnonapprovedView(View):
+    def get(self, request, format=None):
+
+        user = request.user
+        context = {
+            'prequest': user.branch.purchaseRequest.filter(approved=False),
+        }
+        return render(request, 'pr-nonapproved.html', context)
+
+################# PURCHASE ORDER #################
 
 class POapprovedView(View):
     def get(self, request, format=None):
