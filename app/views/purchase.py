@@ -73,6 +73,9 @@ class SavePurchaseOrder(APIView):
         po.amountPaid = Decimal(purchaseOrder['amountPaid'])
         po.amountDue = Decimal(purchaseOrder['amountDue'])
         po.amountTotal = Decimal(purchaseOrder['amountTotal'])
+        po.taxType = purchaseOrder['taxType']
+        po.taxRate = Decimal(purchaseOrder['taxRate'])
+        po.taxPeso = Decimal(purchaseOrder['taxPeso'])
         po.paymentMethod = purchaseOrder['paymentMethod']
         po.paymentPeriod = purchaseOrder['paymentPeriod']
         po.chequeNo = purchaseOrder['chequeNo']

@@ -236,6 +236,8 @@ class PurchaseOrder(models.Model):
     amountPaid = models.DecimalField(max_digits=18, decimal_places=5)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5)
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    taxType = models.CharField(max_length=20, null = True, blank = True)
+    taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5)
     paymentMethod = models.CharField(max_length=50)
     paymentPeriod = models.CharField(max_length=50)
@@ -264,7 +266,6 @@ class POItemsMerch(models.Model):
     qty = models.PositiveIntegerField()
     purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
     totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
-    inputVat = models.DecimalField(max_digits=20, decimal_places=5)
     delivered = models.BooleanField(null = True, default=False)
 
     class Meta:
