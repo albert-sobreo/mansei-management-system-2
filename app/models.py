@@ -225,7 +225,7 @@ class MerchandiseInventory(models.Model):
         verbose_name_plural = "Merchandise Inventories"
 
     def __str__(self):
-        return self.code
+        return str(self.pk) + ' ' + str(self.code)
     
 
 class PurchaseRequest(models.Model):

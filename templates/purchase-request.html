@@ -54,6 +54,9 @@
 					</select>
 				</div>
 			</div>
+
+
+			<button @click="testData(null, 0)">Send Test Data</button>
 			<!-- END DEPARTMENT -->
 
 			<!-- ITEMS *** -->
@@ -74,18 +77,19 @@
 					<i class="fas fa-minus-circle stop pl-3" style="color:rgba(0,0,0,0)"></i>
 				</div>
 				<!-- V-FOR ITEMS *** -->
-				<div class="row" >
+				<div v-for="(item, index) in purchaseRequest.items"  class="row" >
 					<div class="col-2 px-1">
-						<select class="form-control">
+						<select v-model="item.type" class="form-control">
 							<option value="" selected disabled>Choose Type</option>
-							<option value="">Hello world</option>
+                            <option v-for="type in inventoryTypes" :value="type">[[type]]</option>
 						</select>
 					</div>
 					<div class="col px-1">
-						<select class="form-control">
+						<select @change="testData(item.code, index)" v-model="item.code" class="form-control" v-if="item.type=='Merchandise'">
 							<option value="" selected disabled>Choose Merchandise Inventory</option>
-							<option value=""></option>
+							<option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]]</option>
 						</select>
+						<select v-model="item.code" class="form-control" v-else></select>
 					</div>
 					<div class="col-2 px-1">
 						<input type="number" class="form-control" readonly>
@@ -130,35 +134,23 @@
 				<th>Vendor 2</th>
 			</thead>
 			<tbody>
-				<tr>
+				<tr v-for="(item, index) in vendorquotes">
 					<td class="align-middle py-4">
-						<span class="font-bold">Bond Paper A4</span>
+						<span class="font-bold">[[item.item]]</span>
 					</td>
 					<td class="align-middle py-4">
-						<span>P800.00</span><br>
-						<span class="gray">Diorella Printshop</span>
+						<span>[[item.info[0].purchasingPrice]]</span><br>
+						<span class="gray">[[item.info[0].name]]</span>
 					</td>
 					<td class="align-middle py-4">
-						<span>P750.00</span><br>
-						<span class="gray">Ilonggo Variety Shop</span>
-					</td>
-				</tr>
-				<tr>
-					<td class="align-middle py-4">
-						<span class="font-bold">HP GT51 Black Ink </span>
-					</td>
-					<td class="align-middle py-4">
-						<span>₱200.00</span><br>
-						<span class="gray">PCWorx</span>
-					</td>
-					<td class="align-middle py-4">
-						<span>P750.00</span><br>
-						<span class="gray">Octagon</span>
+						<span>[[item.info[1].purchasingPrice]]</span><br>
+						<span class="gray">[[item.info[1].name]]</span>
 					</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
+	<pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -169,8 +161,116 @@
 
 <script>
 	var app = new Vue({
-			delimiters: ['[[', ']]'],
-			el: '#app'
+		delimiters: ['[[', ']]'],
+		el: '#app',
+		data: {
+			config: {
+				headers: {
+					"X-CSRFToken": getCookie('csrftoken')
+				}
+			},
+			inventoryTypes: [
+        	    'Merchandise',
+        	    'Manufacturing',
+				'Office Supplies'
+        	],
+			purchaseRequest:{
+				type: null,
+				code: null,
+				items: [{
+					type: null,
+					item: null,
+					onHand: null,
+					qty: null,
+				}]
+			},
+			vendorquotes: [{
+				item: null,
+				info: [
+				{
+					purchasingPrice: null,
+					name: null,
+				},
+				{
+					purchasingPrice: null,
+					name: null,
+				},
+				
+				]	
+			}],
+			merchandiseInventory: [],
+		},
+		methods: {
+			loadData(){
+				axios.get('/api/merchinventory/')
+				.then(res=>this.merchandiseInventory=res.data)
+				.catch(err=>{
+					Swal.fire({
+						title: "Something went wrong.",
+						html: 'inventory failed to fetch',
+						icon: 'error'
+					})
+				})
+			},
+			testData(pk, index){
+				axios.post('/getvendorquotes/', {id:pk}, this.config)
+				.then(res=>{
+					item = res.data[0]
+					vendor1 = res.data[1]
+					vendor2 = res.data[2]
+					this.vendorquotes[index].info=[{
+						purchasingPrice: null,
+						name: null,
+					},
+					{
+						purchasingPrice: null,
+						name: null,
+					},]
+					this.vendorquotes[index].item = item.code + ' ' + item.classification + ' ' + item.type
+					this.vendorquotes[index].info[0].purchasingPrice = '₱' + this.formatPrice(vendor1.purchasingPrice)
+					this.vendorquotes[index].info[0].name = vendor1.vendor
+					this.vendorquotes[index].info[1].purchasingPrice = '₱' + this.formatPrice(vendor2.purchasingPrice)
+					this.vendorquotes[index].info[1].name = vendor2.vendor
+				})
+			},
+			formatPrice(val){
+				val = Number(val).toFixed(2)
+				var num = val.replace(/,/gi, "");
+				var num1 = num.split('.')
+				var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+				val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+				return val
+			},
+			addLine(){
+				this.purchaseRequest.items.push({
+					type: null,
+					item: null,
+					onHand: null,
+					qty: null,
+				})
+				this.vendorquotes.push({
+					item: null,
+					info: [
+					{
+						purchasingPrice: null,
+						name: null,
+					},
+					{
+						purchasingPrice: null,
+						name: null,
+					},
+					
+					]
+				})
+			},
+			remove (index) {
+				this.$delete(this.purchaseRequest.items, index)
+				this.$delete(this.vendorquotes, index)
+			},
+		},
+		mounted(){
+			this.loadData()
+		}
 	})
 </script>
 

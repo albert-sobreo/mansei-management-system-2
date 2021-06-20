@@ -88,10 +88,24 @@ class SavePurchaseRequest(APIView):
         return JsonResponse(0, safe=False)
 
 class VendorQuotes(APIView):
-    def get(self, request, format = None):
+    def post(self, request, format = None):
 
         items = MerchandiseInventory.objects.get(pk = request.data['id'])
+        jsonItems = [{
+            'code': items.code,
+            'classification': items.classification,
+            'type': items.type
+        }]
         
         for party in Party.objects.filter(type = 'Vendor'):
-            if items.poitemsmerch.filter(purchaseOrder__party = party.pk).count():
-                json = []
+            element = items.poitemsmerch.filter(purchaseOrder__party = party.pk)
+            if element.count():
+                jsonItems.append({
+                    'purchasingPrice': element.order_by('-pk')[0].purchasingPrice,
+                    'vendor': party.name
+                })
+            if len(jsonItems) >= 3:
+                break
+
+        print(jsonItems)
+        return JsonResponse(jsonItems, safe=False)

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.urls import urlpatterns
 from django.urls import path, include
@@ -96,5 +97,6 @@ urlpatterns = [
     path('approve-deliveries/<int:pk>/', login_required(views.DeliveriesApprovalAPI.as_view())),
     path('return-truck/<int:pk>/', login_required(views.ReturnTruck.as_view())),
     path('import-atc/', login_required(views.ImportATC.as_view())),
-    path('purchase-request/', login_required(views.PurchaseRequestView.as_view()))
+    path('purchase-request/', login_required(views.PurchaseRequestView.as_view())),
+    path('getvendorquotes/', login_required(views.VendorQuotes.as_view()))
 ]
