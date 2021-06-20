@@ -286,3 +286,37 @@ class DeliveriesSZ(serializers.ModelSerializer):
         model = Deliveries
         fields = '__all__'
         depth = 1
+
+
+
+
+
+########## PURCHASE REQUEST ##########
+class VendorQuotesItemsMerchSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    class Meta: 
+        model = VendorQuotesItemsMerch
+        fields = '__all__'
+
+class VendorQuotesMerchSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventorySZ(read_only=True)
+    vendorquotesitemsmerch = VendorQuotesItemsMerchSZ(read_only=True, many=True)
+    class Meta:
+        model = VendorQuotesMerch
+        fields = "__all__"
+
+class PRItemsMerchSZ(serializers.ModelSerializer):
+    vendorquotesmerch = VendorQuotesMerchSZ(read_only=True, many=True)
+    merchInventory = MerchandiseInventorySZ(read_only=True)
+    class Meta:
+        model = PRItemsMerch
+        fields = '__all__'
+
+# MAIN SERIALIZER
+class PurchaseRequestSZ(serializers.ModelSerializer):
+    pritemsmerch = PRItemsMerchSZ(read_only=True, many=True)
+    vendorquotesmerch = VendorQuotesMerchSZ(read_only=True, many=True)
+    class Meta:
+        model = PurchaseRequest
+        fields = "__all__"
+        depth = 1

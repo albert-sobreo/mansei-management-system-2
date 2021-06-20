@@ -1,5 +1,5 @@
 {% extends "base-template.html" %}
-{% block title %}TEST{% endblock %}
+{% block title %}Purhcase Request{% endblock %}
 
 
 {% block body %}
@@ -32,15 +32,15 @@
 			<div class="row">
 				<div class="col col-3 pr-2">
 					<label>Reference No.</label>
-					<input type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
+					<input v-model="purchaseRequest.code" type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
 				</div>
 				<div class="col col-2 px-2">
 					<label>Date Created</label>
-					<input type="date" class="form-control" name="date">
+					<input v-model="purchaseRequest.date" type="date" class="form-control" name="date" readonly>
 				</div>
 				<div class="col col-2 px-2">
 					<label><span>Date Needed</span>&nbsp;<span class="font-size-10 gray">(optional)</span></label>
-					<input type="date" class="form-control" name="retroactiveDate">
+					<input v-model="purchaseRequest.dateNeeded" type="date" class="form-control">
 				</div>
 			</div>
 			<!-- END REFERENCE NO AND DATES -->
@@ -48,15 +48,12 @@
 			<div class="row mt-3">
 				<div class="col col-3 pr-2">
 					<label>Department</label>
-					<select name="pr" class="form-control">
+					<select v-model="purchaseRequest.department" name="pr" class="form-control">
 						<option value="-1" selected disabled>Select</option>
 						<option value="">None</option>
 					</select>
 				</div>
 			</div>
-
-
-			<button @click="testData(null, 0)">Send Test Data</button>
 			<!-- END DEPARTMENT -->
 
 			<!-- ITEMS *** -->
@@ -85,17 +82,17 @@
 						</select>
 					</div>
 					<div class="col px-1">
-						<select @change="testData(item.code, index)" v-model="item.code" class="form-control" v-if="item.type=='Merchandise'">
+						<select @change="testData(item.code, index, 'Merchandise')" v-model="item.code" class="form-control" v-if="item.type=='Merchandise'">
 							<option value="" selected disabled>Choose Merchandise Inventory</option>
 							<option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]]</option>
 						</select>
 						<select v-model="item.code" class="form-control" v-else></select>
 					</div>
 					<div class="col-2 px-1">
-						<input type="number" class="form-control" readonly>
+						<input v-model="item.remaining" type="number" class="form-control" readonly>
 					</div>
 					<div class="col-2 px-1">
-						<input type="number" class="form-control" min="0">
+						<input v-model="item.qty" type="number" class="form-control" min="0">
 					</div>
 						<i @click="remove(index)" class="fas fa-minus-circle stop text-shadow-small pl-3" style="line-height: 30px;"></i>
 				</div>
@@ -117,7 +114,7 @@
 			</div>
 			<!-- END ITEMS -->
 			<!-- SAVE *** -->
-			<div @click="checkForm()" class="container-extend border container-extend btn-bottom mb-3">
+			<div @click="submit()" class="container-extend border container-extend btn-bottom mb-3">
 				Save
 			</div>
 		</div>
@@ -136,14 +133,14 @@
 			<tbody>
 				<tr v-for="(item, index) in vendorquotes">
 					<td class="align-middle py-4">
-						<span class="font-bold">[[item.item]]</span>
+						<span class="font-bold">[[findMerch(item.item)]]</span>
 					</td>
 					<td class="align-middle py-4">
-						<span>[[item.info[0].purchasingPrice]]</span><br>
+						<span>₱[[item.info[0].purchasingPrice]]</span><br>
 						<span class="gray">[[item.info[0].name]]</span>
 					</td>
 					<td class="align-middle py-4">
-						<span>[[item.info[1].purchasingPrice]]</span><br>
+						<span>₱[[item.info[1].purchasingPrice]]</span><br>
 						<span class="gray">[[item.info[1].name]]</span>
 					</td>
 				</tr>
@@ -175,17 +172,22 @@
 				'Office Supplies'
         	],
 			purchaseRequest:{
-				type: null,
-				code: null,
+				code: '{{new_code}}',
+                date: new Date().toISOString().split('T')[0],
+                dateTimeCreated: new Date().toISOString(),
+				dateNeeded: new Date().toISOString().split('T')[0],
+				department: '',
+				intendedFor: null,
 				items: [{
-					type: null,
-					item: null,
-					onHand: null,
+					code: '',
+					type: '',
+					remaining: null,
 					qty: null,
 				}]
 			},
 			vendorquotes: [{
 				item: null,
+				type: null,
 				info: [
 				{
 					purchasingPrice: null,
@@ -212,7 +214,8 @@
 					})
 				})
 			},
-			testData(pk, index){
+			testData(pk, index, itemType){
+				//THIS IS THE FUNCTION FOR FETCHING VENDOR QUOTES
 				axios.post('/getvendorquotes/', {id:pk}, this.config)
 				.then(res=>{
 					item = res.data[0]
@@ -226,12 +229,16 @@
 						purchasingPrice: null,
 						name: null,
 					},]
-					this.vendorquotes[index].item = item.code + ' ' + item.classification + ' ' + item.type
-					this.vendorquotes[index].info[0].purchasingPrice = '₱' + this.formatPrice(vendor1.purchasingPrice)
+					this.vendorquotes[index].item = item.id
+					this.vendorquotes[index].type = itemType
+					this.vendorquotes[index].info[0].purchasingPrice = this.formatPrice(vendor1.purchasingPrice)
 					this.vendorquotes[index].info[0].name = vendor1.vendor
-					this.vendorquotes[index].info[1].purchasingPrice = '₱' + this.formatPrice(vendor2.purchasingPrice)
+					this.vendorquotes[index].info[1].purchasingPrice = this.formatPrice(vendor2.purchasingPrice)
 					this.vendorquotes[index].info[1].name = vendor2.vendor
 				})
+
+				item = this.merchandiseInventory.find(x=>x.id==pk)
+                this.purchaseRequest.items[index].remaining = item.qtyA
 			},
 			formatPrice(val){
 				val = Number(val).toFixed(2)
@@ -267,6 +274,17 @@
 				this.$delete(this.purchaseRequest.items, index)
 				this.$delete(this.vendorquotes, index)
 			},
+			submit(){
+				axios.post('/save-purchase-request/', {0: this.purchaseRequest, 1: this.vendorquotes}, this.config)
+				.then(res=>res.data==0?location.reload():'')
+			},
+			findMerch(id){
+				try{
+					item = this.merchandiseInventory.find(x=>x.id==id)
+					return String(item.code) + " " + item.classification + " " + item.type
+				} catch (e) {
+				}
+			}
 		},
 		mounted(){
 			this.loadData()

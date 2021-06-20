@@ -33,12 +33,14 @@
                 <th>Created By</th>
             </thead>
             <tbody>
+                {% for item in purchase %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#prModal">PR-2021-01-0005</td>
-                    <td>Apr. 22, 2021</td>
-                    <td>Apr. 30, 2021</td>
-                    <td>Clark Kent</td>
+                    <td @click="viewPR('{{item.pk}}')" class="link" data-toggle="modal" data-target="#prModal">{{item.code}}</td>
+                    <td>{{item.dateRequested}}</td>
+                    <td>{{item.dateNeeded}}</td>
+                    <td>{{item.createdBy.first_name}} {{item.createdBy.last_name}}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 
@@ -52,25 +54,26 @@
                             <!-- LVL 1 -->
                             <div class="col-6 mt-3">
                                 <label class="gray">PR Code</label><br>
-                                <span class="font-size-14 font-bold">PR-2021-01-0001</span>
+                                <span class="font-size-14 font-bold">[[prModal.code]]</span>
                             </div>
                             <div class="col-6 mt-3">
                                 <label class='gray'>Status</label><br>
-                                <span class="font-size-14 font-bold">Approved</span>
+                                <span v-if="prModal.approved" class="font-size-14 font-bold approved">Approved</span>
+                                <span v-else class="font-size-14 font-bold pending">Pending</span>
                             </div>
                             <!-- LVL 2 -->
                             <div class="col-6 my-3">
                                 <label for="" class="gray">Datetime Created</label><br>
-                                <span class="font-size-14 font-bold">Apr. 15, 2021 10:05am</span>
+                                <span class="font-size-14 font-bold">[[formatDateTime(this.prModal.datetimeCreated)]]</span>
                             </div>
                             <div class="col-6 my-3">
                                 <label for="" class="gray">Date Needed</label><br>
-                                <span class="font-size-14 font-bold">Apr. 21, 2021</span>
+                                <span class="font-size-14 font-bold">[[formatDate(prModal.dateNeeded)]]</span>
                             </div>
                             <!-- LVL 3 -->
                             <div class="col-6 mb-3">
                                 <label class="gray">Created By</label><br>
-                                <span class="font-size-14 font-bold">Clark Kent</span>
+                                <span class="font-size-14 font-bold">[[prModal.createdBy.first_name]] [[prModal.createdBy.last_name]]</span>
                             </div>
                         </div>
 
@@ -89,20 +92,10 @@
                                     <th><span class="font-bold gray">Qty</span></th>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Bond Paper</td>
-                                        <td>1</td>
-                                        <td>1</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Bond Paper</td>
-                                        <td>1</td>
-                                        <td>1</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Bond Paper</td>
-                                        <td>1</td>
-                                        <td>1</td>
+                                    <tr v-for="item in prModal.pritemsmerch">
+                                        <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
+                                        <td>[[item.remaining]]</td>
+                                        <td>[[item.qty]]</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -118,41 +111,17 @@
                         <div class="row">
                             <table class="table table-sm table-striped table-borderless">
                                 <tbody>
-                                    <tr>
+                                    <tr v-for="item in prModal.vendorquotesmerch">
                                         <td class="px-3">
                                             <div class="row">
                                                 <div class="col">
-                                                    <span class="font-bold">Bond Paper A4</span>
+                                                    <span class="font-bold">[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</span>
                                                 </div>
                                             </div>
                                             <div class="row mt-3">
-                                                <div class="col-6">
-                                                    <span>P800.00</span><br>
-                                                    <span class="gray">Diorella Printshop</span>
-                                                </div>
-                                                <div class="col-6">
-                                                    <span>P750.00</span><br>
-                                                    <span class="gray">Ilonggo Variety Shop</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td class="px-3">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <span class="font-bold">Bond Paper A4</span>
-                                                </div>
-                                            </div>
-                                            <div class="row mt-3">
-                                                <div class="col-6">
-                                                    <span>P800.00</span><br>
-                                                    <span class="gray">Diorella Printshop</span>
-                                                </div>
-                                                <div class="col-6">
-                                                    <span>P750.00</span><br>
-                                                    <span class="gray">Ilonggo Variety Shop</span>
+                                                <div class="col-6" v-for="qItem in item.vendorquotesitemsmerch">
+                                                    <span>₱[[formatPrice(qItem.price)]]</span><br>
+                                                    <span class="gray">[[qItem.party.name]]</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -239,7 +208,155 @@
                     "X-CSRFToken": getCookie('csrftoken')
                 }
             },
-        }
+            prModal: {
+                id: null,
+                code: null,
+                datetimeCreated: null,
+                dateRequested: null,
+                dateNeeded: null,
+                department: null,
+                intendedFor: null,
+                datetimeApproved: null,
+                approved: null,
+                createdBy: {
+                    first_name: null,
+                    last_name: null,
+                },
+                approvedBy: {
+                    first_name: null,
+                    last_name: null,
+                },
+                pritemsmerch: [{
+                    id: null,
+                    merchInventory: {
+                        id: null,
+                        code: null,
+                        classification: null,
+                        type: null,
+                    },
+                    remaining: null,
+                    qty: null,
+                }],
+
+                vendorquotesmerch: [{
+                    id: null,
+                    merchInventory: {
+                        id: null,
+                        code: null,
+                        classification: null,
+                        type: null,
+                    },
+                    vendorquotesitemsmerch: [{
+                        id: null,
+                        party: {
+                            id: null,
+                            name: null,
+                        },
+                        price: null,
+                    }]
+                }],
+
+                roundToggle: false,
+            }
+        },
+        methods: {
+            viewPR(code){
+                console.log(code)
+                axios.get(`/api/purchase-request/${code}/`)
+                .then(res=>this.prModal=res.data)
+            },
+            roundNumber2(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(2).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            roundToggler(){
+                this.roundToggle = !this.roundToggle
+            },
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+        },
     })
 </script>
 {% endblock %}

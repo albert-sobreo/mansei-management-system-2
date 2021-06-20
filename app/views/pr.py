@@ -51,21 +51,18 @@ class PRListView(View):
 
 class SavePurchaseRequest(APIView):
     def post(self, request, format = None):
-        purchaseRequest = request.data
+        purchaseRequest = request.data['0']
+        vendorQuotes = request.data['1']
 
         pr = PurchaseRequest()
 
         pr.code = purchaseRequest['code']
         pr.datetimeCreated = purchaseRequest['dateTimeCreated']
-
-        if purchaseRequest['retroactive']:
-            pr.dateRequested = purchaseRequest['retroactive']
-        else:
-            pr.dateRequested = purchaseRequest['date']
+        pr.dateRequested = purchaseRequest['date']
 
         pr.dateNeeded = purchaseRequest['dateNeeded']
         pr.department = purchaseRequest['department']
-        pr.intendedFor = purchaseRequest['intenderFor']        
+        pr.intendedFor = purchaseRequest['intendedFor']        
         if request.user.is_authenticated:
             pr.createdBy = request.user
 
@@ -79,11 +76,31 @@ class SavePurchaseRequest(APIView):
             pritemsmerch.purchaseRequest = pr
             pritemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
             pritemsmerch.remaining = item['remaining']
-            pritemsmerch.qty = item['quantity']
+            pritemsmerch.qty = item['qty']
 
             
             pritemsmerch.save()
-            request.user.branch.pritemsmerch.add(pritemsmerch)
+            request.user.branch.pritemsMerch.add(pritemsmerch)
+
+
+        for item in vendorQuotes:
+            if item['type'] == 'Merchandise':
+                vqmerch  = VendorQuotesMerch()
+                vqmerch.purchaseRequest = pr
+                vqmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['item'])
+
+                vqmerch.save()
+                request.user.branch.vendorQuotesMerch.add(vqmerch)
+                for info in item['info']:
+                    if info['purchasingPrice']:
+                        vqitemsmerch = VendorQuotesItemsMerch()
+                        vqitemsmerch.vendorquotesmerch = vqmerch
+                        vqitemsmerch.price = info['purchasingPrice']
+                        vqitemsmerch.party = Party.objects.get(name=info['name'])
+
+                        vqitemsmerch.save()
+                        request.user.branch.vendorQuotesItemsMerch.add(vqitemsmerch)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -92,6 +109,7 @@ class VendorQuotes(APIView):
 
         items = MerchandiseInventory.objects.get(pk = request.data['id'])
         jsonItems = [{
+            'id': items.pk,
             'code': items.code,
             'classification': items.classification,
             'type': items.type

@@ -232,13 +232,13 @@ class PurchaseRequest(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     dateRequested = models.DateField()
-    dateNeeded = models.DateField()
-    department = models.CharField(max_length=50)
-    intendedFor = models.CharField(max_length=200)
+    dateNeeded = models.DateField(null=True, blank=True)
+    department = models.CharField(max_length=50, null=True, blank=True)
+    intendedFor = models.CharField(max_length=200, null=True, blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "prCreatedBy")
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "prApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
-    approved = models.BooleanField(null = True, default=False)
+    approved = models.BooleanField(default=False)
     
 
     class Meta:
@@ -449,6 +449,7 @@ class VendorQuotesMerch(models.Model):
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="vendorquotesmerch", on_delete=models.PROTECT, null=True, blank=True)
 
 class VendorQuotesItemsMerch(models.Model):
+    vendorquotesmerch = models.ForeignKey(VendorQuotesMerch, related_name="vendorquotesitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     price = models.DecimalField(max_digits=18, decimal_places=5)
     party = models.ForeignKey(Party, related_name="vendorquotesitemsmerch", on_delete=models.PROTECT)
 
@@ -546,24 +547,46 @@ class DeliveryItemMerch(models.Model):
 
 class Branch(models.Model):
     name = models.CharField(max_length=255)
+    ##### CHART OF ACCOUNTS #####
     accountGroup = models.ManyToManyField(AccountGroup, blank = True)
     subGroup = models.ManyToManyField(AccountSubGroup, blank = True)
     accountChild = models.ManyToManyField(AccountChild, blank = True)
+
+    ##### VENDORS AND CUSTOMER #####
     party = models.ManyToManyField(Party, blank = True)
+
+    ##### ACCOUNTING #####
     journal = models.ManyToManyField(Journal, blank = True)
     journalEntries = models.ManyToManyField(JournalEntries, blank = True)
+
+    ##### INVENTORY #####
     warehouse = models.ManyToManyField(Warehouse, blank = True)
     merchInventory = models.ManyToManyField(MerchandiseInventory, blank = True)
+
+    ##### PURCHASE REQUEST #####
     purchaseRequest = models.ManyToManyField(PurchaseRequest, blank = True)
     pritemsMerch = models.ManyToManyField(PRItemsMerch, blank = True)
+
+    ##### VENDOR QUOTES #####
+    vendorQuotesMerch = models.ManyToManyField(VendorQuotesMerch, blank = True)
+    vendorQuotesItemsMerch = models.ManyToManyField(VendorQuotesItemsMerch, blank=True)
+
+    ##### PURCHASE ORDER #####
     purchaseOrder = models.ManyToManyField(PurchaseOrder, blank = True)
     poitemsMerch = models.ManyToManyField(POItemsMerch, blank = True)
+    poatc = models.ManyToManyField(POatc, blank=True)
+
+    ##### RECEIVING REPORT #####
     receivingReport = models.ManyToManyField(ReceivingReport, blank = True)
     rritemsMerch = models.ManyToManyField(RRItemsMerch, blank = True)
     rratc = models.ManyToManyField(RRatc, blank = True)
+
+    ##### SALES CONTRACT #####
     salesContract = models.ManyToManyField(TempSalesContract, blank = True)
     scitemsMerch = models.ManyToManyField(TempSCItemsMerch, blank = True)
     tempSCOtherFees = models.ManyToManyField(TempSCOtherFees, blank = True)
+
+    ##### DELIVERIES #####
     driver = models.ManyToManyField(Driver, blank = True)
     truck = models.ManyToManyField(Truck, blank = True)
     deliveries = models.ManyToManyField(Deliveries, blank = True)
@@ -571,7 +594,7 @@ class Branch(models.Model):
     deliveryPhotos = models.ManyToManyField(DeliveryPhotos, blank = True)
     deliveryitemsGroup = models.ManyToManyField(DeliveryItemsGroup, blank = True)
     deliveryitemsMerch = models.ManyToManyField(DeliveryItemMerch, blank = True)
-    poatc = models.ManyToManyField(POatc, blank=True)
+    
 
     def __str__(self):
         return self.name

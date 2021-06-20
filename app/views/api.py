@@ -175,3 +175,24 @@ class ATCAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ATCSZ
     queryset = ATC.objects.all()
+
+
+
+
+
+
+########## PURCHASE REQUEST ##########
+class PurchaseRequestAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PurchaseRequestSZ
+    queryset = PurchaseRequest.objects.all()
+
+class PurchaseRequestApprovedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PurchaseRequestSZ
+    queryset = PurchaseRequest.objects.filter(approved=True)
+
+class PurchaseRequestNonApprovedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PurchaseRequestSZ
+    queryset = PurchaseRequest.objects.filter(approved=False)
