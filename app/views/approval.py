@@ -40,14 +40,22 @@ class PRApprovalAPI(APIView):
 
         prequest = PurchaseRequest.objects.get(pk=pk)
 
-        prequest.datetimeApproved = request.data['datetimeApproved']
+        prequest.datetimeApproved = datetime.now()
         prequest.approved = True
         prequest.approvedBy = request.user
         prequest.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
-
+        
+        
+        
+        
+        
+        
+        
+        
+        
 ################# PURCHASE ORDER #################
 
 class POapprovedView(View):
@@ -73,7 +81,7 @@ class POApprovalAPI(APIView):
 
         purchase = PurchaseOrder.objects.get(pk=pk)
 
-        purchase.datetimeApproved = request.data['datetimeApproved']
+        purchase.datetimeApproved = datetime.now()
         purchase.approved = True
         purchase.approvedBy = request.user
         
@@ -223,7 +231,38 @@ class POApprovalAPI(APIView):
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
-    
+
+
+
+
+
+
+
+
+
+########## RECEIVING REPORT ##########
+class RRnonapproved(View):
+    def get(self, request, format=None):
+        context = {
+            'purchase': request.user.branch.receivingReport.filter(approved=False),
+        }
+        return render(request, 'rr-nonapproved.html', context)
+
+class RRapproved(View):
+    def get(self, request, format=None):
+        context = {
+            'purchase': request.user.branch.receivingReport.filter(approved=True)
+        }
+        return render(request, 'rr-approved.html', context)
+
+
+
+
+
+
+
+
+
 
 ################# SALES #################
 
@@ -250,7 +289,7 @@ class SCApprovalAPI(APIView):
 
         sale = TempSalesContract.objects.get(pk=pk)
 
-        sale.datetimeApproved = request.data['datetimeApproved']
+        sale.datetimeApproved = datetime.now()
         sale.approved = True
         sale.approvedBy = request.user
         

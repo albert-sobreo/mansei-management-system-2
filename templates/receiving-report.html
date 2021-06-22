@@ -1,0 +1,316 @@
+{% extends "base-template.html" %}
+{% block title %}TEST{% endblock %}
+
+
+{% block body %}
+
+<div id="app" v-cloak> <!-- #app -->
+    <!-- INSERT NAVIGATION BAR HERE -->
+    <navbar-gas active="nav-purchase" photo="/media/{{request.user.image}}"></navbar-gas>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+		<!-- END NAVIGATION BAR -->
+
+  <div class="container"> <!-- .container -->
+			<!-- NAVIGATION 2 -->
+      <div class="d-flex font-semibold mb-2 justify-content-center">
+          <div class="justify-content-center c-nav-links gas-nav">
+              <a href="/receiving-report/" class="active-gas mx-2">Create</a>
+              <a href="/rr-list/" class="mx-2">RR List</a>
+          </div>
+      </div>
+			<!-- END NAVIGATION 2 -->
+
+			<!-- TITLE AND BUTTONS -->
+			<div class="d-flex align-items-center mb-3">
+			<span class="font-size-18 font-bold mr-1">Receiving Report</span>
+			</div>
+			<!-- END TITLE AND BUTTONS -->
+
+      <div> <!-- REPORT -->
+      <!-- REFERENCE NO AND DATES *** -->
+			<div class="row">
+        <div class="col col-3 pr-2">
+            <label>Reference No.</label>
+            <input type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
+        </div>
+        <div class="col col-2 px-2">
+            <label>Date Created</label>
+            <input type="date" class="form-control" name="date">
+        </div>
+        <div class="col col-2 px-2">
+            <label><span>Retroactive</span>&nbsp;<span class="font-size-10 gray">(optional)</span></label>
+            <input type="date" class="form-control" name="retroactiveDate">
+        </div>
+      </div>
+      <!-- END REFERENCE NO AND DATES -->
+      <!-- PURCHASE PO *** -->
+			<div class="row mt-3">
+				<div class="col col-3 pr-2">
+					<label>Purchase PO</label>
+					<select name="pr" class="form-control">
+							<option value="-1" selected disabled>Select</option>
+							<option value="">None</option>
+					</select>
+				</div>
+			</div>
+			<!-- END PURCHASE PO -->
+      <!-- ITEMS *** -->
+			<div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
+				<div class="row">
+						<div class="col-5 px-1">
+								<label for="warehouse" class="m-0">Item-Code - Item name</label>
+						</div>
+            		<div class="col-1 px-1">
+              				<label for="order-quantity" class="m-0">Qty</label>
+          			</div>
+						<div class="col px-1">
+								<label for="remaining" class="m-0">VATable Amount</label>
+						</div>
+            		<div class="col px-1">
+              				<label for="Total Cost" class="m-0">Input VAT</label>
+          			</div>
+						<div class="col px-1">
+							<label for="Total Cost" class="m-0">Total Amount</label>
+				  		</div>
+				</div>
+				<!-- V-FOR ITEMS *** -->
+				<div class="row">
+					<div class="col-5 px-1">
+						<!-- V-IF ELSE FOR DIFFERENT INVENTORY LIST *** -->
+						<select class="form-control">
+								<option value="" selected disabled>Choose Merchandise Inventory</option>
+						</select>
+						<!-- END -->
+					</div>
+					<div class="col-1 px-1">
+						<input type="number" class="form-control">
+					</div>
+          	<!-- *** -->
+          		<div class="col px-1">
+            		<div class="input-group">
+                		<div class="input-group-prepend">
+                    		<span class="input-group-text">₱</span>
+                		</div>
+                			<input type="number" step="0.01" class="form-control box-shadow-off" min="0">
+            		</div>
+          		</div>
+          	<!-- /*** -->
+					<div class="col px-1">
+						<input type="number" class="form-control" min="0" readonly>
+					</div>
+          	<!-- *** -->
+          		<div class="col px-1">
+            		<div class="input-group">
+                		<div class="input-group-prepend">
+                    		<span class="input-group-text">₱</span>
+                		</div>
+                		<input type="number" step="0.01" class="form-control box-shadow-off" min="0" readonly>
+            		</div>
+          		</div>
+          	<!-- /*** -->
+					<i @click="remove(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
+				</div>
+				<!-- END V-FOR ITEMS -->
+				<!-- ADD NEW LINE *** -->
+				<div class="row">
+					<div class="col px-1">
+						<button @click="addLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
+					</div>
+				</div>
+				<!-- END ADD NEW LINE -->
+				<!-- ATC AND AMOUNT *** -->
+            <div class="row mt-2">
+               	<!-- ATC AND MORE *** -->
+               	<div class="col-6 pl-0">
+                  	<div class="p-4 order-card-darker b-radius-15">
+						<div class="row">
+							<div class="col-3 px-1">
+								<label>ATC Code</label>
+							</div>
+							<div class="col-3 px-1">
+								<label>Tax Base</label>
+							</div>
+							<div class="col-3 px-1">
+								<label>Tax Rate</label>
+							</div>
+							<div class="col-3 px-1">
+								<label>Amount Withheld</label>
+							</div>
+						</div>
+						<!-- V-MODEL ATC AND MORE *** -->
+                     <div class="row">
+								<div class="col-3 px-1">
+									<select class="form-control">
+											<option value="">None</option>
+											<optgroup>
+												<option></option>
+											</optgroup>
+									</select>
+								</div>
+								<div class="col-3 px-1">
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">₱</span>
+										</div>
+										<input type="number" step="0.02" class="form-control box-shadow-off" readonly>
+									</div>
+								</div>
+								<div class="col-3 px-1">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <input type="number" step="0.02" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+								<div class="col-3 px-1">
+									<div class="input-group">
+											<div class="input-group-prepend">
+												<span class="input-group-text">₱</span>
+											</div>
+											<input type="number" step="0.02" class="form-control box-shadow-off" readonly>
+									</div>
+								</div>
+							</div>
+							<!-- ADD NEW LINE *** -->
+							<div class="row">
+								<div class="col px-1">
+									<button class="btn btn-warning my-1" type="button">+ Add New ATC</button>
+								</div>
+							</div>
+							<!-- END ADD NEW LINE -->
+                     <!-- REMARKS *** -->
+                     <div class="row mt-2">
+                        <div class="col-12 px-1">
+                           <label>Remarks</label>
+                           <textarea cols="30" rows="2" class="form-control" placeholder="Enter Remarks (Optional)"></textarea>
+                        </div>
+                     </div>
+							<!-- END REMARKS *** -->
+               	</div>
+            	</div>
+					<!-- AMOUNT AND PAYMENT -->
+                    <div class="col-6 pr-0">
+                        <div class="p-4 order-card-darker b-radius-15">
+                            <div class="row">
+                                <div class="col px-1">
+                                    <label>Sub-Total</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input type="text" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 px-1">
+                                    <label>Tax <span class="gray font-size-10">Inclusive</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input type="text" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-6 px-1">
+                                    <label>Withholding Tax</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input type="text" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 px-1">
+                                    <label>Total</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input type="text" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-6 px-1">
+                                    <label>Amount Paid</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input type="number" step="0.01" class="form-control box-shadow-off" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-12 px-1">
+                                    <label>Payment Method</label>
+                                </div>
+                                <div class="col-12 px-1">
+                                    <div class="d-flex align-items-center">
+                                        <select class="col col-5 form-control">
+                                            <option value="" selected disabled>Choose Payment Method</option>
+                                            <option value="Cash on Hand">Cash on Hand</option>
+                                            <option value="Cash in Bank">Cash in Bank</option>
+                                            <option value="Cheque">Cheque</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div class="col ml-2 form-check form-check-inline">
+                                            <input value="Full Payment" name="radios" type="radio" class="form-check-input">
+                                            <label class="form-check-label">Full Payment</label>
+                                        </div>
+                                        <div class="col form-check form-check-inline">
+                                            <input value="Partial Payment" name="radios" type="radio" class="form-check-input">
+                                            <label class="form-check-label">Partial Payment</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 px-1">
+                                    <label>Cheque No.</label>
+                                    <input type="text" class="form-control" placeholder="Leave blank if applicable">
+                                </div>
+                                <div class="col-6 px-1">
+                                    <label>Due Date</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 px-1">
+                                    <label>Bank</label>
+                                    <input type="text" class="form-control" placeholder="Leave blank if applicable">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+					<!-- END PAYMENT -->
+        	<!-- END ITEMS -->
+			</div>
+      </div> <!-- END REPORT -->
+
+		<!-- SAVE *** -->
+		<div @click="checkForm()" class="container-extend border container-extend btn-bottom mb-4">
+			Save
+	  </div>
+	  <!-- END SAVE -->
+
+  </div> <!-- .container -->
+</div> <!-- #app -->
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+	var app = new Vue({
+		delimiters: ['[[', ']]'],
+		el: "#app"
+	})
+</script>
+
+{% endblock %}

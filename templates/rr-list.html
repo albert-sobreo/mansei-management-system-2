@@ -1,0 +1,479 @@
+{% extends "base-template.html" %}
+{% block title %}Receiving Report{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak> <!-- #app -->
+    <!-- INSERT NAVIGATION BAR HERE -->
+    <navbar-gas active="nav-purchase" photo="/media/{{request.user.image}}"></navbar-gas>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+		<!-- END NAVIGATION BAR -->
+
+    <!-- MAIN BODY -->
+    <div class="container"> <!-- .container -->
+
+      <!-- NAVIGATION 2 -->
+      <div class="d-flex font-semibold mb-2 justify-content-center">
+        <div class="justify-content-center c-nav-links gas-nav">
+            <a href="/receiving-report/" class="mx-2">Create</a>
+            <a href="/rr-list/" class="active-gas mx-2">RR List</a>
+        </div>
+      </div>
+      <!-- END NAVIGATION 2 -->
+
+        <!-- TITLE AND BUTTONS-->        
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Receiving Report</span>
+        </div>
+        <!-- END TITLE AND BUTTONS-->  
+
+        <!-- TABLE *** -->
+        <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead class="thead-dark">
+              <th>RR Code</th>
+              <th>PO Code</th>
+              <th>Gross Amount</th>
+              <th>Date Created</th>
+              <th>Created by</th>
+            </thead>
+            <tbody>
+                <tr>
+                  <!-- RR CODE w/ MODAL *** -->
+                    <td class="align-middle"><span><a href="#" data-toggle="modal" data-target="#rrlistmodal">RR-2021-01-0001</a></span></td>
+                  <!-- END RR CODE w/ MODAL -->
+                    <td class="align-middle">PO-2021-01-0005</td>
+                    <td class="align-middle">
+                        <span>₱ 1000.00</span><br>
+                    </td>
+                    <td class="align-middle">
+                        <span>April 15,2021</span><br>
+                    </td>
+                    <td class="align-middle">
+                        <span>Clark Kent</span><br>
+                    </td>
+                </tr>
+                <!--
+                {% for po in request.user.branch.purchaseOrder.all reversed %}
+                <tr>
+                    <td class="link" @click="viewPO('{{po.pk}}')" data-toggle="modal" data-target="#poModal">{{po.code}}</td>
+                    <td>{{po.party.name}}</td>
+                    <td>₱[[roundNumber2({{po.amountDue}})]]</td>
+                    <td>₱[[roundNumber2({{po.amountPaid}})]]</td>
+                    <td>{{po.datetimeCreated}}</td>
+                    <td>{{po.createdBy.first_name}} {{po.createdBy.last_name}}</td>
+                </tr>
+                {% endfor %}
+                -->
+            </tbody>
+        </table>
+
+        <!-- VIEW RR MODAL*** -->
+        <div class="modal fade" id="rrlistmodal">
+        <!-- <div class="modal fade" id="POmodal"> -->
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD *** -->
+                        <div class="order-card row my-2">
+                            <!-- LVL 1 ***-->
+                            <div class="col-3 mt-3">
+                                <label class="gray">RR Code</label><br>
+                                <span class="font-size-14 font-bold">[[this.poModal.code]]</span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="gray">Status</label><br>
+                                <span class="font-size-14 font-bold approved" v-if="poModal.approved">Approved</span>
+                                <span class="font-size-14 font-bold pending" v-else>Pending</span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="gray">Created By</label><br>
+                                <span class="font-size-14 font-bold" v-if="this.poModal.createdBy!==null">[[this.poModal.createdBy.first_name]] [[this.poModal.createdBy.last_name]]</span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="gray">Date Created</label><br>
+                                <span class="font-size-14 font-bold">[[formatDateTime(this.poModal.datetimeCreated)]]</span>
+                            </div>
+                            
+                            <!-- LVL2 -->
+                            <div class="col-3 my-3">
+                                <label class="gray">Vendor</label><br>
+                                <span class="font-size-14 font-bold" v-if="this.poModal.party!==null">[[this.poModal.party.name]]</span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label class="gray">Purchase Order</label><br>
+                                <span class="font-size-14 font-bold">None</span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label class="gray">Posted By</label><br>
+                                <span class="font-size-14 font-bold" v-if="this.poModal.approvedBy!==null">[[this.poModal.approvedBy.first_name]] [[this.poModal.approvedBy.last_name]]</span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label class="gray">Date Approved</label><br>
+                                <span class="font-size-14 font-bold" v-if="this.poModal.datetimeApproved!==null">[[formatDateTime(this.poModal.datetimeApproved)]]</span>
+                            </div>
+                        </div>
+
+                        <!-- MIDDLE CARD *** -->
+                        <div class="order-card row my-2">
+                            <!-- LVL 1 *** -->
+                            <div class="col-3 mt-3">
+                                <label class="gray">Gross Amount</label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountDue)]]</span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="gray">Amount Paid</label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountPaid)]]</span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="gray">Payment Method</label><br>
+                                <span class="font-size-14 font-bold">[[this.poModal.paymentMethod]]</span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="gray">Payment Period</label><br>
+                                <span class="font-size-14 font-bold">[[this.poModal.paymentPeriod]]</span>
+                            </div>
+
+                            <!-- LVL 2 ***-->
+                            <div class="col-3 my-3">
+                                <label class="gray">Cheque No.</label><br>
+                                <span class="font-size-14 font-bold">[[this.poModal.chequeNo]]</span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label class="gray">Due Date</label><br>
+                                <span class="font-size-14 font-bold">[[this.poModal.dueDate]]</span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label class="gray">Remarks</label><br>
+                                <span class="font-size-14 font-bold">[[this.poModal.remarks]]</span>
+                            </div>
+                        </div>
+                        <!-- LOWER CARD ***-->
+                        <div class="order-card row my-2">
+                            <div class="col-3 my-3">
+                                <label class="gray">ATC Code</label><br>
+                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">[[atc.code.code]]</span>
+                            </div>    
+                            <div class="col-3 my-3">
+                                <label class="gray">Amount</label><br>
+                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">₱[[formatPrice(atc.amountWithheld)]]</span>
+                            </div>  
+                            <div class="col-3 my-3">
+                                <label class="gray">Tax Rate</label><br>
+                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">[[formatPrice(atc.code.rate*100)]]%</span>
+                            </div>   
+                            <div class="col-3 my-3">
+                                <label class="gray">Amount WIthheld</label><br>
+                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">[[formatPrice(atc.code.rate*100)]]%</span>
+                            </div>   
+                        </div>
+
+                        <!-- PO ITEMS *** -->
+                        <div class="row mt-4">
+                            <div class="col">
+                                <span class="font-bold">Received PO Items</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <th><span class="font-bold gray">Account Type</span></th>
+                                    <th><span class="font-bold gray">Item Code - Item Classifcation</span></th>
+                                    <th><span class="font-bold gray">Qty</span></th>
+                                    <th><span class="font-bold gray">Amount</span></th>
+                                    <th><span class="font-bold gray">Input VAT</span></th>
+                                    <th><span class="font-bold gray">Total Amount</span></th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Merchandise</td>
+                                        <td>0000 - Item Name XX</td>
+                                        <td>00</td>
+                                        <td>₱123.90</td>
+                                        <td>0.00%</td>
+                                        <td>₱123.90</td>
+
+                                        <!--
+                                    <tr v-for="item in poModal.poitemsmerch">
+                                        <td>Merchandise</td>
+                                        <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
+                                        <td>[[item.qty]]</td>
+                                        <td>₱[[formatPrice(item.purchasingPrice)]]</td>
+                                        <td>[[formatPrice(item.inputVat)]]%</td>
+                                        <td>₱[[formatPrice(item.totalPrice)]]</td>
+                                        -->
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <a href="/rr-approved/">Go to approvals</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END RR MODAL -->
+
+        <!-- ADD MODAL*** from MERCHINVENTORY . HTML -->
+        <div class="modal fade" id="addInventory">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Initialize Item</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col px-1">
+                                <div class="form-group">
+                                    <label>Item Code</label>
+                                    <input type="text" class="form-control" placeholder="Enter Code">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 px-1">
+                                <div class="form-group">
+                                    <label>Item Classification</label>
+                                    <input type="text" class="form-control" placeholder="Enter Classification">
+                                </div>
+                            </div>
+                            <div class="col-6 px-1">
+                                <div class="form-group">
+                                    <label for="Item type">Item Type</label>
+                                    <input type="text" class="form-control" placeholder="Enter Type">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 px-1">
+                                <div class="form-group">
+                                    <label>Length</label>
+                                    <input type="number" class="form-control" placeholder="Enter Length">
+                                </div>
+                            </div>
+                            <div class="col-4 px-1">
+                                <div class="form-group">
+                                    <label>Width</label>
+                                    <input type="number" class="form-control" placeholder="Enter Width">
+                                </div>
+                            </div>
+                            <div class="col-4 px-1">
+                                <div class="form-group">
+                                    <label>Thickness</label>
+                                    <input type="number" class="form-control" placeholder="Enter Thickness">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 px-1">
+                                <div class="form-group">
+                                    <label>Purchasing Price</label>
+                                    <input type="number" step="0.01" class="form-control" placeholder="Enter Purchasing Price">
+                                </div>
+                            </div>
+                            <div class="col-6 px-1">
+                                <div class="form-group">
+                                    <label>Selling Price</label>
+                                    <input type="number" step="0.01" class="form-control" placeholder="Enter Selling Price">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col px-1">
+                                <div class="form-group">
+                                    <label>Choose Warehouse</label><br>
+                                    <span class="font-size-10 font-medium">Hold down “Control”, or “Command” on a Mac, to select more than one.</span>
+                                    <select class="form-control" multiple>
+                                        <option value="">Warehouse 1</option>
+                                        <option value="">Warehoue 2</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col px-1">
+                                <button class="btn btn-primary col">Save Item</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--END ADD MODAL*** from MERCHINVENTORY . HTML -->
+
+    </div>  <!-- .container -->
+</div> <!-- #app -->
+
+{% endblock %}
+
+
+<!-- SCRIPTS -->
+{% block scripts %}
+<!-- SCRIPT FROM PO-LIST . HTML -->
+<script>
+    $(document).ready(function() {
+        $('#table').DataTable({
+            language: { search: '', searchPlaceholder: 'Search'},
+            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+
+            buttons: {
+                buttons: [
+                {
+                    text: '<i class="fas fa-file-excel"></i>',
+                    className: 'btn text-success btn-table',
+                    titleAttr: 'Export Excel',
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fas fa-file-csv"></i>',
+                    className: 'btn text-warning btn-table',
+                    titleAttr: 'Export CSV',
+                    extend: 'csv'
+                },
+                {
+                    text: '<i class="fas fa-print"></i>',
+                    className: 'btn btn-table',
+                    titleAttr: 'Print',
+                    extend: 'print'
+                },
+                {
+                    text: "RAW",
+                    className: 'btn btn-table font-size-10',
+                    titleAttr: 'View Raw Numbers',
+                    action: function(){
+                        app.roundToggler()
+                    }
+                }
+                ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
+                }
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            },
+        
+        });
+    });
+    $('option').mousedown(function(e) {
+        e.preventDefault();
+        $(this).prop('selected', !$(this).prop('selected'));
+        return false;
+    });
+</script>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+        data: {
+            poModal: {
+                code: null,
+                createdBy: null,
+                datetimeCreated: null,
+                party: null,
+                approvedBy: null,
+                datetimeApproved: null,
+
+                amountDue: null,
+                amountPaid: null,
+                amountTotal: null,
+                paymentMethod: null,
+                paymentPeriod: null,
+                chequeNo: null,
+                dueDate: null,
+                remarks: null,
+
+                atcCode: null,
+                amountWithheld: null,
+
+                poatc: [{
+                    amountWithheld: null,
+                    code: {
+                        code: null,
+                        rate: null
+                    }
+
+                }]
+            },
+            roundToggle: false,
+        },
+        methods: {
+            viewPO(code){
+                console.log(code)
+                axios.get(`/api/purchase-order/${code}/`)
+                .then(res=>this.poModal=res.data)
+            },
+            roundNumber2(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(2).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            roundToggler(){
+                this.roundToggle = !this.roundToggle
+            },
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+        },
+        created(){
+            this.$root.$refs.app = this
+        }
+    })
+</script>
+
+{% endblock %}

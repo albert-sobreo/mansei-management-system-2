@@ -50,7 +50,7 @@ Vue.component('navbar-gas', {
                 <div class="dropdown-menu b-radius-5 py-0">
                     <a href="/purchase-request/" class="dropdown-item d-item-gas font-size-12 font-semibold">Purchase Request</a>
                     <a href="/purchase-order/" class="dropdown-item d-item-gas font-size-12 font-semibold">Purchase Order</a>
-                    <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Receiving Report</a>
+                    <a href="/receiving-report/" class="dropdown-item d-item-gas font-size-12 font-semibold">Receiving Report</a>
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Inward Inventory</a> 
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Completion Report</a> 
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Vouchers</a>
@@ -67,6 +67,8 @@ Vue.component('navbar-gas', {
                 <div class="dropdown-menu b-radius-5 py-0">
                     <a href="/pr-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Purchase Request</a>
                     <a href="/po-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Purchase Order</a>
+                    <a href="/rr-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Receiving Report</a>
+                    <div class="dropdown-divider"></div>
                     <a href="/sc-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Sales Contract</a>
                 </div>
             </div>
