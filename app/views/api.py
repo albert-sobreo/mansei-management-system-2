@@ -100,6 +100,11 @@ class PurchaseOrderAPI(viewsets.ModelViewSet):
     serializer_class = PurchaseOrderNestedSZ
     queryset = PurchaseOrder.objects.all()
 
+class PurchaseOrderApprovedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PurchaseOrderNestedSZ
+    queryset = PurchaseOrder.objects.filter(approved=True)
+
 
 
 

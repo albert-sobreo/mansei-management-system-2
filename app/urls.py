@@ -47,6 +47,9 @@ router.register(r"deliveries", views.DeliveriesAPI, 'deliveries')
 ########## ATC ##########
 router.register(r"atc", views.ATCAPI, 'atc')
 
+########## PURCHASE ORDER ##########
+router.register(r"purchase-order-approved", views.PurchaseOrderApprovedAPI, 'purchase-order-approved')
+
 ########## PURCHASE REQUEST ##########
 router.register(r"purchase-request", views.PurchaseRequestAPI, 'purchase-request')
 router.register(r"purchase-request-non-approved", views.PurchaseRequestNonApprovedAPI, 'purchase-request-non-approved')

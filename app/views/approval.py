@@ -99,7 +99,7 @@ class POApprovalAPI(APIView):
         j.code = purchase.code
         j.datetimeCreated = purchase.datetimeApproved
         j.createdBy = purchase.createdBy
-        j.journalDate = (purchase.datetimeApproved).split('T')[0]
+        j.journalDate = datetime.now()
         j.save()
         request.user.branch.journal.add(j)
 
@@ -307,7 +307,7 @@ class SCApprovalAPI(APIView):
         j.code = sale.code
         j.datetimeCreated = sale.datetimeApproved
         j.createdBy = sale.createdBy
-        j.journalDate = (sale.datetimeApproved).split('T')[0]
+        j.journalDate = datetime.now()
         j.save()
         request.user.branch.journal.add(j)
 

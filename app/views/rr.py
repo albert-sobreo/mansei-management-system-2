@@ -36,12 +36,12 @@ class ReceivingReportView(View):
                 new_code = 'RR-{}-{}-0001'.format(listed_date[0], listed_date[1])
 
         except Exception as e:
-            print(e)
             listed_date = str(now.today()).split('-')
             new_code = 'RR-{}-{}-0001'.format(listed_date[0], listed_date[1])
 
         context = {
             'new_code': new_code,
+            'pos': request.user.branch.purchaseOrder.filter(approved=True)
         }
         return render(request, 'receiving-report.html', context)
 
