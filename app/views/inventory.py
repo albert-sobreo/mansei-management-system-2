@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from ..models import MerchandiseInventory
+from ..models import MerchandiseInventory, Warehouse
 from django import views
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import query
@@ -14,6 +14,8 @@ from django.views.decorators.cache import never_cache
 from rest_framework import viewsets
 import sweetify
 from decimal import Decimal
+import pandas as pd
+import json
 
 class MerchInventoryView(View):
     def get(self, request, format=None):
@@ -48,3 +50,49 @@ class AddMerchInventoryAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class ImportMerchandiseInventory(View):
+    def post(self, request, format=None):
+        df = pd.read_excel(request.FILES['excel'])
+        jsonDF = json.loads(df.to_json(orient='records'))
+        
+        for item in jsonDF:
+            merch = MerchandiseInventory()
+
+            if MerchandiseInventory.objects.filter(code=item['Code']):
+                print('it exists')
+                continue
+            merch.code = item['Code']
+            merch.name = item['Name']
+            merch.classification = item['Classification']
+            merch.type = item['Type']
+            merch.length = item['Length']
+            merch.width = item['Width']
+            merch.thickness = item['Thickness']
+
+            item['Purchasing-Price'] = str(item['Purchasing-Price']).replace('₱', '')
+            item['Purchasing-Price'] = item['Purchasing-Price'].replace(',', '')
+            merch.purchasingPrice = item['Purchasing-Price']
+
+            item['Selling-Price'] = str(item['Selling-Price']).replace('₱', '')
+            item['Selling-Price'] = item['Selling-Price'].replace(',', '')
+            merch.sellingPrice = item['Selling-Price']
+            merch.vol = item['Volume']
+
+            item['Price-Per-Cubic'] = str(item['Price-Per-Cubic']).replace('₱', '')
+            item['Price-Per-Cubic'] = item['Price-Per-Cubic'].replace(',', '')
+            merch.pricePerCubic = item['Price-Per-Cubic']
+            merch.qtyT = item['QtyT']
+            merch.qtyR = item['QtyR']
+            merch.qtyA = item['QtyA']
+            merch.um = item['U/M']
+            merch.description = item['Description']
+            merch.totalCost = item['Total-Cost']
+
+            print(merch.code, merch.name, merch.classification, merch.type, merch.length, merch.width, merch.thickness, merch.purchasingPrice, merch.sellingPrice, merch.vol, merch.pricePerCubic, merch.qtyA, merch.qtyR, merch.qtyT, merch.um, merch.description, merch.totalCost)
+
+            merch.save()
+            merch.warehouse.add(Warehouse.objects.get(name=item['Warehouse']))
+            request.user.branch.merchInventory.add(merch)
+        
+        return redirect('/merchinventory/')

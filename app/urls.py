@@ -110,5 +110,6 @@ urlpatterns = [
     path('receiving-report/', login_required(views.ReceivingReportView.as_view())),
     path('rr-list/', login_required(views.RRListView.as_view())),
     path('rr-nonapproved/', login_required(views.RRnonapproved.as_view())),
-    path('rr-approved/', login_required(views.RRapproved.as_view()))
+    path('rr-approved/', login_required(views.RRapproved.as_view())),
+    path('import-merch-inventory/', login_required(views.ImportMerchandiseInventory.as_view()))
 ]
