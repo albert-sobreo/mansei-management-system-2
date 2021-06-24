@@ -401,15 +401,7 @@
 
         watch: {
             amountDue(){
-                this.purchaseOrder.amountDue = (this.amountDue.reduce((a, b)=>Number(a)+Number(b), 0)).toFixed(5)
-                this.purchaseOrder.atc.forEach(item=>{
-                    item.amount = Number(this.purchaseOrder.amountDue).toFixed(2)
-                })
-
-                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
-                this.purchaseOrder.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
-                this.purchaseOrder.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
-                this.purchaseOrder.atc[0].amountWithheld = ((this.purchaseOrder.atc[0].taxRate) / 100) * this.purchaseOrder.amountDue
+                this.watchers()
             },
 
             amountTotal(){
@@ -428,17 +420,22 @@
                 }
             },
             amountWithheld(){
-                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
-                this.purchaseOrder.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
-                this.purchaseOrder.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                this.watchers()
             },
             taxRate(){
-                this.purchaseOrder.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
-                this.purchaseOrder.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                this.watchers()
             }
         },
 
         methods:{
+            watchers(){
+                this.purchaseOrder.withholdingTax = this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)
+                this.purchaseOrder.amountDue = this.amountDue.reduce((a,b)=>Number(a)+Number(b),0)
+                this.purchaseOrder.taxPeso = this.purchaseOrder.amountDue * (this.purchaseOrder.taxRate/100)
+                this.purchaseOrder.atc[0].amount = this.purchaseOrder.amountDue - this.purchaseOrder.taxPeso
+                this.purchaseOrder.atc[0].amountWithheld = (((this.purchaseOrder.atc[0].taxRate)/100) * this.purchaseOrder.atc[0].amount)
+                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - this.purchaseOrder.withholdingTax
+            },
 
             loadData(){
                 axios.get('/api/vendor/')
