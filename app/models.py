@@ -202,6 +202,7 @@ class Warehouse(models.Model):
 
 class MerchandiseInventory(models.Model):
     code = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, null = True, blank = True)
     classification = models.CharField(max_length=50, null = True, blank = True)
     type = models.CharField(max_length=50, null = True, blank = True)
     length =  models.DecimalField(max_digits=20, decimal_places=5)

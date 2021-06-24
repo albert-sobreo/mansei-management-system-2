@@ -58,6 +58,33 @@
             </tbody>
         </table>
 
+        <!-- IMPORT MODAL -->
+        <div class="modal fade" id="import">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Import Inventory Items</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="/import-merch-inventory/" enctype="multipart/form-data" method="POST">{% csrf_token %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="">Select Excel file</label><br>
+                                    <input name="excel" type="file" accept=".xls,.xlsx,.csv"><br>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary col">Import</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ADD MODAL -->
         <div class="modal fade" id="addInventory">
             <div class="modal-dialog">
@@ -289,6 +316,14 @@
                     titleAttr: 'View Raw Numbers',
                     action: function(){
                         app.roundToggler()
+                    },
+                },
+                {
+                    text: `<i class="fas fa-file-import"></i>`,
+                    className: 'btn btn-table',
+                    titleAttr: 'Import',
+                    action: function(){
+                        $("#import").modal('show')
                     }
                 }
                 ],
