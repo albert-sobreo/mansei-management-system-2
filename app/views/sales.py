@@ -17,6 +17,7 @@ import sweetify
 from datetime import date as now
 from decimal import Decimal
 
+########## SALES CONTRACT ##########
 class SalesContractView(View):
     def get(self, request, format=None):
 
@@ -110,3 +111,17 @@ class SaveSalesContract(APIView):
             request.user.branch.tempSCOtherFees.add(f)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+
+
+
+
+
+########## QUOTATIONS ##########
+class SalesQuotationsView(View):
+    def get(self, request, format=None):
+        return render(request, 'sales-quotations.html')
+
+class QQListView(View):
+    def get(self, request, format=None):
+        return render(request, 'qq-list.html')

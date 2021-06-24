@@ -112,5 +112,7 @@ urlpatterns = [
     path('rr-nonapproved/', login_required(views.RRnonapproved.as_view())),
     path('rr-approved/', login_required(views.RRapproved.as_view())),
     path('rr-approval/<int:pk>/', login_required(views.RRApprovalAPI.as_view())),
-    path('import-merch-inventory/', login_required(views.ImportMerchandiseInventory.as_view()))
+    path('import-merch-inventory/', login_required(views.ImportMerchandiseInventory.as_view())),
+    path('sales-quotations/', login_required(views.SalesQuotationsView.as_view())),
+    path('sales-quotations-list/', login_required(views.QQListView.as_view()))
 ]
