@@ -116,6 +116,20 @@ class POApprovalAPI(APIView):
         wep.balance = wep.accountChild.amount
         wep.save()
         request.user.branch.journalEntries.add(wep)
+        vat = JournalEntries()
+        vat.journal = j
+        vat.normally = 'Credit'
+        vat.accountChild = AccountChild.objects.get(name="VAT Amount")
+        vat.amount = purchase.taxPeso
+        vat.accountChild.accountSubGroup.amount -= vat.amount
+        vat.accountChild.accountSubGroup.accountGroup.amount -= vat.amount
+        vat.accountChild.save()
+        vat.accountChild.accountSubGroup.save()
+        vat.accountChild.accountSubGroup.accountGroup.save()
+        vat.balance = vat.accountChild.amount
+        vat.save()
+        request.user.branch.journalEntries.add(vat)
+        
 
         if purchase.paymentPeriod == 'Full Payment':
             if purchase.paymentMethod == 'Cash on Hand':
