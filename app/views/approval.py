@@ -85,12 +85,6 @@ class POApprovalAPI(APIView):
         purchase.approved = True
         purchase.approvedBy = request.user
         
-        for element in purchase.poitemsmerch.all():
-            element.merchInventory.qtyA += element.qty
-            element.merchInventory.qtyT = element.merchInventory.qtyA + element.merchInventory.qtyR
-            element.merchInventory.totalCost += element.totalPrice                
-            element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
-            element.merchInventory.save()
 
         purchase.save()
 
@@ -103,21 +97,7 @@ class POApprovalAPI(APIView):
         j.save()
         request.user.branch.journal.add(j)
 
-        je = JournalEntries()
-
-        je.journal = j
-        je.normally = 'Debit'
-        je.accountChild = AccountChild.objects.get(name='Merchandise Inventory')
-        je.amount = purchase.amountDue
-        je.accountChild.amount += je.amount
-        je.accountChild.accountSubGroup.amount += je.amount
-        je.accountChild.accountSubGroup.accountGroup.amount += je.amount
-        je.accountChild.save()
-        je.accountChild.accountSubGroup.save()
-        je.accountChild.accountSubGroup.accountGroup.save()
-        je.balance = je.accountChild.amount
-        je.save()
-        request.user.branch.journalEntries.add(je)
+        
 
         je = JournalEntries()
         wep = JournalEntries()
@@ -255,9 +235,51 @@ class RRapproved(View):
         }
         return render(request, 'rr-approved.html', context)
 
+class RRApprovalAPI(APIView):
+    def put(self, request, pk, format = None):
 
+        receive = ReceivingReport.objects.get(pk=pk)
 
+        receive.datetimeApproved = datetime.now()
+        receive.approved = True
+        receive.approvedBy = request.user
+        
+        for element in receive.rritemsmerch.all():
+            element.merchInventory.qtyA += element.qty
+            element.merchInventory.qtyT = element.merchInventory.qtyA + element.merchInventory.qtyR
+            element.merchInventory.totalCost += element.totalPrice                
+            element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
+            element.merchInventory.save()
 
+        receive.save()
+
+        j = Journal()
+
+        j.code = receive.code
+        j.datetimeCreated = receive.datetimeApproved
+        j.createdBy = receive.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+
+        je = JournalEntries()
+
+        je.journal = j
+        je.normally = 'Debit'
+        je.accountChild = AccountChild.objects.get(name='Merchandise Inventory')
+        je.amount = receive.amountDue
+        je.accountChild.amount += je.amount
+        je.accountChild.accountSubGroup.amount += je.amount
+        je.accountChild.accountSubGroup.accountGroup.amount += je.amount
+        je.accountChild.save()
+        je.accountChild.accountSubGroup.save()
+        je.accountChild.accountSubGroup.accountGroup.save()
+        je.balance = je.accountChild.amount
+        je.save()
+        request.user.branch.journalEntries.add(je)
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
 
 
 
