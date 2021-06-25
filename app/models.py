@@ -274,7 +274,7 @@ class PurchaseOrder(models.Model):
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    taxPeso = models.DecimalField(max_digits=20, decimal_places=5)
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     paymentMethod = models.CharField(max_length=50)
     paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True, blank=True)
@@ -288,7 +288,7 @@ class PurchaseOrder(models.Model):
     journal = models.ForeignKey(Journal, related_name="purchaseorder", on_delete=models.PROTECT, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    qtrReceived = models.IntegerField()
+    qtyReceived = models.IntegerField(null = True, blank = True)
     fullyReceived = models.BooleanField(null = True, blank = True)
     
     class Meta:
@@ -330,7 +330,7 @@ class ReceivingReport(models.Model):
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    taxPeso = models.DecimalField(max_digits=20, decimal_places=5)
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     paymentMethod = models.CharField(max_length=50)
     paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True, blank=True)
@@ -343,6 +343,9 @@ class ReceivingReport(models.Model):
     approved = models.BooleanField(null = True, default=False)
     journal = models.ForeignKey(Journal, related_name="receivingreport", on_delete=models.PROTECT, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, default = False)
+    runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    qtyReceived = models.IntegerField(null = True, blank = True)
+    fullyReceived = models.BooleanField(null = True, blank = True)
 
     class Meta:
         verbose_name = "Receiving Report"
@@ -385,7 +388,7 @@ class SalesContract(models.Model):
     discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    taxPeso = models.DecimalField(max_digits=20, decimal_places=5)
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     paymentMethod = models.CharField(max_length=50)
     paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True)
@@ -399,8 +402,7 @@ class SalesContract(models.Model):
     journal = models.ForeignKey(Journal, related_name="tempsalescontract", on_delete=models.PROTECT, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    qtrReceived = models.IntegerField()
-    fullyReceived = models.BooleanField(null = True, blank = True)
+    
 
     class Meta:
         verbose_name = "Sales Contract"
