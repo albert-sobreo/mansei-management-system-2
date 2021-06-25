@@ -375,6 +375,44 @@ class RRatc(models.Model):
     code = models.ForeignKey(ATC, related_name="rratc",on_delete=models.PROTECT, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
 
+class InwardInventory(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    dateInward = models.DateField()
+    party = models.ForeignKey(Party, related_name="inwardinventory", on_delete=models.PROTECT, null=True, blank=True)
+    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "iiCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "iiApprovedBy")
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    approved = models.BooleanField(null = True, default = False)
+    adjustedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "iiAdjustedBy")
+    datetimeAdjusted = models.DateTimeField(null=True, blank=True)
+    adjusted = models.BooleanField(null = True, default = False)
+    journal = models.ForeignKey(Journal, related_name="inwardinventory", on_delete=models.PROTECT, null=True, blank=True)
+    fullyPaid = models.BooleanField(null = True, default = False)
+    runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+
+class IIItemsMerch(models.Model):
+    inwardInventory = models.ForeignKey(InwardInventory, related_name="iiitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="iiitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.IntegerField()
+    totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    barcode = models.CharField(max_length=50)
+    productMark = models.CharField(max_length=50)
+
+class IIAdjustedItems(models.Model):
+    inwardInventory = models.ForeignKey(InwardInventory, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
+    iiItemsMerch = models.ForeignKey(IIItemsMerch, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.IntegerField()
+    totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    barcode = models.CharField(max_length=50)
+    productMark = models.CharField(max_length=50)
+    classfication = models.CharField(max_length=50)
+    type = models.CharField(max_length=50)
+
 class SalesContract(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
