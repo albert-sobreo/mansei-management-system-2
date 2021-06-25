@@ -287,7 +287,10 @@ class PurchaseOrder(models.Model):
     approved = models.BooleanField(null = True, default=False)
     journal = models.ForeignKey(Journal, related_name="purchaseorder", on_delete=models.PROTECT, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, default = False)
-
+    runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    qtrReceived = models.IntegerField()
+    fullyReceived = models.BooleanField(null = True, blank = True)
+    
     class Meta:
         verbose_name = "Purchase Order"
         verbose_name_plural = "Purchase Orders"
@@ -378,6 +381,11 @@ class SalesContract(models.Model):
     amountPaid = models.DecimalField(max_digits=18, decimal_places=5, null = True)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    taxType = models.CharField(max_length=20, null = True, blank = True)
+    taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5)
     paymentMethod = models.CharField(max_length=50)
     paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True)
@@ -390,6 +398,9 @@ class SalesContract(models.Model):
     approved = models.BooleanField(null = True)
     journal = models.ForeignKey(Journal, related_name="tempsalescontract", on_delete=models.PROTECT, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, default = False)
+    runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    qtrReceived = models.IntegerField()
+    fullyReceived = models.BooleanField(null = True, blank = True)
 
     class Meta:
         verbose_name = "Sales Contract"
