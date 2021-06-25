@@ -92,7 +92,16 @@ class ImportMerchandiseInventory(View):
             print(merch.code, merch.name, merch.classification, merch.type, merch.length, merch.width, merch.thickness, merch.purchasingPrice, merch.sellingPrice, merch.vol, merch.pricePerCubic, merch.qtyA, merch.qtyR, merch.qtyT, merch.um, merch.description, merch.totalCost)
 
             merch.save()
-            merch.warehouse.add(Warehouse.objects.get(name=item['Warehouse']))
+            try:
+                merch.warehouse.add(Warehouse.objects.get(name=item['Warehouse']))
+            except:
+                w = Warehouse()
+                w.name = item['Warehouse']
+                w.address = '---'
+                w.save()
+                request.user.branch.warehouse.add(w)
+                merch.warehouse.add(w)
+            request.user.branch.merchInventory.add(merch)
             request.user.branch.merchInventory.add(merch)
         
         return redirect('/merchinventory/')
