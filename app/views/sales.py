@@ -55,47 +55,64 @@ class SaveSalesContract(APIView):
     def post(self, request, format = None):
         salesContract = request.data
 
-        sc = TempSalesContract()
+        sc = SalesContract()
 
         sc.code = salesContract['code']
         sc.datetimeCreated = salesContract['dateTimeCreated']
-        sc.dateSold = salesContract['date']
+
+        if salesContract['retroactive']:
+            sc.dateSold = salesContract['retroactive']
+        else:
+            sc.dateSold = salesContract['date']
 
         sc.party = Party.objects.get(pk=salesContract['customer'])
         
-        # for atc in salesContract['atc']:
-        #     sc.atcCode = atc['code']
-        #     sc.amountWithheld = atc['amountWithheld']
-        
-        sc.subTotal = salesContract['subTotal']
+        sc.amountPaid = Decimal(salesContract['amountPaid'])
+        sc.amountDue = Decimal(salesContract['amountDue'])
+        sc.amountTotal = Decimal(salesContract['amountTotal'])
+        sc.taxType = salesContract['taxType']
+        sc.taxRate = Decimal(salesContract['taxRate'])
+        sc.taxPeso = Decimal(salesContract['taxPeso'])
+        sc.paymentMethod = salesContract['paymentMethod']
+        sc.paymentPeriod = salesContract['paymentPeriod']
+        sc.chequeNo = salesContract['chequeNo']
+        sc.dueDate = salesContract['dueDate']
+        sc.bank = salesContract['bank']
+        sc.remarks = salesContract['remarks']
+
+        if request.user.is_authenticated:
+            sc.createdBy = request.user
+
         if salesContract['discountType'] == 'percent':
             sc.discountPercent = salesContract['totalDiscount']
         elif salesContract['discountType'] == 'peso':
             sc.discountPeso = salesContract['totalDiscount']
 
-        sc.taxPeso = salesContract['tax']
-        sc.totalCost = salesContract['total']
-        
-        # sc.paymentMethod = salesContract['paymentMethod']
-        # sc.paymentPeriod = salesContract['paymentPeriod']
-        # sc.chequeNo = salesContract['chequeNo']
-        # sc.dueDate = salesContract['dueDate']
-        # sc.bank = salesContract['bank']
-        # sc.remarks = salesContract['remarks']
-        
-        if request.user.is_authenticated:
-            sc.createdBy = request.user
-
         sc.save()
         request.user.branch.salesContract.add(sc)
 
+
+        atc = SCatc()
+
+        for jsonatc in salesContract['atc']:
+            print(jsonatc)
+            atc.code = ATC.objects.get(pk=jsonatc['code'])
+            atc.amountWithheld = jsonatc['amountWithheld']
+            atc.salesContract = sc
+            atc.save()
+            request.user.branch.scatc.add(atc)
+        
+
         for item in salesContract['items']:
-            scitemsmerch = TempSCItemsMerch()
+            scitemsmerch = SCItemsMerch()
             scitemsmerch.salesContract = sc
             scitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
             scitemsmerch.remaining = item['remaining']
             scitemsmerch.qty = item['quantity']
-            scitemsmerch.totalCost = Decimal(item['total'])
+            scitemsmerch.cbm = item['cbm']
+            scitemsmerch.vol = item['vol']
+            scitemsmerch.pricePerCubic = item['pricePerCubic']
+            scitemsmerch.totalCost = Decimal(item['totalCost'])
 
             print(scitemsmerch.totalCost)
             

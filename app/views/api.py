@@ -113,7 +113,7 @@ class PurchaseOrderApprovedAPI(viewsets.ModelViewSet):
 class SalesContractAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesContractNestedSZ
-    queryset = TempSalesContract.objects.all()
+    queryset = SalesContract.objects.all()
 
 
 
@@ -133,12 +133,12 @@ class PurchaseApprovalApprovedAPI(viewsets.ModelViewSet):
 class SalesContractApprovalNonApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesContractNestedSZ
-    queryset = TempSalesContract.objects.filter(approved = False)
+    queryset = SalesContract.objects.filter(approved = False)
 
 class SalesContractApprovalApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesContractNestedSZ
-    queryset = TempSalesContract.objects.filter(approved = True)
+    queryset = SalesContract.objects.filter(approved = True)
 
 
 

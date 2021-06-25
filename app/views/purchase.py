@@ -105,7 +105,6 @@ class SavePurchaseOrder(APIView):
             poitemsmerch.qty = item['quantity']
             poitemsmerch.purchasingPrice = Decimal(item['vatable'])
             poitemsmerch.totalPrice = Decimal(item['totalCost'])
-            poitemsmerch.inputVat = Decimal(item['inputVAT'])
 
             print(poitemsmerch.purchasingPrice, poitemsmerch.totalPrice, poitemsmerch.inputVat)
             

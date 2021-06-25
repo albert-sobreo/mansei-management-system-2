@@ -148,7 +148,7 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
 class SCItemsMerchNestedSZ(serializers.ModelSerializer):
     merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
     class Meta:
-        model = TempSCItemsMerch
+        model = SCItemsMerch
         fields= '__all__'
 
 class SalesContractNestedSZ(serializers.ModelSerializer):
@@ -156,10 +156,10 @@ class SalesContractNestedSZ(serializers.ModelSerializer):
     createdBy = UserSZ(read_only=True)
     approvedBy = UserSZ(read_only=True)
     journal = JournalSZ(read_only=True)
-    tempscitemsmerch = SCItemsMerchNestedSZ(read_only=True, many=True)
+    scitemsmerch = SCItemsMerchNestedSZ(read_only=True, many=True)
 
     class Meta:
-        model = TempSalesContract
+        model = SalesContract
         fields = '__all__'
         depth = 1
 

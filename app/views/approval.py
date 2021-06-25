@@ -323,13 +323,13 @@ class SCnonapprovedView(View):
 class SCApprovalAPI(APIView):
     def put(self, request, pk, format = None):
 
-        sale = TempSalesContract.objects.get(pk=pk)
+        sale = SalesContract.objects.get(pk=pk)
 
         sale.datetimeApproved = datetime.now()
         sale.approved = True
         sale.approvedBy = request.user
         
-        for element in sale.tempscitemsmerch.all():
+        for element in sale.scitemsmerch.all():
             element.merchInventory.qtyA -= element.qty
             element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
             element.merchInventory.totalCost += element.totalCost                

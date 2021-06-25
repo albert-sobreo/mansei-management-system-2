@@ -655,7 +655,7 @@
                 if (
                     this.order.code &&
                     this.order.date &&
-                    this.order.vendor &&
+                    this.order.customer &&
                     this.order.amountPaid &&
                     this.order.paymentMethod &&
                     this.order.paymentPeriod &&
@@ -665,10 +665,8 @@
                 {
                     for(var item of this.order.items){
                         if(
-                            item.type &&
                             item.code &&
                             item.quantity &&
-                            item.vatable &&
                             item.totalCost
                         )
                         {
@@ -705,8 +703,8 @@
                 if (!this.order.date){
                     this.errors.push('Date Required')
                 }
-                if (!this.order.vendor){
-                    this.errors.push('Vendor Required')
+                if (!this.order.customer){
+                    this.errors.push('Customer Required')
                 }
                 if (!this.order.amountPaid){
                     this.errors.push('Amount Paid Required')
@@ -725,17 +723,11 @@
                 }
 
                 this.order.items.forEach((item, index)=>{
-                    if(!item.type){
-                        this.errors.push('Item Type Required at index: ' + String(index+1))
-                    }
                     if(!item.code){
                         this.errors.push('Item Code Required at index: ' + String(index+1))
                     }
                     if(!item.quantity){
                         this.errors.push('Item Quantity Required at index: ' + String(index+1))
-                    }
-                    if(!item.vatable){
-                        this.errors.push('Purchasing Price Required at index: ' + String(index+1))
                     }
                     if(!item.totalCost){
                         this.errors.push('Total Cost Required at index: ' + String(index+1))
@@ -813,7 +805,7 @@
             },
             submit(){
                 if(Number(this.order.amountTotal) >= Number(this.order.amountPaid)){
-                    axios.post('/save-purchase-order/', this.order, this.config)
+                    axios.post('/save-sales-contract/', this.order, this.config)
                     .then(res=>res.data==0?location.reload():'')
                 } else {
                     Swal.fire({

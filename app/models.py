@@ -388,18 +388,18 @@ class SalesContract(models.Model):
     discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
     paymentMethod = models.CharField(max_length=50)
     paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True)
     dueDate = models.DateField(null = True, blank = True)
-    bank = models.CharField(max_length=50)
-    remarks = models.TextField(null = True)
+    bank = models.CharField(max_length=50, null = True, blank = True)
+    remarks = models.TextField(null = True, blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "tempscCreatedBy")
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "tempscApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
-    approved = models.BooleanField(null = True)
-    journal = models.ForeignKey(Journal, related_name="tempsalescontract", on_delete=models.PROTECT, null=True, blank=True)
+    approved = models.BooleanField(null = True, default = False)
+    journal = models.ForeignKey(Journal, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     
@@ -424,7 +424,7 @@ class TempSalesContract(models.Model):
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "scCreatedBy")
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "scApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
-    journal = models.ForeignKey(Journal, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
+    journal = models.ForeignKey(Journal, related_name="tempsalescontract", on_delete=models.PROTECT, null=True, blank=True)
     approved = models.BooleanField(default=False)
     
 
@@ -437,19 +437,20 @@ class TempSCItemsMerch(models.Model):
     delivered = models.BooleanField(null = True, default=False)
 
 class TempSCOtherFees(models.Model):
-    salesContract = models.ForeignKey(TempSalesContract, related_name='tempscotherfees', on_delete=models.PROTECT)
+    salesContract = models.ForeignKey(SalesContract, related_name='scotherfees', on_delete=models.PROTECT)
     fee = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, null = True)
 
 class SCItemsMerch(models.Model):
     salesContract = models.ForeignKey(SalesContract, related_name="scitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="scitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.IntegerField()
-    purchasingPrice = models.DecimalField(max_digits=8, decimal_places=5)
-    totalPrice = models.DecimalField(max_digits=10, decimal_places=5)
-    outputVat = models.DecimalField(max_digits=5, decimal_places=5)
-    delivered = models.BooleanField(null = True)
+    cbm = models.CharField(max_length=10, null = True)
+    vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    delivered = models.BooleanField(null = True, default = False)
 
     class Meta:
         verbose_name = "SC Items Merch"
@@ -457,6 +458,11 @@ class SCItemsMerch(models.Model):
 
     def __str__(self):
         return self.merchInventory.name
+
+class SCatc(models.Model):
+    salesContract = models.ForeignKey(SalesContract, related_name="scatc",on_delete=models.PROTECT, null=True, blank=True)
+    code = models.ForeignKey(ATC, related_name="scatc",on_delete=models.PROTECT, null=True, blank=True)
+    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
 
 class VendorQuotesMerch(models.Model):
     purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="vendorquotesmerch",on_delete=models.PROTECT, null=True, blank=True)
@@ -596,9 +602,10 @@ class Branch(models.Model):
     rratc = models.ManyToManyField(RRatc, blank = True)
 
     ##### SALES CONTRACT #####
-    salesContract = models.ManyToManyField(TempSalesContract, blank = True)
-    scitemsMerch = models.ManyToManyField(TempSCItemsMerch, blank = True)
+    salesContract = models.ManyToManyField(SalesContract, blank = True)
+    scitemsMerch = models.ManyToManyField(SCItemsMerch, blank = True)
     tempSCOtherFees = models.ManyToManyField(TempSCOtherFees, blank = True)
+    scatc = models.ManyToManyField(SCatc, blank = True)
 
     ##### DELIVERIES #####
     driver = models.ManyToManyField(Driver, blank = True)
