@@ -41,7 +41,7 @@ class ReceivingReportView(View):
 
         context = {
             'new_code': new_code,
-            'pos': request.user.branch.purchaseOrder.filter(approved=True)
+            'pos': request.user.branch.purchaseOrder.filter(approved=True, fullyReceived=False)
         }
         return render(request, 'receiving-report.html', context)
 

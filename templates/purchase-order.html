@@ -465,12 +465,19 @@
                     var wcTempList = []
 
                     this.atcList.forEach((item, index)=>{
-                        if(item.code.includes('WI')){
+                        if(item.code.includes('None')){
+                            none.push(item)
+                        }
+                        else if(item.code.includes('WI')){
                             wiTempList.push(item)
                         } else {
                             wcTempList.push(item)
                         }
                         this.formattedATCList = [
+                            {
+                                name: 'None',
+                                list: none
+                            },
                             {
                                 name: 'Individual',
                                 list: wiTempList

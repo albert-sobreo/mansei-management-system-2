@@ -136,11 +136,11 @@
 						<span class="font-bold">[[findMerch(item.item)]]</span>
 					</td>
 					<td class="align-middle py-4">
-						<span>₱[[item.info[0].purchasingPrice]]</span><br>
+						<span>[[putPeso(item.info[0].purchasingPrice)]]</span><br>
 						<span class="gray">[[item.info[0].name]]</span>
 					</td>
 					<td class="align-middle py-4">
-						<span>₱[[item.info[1].purchasingPrice]]</span><br>
+						<span>[[putPeso(item.info[1].purchasingPrice)]]</span><br>
 						<span class="gray">[[item.info[1].name]]</span>
 					</td>
 				</tr>
@@ -284,6 +284,9 @@
 					return String(item.code) + " " + item.classification + " " + item.type
 				} catch (e) {
 				}
+			},
+			putPeso(value){
+				return (value!=null?'₱' + String(value):'')
 			}
 		},
 		mounted(){
