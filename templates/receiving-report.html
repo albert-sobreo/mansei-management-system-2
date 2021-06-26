@@ -27,7 +27,7 @@
 		<div class="row">
         	<div class="col col-3 pr-2">
         	    <label>Reference No.</label>
-        	    <input type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
+        	    <input type="text" class="form-control" name="code" placeholder="Enter Reference No.">
         	</div>
         	<div class="col col-2 px-2">
 				<label>Date</label>
@@ -339,12 +339,12 @@
                 taxType: '',
                 taxRate: '',
                 items: [{
+					poID: null,
                     type: '',
                     code: '',
                     remaining: null,
                     quantity: null,
                     vatable: 0.00,
-                    inputVAT: 0,
                     totalCost: null
                 }],
                 atc: [{
@@ -395,15 +395,7 @@
 
 		watch: {
             amountDue(){
-                this.purchaseOrder.amountDue = (this.amountDue.reduce((a, b)=>Number(a)+Number(b), 0)).toFixed(5)
-                this.purchaseOrder.atc.forEach(item=>{
-                    item.amount = Number(this.purchaseOrder.amountDue).toFixed(2)
-                })
-
-                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
-                this.purchaseOrder.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
-                this.purchaseOrder.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
-                this.purchaseOrder.atc[0].amountWithheld = ((this.purchaseOrder.atc[0].taxRate) / 100) * this.purchaseOrder.amountDue
+                this.watchers()
             },
 
             amountTotal(){
@@ -422,17 +414,22 @@
                 }
             },
             amountWithheld(){
-                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
-                this.purchaseOrder.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
-                this.purchaseOrder.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                this.watchers()
             },
             taxRate(){
-                this.purchaseOrder.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
-                this.purchaseOrder.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                this.watchers()
             }
         },
 
 		methods:{
+			watchers(){
+                this.purchaseOrder.withholdingTax = this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)
+                this.purchaseOrder.amountDue = this.amountDue.reduce((a,b)=>Number(a)+Number(b),0)
+                this.purchaseOrder.taxPeso = this.purchaseOrder.amountDue * (this.purchaseOrder.taxRate/100)
+                this.purchaseOrder.atc[0].amount = this.purchaseOrder.amountDue - this.purchaseOrder.taxPeso
+                this.purchaseOrder.atc[0].amountWithheld = (((this.purchaseOrder.atc[0].taxRate)/100) * this.purchaseOrder.atc[0].amount)
+                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - this.purchaseOrder.withholdingTax
+            },
 
             loadData(){
                 axios.get('/api/vendor/')
@@ -686,18 +683,20 @@
 					this.purchaseOrder.taxRate = Number(po.taxRate).toFixed(0)
 					po.poitemsmerch.forEach((item, index)=>{
 						if(index==0){
+							this.purchaseOrder.items[0].poID = item.id
 							this.purchaseOrder.items[0].type = 'Merchandise'
 							this.purchaseOrder.items[0].code = item.merchInventory.id
 							this.purchaseOrder.items[0].remaining = item.remaining
-							this.purchaseOrder.items[0].quantity = item.qty
+							this.purchaseOrder.items[0].quantity = item.qty - item.qtyReceived
 							this.purchaseOrder.items[0].vatable = item.purchasingPrice
 							this.purchaseOrder.items[0].totalCost = item.totalPrice
 						} else {
 							this.purchaseOrder.items.push({
+								poID: item.id,
 								type: 'Merchandise',
                     			code: item.merchandiseInventory.id,
                     			remaining: item.remaining,
-                    			quantity: item.qty,
+                    			quantity: item.qty - item.qtyReceived,
                     			vatable: item.purchasingPrice,
                     			totalCost: item.totalPrice
 							})

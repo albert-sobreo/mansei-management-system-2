@@ -207,3 +207,10 @@ class PurchaseRequestNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseRequestNestedSZ
     queryset = PurchaseRequest.objects.all()
+
+########## RECEIVING REPORT ##########
+
+class ReceivingReportNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReceivingReportNestedSZ
+    queryset = ReceivingReport.objects.all()

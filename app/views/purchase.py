@@ -86,9 +86,13 @@ class SavePurchaseOrder(APIView):
         po.dueDate = purchaseOrder['dueDate']
         po.bank = purchaseOrder['bank']
         po.remarks = purchaseOrder['remarks']
-        po.purchaseRequest = PurchaseRequest.objects.get(pk=purchaseOrder['pr'])
-        po.purchaseRequest.poed = True
-        po.purchaseRequest.save()
+        try:
+            po.purchaseRequest = PurchaseRequest.objects.get(pk=purchaseOrder['pr'])
+            po.purchaseRequest.poed = True
+            po.purchaseRequest.save()
+        except:
+            pass
+        
         
         if request.user.is_authenticated:
             po.createdBy = request.user

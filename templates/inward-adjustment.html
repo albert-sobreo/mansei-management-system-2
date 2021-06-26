@@ -1,0 +1,190 @@
+{% extends "base-template.html" %}
+{% block title %}Inward Inventory Adjustments{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION -->
+    <navbar-gas active="nav-purchase" photo="/media/{{request.user.image}}"></navbar-gas>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAV -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/inward-inventory/" class="mx-2">List</a>
+                <a href="/inward-adjustments/" class="active-gas mx-2">Adjustments</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Inward Inventory</span>
+        </div>
+
+        <!-- INPUTS -->
+        <div class="row">
+            <div class="col col-3 pr-2">
+                <label for="">Reference No.</label>
+                <input type="text" class="form-control" placeholder="Enter Reference No.">
+            </div>
+            <div class="col col-2 pl-2">
+                <label>Date</label>
+                <input type="date" class="form-control">
+            </div>
+        </div>
+        <div class="row mt-3">
+            <span class="col font-bold">Inward Inventory Items</span>
+        </div>
+        <div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card">
+            <div class="row">
+                <div class="col px-1 gray">
+                    <label for="" class="m-0">Barcode</label>
+                </div>
+                <div class="col px-1 gray">
+                    <label for="" class="m-0">Name</label>
+                </div>
+                <div class="col px-1 gray">
+                    <label for="" class="m-0">Classification</label>
+                </div>
+                <div class="col-1 px-1 gray">
+                    <label for="" class="m-0">Type</label>
+                </div>
+                <div class="col-1 px-1 gray">
+                    <label for="" class="m-0">Length <span class="gray font-size-10">mm</span></label>
+                </div>
+                <div class="col-1 px-1 gray">
+                    <label for="" class="m-0">Width <span class="gray font-size-10">mm</span></label>
+                </div>
+                <div class="col-1 px-1 gray">
+                    <label for="" class="m-0">Thick <span class="gray font-size-10">mm</span></label>
+                </div>
+                <div class="col-1 px-1 gray">
+                    <label for="" class="m-0">Qty</label>
+                </div>
+                <div class="col px-1 gray">
+                    <label for="" class="m-0">Amount</label>
+                </div>
+                <div class="col px-1 gray">
+                    <label for="" class="m-0">Total Amount</label>
+                </div>
+            </div>
+            <div class="order-card-darker container-extend-2 row py-3">
+                <div class="col-12 px-5">
+                    <div class="row font-semibold">
+                        <div class="col px-1 ">
+                            <span>w001</span>
+                        </div>
+                        <div class="col px-1 ">
+                            <span></span>
+                        </div>
+                        <div class="col px-1 ">
+                            <span></span>
+                        </div>
+                        <div class="col-1 px-1 ">
+                            <span></span>
+                        </div>
+                        <div class="col-1 px-1 ">
+                            <span>2000mm</span>
+                        </div>
+                        <div class="col-1 px-1 ">
+                            <span>2000mm</span>
+                        </div>
+                        <div class="col-1 px-1 ">
+                            <span>100mm</span>
+                        </div>
+                        <div class="col-1 px-1 ">
+                            <span>5</span>
+                        </div>
+                        <div class="col px-1 ">
+                            <span>₱200.00</span>
+                        </div>
+                        <div class="col px-1 ">
+                            <span>₱2,000.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 px-5">
+                    <div class="row">
+                        <div class="col px-1">
+                            <input type="text" class="form-control" placeholder="Barcode">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" class="form-control" placeholder="Item Name">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" class="form-control" placeholder="Item Class">
+                        </div>
+                        <div class="col-1 px-1">
+                            <input type="text" class="form-control" placeholder="Item Type">
+                        </div>
+                        <div class="col-1 px-1">
+                            <input type="text" class="form-control" placeholder="Length">
+                        </div>
+                        <div class="col-1 px-1">
+                            <input type="text" class="form-control" placeholder="Width">
+                        </div>
+                        <div class="col-1 px-1">
+                            <input type="text" class="form-control" placeholder="Thickness">
+                        </div>
+                        <div class="col-1 px-1">
+                            <input type="text" class="form-control" placeholder="Qty">
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" class="form-control box-shadow-off" placeholder="Amount" onkeypress="validate()">
+                            </div>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" class="form-control box-shadow-off" placeholder="Total Amount" onkeypress="validate()" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 px-5">
+                    <div class="row">
+                        <div class="col px-1">
+                            <button class="btn btn-warning">+ Add Adjustments</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-2 offset-10">
+                    <label class="font-size-14">Total Amount Due</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">₱</span>
+                        </div>
+                        <input type="text" class="form-control box-shadow-off" placeholder="Total Amount" onkeypress="validate()" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div @click="checkForm()" class="container-extend border container-extend btn-bottom">
+			REQUEST FOR APPROVAL
+		</div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app"
+    })
+</script>
+
+{% endblock %}

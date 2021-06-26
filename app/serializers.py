@@ -334,6 +334,33 @@ class PRItemsMerchSZ(serializers.ModelSerializer):
         model = PRItemsMerch
         fields = '__all__'
 
+########## RECEIVING REPORT ##########
+class RRatcSZ(serializers.ModelSerializer):
+    code = ATCSZ(read_only=True)
+    class Meta: 
+        model = RRatc
+        fields = '__all__'
+
+class RRItemsMerchNestedSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = RRItemsMerch
+        fields = '__all__'  
+
+class ReceivingReportNestedSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    createdBy = UserSZ(read_only=True)
+    approvedBy = UserSZ(read_only=True)
+    journal = JournalSZ(read_only=True)
+    rritemsmerch = RRItemsMerchNestedSZ(read_only=True, many=True)
+    rratc = RRatcSZ(read_only=True, many=True)
+
+    class Meta:
+        model = ReceivingReport
+        fields = '__all__'
+        depth = 1
+
+
 # MAIN SERIALIZER
 class PurchaseRequestSZ(serializers.ModelSerializer):
     pritemsmerch = PRItemsMerchSZ(read_only=True, many=True)

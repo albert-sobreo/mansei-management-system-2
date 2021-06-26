@@ -1,4 +1,3 @@
-from app.views.sales import SaveQuotations
 from django.contrib import admin
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -55,8 +54,10 @@ router.register(r"purchase-order-approved", views.PurchaseOrderApprovedAPI, 'pur
 router.register(r"purchase-request", views.PurchaseRequestAPI, 'purchase-request')
 router.register(r"purchase-request-non-approved", views.PurchaseRequestNonApprovedAPI, 'purchase-request-non-approved')
 router.register(r"purchase-request-approved", views.PurchaseRequestApprovedAPI, 'purchase-request-approved')
-
 router.register(r"purchase-request-nested", views.PurchaseRequestNestedAPI, 'purchase-request-nested')
+
+########## PURCHASE REQUEST ##########
+router.register(r"receiving-report", views.ReceivingReportNestedAPI, 'receiving-report')
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -112,6 +113,7 @@ urlpatterns = [
     path('getvendorquotes/', login_required(views.VendorQuotes.as_view())),
     path('receiving-report/', login_required(views.ReceivingReportView.as_view())),
     path('rr-list/', login_required(views.RRListView.as_view())),
+    path('save-receivingreport/', login_required(views.SaveReceivingReport.as_view())),
     path('rr-nonapproved/', login_required(views.RRnonapproved.as_view())),
     path('rr-approved/', login_required(views.RRapproved.as_view())),
     path('rr-approval/<int:pk>/', login_required(views.RRApprovalAPI.as_view())),
@@ -123,5 +125,7 @@ urlpatterns = [
     path('qq-approved/', login_required(views.QQapprovedView.as_view())),
     path('qq-approval/<int:pk>/', login_required(views.QQApprovalAPI.as_view())),
     path('inward-inventory/', login_required(views.InwardView.as_view())),
-    path('pr-approval/<int:pk>/', login_required(views.PRApprovalAPI.as_view()))
+    path('pr-approval/<int:pk>/', login_required(views.PRApprovalAPI.as_view())),
+    path('inward-adjustments/', login_required(views.InwardAdjustmentsView.as_view())),
+    path('save-receiving-report/', login_required(views.SaveReceivingReport.as_view()))
 ]

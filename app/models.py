@@ -289,9 +289,7 @@ class PurchaseOrder(models.Model):
     journal = models.ForeignKey(Journal, related_name="purchaseorder", on_delete=models.PROTECT, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, blank = True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    qtyReceived = models.IntegerField(null = True, blank = True)
     fullyReceived = models.BooleanField(default=False)
-    rred = models.BooleanField(default = False)
     
     class Meta:
         verbose_name = "Purchase Order"
@@ -308,6 +306,7 @@ class POItemsMerch(models.Model):
     purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
     totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
     delivered = models.BooleanField(null = True, default=False)
+    qtyReceived = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = 'PO Items Merch'
@@ -364,6 +363,7 @@ class RRItemsMerch(models.Model):
     purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
     totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
     delivered = models.BooleanField(null = True, default=False)
+    poitemsmerch = models.ForeignKey(POItemsMerch, related_name='rritemsmerch', on_delete=models.PROTECT, null=True, blank=True)
 
     class Meta:
         verbose_name = 'RR Items Merch'
