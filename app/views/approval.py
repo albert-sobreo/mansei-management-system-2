@@ -296,7 +296,37 @@ class RRApprovalAPI(APIView):
         return JsonResponse(0, safe=False)
 
 
+################# QUOTATIONS #################
+class QQapprovedView(View):
+    def get(self, request, format=None):
 
+        user = request.user
+        context = {
+            'quotes': user.branch.quotations.filter(approved=True),
+        }
+        return render(request, 'qq-approved.html', context)
+
+class QQnonapprovedView(View):
+    def get(self, request, format=None):
+
+        user = request.user
+        context = {
+            'quotes': user.branch.quotations.filter(approved=False),
+        }
+        return render(request, 'qq-nonapproved.html', context)
+
+class QQApprovalAPI(APIView):
+    def put(self, request, pk, format = None):
+
+        quotes = Quotations.objects.get(pk=pk)
+
+        quotes.datetimeApproved = datetime.now()
+        quotes.approved = True
+        quotes.approvedBy = request.user
+        quotes.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
 
 
 

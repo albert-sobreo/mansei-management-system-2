@@ -1,3 +1,4 @@
+from app.views.sales import SaveQuotations
 from django.contrib import admin
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -115,5 +116,9 @@ urlpatterns = [
     path('import-merch-inventory/', login_required(views.ImportMerchandiseInventory.as_view())),
     path('sales-quotations/', login_required(views.SalesQuotationsView.as_view())),
     path('sales-quotations-list/', login_required(views.QQListView.as_view())),
+    path('save-quotations/', login_required(views.SaveQuotations.as_views())),
+    path('qq-nonapproved/', login_required(views.QQnonapprovedView.as_view())),
+    path('qq-approved/', login_required(views.QQapprovedView.as_view())),
+    path('qq-approval/<int:pk>/', login_required(views.QQApprovalAPI.as_view())),
     path('inward-inventory/', login_required(views.InwardView.as_view()))
 ]
