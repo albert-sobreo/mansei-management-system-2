@@ -116,7 +116,7 @@ urlpatterns = [
     path('import-merch-inventory/', login_required(views.ImportMerchandiseInventory.as_view())),
     path('sales-quotations/', login_required(views.SalesQuotationsView.as_view())),
     path('sales-quotations-list/', login_required(views.QQListView.as_view())),
-    path('save-quotations/', login_required(views.SaveQuotations.as_views())),
+    path('save-quotations/', login_required(views.SaveQuotations.as_view())),
     path('qq-nonapproved/', login_required(views.QQnonapprovedView.as_view())),
     path('qq-approved/', login_required(views.QQapprovedView.as_view())),
     path('qq-approval/<int:pk>/', login_required(views.QQApprovalAPI.as_view())),
