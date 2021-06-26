@@ -413,6 +413,56 @@ class IIAdjustedItems(models.Model):
     classfication = models.CharField(max_length=50)
     type = models.CharField(max_length=50)
 
+class Quotations(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    dateQuoted = models.DateField()
+    party = models.ForeignKey(Party, related_name="quotations", on_delete=models.PROTECT, null=True, blank=True)
+    amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)
+    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    taxType = models.CharField(max_length=20, null = True, blank = True)
+    taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "qCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "qApprovedBy")
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    approved = models.BooleanField(default=False)
+    journal = models.ForeignKey(Journal, related_name="quotations", on_delete=models.PROTECT, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Purchase Request"
+        verbose_name_plural = "Purchase Requests"
+
+    def __str__(self):
+        return self.code
+
+
+class QQItemsMerch(models.Model):
+    quotations = models.ForeignKey(Quotations, related_name="qqitemsmerch",on_delete=models.PROTECT, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="qqitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.PositiveIntegerField()
+    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+
+    class Meta:
+        verbose_name = 'PR Items Merch'
+        verbose_name_plural = "PR Items Merchs"
+
+    def __str__(self):
+        return self.purchaseRequest.code + " - " + self.merchInventory.code
+
+class QQCOtherFees(models.Model):
+    quotations = models.ForeignKey(Quotations, related_name="qqotherfees",on_delete=models.PROTECT, null=True, blank=True)
+    fee = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
+    description = models.CharField(max_length=255, null = True)
+
+class QQatc(models.Model):
+    quotations = models.ForeignKey(Quotations, related_name="qqatc",on_delete=models.PROTECT, null=True, blank=True)
+    code = models.ForeignKey(ATC, related_name="qqatc",on_delete=models.PROTECT, null=True, blank=True)
+    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+
 class SalesContract(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
@@ -638,6 +688,12 @@ class Branch(models.Model):
     receivingReport = models.ManyToManyField(ReceivingReport, blank = True)
     rritemsMerch = models.ManyToManyField(RRItemsMerch, blank = True)
     rratc = models.ManyToManyField(RRatc, blank = True)
+
+    ##### QUOTATIONS #####
+    quotations = models.ManyToManyField(Quotations, blank = True)
+    qqitemsMerch = models.ManyToManyField(QQItemsMerch, blank = True)
+    qqOtherFees = models.ManyToManyField(QQCOtherFees, blank = True)
+    qqatc = models.ManyToManyField(QQatc, blank = True)
 
     ##### SALES CONTRACT #####
     salesContract = models.ManyToManyField(SalesContract, blank = True)

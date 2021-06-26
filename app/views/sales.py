@@ -137,8 +137,93 @@ class SaveSalesContract(APIView):
 ########## QUOTATIONS ##########
 class SalesQuotationsView(View):
     def get(self, request, format=None):
-        return render(request, 'sales-quotations.html')
+
+        user = request.user
+
+        try:
+            qq = user.branch.quotations.latest('pk')
+
+            listed_code = qq.code.split('-')
+            listed_date = str(now.today()).split('-')
+
+            current_code = int(listed_code[3])
+
+            if listed_code[1] == listed_date[0] and listed_code[2] == listed_date[1]:
+                current_code += 1
+                new_code = 'QQ-{}-{}-{}'.format(listed_date[0], listed_date[1], str(current_code).zfill(4))
+            else:
+                new_code = 'QQ-{}-{}-0001'.format(listed_date[0], listed_date[1])
+
+        except Exception as e:
+            print(e)
+            listed_date = str(now.today()).split('-')
+            new_code = 'QQ-{}-{}-0001'.format(listed_date[0], listed_date[1])
+
+        context = {
+            'new_code': new_code,
+        }
+        return render(request, 'sales-quotations.html', context)
 
 class QQListView(View):
     def get(self, request, format=None):
         return render(request, 'qq-list.html')
+
+class SaveQuotations(APIView):
+    def post(self, request, format = None):
+        quotes = request.data
+
+        qq = Quotations()
+
+        qq.code = quotes['code']
+        qq.datetimeCreated = quotes['dateTimeCreated']
+        qq.dateQuoted = quotes['date']
+        qq.party = Party.objects.get(pk=quotes['customer'])
+        qq.amountDue = Decimal(quotes['amountDue'])
+        qq.amountTotal = Decimal(quotes['amountTotal'])
+        qq.taxType = quotes['taxType']
+        qq.taxRate = Decimal(quotes['taxRate'])
+        qq.taxPeso = Decimal(quotes['taxPeso'])
+
+        if request.user.is_authenticated:
+            qq.createdBy = request.user
+
+        if quotes['discountType'] == 'percent':
+            qq.discountPercent = quotes['totalDiscount']
+        elif quotes['discountType'] == 'peso':
+            qq.discountPeso = quotes['totalDiscount']
+
+        qq.save()
+        request.user.branch.quotations.add(qq)
+        
+        atc = QQatc()
+        
+        for jsonatc in quotes['atc']:
+            print(jsonatc)
+            atc.code = ATC.objects.get(pk=jsonatc['code'])
+            atc.amountWithheld = jsonatc['amountWithheld']
+            atc.quotations = qq
+            atc.save()
+            request.user.branch.qqatc.add(atc)
+
+        for item in quotes['items']:
+            qqitemsmerch = QQItemsMerch()
+            qqitemsmerch.quotations = qq
+            qqitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
+            qqitemsmerch.remaining = item['remaining']
+            qqitemsmerch.qty = item['quantity']
+            qqitemsmerch.amountTotal = Decimal(item['amountTotal'])
+
+            print(qqitemsmerch.amountTotal)
+            
+            qqitemsmerch.save()
+            request.user.branch.qqitemsMerch.add(qqitemsmerch)
+
+        for fee in quotes['otherFees']:
+            f = QQCOtherFees()
+            f.quotations = qq
+            f.fee = fee['fee']
+            f.description = fee['description']
+            f.save()
+            request.user.branch.tempSCOtherFees.add(f)
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
