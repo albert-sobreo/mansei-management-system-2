@@ -164,7 +164,6 @@
 						<div class="row" v-for="(line, index) in purchaseOrder.atc">
 							<div class="col-3 px-1">
 								<select v-model="line.code" class="form-control" @change="setATCRate(line.code, index)">
-									<option value="">None</option>
 									<optgroup v-for="atcGroup in formattedATCList" :label="atcGroup.name">
 										<option v-for="atc in atcGroup.list" :value="atc.id">[[atc.code]]</option>
 									</optgroup>
@@ -349,7 +348,7 @@
                     totalCost: null
                 }],
                 atc: [{
-                    code: '',
+                    code: '47',
                     amount: 0,
                     taxRate: 0,
                     amountWithheld: 0,
@@ -459,6 +458,7 @@
                 axios.get('/api/atc/')
                 .then(res=>this.atcList=res.data)
                 .then(res=>{
+                    var none = []
                     var wiTempList = []
                     var wcTempList = []
 

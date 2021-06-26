@@ -240,6 +240,7 @@ class PurchaseRequest(models.Model):
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "prApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(default=False)
+    poed = models.BooleanField(default = False)
     
 
     class Meta:
@@ -290,6 +291,7 @@ class PurchaseOrder(models.Model):
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     qtyReceived = models.IntegerField(null = True, blank = True)
     fullyReceived = models.BooleanField(default=False)
+    rred = models.BooleanField(default = False)
     
     class Meta:
         verbose_name = "Purchase Order"

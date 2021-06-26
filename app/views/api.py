@@ -201,3 +201,9 @@ class PurchaseRequestNonApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseRequestSZ
     queryset = PurchaseRequest.objects.filter(approved=False)
+
+
+class PurchaseRequestNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PurchaseRequestNestedSZ
+    queryset = PurchaseRequest.objects.all()

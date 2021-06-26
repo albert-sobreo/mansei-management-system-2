@@ -102,7 +102,7 @@ class POApprovalAPI(APIView):
         je = JournalEntries()
         wep = JournalEntries()
         wep.journal = j
-        wep.normally = 'Debit'
+        wep.normally = 'Credit'
         wep.accountChild = AccountChild.objects.get(name="Withholding Expanded Payables")
         # wep.amount = purchase.poatc.amountWithheld
         for poatc in purchase.poatc.all():
@@ -118,7 +118,7 @@ class POApprovalAPI(APIView):
         request.user.branch.journalEntries.add(wep)
         vat = JournalEntries()
         vat.journal = j
-        vat.normally = 'Debit'
+        vat.normally = 'Credit'
         vat.accountChild = AccountChild.objects.get(name="VAT Amount")
         vat.amount = purchase.taxPeso
         vat.accountChild.accountSubGroup.amount += vat.amount

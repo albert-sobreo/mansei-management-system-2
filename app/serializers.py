@@ -132,7 +132,7 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
     createdBy = UserSZ(read_only=True)
     approvedBy = UserSZ(read_only=True)
     journal = JournalSZ(read_only=True)
-    poitemsmerch = POItemsMerchNestedSZ(read_only=False, many=True)
+    poitemsmerch = POItemsMerchNestedSZ(read_only=True, many=True)
     poatc = POatcSZ(read_only=True, many=True)
 
     class Meta:
@@ -140,6 +140,28 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+
+
+
+
+
+########## PURCHASE REQUEST ##########
+class PRItemsMerchNestedSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = PRItemsMerch
+        fields = '__all__'
+
+class PurchaseRequestNestedSZ(serializers.ModelSerializer):
+    createdBy = UserSZ(read_only=True)
+    approvedBy = UserSZ(read_only=True)
+    pritemsmerch = PRItemsMerchNestedSZ(read_only=True, many=True)
+    class Meta:
+        model = PurchaseRequest
+        fields = '__all__'
+        depth = 1
+
+        
 
 
 
