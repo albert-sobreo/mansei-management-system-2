@@ -114,5 +114,6 @@ urlpatterns = [
     path('rr-approval/<int:pk>/', login_required(views.RRApprovalAPI.as_view())),
     path('import-merch-inventory/', login_required(views.ImportMerchandiseInventory.as_view())),
     path('sales-quotations/', login_required(views.SalesQuotationsView.as_view())),
-    path('sales-quotations-list/', login_required(views.QQListView.as_view()))
+    path('sales-quotations-list/', login_required(views.QQListView.as_view())),
+    path('inward-inventory/', login_required(views.InwardView.as_view()))
 ]

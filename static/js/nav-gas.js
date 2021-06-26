@@ -50,7 +50,7 @@ Vue.component('navbar-gas', {
                     <a href="/purchase-request/" class="dropdown-item d-item-gas font-size-12 font-semibold">Purchase Request</a>
                     <a href="/purchase-order/" class="dropdown-item d-item-gas font-size-12 font-semibold">Purchase Order</a>
                     <a href="/receiving-report/" class="dropdown-item d-item-gas font-size-12 font-semibold">Receiving Report</a>
-                    <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Inward Inventory</a> 
+                    <a href="/inward-inventory/" class="dropdown-item d-item-gas font-size-12 font-semibold">Inward Inventory</a> 
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Completion Report</a> 
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Vouchers</a>
                 </div>
