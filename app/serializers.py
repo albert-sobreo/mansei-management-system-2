@@ -132,7 +132,7 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
     createdBy = UserSZ(read_only=True)
     approvedBy = UserSZ(read_only=True)
     journal = JournalSZ(read_only=True)
-    poitemsmerch = POItemsMerchNestedSZ(read_only=False, many=True)
+    poitemsmerch = POItemsMerchNestedSZ(read_only=True, many=True)
     poatc = POatcSZ(read_only=True, many=True)
 
     class Meta:
@@ -140,6 +140,28 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+
+
+
+
+
+########## PURCHASE REQUEST ##########
+class PRItemsMerchNestedSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = PRItemsMerch
+        fields = '__all__'
+
+class PurchaseRequestNestedSZ(serializers.ModelSerializer):
+    createdBy = UserSZ(read_only=True)
+    approvedBy = UserSZ(read_only=True)
+    pritemsmerch = PRItemsMerchNestedSZ(read_only=True, many=True)
+    class Meta:
+        model = PurchaseRequest
+        fields = '__all__'
+        depth = 1
+
+        
 
 
 
@@ -311,6 +333,33 @@ class PRItemsMerchSZ(serializers.ModelSerializer):
     class Meta:
         model = PRItemsMerch
         fields = '__all__'
+
+########## RECEIVING REPORT ##########
+class RRatcSZ(serializers.ModelSerializer):
+    code = ATCSZ(read_only=True)
+    class Meta: 
+        model = RRatc
+        fields = '__all__'
+
+class RRItemsMerchNestedSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = RRItemsMerch
+        fields = '__all__'  
+
+class ReceivingReportNestedSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    createdBy = UserSZ(read_only=True)
+    approvedBy = UserSZ(read_only=True)
+    journal = JournalSZ(read_only=True)
+    rritemsmerch = RRItemsMerchNestedSZ(read_only=True, many=True)
+    rratc = RRatcSZ(read_only=True, many=True)
+
+    class Meta:
+        model = ReceivingReport
+        fields = '__all__'
+        depth = 1
+
 
 # MAIN SERIALIZER
 class PurchaseRequestSZ(serializers.ModelSerializer):

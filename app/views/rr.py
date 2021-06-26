@@ -48,3 +48,70 @@ class ReceivingReportView(View):
 class RRListView(View):
     def get(self, request, format=None):
         return render(request, 'rr-list.html')
+
+class SaveReceivingReport(APIView):
+    def post(self, request, format = None):
+        receivingReport = request.data
+
+        rr = ReceivingReport()
+
+        for key, value in receivingReport.items() :
+            print (key, value)
+
+        rr.code = receivingReport['code']
+        rr.datetimeCreated = receivingReport['datetimeCreated']
+
+        if receivingReport['retroactive']:
+            rr.dateReceived = receivingReport['retroactive']
+        else:
+            rr.dateReceived = receivingReport['datePurchased']
+
+        rr.party = Party.objects.get(pk=receivingReport['vendor'])
+
+        atc = RRatc()
+
+        
+        
+        rr.amountPaid = Decimal(receivingReport['amountPaid'])
+        rr.amountDue = Decimal(receivingReport['amountDue'])
+        rr.amountTotal = Decimal(receivingReport['amountTotal'])
+        rr.taxType = receivingReport['taxType']
+        rr.taxRate = Decimal(receivingReport['taxRate'])
+        rr.taxPeso = Decimal(receivingReport['taxPeso'])
+        rr.paymentMethod = receivingReport['paymentMethod']
+        rr.paymentPeriod = receivingReport['paymentPeriod']
+        rr.chequeNo = receivingReport['chequeNo']
+        rr.dueDate = receivingReport['dueDate']
+        rr.bank = receivingReport['bank']
+        rr.remarks = receivingReport['remarks']
+        rr.purchaseOrder = PurchaseOrder.objects.get(pk=receivingReport['po'])
+        rr.purchaseOrder.save()
+        
+        if request.user.is_authenticated:
+            rr.createdBy = request.user
+
+        rr.save()
+        request.user.branch.receivingReport.add(rr)
+
+        for jsonatc in receivingReport['atc']:
+            print(jsonatc)
+            atc.code = ATC.objects.get(pk=jsonatc['code'])
+            atc.amountWithheld = jsonatc['amountWithheld']
+            atc.receivingReport = rr
+            atc.save()
+            request.user.branch.rratc.add(atc)
+
+        for item in receivingReport['items']:
+            rritemsmerch = RRItemsMerch()
+            rritemsmerch.receivingReport = rr
+            rritemsmerch.poitemsmerch = POItemsMerch.objects.get(pk=item['poID'])
+            rritemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
+            rritemsmerch.remaining = item['remaining']
+            rritemsmerch.qty = item['quantity']
+            rritemsmerch.purchasingPrice = Decimal(item['vatable'])
+            rritemsmerch.totalPrice = Decimal(item['totalCost'])
+            
+            rritemsmerch.save()
+            request.user.branch.rritemsMerch.add(rritemsmerch)
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)

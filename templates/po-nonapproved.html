@@ -81,7 +81,7 @@
                             </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Purchase Request</label><br>
-                                <span class="font-size-14 font-bold">None</span>
+                                <span class="font-size-14 font-bold">[[this.poModal.purchaseRequest.code]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Approved By</label><br>
@@ -269,6 +269,10 @@
                 party: null,
                 approvedBy: null,
                 datetimeApproved: null,
+
+                purchaseRequest:[{
+                    code: null,
+                }],
 
                 amountDue: null,
                 amountPaid: null,

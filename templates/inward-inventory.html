@@ -48,6 +48,34 @@
             </tbody>
         </table>
 
+        <!-- IMPORT MODAL -->
+        <div class="modal fade" id="import">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15 px-3 pt-2">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Import Inward Inventory</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="#" method="POST" enctype="multipart/form-data">{% csrf_token %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="">Select Excel file</label>
+                                    <br>
+                                    <input type="file" name="excel" accept=".xls,.xlsx,.csv">
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary col">Import</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- VIEW MODAL -->
         <div class="modal fade" id="orderModal">
             <div class="modal-dialog modal-lg">

@@ -40,9 +40,11 @@
                 </div>
                 <div class="col col-2 pl-2">
                     <label>Purchase Request</label>
-                    <select name="pr" class="form-control">
-                        <option value="-1" selected disabled>Choose Request</option>
+                    <select v-model="purchaseOrder.pr" @change="getPR(purchaseOrder.pr)" name="pr" class="form-control">
                         <option value="">None</option>
+                        {% for pr in prs %}
+                        <option value="{{pr.pk}}">{{pr.code}}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -164,7 +166,6 @@
                             <div class="row" v-for="(line, index) in purchaseOrder.atc">
                                 <div class="col-3 px-1">
                                     <select v-model="line.code" class="form-control" @change="setATCRate(line.code, index)">
-                                        <option value="">None</option>
                                         <optgroup v-for="atcGroup in formattedATCList" :label="atcGroup.name">
                                             <option v-for="atc in atcGroup.list" :value="atc.id">[[atc.code]]</option>
                                         </optgroup>
@@ -306,6 +307,24 @@
                 Save
             </div>
         </div>
+        <table class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+			<thead class="thead-dark">
+				<th>Item</th>
+				<th>Vendor 1</th>
+				<th>Vendor 2</th>
+			</thead>
+			<tbody>
+				<tr v-for="(item, index) in vendorquotesmerch">
+					<td class="align-middle py-4">
+						<span class="font-bold">[[item.merchInventory.code]] [[item.merchInventory.classification]] [[item.merchInventory.type]]</span>
+					</td>
+					<td class="align-middle py-4" v-for="i in item.vendorquotesitemsmerch">
+						<span>[[i.price]]</span><br>
+						<span class="gray">[[i.party.name]]</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
         <form hidden action="/import-atc/" enctype="multipart/form-data" method="POST">{%csrf_token%}
             <label>import atc list</label><br>
             <input type="file" name="excel"><br>
@@ -343,6 +362,7 @@
                 vendor: '',
                 taxType: '',
                 taxRate: '',
+                pr: '',
                 items: [{
                     type: '',
                     code: '',
@@ -353,7 +373,7 @@
                     totalCost: null
                 }],
                 atc: [{
-                    code: '',
+                    code: '47',
                     amount: 0,
                     taxRate: 0,
                     amountWithheld: 0,
@@ -370,6 +390,32 @@
                 dueDate: null,
                 bank: null,
             },
+            vendorquotesmerch: [{
+                id: null,
+                merchInventory: {
+                    id: null,
+                    code: null,
+                    classification: null,
+                    type: null,
+                },
+                vendorquotesitemsmerch: [{
+                    id: null,
+                    party: {
+                        id: null,
+                        name: null,
+                    },
+                    price: null,
+                },
+                {
+                    id: null,
+                    party: {
+                        id: null,
+                        name: null,
+                    },
+                    price: null, 
+                }
+                ]
+            }],
             vendor: [],
             merchandiseInventory: [],
             atcList: [],
@@ -461,6 +507,7 @@
                 axios.get('/api/atc/')
                 .then(res=>this.atcList=res.data)
                 .then(res=>{
+                    var none = []
                     var wiTempList = []
                     var wcTempList = []
 
@@ -500,7 +547,6 @@
 
             checkForm(e){
                 var success1 = false
-                var success2 = false
                 if (
                     this.purchaseOrder.code &&
                     this.purchaseOrder.date &&
@@ -529,22 +575,7 @@
                             break
                         }
                     }
-                    for(var item of this.purchaseOrder.atc){
-                        if(
-                            item.code &&
-                            item.amount &&
-                            item.taxRate &&
-                            item.amountWithheld
-                        )
-                        {
-                            success2=true
-                            console.log('i was here 2', success2)
-                        } else {
-                            success2=false
-                            break
-                        }
-                    }
-                    if(success1 && success2){
+                    if(success1){
                         this.submit()
                         return
                     }
@@ -591,21 +622,6 @@
                     }
                     if(!item.totalCost){
                         this.errors.push('Total Cost Required at index: ' + String(index+1))
-                    }
-                })
-
-                this.purchaseOrder.atc.forEach((item, index)=>{
-                    if(!item.code){
-                        this.errors.push('ATC Code Required at index: ' + String(index+1))
-                    }
-                    if(!item.amount){
-                        this.errors.push('ATC Amount Required at index: ' + String(index+1))
-                    }
-                    if(!item.taxRate){
-                        this.errors.push('ATC Tax Rate Required at index: ' + String(index+1))
-                    }
-                    if(!item.amountWithheld){
-                        this.errors.push('ATC Amount Withheld Required at index: ' + String(index+1))
                     }
                 })
 
@@ -677,6 +693,40 @@
                 this.purchaseOrder.atc[index].taxRate = ((object.rate)*100).toFixed(2)
 
                 this.purchaseOrder.atc[index].amountWithheld = (((this.purchaseOrder.atc[index].taxRate)/100) * this.purchaseOrder.atc[index].amount).toFixed(2)
+            },
+            viewPR(code){
+                console.log(code)
+                axios.get(`/api/purchase-request/${code}/`)
+                .then(res=>this.prModal=res.data)
+            },
+            getPR(id){
+                axios.get(`/api/purchase-request-nested/${id}`)
+                .then(res=>{
+                    console.log(res.data)
+                    var pr = res.data
+                    pr.pritemsmerch.forEach((item, index)=>{
+                        console.log(item.merchInventory.id)
+                        var invObject = this.merchandiseInventory.find(x=>x.id==item.merchInventory.id)
+                        if(index==0){
+                            this.purchaseOrder.items[0].type = 'Merchandise'
+							this.purchaseOrder.items[0].code = invObject.id
+							this.purchaseOrder.items[0].quantity = item.qty
+                            this.purchaseOrder.items[0].remaining = invObject.qtyA
+                        } else {
+                            this.purchaseOrder.items.push({
+								type: 'Merchandise',
+                    			code: invObject.id,
+                    			quantity: item.qty,
+                                remaining: invObject.qtyA,
+                                vatable: 0,
+                                totalCost: null,
+                            })
+                        }
+                    })
+                })
+                axios.get(`/api/purchase-request/${id}/`)
+                .then(res=>this.vendorquotesmerch=res.data.vendorquotesmerch)
+
             }
         },
         mounted(){

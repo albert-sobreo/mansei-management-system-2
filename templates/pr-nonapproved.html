@@ -365,6 +365,15 @@
 
             approvePR(id){
                 $("#prModal").modal('hide')
+                axios.put(`/pr-approval/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(res=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        html: res.response,
+                        icon: 'error'
+                    })
+                })
             }
         },
     })

@@ -20,3 +20,7 @@ from decimal import Decimal
 class InwardView(View):
     def get(self, request, format=None):
         return render(request, 'inward-inventory.html')
+
+class InwardAdjustmentsView(View):
+    def get(self, request, format=None):
+        return render(request, 'inward-adjustment.html')

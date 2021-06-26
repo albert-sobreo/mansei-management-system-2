@@ -69,8 +69,7 @@ class SavePurchaseRequest(APIView):
         pr.save()
         request.user.branch.purchaseRequest.add(pr)
 
-        
-
+    
         for item in purchaseRequest['items']:
             pritemsmerch = PRItemsMerch()
             pritemsmerch.purchaseRequest = pr

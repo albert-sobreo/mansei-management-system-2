@@ -842,6 +842,11 @@ select.form-control{
     margin-right: -35px;
 }
 
+.container-extend-2{
+    margin-left: -48px;
+    margin-right: -48px;
+}
+
 .approved {
     color: #28A745;
 }

@@ -33,38 +33,22 @@
             <thead class="thead-dark">
               <th>RR Code</th>
               <th>PO Code</th>
-              <th>Gross Amount</th>
+              <th>Amount Due</th>
+              <th>Amount Paid</th>
               <th>Date Created</th>
               <th>Created by</th>
             </thead>
             <tbody>
+                {% for po in request.user.branch.receivingReport.all %}
                 <tr>
-                  <!-- RR CODE w/ MODAL *** -->
-                    <td class="align-middle"><span><a href="#" data-toggle="modal" data-target="#rrlistmodal">RR-2021-01-0001</a></span></td>
-                  <!-- END RR CODE w/ MODAL -->
-                    <td class="align-middle">PO-2021-01-0005</td>
-                    <td class="align-middle">
-                        <span>₱ 1000.00</span><br>
-                    </td>
-                    <td class="align-middle">
-                        <span>April 15,2021</span><br>
-                    </td>
-                    <td class="align-middle">
-                        <span>Clark Kent</span><br>
-                    </td>
-                </tr>
-                <!--
-                {% for po in request.user.branch.purchaseOrder.all reversed %}
-                <tr>
-                    <td class="link" @click="viewPO('{{po.pk}}')" data-toggle="modal" data-target="#poModal">{{po.code}}</td>
-                    <td>{{po.party.name}}</td>
+                    <td class="link" @click="viewPO('{{po.pk}}')" data-toggle="modal" data-target="#rrlistmodal">{{po.code}}</td>
+                    <td>{{po.purchaseOrder.code}}</td>
                     <td>₱[[roundNumber2({{po.amountDue}})]]</td>
                     <td>₱[[roundNumber2({{po.amountPaid}})]]</td>
                     <td>{{po.datetimeCreated}}</td>
                     <td>{{po.createdBy.first_name}} {{po.createdBy.last_name}}</td>
                 </tr>
                 {% endfor %}
-                -->
             </tbody>
         </table>
 
@@ -102,7 +86,7 @@
                             </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Purchase Order</label><br>
-                                <span class="font-size-14 font-bold">None</span>
+                                <span class="font-size-14 font-bold">[[this.poModal.purchaseOrder.code]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Posted By</label><br>
@@ -118,23 +102,31 @@
                         <div class="order-card row my-2">
                             <!-- LVL 1 *** -->
                             <div class="col-3 mt-3">
-                                <label class="gray">Gross Amount</label><br>
+                                <label class="gray">Amount Due</label><br>
                                 <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountDue)]]</span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label for="" class="gray">Total Input VAT</label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.taxPeso)]]</span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="gray">Total Amount Due</label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountTotal)]]</span>
                             </div>
                             <div class="col-3 mt-3">
                                 <label class="gray">Amount Paid</label><br>
                                 <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountPaid)]]</span>
                             </div>
-                            <div class="col-3 mt-3">
+
+                            <!-- LVL 2 ***-->
+                            <div class="col-3 my-3">
                                 <label class="gray">Payment Method</label><br>
                                 <span class="font-size-14 font-bold">[[this.poModal.paymentMethod]]</span>
                             </div>
-                            <div class="col-3 mt-3">
+                            <div class="col-3 my-3">
                                 <label class="gray">Payment Period</label><br>
                                 <span class="font-size-14 font-bold">[[this.poModal.paymentPeriod]]</span>
                             </div>
-
-                            <!-- LVL 2 ***-->
                             <div class="col-3 my-3">
                                 <label class="gray">Cheque No.</label><br>
                                 <span class="font-size-14 font-bold">[[this.poModal.chequeNo]]</span>
@@ -143,28 +135,20 @@
                                 <label class="gray">Due Date</label><br>
                                 <span class="font-size-14 font-bold">[[this.poModal.dueDate]]</span>
                             </div>
-                            <div class="col-3 my-3">
-                                <label class="gray">Remarks</label><br>
-                                <span class="font-size-14 font-bold">[[this.poModal.remarks]]</span>
-                            </div>
                         </div>
                         <!-- LOWER CARD ***-->
                         <div class="order-card row my-2">
                             <div class="col-3 my-3">
                                 <label class="gray">ATC Code</label><br>
-                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">[[atc.code.code]]</span>
-                            </div>    
-                            <div class="col-3 my-3">
-                                <label class="gray">Amount</label><br>
-                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">₱[[formatPrice(atc.amountWithheld)]]</span>
-                            </div>  
+                                <span v-for="atc in poModal.rratc" class="font-size-14 font-bold">[[atc.code.code]]</span>
+                            </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Tax Rate</label><br>
-                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">[[formatPrice(atc.code.rate*100)]]%</span>
+                                <span v-for="atc in poModal.rratc" class="font-size-14 font-bold">[[formatPrice(atc.code.rate*100)]]%</span>
                             </div>   
                             <div class="col-3 my-3">
                                 <label class="gray">Amount WIthheld</label><br>
-                                <span v-for="atc in poModal.poatc" class="font-size-14 font-bold">[[formatPrice(atc.code.rate*100)]]%</span>
+                                <span v-for="atc in poModal.rratc" class="font-size-14 font-bold">₱[[formatPrice(atc.amountWithheld)]]</span>
                             </div>   
                         </div>
 
@@ -181,27 +165,15 @@
                                     <th><span class="font-bold gray">Item Code - Item Classifcation</span></th>
                                     <th><span class="font-bold gray">Qty</span></th>
                                     <th><span class="font-bold gray">Amount</span></th>
-                                    <th><span class="font-bold gray">Input VAT</span></th>
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Merchandise</td>
-                                        <td>0000 - Item Name XX</td>
-                                        <td>00</td>
-                                        <td>₱123.90</td>
-                                        <td>0.00%</td>
-                                        <td>₱123.90</td>
-
-                                        <!--
-                                    <tr v-for="item in poModal.poitemsmerch">
+                                    <tr v-for="item in poModal.rritemsmerch">
                                         <td>Merchandise</td>
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.qty]]</td>
                                         <td>₱[[formatPrice(item.purchasingPrice)]]</td>
-                                        <td>[[formatPrice(item.inputVat)]]%</td>
                                         <td>₱[[formatPrice(item.totalPrice)]]</td>
-                                        -->
                                     </tr>
                                 </tbody>
                             </table>
@@ -301,6 +273,7 @@
                 </div>
             </div>
         </div>
+        <pre>[[$data]]</pre>
         <!--END ADD MODAL*** from MERCHINVENTORY . HTML -->
 
     </div>  <!-- .container -->
@@ -383,6 +356,10 @@
                 approvedBy: null,
                 datetimeApproved: null,
 
+                purchaseOrder: {
+                    code:null
+                },
+
                 amountDue: null,
                 amountPaid: null,
                 amountTotal: null,
@@ -395,7 +372,7 @@
                 atcCode: null,
                 amountWithheld: null,
 
-                poatc: [{
+                rratc: [{
                     amountWithheld: null,
                     code: {
                         code: null,
@@ -409,7 +386,7 @@
         methods: {
             viewPO(code){
                 console.log(code)
-                axios.get(`/api/purchase-order/${code}/`)
+                axios.get(`/api/receiving-report/${code}/`)
                 .then(res=>this.poModal=res.data)
             },
             roundNumber2(value) {

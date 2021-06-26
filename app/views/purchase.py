@@ -43,6 +43,7 @@ class PurchaseOrderView(View):
 
         context = {
             'new_code': new_code,
+            'prs': request.user.branch.purchaseRequest.filter(approved=True, poed=False)
         }
         return render(request, 'purchase-order.html', context)
 
@@ -55,6 +56,9 @@ class SavePurchaseOrder(APIView):
         purchaseOrder = request.data
 
         po = PurchaseOrder()
+
+        for key, value in purchaseOrder.items() :
+            print (key, value)
 
         po.code = purchaseOrder['code']
         po.datetimeCreated = purchaseOrder['dateTimeCreated']
@@ -82,6 +86,13 @@ class SavePurchaseOrder(APIView):
         po.dueDate = purchaseOrder['dueDate']
         po.bank = purchaseOrder['bank']
         po.remarks = purchaseOrder['remarks']
+        try:
+            po.purchaseRequest = PurchaseRequest.objects.get(pk=purchaseOrder['pr'])
+            po.purchaseRequest.poed = True
+            po.purchaseRequest.save()
+        except:
+            pass
+        
         
         if request.user.is_authenticated:
             po.createdBy = request.user
@@ -105,8 +116,6 @@ class SavePurchaseOrder(APIView):
             poitemsmerch.qty = item['quantity']
             poitemsmerch.purchasingPrice = Decimal(item['vatable'])
             poitemsmerch.totalPrice = Decimal(item['totalCost'])
-
-            print(poitemsmerch.purchasingPrice, poitemsmerch.totalPrice, poitemsmerch.inputVat)
             
             poitemsmerch.save()
             request.user.branch.poitemsMerch.add(poitemsmerch)
