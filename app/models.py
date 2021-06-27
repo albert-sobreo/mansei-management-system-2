@@ -448,8 +448,8 @@ class QQItemsMerch(models.Model):
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
 
     class Meta:
-        verbose_name = 'PR Items Merch'
-        verbose_name_plural = "PR Items Merchs"
+        verbose_name = 'QQ Items Merch'
+        verbose_name_plural = "QQ Items Merchs"
 
     def __str__(self):
         return self.purchaseRequest.code + " - " + self.merchInventory.code
