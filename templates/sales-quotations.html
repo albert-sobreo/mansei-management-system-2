@@ -600,20 +600,16 @@
                 if (
                     this.order.code &&
                     this.order.date &&
-                    this.order.vendor &&
-                    this.order.amountPaid &&
-                    this.order.paymentMethod &&
-                    this.order.paymentPeriod &&
+                    this.order.customer &&
                     this.order.taxType &&
                     this.order.taxRate
                     )
                 {
                     for(var item of this.order.items){
                         if(
-                            item.type &&
                             item.code &&
                             item.quantity &&
-                            item.vatable &&
+                            item.pricePerCubic &&
                             item.totalCost
                         )
                         {
@@ -650,17 +646,8 @@
                 if (!this.order.date){
                     this.errors.push('Date Required')
                 }
-                if (!this.order.vendor){
-                    this.errors.push('Vendor Required')
-                }
-                if (!this.order.amountPaid){
-                    this.errors.push('Amount Paid Required')
-                }
-                if (!this.order.paymentMethod){
-                    this.errors.push("Payment Method Required")
-                }
-                if (!this.order.paymentPeriod){
-                    this.errors.push('Payment Period Required')
+                if (!this.order.customer){
+                    this.errors.push('Customer Required')
                 }
                 if (!this.order.taxType){
                     this.errors.push('Tax Type Required')
@@ -670,17 +657,14 @@
                 }
 
                 this.order.items.forEach((item, index)=>{
-                    if(!item.type){
-                        this.errors.push('Item Type Required at index: ' + String(index+1))
-                    }
                     if(!item.code){
                         this.errors.push('Item Code Required at index: ' + String(index+1))
                     }
                     if(!item.quantity){
                         this.errors.push('Item Quantity Required at index: ' + String(index+1))
                     }
-                    if(!item.vatable){
-                        this.errors.push('Purchasing Price Required at index: ' + String(index+1))
+                    if(!item.pricePerCubic){
+                        this.errors.push('Price Per Cubic Required at index: ' + String(index+1))
                     }
                     if(!item.totalCost){
                         this.errors.push('Total Cost Required at index: ' + String(index+1))
@@ -758,7 +742,7 @@
             },
             submit(){
                 if(Number(this.order.amountTotal) >= Number(this.order.amountPaid)){
-                    axios.post('/save-purchase-order/', this.order, this.config)
+                    axios.post('/save-quotations/', this.order, this.config)
                     .then(res=>res.data==0?location.reload():'')
                 } else {
                     Swal.fire({

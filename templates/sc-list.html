@@ -37,7 +37,7 @@
                 <tr>
                     <td @click="viewSC('{{sale.pk}}')" class="link" data-toggle="modal" data-target="#scModal">{{sale.code}}</td>
                     <td>{{sale.party.name}}</td>
-                    <td>₱[[roundNumber2({{sale.totalCost}})]]</td>
+                    <td>₱[[roundNumber2({{sale.amountTotal}})]]</td>
                     <td>{{sale.dateSold}}</td>
                     <td>{{sale.createdBy.first_name}} {{sale.createdBy.last_name}}</td>
                 </tr>
@@ -54,39 +54,39 @@
                         <div class="order-card row my-2">
                             <!-- LVL 1 -->
                             <div class="col-3 mt-3">
-                                <label class="gray">SC Code</label><br>
-                                <span class="font-size-14 font-bold">[[this.scModal.code]]</span>
+                                <label for="" class="gray">Quotation Code</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[orderModal.code]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label class="gray">Status</label><br>
-                                <span class="font-size-14 font-bold approved" v-if="scModal.approved">Approved</span>
+                                <label for="" class="gray">Status</label>
+                                <br>
+                                <span class="font-size-14 font-bold approved" v-if="orderModal.approved">Approved</span>
                                 <span class="font-size-14 font-bold pending" v-else>Pending</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label class="gray">Created By</label><br>
-                                <span class="font-size-14 font-bold" v-if="this.scModal.createdBy!==null">[[this.scModal.createdBy.first_name]] [[this.scModal.createdBy.last_name]]</span>
+                                <label for="" class="gray">Created By</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[orderModal.createdBy.first_name]] [[orderModal.createdBy.last_name]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label class="gray">Date Created</label><br>
-                                <span class="font-size-14 font-bold">[[formatDateTime(this.scModal.datetimeCreated)]]</span>
+                                <label for="" class="gray">Date Created</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[formatDateTime(orderModal.datetimeCreated)]]</span>
                             </div>
-                            
-                            <!-- LVL2 -->
+
+                            <!-- LVL 2 -->
                             <div class="col-3 my-3">
                                 <label class="gray">Customer</label><br>
-                                <span class="font-size-14 font-bold" v-if="this.scModal.party!==null">[[this.scModal.party.name]]</span>
-                            </div>
-                            <div class="col-3 my-3">
-                                <label class="gray">Purchase Request</label><br>
-                                <span class="font-size-14 font-bold">None</span>
+                                <span class="font-size-14 font-bold">[[orderModal.party.name]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Approved By</label><br>
-                                <span class="font-size-14 font-bold" v-if="this.scModal.approvedBy!==null">[[this.scModal.approvedBy.first_name]] [[this.scModal.approvedBy.last_name]]</span>
+                                <span class="font-size-14 font-bold" v-if="this.orderModal.approvedBy!==null">[[orderModal.approvedBy.first_name]] [[orderModal.approvedBy.last_name]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Date Approved</label><br>
-                                <span class="font-size-14 font-bold" v-if="this.scModal.datetimeApproved!==null">[[formatDateTime(this.scModal.datetimeApproved)]]</span>
+                                <span class="font-size-14 font-bold" v-if="this.orderModal.datetimeApproved!==null">[[formatDateTime(orderModal.datetimeApproved)]]</span>
                             </div>
                         </div>
 
@@ -94,61 +94,76 @@
                         <div class="order-card row my-2">
                             <!-- LVL 1 -->
                             <div class="col-3 mt-3">
-                                <label class="gray">Sub Total</label><br>
-                                <span class="font-size-14 font-bold">₱[[formatPrice(this.scModal.subTotal)]]</span>
+                                <label for="" class="gray">Amount Due</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(orderModal.amountDue)]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label class="gray">Discount from Percent</label><br>
-                                <span class="font-size-14 font-bold">[[formatPrice(this.scModal.discountPercent)]]%</span>
+                                <label for="" class="gray">Total Input VAT</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(orderModal.taxPeso)]]</span>
+                            </div>
+                            <div class="col-3 mt-3" v-if="orderModal.discountPeso!==null">
+                                <label for="" class="gray">Discount</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(orderModal.discountPeso)]]</span>
+                            </div>
+                            <div class="col-3 mt-3" v-if="orderModal.discountPercent!==null">
+                                <label for="" class="gray">Discount</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[formatPrice(orderModal.discountPercent)]]%</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label class="gray">Discount from Peso</label><br>
-                                <span class="font-size-14 font-bold">₱[[roundNumber2(this.scModal.discountPeso)]]</span>
-                            </div>
-                            <div class="col-3 mt-3">
-                                <label class="gray">Tax</label><br>
-                                <span class="font-size-14 font-bold">₱[[roundNumber2(this.scModal.taxPeso)]]</span>
+                                <label for="" class="gray">Total Other Fees</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[this.totalOtherFees]]</span>
                             </div>
 
                             <!-- LVL 2 -->
                             <div class="col-3 my-3">
-                                <label class="gray">Total</label><br>
-                                <span class="font-size-14 font-bold">₱[[roundNumber2(this.scModal.totalCost)]]</span>
+                                <label class="gray">Total Amount Due</label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(orderModal.amountTotal)]]</span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label class="gray">Remarks</label><br>
+                                <span class="font-size-14 font-bold">[[orderModal.remarks]]</span>
                             </div>
                         </div>
 
-                        <!-- SC ITEMS -->
+                        <!-- QQ ITEMS -->
                         <div class="row mt-4">
                             <div class="col">
-                                <span class="font-bold">SC Items</span>
+                                <span class="font-bold">Quotation Items</span>
                             </div>
                         </div>
                         <div class="row">
                             <table class="table table-sm table-striped">
                                 <thead>
                                     <th><span class="font-bold gray">Type</span></th>
-                                    <th><span class="font-bold gray">Item Code - Item name</span></th>
+                                    <th><span class="font-bold gray">Item Code - Item Classifcation</span></th>
                                     <th><span class="font-bold gray">Qty</span></th>
-                                    <th><span class="font-bold gray">Remaining</span></th>
-                                    <th><span class="font-bold gray">Total Cost</span></th>
+                                    <th><span class="font-bold gray">Vol</span></th>
+                                    <th><span class="font-bold gray">Price Per Cubic</span></th>
+                                    <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="item in scModal.tempscitemsmerch">
+                                    <tr v-for="item in orderModal.scitemsmerch">
                                         <td>Merchandise</td>
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.qty]]</td>
-                                        <td>[[item.remaining]]</td>
+                                        <td>[[item.vol]]</td>
+                                        <td>₱[[formatPrice(item.pricePerCubic)]]</td>
                                         <td>₱[[formatPrice(item.totalCost)]]</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <a href="/sc-approved/" v-if="scModal.approved">Go to approvals</a>
-                        <a href="/sc-nonapproved" v-else>Go to approvals</a>
+                        <a href="/qq-nonapproved">Go to approvals</a>
                     </div>
                 </div>
             </div>
         </div>
+        <pre>[[$data]]</pre>
     </div>
 </div>
 
@@ -226,30 +241,67 @@
                 }
             },
 
-            scModal: {
+            orderModal: {
                 code: null,
-                createdBy: null,
+                createdBy: {
+                    first_name: null,
+                    last_name: null
+                },
                 datetimeCreated: null,
-                party: null,
-                approvedBy: null,
+                party: {
+                    name: null
+                },
+                approvedBy: {
+                    first_name: null,
+                    last_name: null
+                },
                 datetimeApproved: null,
 
-                subTotal: null,
-                discountPercent: null,
-                discountPeso: null,
+                approved: null,
+
+                scitemsmerch: [],
+
                 taxPeso: null,
-                totalCost: null,
+                amountDue: null,
+                amountPaid: null,
+                amountTotal: null,
+                paymentMethod: null,
+                paymentPeriod: null,
+                chequeNo: null,
+                dueDate: null,
+                remarks: null,
+                discountPeso: null,
+                discountPercent: null,
 
                 atcCode: null,
                 amountWithheld: null,
+
+                scotherfees: [{
+                    fee: null,
+                }],
+
+                scatc: [{
+                    amountWithheld: null,
+                    code: {
+                        code: null,
+                        rate: null
+                    }
+
+                }],
+                scotherfees: []
             },
-            updateSC:{},
             roundToggle: false,
+        },
+        computed: {
+            totalOtherFees(){
+                var x = this.orderModal.scotherfees.map(item=>item.fee)
+                return x.reduce((a,b)=>Number(a)+Number(b), 0)
+            }
         },
         methods: {
             viewSC(code){
                 axios.get(`/api/sales-contract/${code}/`)
-                .then(res=>this.scModal=res.data)
+                .then(res=>this.orderModal=res.data)
             },
             roundNumber2(value) {
                 if (this.roundToggle){

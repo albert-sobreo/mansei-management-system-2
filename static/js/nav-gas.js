@@ -68,6 +68,7 @@ Vue.component('navbar-gas', {
                     <a href="/po-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Purchase Order</a>
                     <a href="/rr-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Receiving Report</a>
                     <div class="dropdown-divider"></div>
+                    <a href="/qq-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Quotations</a>
                     <a href="/sc-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Sales Contract</a>
                 </div>
             </div>

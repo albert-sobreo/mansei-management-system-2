@@ -367,10 +367,17 @@ class SCApprovalAPI(APIView):
 
         sale = SalesContract.objects.get(pk=pk)
 
+        for element in sale.scitemsmerch.all():
+            if element.merchInventory.qtyA == 0:
+                print('b0ss')
+                sweetify.sweetalert(request, icon='error', title='Error', text="{} has {} items. You are selling {} items.".format((element.merchInventory.name + ' ' + element.merchInventory.classification + ' ' + element.merchInventory.type), element.merchInventory.qtyA, element.qty), persistent='Dismiss')
+                return JsonResponse(0, safe=False)
+
         sale.datetimeApproved = datetime.now()
         sale.approved = True
         sale.approvedBy = request.user
-        
+
+
         for element in sale.scitemsmerch.all():
             element.merchInventory.qtyA -= element.qty
             element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
@@ -394,7 +401,7 @@ class SCApprovalAPI(APIView):
         je.journal = j
         je.normally = 'Credit'
         je.accountChild = AccountChild.objects.get(name='Merchandise Inventory')
-        je.amount = sale.totalCost
+        je.amount = sale.amountTotal
         je.accountChild.amount -= je.amount
         je.accountChild.save()
         je.balance = je.accountChild.amount
@@ -406,7 +413,7 @@ class SCApprovalAPI(APIView):
         je.journal = j
         je.normally = 'Debit'
         je.accountChild = AccountChild.objects.get(name="Cash on Hand")
-        je.amount = sale.totalCost
+        je.amount = sale.amountTotal
         je.accountChild.amount += je.amount
         je.accountChild.save()
         je.balance = je.accountChild.amount
