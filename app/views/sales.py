@@ -208,10 +208,11 @@ class SaveQuotations(APIView):
         for item in quotes['items']:
             qqitemsmerch = QQItemsMerch()
             qqitemsmerch.quotations = qq
+            qqitemsmerch.amount = item['pricePerCubic']
             qqitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
             qqitemsmerch.remaining = item['remaining']
             qqitemsmerch.qty = item['quantity']
-            qqitemsmerch.amountTotal = Decimal(item['amountTotal'])
+            qqitemsmerch.amountTotal = Decimal(item['totalCost'])
 
             print(qqitemsmerch.amountTotal)
             
@@ -224,6 +225,6 @@ class SaveQuotations(APIView):
             f.fee = fee['fee']
             f.description = fee['description']
             f.save()
-            request.user.branch.tempSCOtherFees.add(f)
+            request.user.branch.qqOtherFees.add(f)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

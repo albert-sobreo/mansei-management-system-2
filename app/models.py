@@ -433,8 +433,8 @@ class Quotations(models.Model):
     approved = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = "Purchase Request"
-        verbose_name_plural = "Purchase Requests"
+        verbose_name = "Quotation"
+        verbose_name_plural = "Quotations"
 
     def __str__(self):
         return self.code
@@ -445,14 +445,15 @@ class QQItemsMerch(models.Model):
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="qqitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
+    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True)
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
 
     class Meta:
-        verbose_name = 'PR Items Merch'
-        verbose_name_plural = "PR Items Merchs"
+        verbose_name = 'QQ Items Merch'
+        verbose_name_plural = "QQ Items Merchs"
 
     def __str__(self):
-        return self.purchaseRequest.code + " - " + self.merchInventory.code
+        return self.quotations.code + " - " + self.merchInventory.code
 
 class QQCOtherFees(models.Model):
     quotations = models.ForeignKey(Quotations, related_name="qqotherfees",on_delete=models.PROTECT, null=True, blank=True)
@@ -480,7 +481,7 @@ class SalesContract(models.Model):
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
     paymentMethod = models.CharField(max_length=50)
     paymentPeriod = models.CharField(max_length=50)
-    chequeNo = models.CharField(max_length=50, null=True)
+    chequeNo = models.CharField(max_length=50, null=True, blank=True)
     dueDate = models.DateField(null = True, blank = True)
     bank = models.CharField(max_length=50, null = True, blank = True)
     remarks = models.TextField(null = True, blank=True)

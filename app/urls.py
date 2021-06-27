@@ -59,6 +59,9 @@ router.register(r"purchase-request-nested", views.PurchaseRequestNestedAPI, 'pur
 ########## PURCHASE REQUEST ##########
 router.register(r"receiving-report", views.ReceivingReportNestedAPI, 'receiving-report')
 
+########### QUOTATIONS ###########
+router.register(r"quotations", views.QuotationsAPI, 'quotations')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -95,7 +98,7 @@ urlpatterns = [
     path('sc-nonapproved/', login_required(views.SCnonapprovedView.as_view())),
     path('sc-approved/', login_required(views.SCapprovedView.as_view())),
     path('sales-contract-list/', login_required(views.SCListView.as_view())),
-    path('sales-contract/<int:pk>/', login_required(views.SCApprovalAPI.as_view())),
+    path('sc-approval/<int:pk>/', login_required(views.SCApprovalAPI.as_view())),
     path('deliveries/', login_required(views.DeliveriesView.as_view())),
     path('trucks/', login_required(views.TruckView.as_view())),
     path('drivers/', login_required(views.DriverView.as_view())),
@@ -127,5 +130,5 @@ urlpatterns = [
     path('inward-inventory/', login_required(views.InwardView.as_view())),
     path('pr-approval/<int:pk>/', login_required(views.PRApprovalAPI.as_view())),
     path('inward-adjustments/', login_required(views.InwardAdjustmentsView.as_view())),
-    path('save-receiving-report/', login_required(views.SaveReceivingReport.as_view()))
+    path('save-receiving-report/', login_required(views.SaveReceivingReport.as_view())),
 ]

@@ -173,12 +173,25 @@ class SCItemsMerchNestedSZ(serializers.ModelSerializer):
         model = SCItemsMerch
         fields= '__all__'
 
+class SCatcSZ(serializers.ModelSerializer):
+    code = ATCSZ(read_only=True)
+    class Meta:
+        model = SCatc
+        fields = '__all__'
+
+class SCOtherFeesSZ(serializers.ModelSerializer):
+    class Meta:
+        model = TempSCOtherFees(serializers.ModelSerializer)
+        fields = '__all__'
+
 class SalesContractNestedSZ(serializers.ModelSerializer):
     party = PartySZ(read_only=True)
     createdBy = UserSZ(read_only=True)
     approvedBy = UserSZ(read_only=True)
     journal = JournalSZ(read_only=True)
     scitemsmerch = SCItemsMerchNestedSZ(read_only=True, many=True)
+    scatc = SCatcSZ(read_only=True, many=True)
+    scotherfees = SCOtherFeesSZ(read_only=True, many=True)
 
     class Meta:
         model = SalesContract
@@ -334,6 +347,47 @@ class PRItemsMerchSZ(serializers.ModelSerializer):
         model = PRItemsMerch
         fields = '__all__'
 
+
+
+
+
+########## QUOTATIONS ##########
+class QQatcSZ(serializers.ModelSerializer):
+    code = ATCSZ(read_only=True)
+    class Meta:
+        model = QQatc
+        fields = '__all__'
+
+class QQOtherFeesSZ(serializers.ModelSerializer):
+    class Meta: 
+        model = QQCOtherFees
+        fields = "__all__"
+
+class QQItemsMerchNestedSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = QQItemsMerch
+        fields = '__all__'
+
+class QuotationsSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    createdBy = UserSZ(read_only=True)
+    approvedBy = UserSZ(read_only=True)
+    journal = JournalSZ(read_only=True)
+    qqitemsmerch = QQItemsMerchNestedSZ(read_only=True, many=True)
+    qqatc = QQatcSZ(read_only=True, many=True)
+    qqotherfees = QQOtherFeesSZ(read_only=True, many=True)
+
+    class Meta:
+        model = Quotations
+        fields = "__all__"
+        depth = 1
+
+
+
+
+
+
 ########## RECEIVING REPORT ##########
 class RRatcSZ(serializers.ModelSerializer):
     code = ATCSZ(read_only=True)
@@ -359,6 +413,10 @@ class ReceivingReportNestedSZ(serializers.ModelSerializer):
         model = ReceivingReport
         fields = '__all__'
         depth = 1
+
+
+
+
 
 
 # MAIN SERIALIZER
