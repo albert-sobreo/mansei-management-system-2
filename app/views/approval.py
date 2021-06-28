@@ -309,6 +309,69 @@ class RRApprovalAPI(APIView):
 
 
 ################# QUOTATIONS #################
+class IIapprovedView(View):
+    def get(self, request, format=None):
+
+        user = request.user
+        context = {
+            'inward': user.branch.inwardInventory.filter(approved=True, adjusted=True),
+        }
+        return render(request, 'ii-approved.html', context)
+
+class IInonapprovedView(View):
+    def get(self, request, format=None):
+
+        user = request.user
+        context = {
+            'inward': user.branch.inwardInventory.filter(approved=False, adjusted=True),
+        }
+        return render(request, 'ii-nonapproved.html', context)
+
+class IIApprovalAPI(APIView):
+    def put(self, request, pk, format = None):
+
+        ii = InwardInventory.objects.get(pk=pk)
+
+        ii.datetimeApproved = datetime.now()
+        ii.approved = True
+        ii.approvedBy = request.user
+
+        for element in ii.iiadjusteditems.all():
+            if MerchandiseInventory.objects.filter(code=element.code):
+                merch = MerchandiseInventory.objects.get(code=element.code)
+                merch.qtyA += element.qty
+                merch.qtyT = merch.qtyA + merch.qtyR
+                merch.totalCost += element.totalCost
+                merch.purchasingPrice = (Decimal(merch.totalCost / merch.qtyT))
+                merch.save()
+            else:
+                newMerch = MerchandiseInventory()
+                newMerch.code = element.code
+                newMerch.name = element.name
+                newMerch.classification = element.classfication
+                newMerch.type = element.type
+                newMerch.length = element.length
+                newMerch.width = element.width
+                newMerch.thickness = element.thicc
+                newMerch.vol = element.vol
+                newMerch.qtyT = element.qty
+                newMerch.qtyA = element.qty
+                newMerch.qtyR = 0
+                newMerch.totalCost = element.totalCost
+                newMerch.purchasingPrice = (Decimal(element.totalCost / element.qty))
+                newMerch.sellingPrice = 0.0
+                newMerch.pricePerCubic = element.pricePerCubic
+                newMerch.save()
+                request.user.branch.merchInventory.add(newMerch)
+                
+
+        ii.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+
+################# QUOTATIONS #################
 class QQapprovedView(View):
     def get(self, request, format=None):
 
