@@ -382,7 +382,7 @@ class InwardInventory(models.Model):
     datetimeCreated = models.DateTimeField()
     dateInward = models.DateField()
     party = models.ForeignKey(Party, related_name="inwardinventory", on_delete=models.PROTECT, null=True, blank=True)
-    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    amountTotal = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "iiCreatedBy")
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "iiApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
@@ -397,11 +397,15 @@ class InwardInventory(models.Model):
 class IIItemsMerch(models.Model):
     inwardInventory = models.ForeignKey(InwardInventory, related_name="iiitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="iiitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
-    remaining = models.IntegerField()
     qty = models.IntegerField()
+    amount = models.DecimalField(max_digits=10, decimal_places=5, null = True)
     totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    barcode = models.CharField(max_length=50)
+    code = models.CharField(max_length=50)
     productMark = models.CharField(max_length=50)
+    length = models.DecimalField(max_digits=10, decimal_places=2, null = True)
+    width = models.DecimalField(max_digits=10, decimal_places=2, null = True)
+    thicc = models.DecimalField(max_digits=10, decimal_places=2, null = True)
+    vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
 
 class IIAdjustedItems(models.Model):
     inwardInventory = models.ForeignKey(InwardInventory, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
@@ -409,11 +413,16 @@ class IIAdjustedItems(models.Model):
     iiItemsMerch = models.ForeignKey(IIItemsMerch, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.IntegerField()
+    amount = models.DecimalField(max_digits=10, decimal_places=5, null = True)
     totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    barcode = models.CharField(max_length=50)
+    code = models.CharField(max_length=50)
     productMark = models.CharField(max_length=50)
     classfication = models.CharField(max_length=50)
     type = models.CharField(max_length=50)
+    length = models.DecimalField(max_digits=10, decimal_places=2, null = True)
+    width = models.DecimalField(max_digits=10, decimal_places=2, null = True)
+    thicc = models.DecimalField(max_digits=10, decimal_places=2, null = True)
+    vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
 
 class Quotations(models.Model):
     code = models.CharField(max_length=50)
@@ -711,6 +720,12 @@ class Branch(models.Model):
     deliveryPhotos = models.ManyToManyField(DeliveryPhotos, blank = True)
     deliveryitemsGroup = models.ManyToManyField(DeliveryItemsGroup, blank = True)
     deliveryitemsMerch = models.ManyToManyField(DeliveryItemMerch, blank = True)
+
+    ##### INWARD #####
+    inwardInventory = models.ManyToManyField(InwardInventory, blank=True)
+    iiItemsMerch = models.ManyToManyField(IIItemsMerch, blank=True)
+    iiAdjustedItems = models.ManyToManyField(IIAdjustedItems, blank=True)
+
     
 
     def __str__(self):

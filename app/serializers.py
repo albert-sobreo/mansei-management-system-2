@@ -162,9 +162,41 @@ class PurchaseRequestNestedSZ(serializers.ModelSerializer):
         depth = 1
 
         
+########## INWARD INVENTORY ##########
+class IIItemsMerchNestedSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = IIItemsMerch
+        fields = '__all__' 
+
+class IIAdjustedItemsNestedSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    iiItemsMerch = IIItemsMerchNestedSZ(read_only=True)
+    class Meta:
+        model = IIAdjustedItems
+        fields = '__all__' 
+
+class InwardInventoryNestedSZ(serializers.ModelSerializer):
+    createdBy = UserSZ(read_only=True)
+    approvedBy = UserSZ(read_only=True)
+    iiitemsmerch = IIItemsMerchNestedSZ(read_only=True, many=True)
+    iiadjusteditems = IIAdjustedItemsNestedSZ(read_only=True, many=True)
+    class Meta:
+        model = InwardInventory
+        fields = '__all__'
+        depth = 1
+
+########## INWARD INVENTORY ADJUSTED ##########
 
 
-
+class InwardInventoryAdjustedNestedSZ(serializers.ModelSerializer):
+    createdBy = UserSZ(read_only=True)
+    approvedBy = UserSZ(read_only=True)
+    iiadjustedItems = IIAdjustedItemsNestedSZ(read_only=True, many=True)
+    class Meta:
+        model = InwardInventory
+        fields = '__all__'
+        depth = 1
 
 ########## SALES CONTRACT ##########
 class SCItemsMerchNestedSZ(serializers.ModelSerializer):

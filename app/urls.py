@@ -62,6 +62,9 @@ router.register(r"receiving-report", views.ReceivingReportNestedAPI, 'receiving-
 ########### QUOTATIONS ###########
 router.register(r"quotations", views.QuotationsAPI, 'quotations')
 
+########### INWARD INVENTORY ###########
+router.register(r"inward-inventory", views.InwardInventoryNestedAPI, 'inward-inventory')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -128,6 +131,7 @@ urlpatterns = [
     path('qq-approved/', login_required(views.QQapprovedView.as_view())),
     path('qq-approval/<int:pk>/', login_required(views.QQApprovalAPI.as_view())),
     path('inward-inventory/', login_required(views.InwardView.as_view())),
+    path('import-inwardinventory/', login_required(views.ImportInwardInventory.as_view())),
     path('pr-approval/<int:pk>/', login_required(views.PRApprovalAPI.as_view())),
     path('inward-adjustments/', login_required(views.InwardAdjustmentsView.as_view())),
     path('save-receiving-report/', login_required(views.SaveReceivingReport.as_view())),

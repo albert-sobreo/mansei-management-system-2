@@ -36,15 +36,25 @@
                 <th>Date Approved</th>
             </thead>
             <tbody>
+                {% for item in request.user.branch.inwardInventory.all %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#orderModal">II-2021-01-0005</td>
-                    <td>Apr. 22, 2021</td>
-                    <td>₱1,750.00</td>
-                    <td>Pending</td>
-                    <td>Apr. 23, 2021</td>
-                    <td>Pending</td>
-                    <td>Apr. 23, 2021</td>
+                    <td @click="viewModal({{item.pk}})" class="link" data-toggle="modal" data-target="#orderModal">{{item.code}}</td>
+                    <td>{{item.dateInward}}</td>
+                    <td>₱[[formatPrice({{item.amountTotal}})]]</td>
+                    {% if item.adjusted %}
+                    <td class="approved">Approved</td>
+                    {% else %}
+                    <td class="pending">Pending</td>
+                    {% endif %}
+                    <td>{{item.datetimeAdjusted}}</td>
+                    {% if item.approved %}
+                    <td class="approved">Approved</td>
+                    {% else %}
+                    <td class="pending">Pending</td>
+                    {% endif %}
+                    <td>{{item.datetimeApproved}}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 
@@ -59,7 +69,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <form action="#" method="POST" enctype="multipart/form-data">{% csrf_token %}
+                        <form action="/import-inwardinventory/" method="POST" enctype="multipart/form-data">{% csrf_token %}
                             <div class="row">
                                 <div class="col-12">
                                     <label for="">Select Excel file</label>
@@ -87,51 +97,53 @@
                             <div class="col-3 mt-3">
                                 <label for="" class="gray">II Code</label>
                                 <br>
-                                <span class="font-size-14 font-bold">II-2021-01-0001</span>
+                                <span class="font-size-14 font-bold">[[order.code]]</span>
                             </div>
                             <div class="col-3 mt-3">
                                 <label for="" class="gray">Adjustment Status</label>
                                 <br>
-                                <span class="font-size-14 font-bold active-gas">Adjusted</span>
+                                <span class="font-size-14 font-bold active-gas" v-if="order.adjusted">Adjusted</span>
+                                <span class="font-size-14 font-bold pending" v-else>Pending</span>
                             </div>
                             <div class="col-3 mt-3">
                                 <label for="" class="gray">Date of Adjustment</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Apr. 15, 2021</span>
+                                <span class="font-size-14 font-bold">[[formatDateTime(order.datetimeApproved)]]</span>
                             </div>
                             <div class="col-3 mt-3">
                                 <label for="" class="gray">Adjusted By</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Clark Kent</span>
+                                <span class="font-size-14 font-bold"></span>
                             </div>
 
                             <!-- LVL 2 -->
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Date of Transfer</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Apr. 15, 2021</span>
+                                <span class="font-size-14 font-bold">[[formatDate(order.dateInward)]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Approval Status</label>
                                 <br>
-                                <span class="font-size-14 font-bold approved">Approved</span>
+                                <span class="font-size-14 font-bold approved" v-if="order.approved">Approved</span>
+                                <span class="font-size-14 font-bold pending" v-else>Pending</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Date of Approval</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Apr. 15, 2021</span>
+                                <span class="font-size-14 font-bold">[[formatDateTime(order.datetimeApproved)]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Approved By</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Clark Kent</span>
+                                <span class="font-size-14 font-bold" v-if="order.approveBy!=null">[[order.approvedBy.first_name]] [[order.approvedBy.last_name]]</span>
                             </div>
 
                             <!-- LVL 3 -->
                             <div class="col-3 mb-3">
                                 <label for="" class="gray">Total Amount Due</label>
                                 <br>
-                                <span class="font-size-14 font-bold">₱1,200.00</span>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(order.amountTotal)]]</span>
                             </div>
                         </div>
 
@@ -149,30 +161,22 @@
                                     <th><span class="font-bold gray">Length</span></th>
                                     <th><span class="font-bold gray">Width</span></th>
                                     <th><span class="font-bold gray">Thickness</span></th>
+                                    <th><span class="font-bold gray">Vol</span></th>
                                     <th><span class="font-bold gray">Qty</span></th>
                                     <th><span class="font-bold gray">Amount</span></th>
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>w001</td>
-                                        <td>JPCVM</td>
-                                        <td>2000mm</td>
-                                        <td>2000mm</td>
-                                        <td>100mm</td>
-                                        <td>5</td>
-                                        <td>₱200.00</td>
-                                        <td>₱1,000.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td>w002</td>
-                                        <td>JPCVM</td>
-                                        <td>1800mm</td>
-                                        <td>1900mm</td>
-                                        <td>100m</td>
-                                        <td>5</td>
-                                        <td>₱200.00</td>
-                                        <td>₱1,000.00</td>
+                                    <tr v-for="item in order.iiitemsmerch">
+                                        <td>[[item.code]]</td>
+                                        <td>[[item.productMark]]</td>
+                                        <td>[[item.length]]mm</td>
+                                        <td>[[item.width]]mm</td>
+                                        <td>[[item.thicc]]mm</td>
+                                        <td>[[item.vol]]m³</td>
+                                        <td>[[item.qty]]</td>
+                                        <td>₱[[formatPrice(item.amount)]]</td>
+                                        <td>₱[[formatPrice(item.totalCost)]]</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -192,30 +196,22 @@
                                     <th><span class="font-bold gray">Length</span></th>
                                     <th><span class="font-bold gray">Width</span></th>
                                     <th><span class="font-bold gray">Thickness</span></th>
+                                    <th><span class="font-bold gray">Vol</span></th>
                                     <th><span class="font-bold gray">Qty</span></th>
                                     <th><span class="font-bold gray">Amount</span></th>
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>w001</td>
-                                        <td>LVL-Standard-90x90</td>
-                                        <td>2000mm</td>
-                                        <td>2000mm</td>
-                                        <td>100mm</td>
-                                        <td>10</td>
-                                        <td>₱200.00</td>
-                                        <td>₱2,000.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td>w002-A</td>
-                                        <td>LVL-Reject-90x90</td>
-                                        <td>1789mm</td>
-                                        <td>1902mm</td>
-                                        <td>100mm</td>
-                                        <td>2</td>
-                                        <td>₱200.00</td>
-                                        <td>₱400.00</td>
+                                    <tr v-for="item in order.adjusted">
+                                        <td>[[item.code]]</td>
+                                        <td>[[item.name]]-[[item.classification]]-[[item.type]]</td>
+                                        <td>[[item.length]]mm</td>
+                                        <td>[[item.width]]mm</td>
+                                        <td>[[item.thicc]]mm</td>
+                                        <td>[[item.vol]]m³</td>
+                                        <td>[[item.qty]]</td>
+                                        <td>₱[[formatPrice(item.amount)]]</td>
+                                        <td>₱[[formatPrice(item.amountTotal)]]</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -226,6 +222,7 @@
                 </div>
             </div>
         </div>
+        <pre>[[$data]] </pre>
     </div>
 </div>
 
@@ -235,8 +232,140 @@
 
 <script>
     var app = new Vue({
-        delimiter: ['[[', ']]'],
+        delimiters: ['[[', ']]'],
         el: "#app",
+
+        data: {
+            order: {
+                code: null,
+                dateInward: null,
+                datetimeApproved: null,
+                datetimeAdjusted: null,
+                adjusted: null,
+                approved: null,
+                createdBy: {
+                    first_name: null,
+                    last_name: null,
+                },
+                approvedBy: {
+                    first_name: null,
+                    last_name: null,
+                },
+                iitemsmerch: [{
+                    code: null,
+                    name: null,
+                    classification: null,
+                    type: null,
+                    length: null,
+                    width: null,
+                    thickness: null,
+                    vol: null,
+                    qty: null,
+                    amount: null,
+                    amountTotal: null,
+                }],
+                iiadjusteditems: [{
+                    code: null,
+                    name: null,
+                    classification: null,
+                    type: null,
+                    length: null,
+                    width: null,
+                    thickness: null,
+                    vol: null,
+                    qty: null,
+                    amount: null,
+                    amountTotal: null,
+                }]
+            }
+        },
+
+        methods: {
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+            viewModal(id){
+                axios.get(`/api/inward-inventory/${id}`)
+                .then(res=>this.order=res.data)
+            },
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+        }
     })
 </script>
 

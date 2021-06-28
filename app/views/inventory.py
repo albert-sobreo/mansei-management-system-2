@@ -102,6 +102,5 @@ class ImportMerchandiseInventory(View):
                 request.user.branch.warehouse.add(w)
                 merch.warehouse.add(w)
             request.user.branch.merchInventory.add(merch)
-            request.user.branch.merchInventory.add(merch)
         
         return redirect('/merchinventory/')

@@ -222,6 +222,21 @@ class ReceivingReportNestedAPI(viewsets.ModelViewSet):
 
 
 
+
+
+########## INWARD INVENTORY ##########
+
+class InwardInventoryNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = InwardInventoryNestedSZ
+    queryset = InwardInventory.objects.all()
+
+
+
+
+
+
+
 ########## QUOTATIONS ##########
 
 class QuotationsAPI(viewsets.ModelViewSet):

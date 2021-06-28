@@ -28,151 +28,180 @@
         <div class="row">
             <div class="col col-3 pr-2">
                 <label for="">Reference No.</label>
-                <input type="text" class="form-control" placeholder="Enter Reference No.">
+                <select name="" id="" class="form-control">
+                    <option value="" selected disabled>Select an Inward Inventory</option>
+                    <option value="0">0</option>
+                </select>
             </div>
             <div class="col col-2 pl-2">
                 <label>Date</label>
                 <input type="date" class="form-control">
             </div>
         </div>
-        <div class="row mt-3">
-            <span class="col font-bold">Inward Inventory Items</span>
+    </div>
+    <div class="mx-5 row mt-3">
+        <span class="col font-bold">Inward Inventory Items</span>
+    </div>
+    <div class="mx-5 px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card">
+        <div class="row">
+            <div class="col px-1 gray">
+                <label for="" class="m-0">Barcode</label>
+            </div>
+            <div class="col px-1 gray">
+                <label for="" class="m-0">Name</label>
+            </div>
+            <div class="col px-1 gray">
+                <label for="" class="m-0">Classification</label>
+            </div>
+            <div class="col-1 px-1 gray">
+                <label for="" class="m-0">Type</label>
+            </div>
+            <div class="col-1 px-1 gray">
+                <label for="" class="m-0">Length <span class="gray font-size-10">mm</span></label>
+            </div>
+            <div class="col-1 px-1 gray">
+                <label for="" class="m-0">Width <span class="gray font-size-10">mm</span></label>
+            </div>
+            <div class="col-1 px-1 gray">
+                <label for="" class="m-0">Thick <span class="gray font-size-10">mm</span></label>
+            </div>
+            <div class="col-1 px-1 gray">
+                <label for="" class="m-0">Vol m³</label>
+            </div>
+            <div class="col-1 px-1 gray">
+                <label for="" class="m-0">Qty</label>
+            </div>
+            <div class="col-1 px-1 gray">
+                <label for="" class="m-0">Price per m³</label>
+            </div>
+            <div class="col px-1 gray">
+                <label for="" class="m-0">Amount</label>
+            </div>
+            <div class="col px-1 gray">
+                <label for="" class="m-0">Total Amount</label>
+            </div>
+            <i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
         </div>
-        <div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card">
-            <div class="row">
-                <div class="col px-1 gray">
-                    <label for="" class="m-0">Barcode</label>
-                </div>
-                <div class="col px-1 gray">
-                    <label for="" class="m-0">Name</label>
-                </div>
-                <div class="col px-1 gray">
-                    <label for="" class="m-0">Classification</label>
-                </div>
-                <div class="col-1 px-1 gray">
-                    <label for="" class="m-0">Type</label>
-                </div>
-                <div class="col-1 px-1 gray">
-                    <label for="" class="m-0">Length <span class="gray font-size-10">mm</span></label>
-                </div>
-                <div class="col-1 px-1 gray">
-                    <label for="" class="m-0">Width <span class="gray font-size-10">mm</span></label>
-                </div>
-                <div class="col-1 px-1 gray">
-                    <label for="" class="m-0">Thick <span class="gray font-size-10">mm</span></label>
-                </div>
-                <div class="col-1 px-1 gray">
-                    <label for="" class="m-0">Qty</label>
-                </div>
-                <div class="col px-1 gray">
-                    <label for="" class="m-0">Amount</label>
-                </div>
-                <div class="col px-1 gray">
-                    <label for="" class="m-0">Total Amount</label>
+        <div class="order-card-darker container-extend-2 row py-3" v-for="(item, index) in order.items">
+            <div class="col-12 px-5">
+                <div class="row font-semibold">
+                    <div class="col px-1 ">
+                        <span>w001</span>
+                    </div>
+                    <div class="col px-1 ">
+                        <span></span>
+                    </div>
+                    <div class="col px-1 ">
+                        <span></span>
+                    </div>
+                    <div class="col-1 px-1 ">
+                        <span></span>
+                    </div>
+                    <div class="col-1 px-1 ">
+                        <span>2000mm</span>
+                    </div>
+                    <div class="col-1 px-1 ">
+                        <span>2000mm</span>
+                    </div>
+                    <div class="col-1 px-1 ">
+                        <span>100mm</span>
+                    </div>
+                    <div class="col-1 px-1">
+                        <span>.40000m³</span>
+                    </div>
+                    <div class="col-1 px-1 ">
+                        <span>5</span>
+                    </div>
+                    <div class="col-1 px-1 ">
+                        <span></span>
+                    </div>
+                    <div class="col px-1 ">
+                        <span>₱200.00</span>
+                    </div>
+                    <div class="col px-1 ">
+                        <span>₱2,000.00</span>
+                    </div>
+                    <i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
                 </div>
             </div>
-            <div class="order-card-darker container-extend-2 row py-3">
-                <div class="col-12 px-5">
-                    <div class="row font-semibold">
-                        <div class="col px-1 ">
-                            <span>w001</span>
-                        </div>
-                        <div class="col px-1 ">
-                            <span></span>
-                        </div>
-                        <div class="col px-1 ">
-                            <span></span>
-                        </div>
-                        <div class="col-1 px-1 ">
-                            <span></span>
-                        </div>
-                        <div class="col-1 px-1 ">
-                            <span>2000mm</span>
-                        </div>
-                        <div class="col-1 px-1 ">
-                            <span>2000mm</span>
-                        </div>
-                        <div class="col-1 px-1 ">
-                            <span>100mm</span>
-                        </div>
-                        <div class="col-1 px-1 ">
-                            <span>5</span>
-                        </div>
-                        <div class="col px-1 ">
-                            <span>₱200.00</span>
-                        </div>
-                        <div class="col px-1 ">
-                            <span>₱2,000.00</span>
-                        </div>
+            <div class="col-12 px-5" v-for="(item1, index1) in item.adjusted">
+                <div class="row">
+                    <div class="col px-1">
+                        <input type="text" class="form-control" placeholder="Barcode">
                     </div>
-                </div>
-                <div class="col-12 px-5">
-                    <div class="row">
-                        <div class="col px-1">
-                            <input type="text" class="form-control" placeholder="Barcode">
-                        </div>
-                        <div class="col px-1">
-                            <input type="text" class="form-control" placeholder="Item Name">
-                        </div>
-                        <div class="col px-1">
-                            <input type="text" class="form-control" placeholder="Item Class">
-                        </div>
-                        <div class="col-1 px-1">
-                            <input type="text" class="form-control" placeholder="Item Type">
-                        </div>
-                        <div class="col-1 px-1">
-                            <input type="text" class="form-control" placeholder="Length">
-                        </div>
-                        <div class="col-1 px-1">
-                            <input type="text" class="form-control" placeholder="Width">
-                        </div>
-                        <div class="col-1 px-1">
-                            <input type="text" class="form-control" placeholder="Thickness">
-                        </div>
-                        <div class="col-1 px-1">
-                            <input type="text" class="form-control" placeholder="Qty">
-                        </div>
-                        <div class="col px-1">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">₱</span>
-                                </div>
-                                <input type="text" class="form-control box-shadow-off" placeholder="Amount" onkeypress="validate()">
+                    <div class="col px-1">
+                        <input type="text" class="form-control" placeholder="Item Name">
+                    </div>
+                    <div class="col px-1">
+                        <input type="text" class="form-control" placeholder="Item Class">
+                    </div>
+                    <div class="col-1 px-1">
+                        <input type="text" class="form-control" placeholder="Item Type">
+                    </div>
+                    <div class="col-1 px-1">
+                        <input type="text" class="form-control" placeholder="Length" onkeypress="validate()">
+                    </div>
+                    <div class="col-1 px-1">
+                        <input type="text" class="form-control" placeholder="Width" onkeypress="validate()">
+                    </div>
+                    <div class="col-1 px-1">
+                        <input type="text" class="form-control" placeholder="Thickness" onkeypress="validate()">
+                    </div>
+                    <div class="col-1 px-1">
+                        <input type="text" class="form-control" placeholder="Vol" onkeypress="validate()">
+                    </div>
+                    <div class="col-1 px-1">
+                        <input type="text" class="form-control" placeholder="Qty" onkeypress="validate()">
+                    </div>
+                    <div class="col px-1">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
                             </div>
+                            <input type="text" class="form-control box-shadow-off" placeholder="Price per m³" onkeypress="validate()">
                         </div>
-                        <div class="col px-1">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">₱</span>
-                                </div>
-                                <input type="text" class="form-control box-shadow-off" placeholder="Total Amount" onkeypress="validate()" readonly>
+                    </div>
+                    <div class="col px-1">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
                             </div>
+                            <input type="text" class="form-control box-shadow-off" placeholder="Amount" onkeypress="validate()">
                         </div>
                     </div>
-                </div>
-                <div class="col-12 px-5">
-                    <div class="row">
-                        <div class="col px-1">
-                            <button class="btn btn-warning">+ Add Adjustments</button>
+                    <div class="col px-1">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input type="text" class="form-control box-shadow-off" placeholder="Total Amount" onkeypress="validate()" readonly>
                         </div>
                     </div>
+                    <i @click="removeAdjustments(index, index1)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
                 </div>
             </div>
-            <div class="row mt-4">
-                <div class="col-2 offset-10">
-                    <label class="font-size-14">Total Amount Due</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">₱</span>
-                        </div>
-                        <input type="text" class="form-control box-shadow-off" placeholder="Total Amount" onkeypress="validate()" readonly>
+            <div class="col-12 px-5">
+                <div class="row">
+                    <div class="col px-1 my-2">
+                        <button @click="addAdjustments(index)" class="btn btn-warning">+ Add Adjustments</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div @click="checkForm()" class="container-extend border container-extend btn-bottom">
-			REQUEST FOR APPROVAL
-		</div>
+        <div class="row mt-4">
+            <div class="col-2 offset-10">
+                <label class="font-size-14">Total Amount Due</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">₱</span>
+                    </div>
+                    <input type="text" class="form-control box-shadow-off" placeholder="Total Amount" onkeypress="validate()" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div @click="checkForm()" class="mx-5 border container-extend btn-bottom">
+        REQUEST FOR APPROVAL
     </div>
 </div>
 
@@ -183,7 +212,61 @@
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
-        el: "#app"
+        el: "#app",
+
+        data: {
+            order: {
+                code: null,
+                date: null,
+                items: [{
+                    code: null,
+                    name: null,
+                    classification: null,
+                    type: null,
+                    length: null,
+                    width: null,
+                    thickness: null,
+                    vol: null,
+                    qty: null,
+                    amount: null,
+                    amountTotal: null,
+                    adjusted: [{
+                        code: null,
+                        name: null,
+                        classification: null,
+                        type: null,
+                        length: null,
+                        width: null,
+                        thickness: null,
+                        vol: null,
+                        qty: null,
+                        amount: null,
+                        amountTotal: null,
+                    }]
+                }]
+            }
+        },
+
+        methods: {
+            addAdjustments(index){
+                this.order.items[index].adjusted.push({
+                    code: null,
+                        name: null,
+                        classification: null,
+                        type: null,
+                        length: null,
+                        width: null,
+                        thickness: null,
+                        vol: null,
+                        qty: null,
+                        amount: null,
+                        amountTotal: null,
+                })
+            },
+            removeAdjustments(index, index1){
+                this.$delete(this.order.items[index].adjusted, index)
+            }
+        }
     })
 </script>
 
