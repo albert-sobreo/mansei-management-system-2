@@ -192,7 +192,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
                                         </div>
-                                        <input :value="formatPrice(line.amountWithheld)" type="number" step="0.02" class="form-control box-shadow-off" readonly>
+                                        <input :value="formatPrice(line.amountWithheld)" type="text" step="0.02" class="form-control box-shadow-off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -459,6 +459,7 @@
             },
 
             amountPaid(){
+                this.watchers()
                 if (this.amountPaid == this.amountTotal){
                     this.purchaseOrder.paymentPeriod = 'Full Payment'
                 } else {
@@ -475,12 +476,18 @@
 
         methods:{
             watchers(){
-                this.purchaseOrder.withholdingTax = this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)
+                //this.purchaseOrder.withholdingTax = this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)
+                var amountDue = this.purchaseOrder.amountDue
+                var VATrate = this.purchaseOrder.taxRate/100
+                var ATCrate = this.purchaseOrder.atc[0].taxRate/100
+                var realCost = amountDue * (1.00/(1+VATrate))
+
+                this.purchaseOrder.withholdingTax = this.amountPaid * (((this.purchaseOrder.atc[0].taxRate/100))/(1+(this.purchaseOrder.taxRate/100)))
                 this.purchaseOrder.amountDue = this.amountDue.reduce((a,b)=>Number(a)+Number(b),0)
-                this.purchaseOrder.taxPeso = this.purchaseOrder.amountDue * (this.purchaseOrder.taxRate/100)
-                this.purchaseOrder.atc[0].amount = this.purchaseOrder.amountDue - this.purchaseOrder.taxPeso
+                this.purchaseOrder.taxPeso = this.purchaseOrder.amountDue * ((this.purchaseOrder.taxRate/100)/(1+(this.purchaseOrder.taxRate/100)))
+                this.purchaseOrder.atc[0].amount = this.purchaseOrder.amountDue * (1.00/(1+(this.purchaseOrder.taxRate/100)))
                 this.purchaseOrder.atc[0].amountWithheld = (((this.purchaseOrder.atc[0].taxRate)/100) * this.purchaseOrder.atc[0].amount)
-                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - this.purchaseOrder.withholdingTax
+                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0))
             },
 
             loadData(){
