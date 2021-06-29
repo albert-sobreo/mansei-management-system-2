@@ -241,4 +241,109 @@ class SaveQuotations(APIView):
 ########## SALES ORDER ##########
 class SalesOrderView(View):
     def get(self, request, format=None):
-        return render(request, 'sales-order.html')
+        
+        try:
+            so = request.user.branch.quotations.latest('pk')
+
+            listed_code = so.code.split('-')
+            listed_date = str(now.today()).split('-')
+
+            current_code = int(listed_code[3])
+
+            if listed_code[1] == listed_date[0] and listed_code[2] == listed_date[1]:
+                current_code += 1
+                new_code = 'SO-{}-{}-{}'.format(listed_date[0], listed_date[1], str(current_code).zfill(4))
+            else:
+                new_code = 'SO-{}-{}-0001'.format(listed_date[0], listed_date[1])
+
+        except Exception as e:
+            print(e)
+            listed_date = str(now.today()).split('-')
+            new_code = 'SO-{}-{}-0001'.format(listed_date[0], listed_date[1])
+
+        context = {
+            'new_code': new_code,
+        }
+        return render(request, 'sales-order.html', context)
+
+class SOListView(View):
+    def get(self, request, format=None):
+        return render(request, 'so-list.html')
+
+class SaveSalesOrder(APIView):
+    def post(self, request, format = None):
+        salesOrder = request.data
+
+        so = SalesOrder()
+
+        so.code = salesOrder['code']
+        so.datetimeCreated = salesOrder['datatimeCreated']
+        
+        if salesOrder['retroactive']:
+            so.dateSold = salesOrder['retroactive']
+        else:
+            so.dateSold = salesOrder['date']
+
+        so.party = Party.objects.get(pk=salesOrder['customer'])
+
+        so.amountPaid = Decimal(salesOrder['amountPaid'])
+        so.amountDue = Decimal(salesOrder['amountDue'])
+        so.amountTotal = Decimal(salesOrder['amountTotal'])
+        so.taxType = salesOrder['taxType']
+        so.taxRate = Decimal(salesOrder['taxRate'])
+        so.taxPeso = Decimal(salesOrder['taxPeso'])
+        so.paymentMethod = salesOrder['paymentMethod']
+        so.paymentPeriod = salesOrder['paymenntPeriod']
+        so.chequeNo = salesOrder['chequeNo']
+        so.dueDate = salesOrder['dueDate']
+        so.bank = salesOrder['bank']
+        so.remarks = salesOrder['remarks']
+
+        if request.user.is_authenticated:
+            so.createdBy = request.user
+
+        if salesOrder['discountType'] == 'percent':
+            so.discountPercent = salesOrder['totalDiscount']
+        elif salesOrder['discountType'] == 'peso':
+            so.discountPeso = salesOrder['totalDiscount']
+
+        so.save()
+        request.user.branch.salesOrder.add(so)
+
+        atc = SOatc
+
+        for jsonatc in salesOrder['atc']:
+            print(jsonatc)
+            atc.code = ATC.objects.get(pk=jsonatc['code'])
+            atc.amountWithheld = jsonatc['amountWithheld']
+            atc.salesOrder = so
+            atc.save
+            request.user.branch.soatc.add(atc)
+
+        for item in salesOrder['items']:
+            soitemsmerch = SOItemsMerch()
+            soitemsmerch.salesOrder = so
+            soitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
+            soitemsmerch.remaining = item['remaining']
+            soitemsmerch.qty = item['quantity']
+            soitemsmerch.cbm = item['cbm']
+            soitemsmerch.vol = item['vol']
+            soitemsmerch.pricePerCubic = item['pricePerCubic']
+            soitemsmerch.totalCost = Decimal(item['totalCost'])
+
+            print(soitemsmerch.totalCost)
+
+            soitemsmerch.save()
+            request.user.branch.soitemsMerch.add(soitemsmerch)
+
+        for fee in salesOrder['otherFees']:
+            f = SOOtherFees
+            f.salesOrder = so
+            f.fee = fee['fee']
+            f.description = fee['description']
+            f.save()
+            request.user.branch.soOtherFees.add(f)
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+

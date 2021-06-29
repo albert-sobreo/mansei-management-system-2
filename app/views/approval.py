@@ -99,23 +99,30 @@ class POApprovalAPI(APIView):
             j.save()
             request.user.branch.journal.add(j)
 
-            
-            wep = JournalEntries()
-            wep.journal = j
-            wep.normally = 'Credit'
-            wep.accountChild = AccountChild.objects.get(name="Withholding Expanded Payables")
-            # wep.amount = purchase.poatc.amountWithheld
-            for poatc in purchase.poatc.all():
-                wep.amount = poatc.amountWithheld
-            wep.accountChild.amount = wep.amount
-            wep.accountChild.accountSubGroup.amount += wep.amount
-            wep.accountChild.accountSubGroup.accountGroup.amount += wep.amount
-            wep.accountChild.save()
-            wep.accountChild.accountSubGroup.save()
-            wep.accountChild.accountSubGroup.accountGroup.save()
-            wep.balance = wep.accountChild.amount
-            wep.save()
-            request.user.branch.journalEntries.add(wep)
+            if purchase.paymentPeriod == 'Full Payment':
+                wep = JournalEntries()
+                wep.journal = j
+                wep.normally = 'Credit'
+                wep.accountChild = AccountChild.objects.get(name="Withholding Expanded Payables")
+                # wep.amount = purchase.poatc.amountWithheld
+                for poatc in purchase.poatc.all():
+                    wep.amount = poatc.amountWithheld
+                wep.accountChild.amount = wep.amount
+                wep.accountChild.accountSubGroup.amount += wep.amount
+                wep.accountChild.accountSubGroup.accountGroup.amount += wep.amount
+                wep.accountChild.save()
+                wep.accountChild.accountSubGroup.save()
+                wep.accountChild.accountSubGroup.accountGroup.save()
+                wep.balance = wep.accountChild.amount
+                wep.save()
+                request.user.branch.journalEntries.add(wep)
+            elif purchase.paymentPeriod == 'Partial Payment':
+                wep = JournalEntries()
+                wep.journal = j
+                wep.normally = 'Credit'
+                wep.accountChild = AccountChild.objects.get(name="Withholding Expanded Payables")
+
+
             vat = JournalEntries()
             vat.journal = j
             vat.normally = 'Debit'
@@ -308,7 +315,6 @@ class RRApprovalAPI(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
-
 ################# QUOTATIONS #################
 class IIapprovedView(View):
     def get(self, request, format=None):
@@ -370,8 +376,7 @@ class IIApprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
-
-
+        
 ################# QUOTATIONS #################
 class QQapprovedView(View):
     def get(self, request, format=None):

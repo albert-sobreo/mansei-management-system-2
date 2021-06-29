@@ -143,12 +143,6 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
 
 
 
-########## QUOTATIONS ##########
-
-
-
-
-
 
 
 ########## PURCHASE REQUEST ##########

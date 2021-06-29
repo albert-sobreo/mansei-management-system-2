@@ -41,9 +41,11 @@
                 </div>
                 <div class="col col-2 pl-2">
                     <label><span>Quotations</span></label>
-                    <select v-model="order.quotation" class="form-control">
+                    <select @change="getQQ(order.quotation)" v-model="order.quotation" class="form-control">
                         <option value="" selected disabled>Choose a Quotation</option>
-                        <option value="">asdf</option>
+                        {% for item in request.user.branch.quotations.all %}
+                        <option value="{{item.pk}}">{{item.code}}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -851,6 +853,25 @@
             removeFee(index){
                 this.$delete(this.order.otherFees, index)
             },
+            getQQ(id){
+                console.log(id)
+                axios.get(`/api/quotations/${id}`)
+                .then(res=>{
+                    item = res.data
+                    this.order.customer = item.party.id
+                    this.order.taxType = item.taxType
+                    this.order.taxRate = item.taxRate
+                    item.qqitemsmerch.forEach((el,index)=>{
+                        if (index==0){
+                            this.order.items[index].type = el.type = 'Merchandise'
+                            this.order.items[index].code = el.merchInventory.id
+                            this.order.items[index].remaining = el.merchInventory.qtyA
+                            this.order.items[index].quantity = el.qtyA
+                            this.order.items[index].vol = el.merchInventory.vol
+                        }
+                    })
+                })
+            }
         },
         mounted(){
             this.loadData()
