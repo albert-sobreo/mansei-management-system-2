@@ -143,6 +143,12 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
 
 
 
+########## QUOTATIONS ##########
+
+
+
+
+
 
 
 ########## PURCHASE REQUEST ##########
@@ -160,6 +166,11 @@ class PurchaseRequestNestedSZ(serializers.ModelSerializer):
         model = PurchaseRequest
         fields = '__all__'
         depth = 1
+
+
+
+
+
 
         
 ########## INWARD INVENTORY ##########
@@ -186,9 +197,12 @@ class InwardInventoryNestedSZ(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+
+
+
+
+
 ########## INWARD INVENTORY ADJUSTED ##########
-
-
 class InwardInventoryAdjustedNestedSZ(serializers.ModelSerializer):
     createdBy = UserSZ(read_only=True)
     approvedBy = UserSZ(read_only=True)
@@ -197,6 +211,11 @@ class InwardInventoryAdjustedNestedSZ(serializers.ModelSerializer):
         model = InwardInventory
         fields = '__all__'
         depth = 1
+
+
+
+
+
 
 ########## SALES CONTRACT ##########
 class SCItemsMerchNestedSZ(serializers.ModelSerializer):
