@@ -1,180 +1,159 @@
 {% extends "base-template.html" %}
-{% block title %}Receiving Report | Approved{% endblock %}
+{% block title %}Sales Order | Approved{% endblock %}
 
 {% block body %}
 
-<div id="app" v-cloak> <!-- #app -->
-    <!-- INSERT NAVIGATION BAR HERE -->
+<div id="app" v-cloak>
     <navbar-gas active="nav-approvals" photo="/media/{{request.user.image}}"></navbar-gas>
     <app-card></app-card>
     <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
-		<!-- END NAVIGATION BAR -->
 
     <!-- MAIN BODY -->
-    <div class="container"> <!-- .container -->
-
-      <!-- NAVIGATION 2 -->
-      <div class="d-flex font-semibold mb-2 justify-content-center">
-        <div class="justify-content-center c-nav-links gas-nav">
-            <a href="/rr-nonapproved/" class="mx-2">Pending</a>
-            <a href="/rr-approved/" class="active-gas mx-2">Approved</a>
+    <div class="container">
+        <!-- MORE NAVS -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/so-nonapproved/" class="mx-2">Pending</a>
+                <a href="/so-approved/" class="active-gas mx-2">Approved</a>
+            </div>
         </div>
-      </div>
-      <!-- END NAVIGATION 2 -->
-
-        <!-- TITLE AND BUTTONS-->        
+        <!-- TITLE AND BUTTONS -->
         <div class="d-flex align-items-center mb-3">
-            <span class="font-size-18 font-bold mr-1">Receiving Report</span>
+            <span class="font-size-18 font-bold mr-1">Sales Order</span>
         </div>
-        <!-- END TITLE AND BUTTONS-->  
 
-        <!-- TABLE *** -->
-        <!-- TABLE *** -->
+        <!-- TABLE -->
+        <!-- <sc-table></sc-table> -->
         <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
             <thead class="thead-dark">
-              <th>RR Code</th>
-              <th>PO Code</th>
-              <th>Amount Due</th>
-              <th>Amount Paid</th>
-              <th>Date Created</th>
-              <th>Created by</th>
+                <th>SC Code</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Date Created</th>
+                <th>Created By</th>
             </thead>
             <tbody>
-                {% for po in purchase %}
+                {% for sale in salesorder %}
                 <tr>
-                    <td class="link" @click="viewPO('{{po.pk}}')" data-toggle="modal" data-target="#rrlistmodal">{{po.code}}</td>
-                    <td>{{po.purchaseOrder.code}}</td>
-                    <td>₱[[roundNumber2({{po.amountDue}})]]</td>
-                    <td>₱[[roundNumber2({{po.amountPaid}})]]</td>
-                    <td>{{po.datetimeCreated}}</td>
-                    <td>{{po.createdBy.first_name}} {{po.createdBy.last_name}}</td>
+                    <td @click="viewSC('{{sale.pk}}')" class="link" data-toggle="modal" data-target="#scModal">{{sale.code}}</td>
+                    <td>{{sale.party.name}}</td>
+                    <td>₱[[roundNumber2({{sale.amountTotal}})]]</td>
+                    <td>{{sale.dateSold}}</td>
+                    <td>{{sale.createdBy.first_name}} {{sale.createdBy.last_name}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <!-- VIEW RR MODAL*** -->
-        <div class="modal fade" id="rrlistmodal">
-        <!-- <div class="modal fade" id="POmodal"> -->
+        <!-- VIEW MODAL -->
+        <div class="modal fade" id="scModal">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content b-radius-15">
                     <div class="modal-body">
-                        <!-- TOP CARD *** -->
+                        <!-- TOP CARD -->
                         <div class="order-card row my-2">
-                            <!-- LVL 1 ***-->
+                            <!-- LVL 1 -->
                             <div class="col-3 mt-3">
-                                <label class="gray">RR Code</label><br>
-                                <span class="font-size-14 font-bold">[[this.poModal.code]]</span>
+                                <label for="" class="gray">Quotation Code</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[orderModal.code]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label class="gray">Status</label><br>
-                                <span class="font-size-14 font-bold approved" v-if="poModal.approved">Approved</span>
+                                <label for="" class="gray">Status</label>
+                                <br>
+                                <span class="font-size-14 font-bold approved" v-if="orderModal.approved">Approved</span>
                                 <span class="font-size-14 font-bold pending" v-else>Pending</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label class="gray">Created By</label><br>
-                                <span class="font-size-14 font-bold" v-if="this.poModal.createdBy!==null">[[this.poModal.createdBy.first_name]] [[this.poModal.createdBy.last_name]]</span>
+                                <label for="" class="gray">Created By</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[orderModal.createdBy.first_name]] [[orderModal.createdBy.last_name]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label class="gray">Date Created</label><br>
-                                <span class="font-size-14 font-bold">[[formatDateTime(this.poModal.datetimeCreated)]]</span>
+                                <label for="" class="gray">Date Created</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[formatDateTime(orderModal.datetimeCreated)]]</span>
                             </div>
-                            
-                            <!-- LVL2 -->
+
+                            <!-- LVL 2 -->
                             <div class="col-3 my-3">
-                                <label class="gray">Vendor</label><br>
-                                <span class="font-size-14 font-bold" v-if="this.poModal.party!==null">[[this.poModal.party.name]]</span>
-                            </div>
-                            <div class="col-3 my-3">
-                                <label class="gray">Purchase Order</label><br>
-                                <span class="font-size-14 font-bold">[[this.poModal.purchaseOrder.code]]</span>
+                                <label class="gray">Customer</label><br>
+                                <span class="font-size-14 font-bold">[[orderModal.party.name]]</span>
                             </div>
                             <div class="col-3 my-3">
-                                <label class="gray">Posted By</label><br>
-                                <span class="font-size-14 font-bold" v-if="this.poModal.approvedBy!==null">[[this.poModal.approvedBy.first_name]] [[this.poModal.approvedBy.last_name]]</span>
+                                <label class="gray">Approved By</label><br>
+                                <span class="font-size-14 font-bold" v-if="this.orderModal.approvedBy!==null">[[orderModal.approvedBy.first_name]] [[orderModal.approvedBy.last_name]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Date Approved</label><br>
-                                <span class="font-size-14 font-bold" v-if="this.poModal.datetimeApproved!==null">[[formatDateTime(this.poModal.datetimeApproved)]]</span>
+                                <span class="font-size-14 font-bold" v-if="this.orderModal.datetimeApproved!==null">[[formatDateTime(orderModal.datetimeApproved)]]</span>
                             </div>
                         </div>
 
-                        <!-- MIDDLE CARD *** -->
+                        <!-- MIDDLE CARD -->
                         <div class="order-card row my-2">
-                            <!-- LVL 1 *** -->
+                            <!-- LVL 1 -->
                             <div class="col-3 mt-3">
-                                <label class="gray">Amount Due</label><br>
-                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountDue)]]</span>
+                                <label for="" class="gray">Amount Due</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(orderModal.amountDue)]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label for="" class="gray">Total Input VAT</label><br>
-                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.taxPeso)]]</span>
+                                <label for="" class="gray">Total Input VAT</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(orderModal.taxPeso)]]</span>
+                            </div>
+                            <div class="col-3 mt-3" v-if="orderModal.discountPeso!==null">
+                                <label for="" class="gray">Discount</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(orderModal.discountPeso)]]</span>
+                            </div>
+                            <div class="col-3 mt-3" v-if="orderModal.discountPercent!==null">
+                                <label for="" class="gray">Discount</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[formatPrice(orderModal.discountPercent)]]%</span>
                             </div>
                             <div class="col-3 mt-3">
+                                <label for="" class="gray">Total Other Fees</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[this.totalOtherFees]]</span>
+                            </div>
+
+                            <!-- LVL 2 -->
+                            <div class="col-3 my-3">
                                 <label class="gray">Total Amount Due</label><br>
-                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountTotal)]]</span>
-                            </div>
-                            <div class="col-3 mt-3">
-                                <label class="gray">Amount Paid</label><br>
-                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountPaid)]]</span>
-                            </div>
-
-                            <!-- LVL 2 ***-->
-                            <div class="col-3 my-3">
-                                <label class="gray">Payment Method</label><br>
-                                <span class="font-size-14 font-bold">[[this.poModal.paymentMethod]]</span>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(orderModal.amountTotal)]]</span>
                             </div>
                             <div class="col-3 my-3">
-                                <label class="gray">Payment Period</label><br>
-                                <span class="font-size-14 font-bold">[[this.poModal.paymentPeriod]]</span>
-                            </div>
-                            <div class="col-3 my-3">
-                                <label class="gray">Cheque No.</label><br>
-                                <span class="font-size-14 font-bold">[[this.poModal.chequeNo]]</span>
-                            </div>
-                            <div class="col-3 my-3">
-                                <label class="gray">Due Date</label><br>
-                                <span class="font-size-14 font-bold">[[this.poModal.dueDate]]</span>
+                                <label class="gray">Remarks</label><br>
+                                <span class="font-size-14 font-bold">[[orderModal.remarks]]</span>
                             </div>
                         </div>
-                        <!-- LOWER CARD ***-->
-                        <div class="order-card row my-2">
-                            <div class="col-3 my-3">
-                                <label class="gray">ATC Code</label><br>
-                                <span v-for="atc in poModal.rratc" class="font-size-14 font-bold">[[atc.code.code]]</span>
-                            </div>
-                            <div class="col-3 my-3">
-                                <label class="gray">Tax Rate</label><br>
-                                <span v-for="atc in poModal.rratc" class="font-size-14 font-bold">[[formatPrice(atc.code.rate*100)]]%</span>
-                            </div>   
-                            <div class="col-3 my-3">
-                                <label class="gray">Amount WIthheld</label><br>
-                                <span v-for="atc in poModal.rratc" class="font-size-14 font-bold">₱[[formatPrice(atc.amountWithheld)]]</span>
-                            </div>   
-                        </div>
 
-                        <!-- PO ITEMS *** -->
+                        <!-- QQ ITEMS -->
                         <div class="row mt-4">
                             <div class="col">
-                                <span class="font-bold">Received PO Items</span>
+                                <span class="font-bold">Quotation Items</span>
                             </div>
                         </div>
                         <div class="row">
                             <table class="table table-sm table-striped">
                                 <thead>
-                                    <th><span class="font-bold gray">Account Type</span></th>
+                                    <th><span class="font-bold gray">Type</span></th>
                                     <th><span class="font-bold gray">Item Code - Item Classifcation</span></th>
                                     <th><span class="font-bold gray">Qty</span></th>
-                                    <th><span class="font-bold gray">Amount</span></th>
+                                    <th><span class="font-bold gray">Vol</span></th>
+                                    <th><span class="font-bold gray">Price Per Cubic</span></th>
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="item in poModal.rritemsmerch">
+                                    <tr v-for="item in orderModal.soitemsmerch">
                                         <td>Merchandise</td>
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.qty]]</td>
-                                        <td>₱[[formatPrice(item.purchasingPrice)]]</td>
-                                        <td>₱[[formatPrice(item.totalPrice)]]</td>
+                                        <td>[[item.vol]]</td>
+                                        <td>₱[[formatPrice(item.pricePerCubic)]]</td>
+                                        <td>₱[[formatPrice(item.totalCost)]]</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -183,19 +162,14 @@
                 </div>
             </div>
         </div>
-        <!-- END RR MODAL -->
-
-        
-
-    </div>  <!-- .container -->
-</div> <!-- #app -->
+        <pre>[[$data]]</pre>
+    </div>
+</div>
 
 {% endblock %}
 
-
-<!-- SCRIPTS -->
 {% block scripts %}
-<!-- SCRIPT FROM PO-LIST . HTML -->
+
 <script>
     $(document).ready(function() {
         $('#table').DataTable({
@@ -258,24 +232,35 @@
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: "#app",
-        data: {
+
+        data:{
             config: {
                 headers: {
                     "X-CSRFToken": getCookie('csrftoken')
                 }
             },
-            poModal: {
+
+            orderModal: {
                 code: null,
-                createdBy: null,
+                createdBy: {
+                    first_name: null,
+                    last_name: null
+                },
                 datetimeCreated: null,
-                party: null,
-                approvedBy: null,
+                party: {
+                    name: null
+                },
+                approvedBy: {
+                    first_name: null,
+                    last_name: null
+                },
                 datetimeApproved: null,
 
-                purchaseOrder: {
-                    code:null
-                },
+                approved: null,
 
+                soitemsmerch: [],
+
+                taxPeso: null,
                 amountDue: null,
                 amountPaid: null,
                 amountTotal: null,
@@ -284,26 +269,38 @@
                 chequeNo: null,
                 dueDate: null,
                 remarks: null,
+                discountPeso: null,
+                discountPercent: null,
 
                 atcCode: null,
                 amountWithheld: null,
 
-                rratc: [{
+                sootherfees: [{
+                    fee: null,
+                }],
+
+                soatc: [{
                     amountWithheld: null,
                     code: {
                         code: null,
                         rate: null
                     }
 
-                }]
+                }],
+                scotherfees: []
             },
             roundToggle: false,
         },
+        computed: {
+            totalOtherFees(){
+                var x = this.orderModal.sootherfees.map(item=>item.fee)
+                return x.reduce((a,b)=>Number(a)+Number(b), 0)
+            }
+        },
         methods: {
-            viewPO(code){
-                console.log(code)
-                axios.get(`/api/receiving-report/${code}/`)
-                .then(res=>this.poModal=res.data)
+            viewSC(code){
+                axios.get(`/api/sales-order/${code}/`)
+                .then(res=>this.orderModal=res.data)
             },
             roundNumber2(value) {
                 if (this.roundToggle){
@@ -362,13 +359,6 @@
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
             },
-            approveRR(id){
-                $("#rrlistmodal").modal('hide')
-
-                axios.put(`/rr-approval/${id}/`, '', this.config)
-                .then(res=>res.data==0?location.reload():'')
-                .catch(res=>console.log(res.response))
-            }
         },
         created(){
             this.$root.$refs.app = this

@@ -243,3 +243,13 @@ class QuotationsAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = QuotationsSZ
     queryset = Quotations.objects.all()
+
+
+
+
+
+########### SALES ORDER ##########
+class SalesOrderAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SalesOrderNestedSZ
+    queryset = SalesOrder.objects.all()

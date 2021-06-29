@@ -246,6 +246,40 @@ class SalesContractNestedSZ(serializers.ModelSerializer):
 
 
 
+
+########## SALES ORDER ##########
+class SOItemsMerchNestedSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = SOItemsMerch
+        fields = '__all__'
+
+class SOatcSZ(serializers.ModelSerializer):
+    code = ATCSZ(read_only=True)
+    class Meta:
+        model = SOatc
+        fields = '__all__'
+
+class SOOtherFeesSZ(serializers.ModelSerializer):
+    class Meta:
+        model = SOOtherFees
+        fields = "__all__"
+
+class SalesOrderNestedSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    createdBy = UserSZ(read_only=True)
+    approvedBy = UserSZ(read_only=True)
+    soitemsmerch = SOItemsMerchNestedSZ(read_only=True, many=True)
+    soatc = SOatcSZ(read_only=True, many=True)
+    sootherfees = SOOtherFeesSZ(read_only=True, many=True)
+
+    class Meta:
+        model = SalesOrder
+        fields = "__all__"
+        depth = 1
+
+
+
     
 ########## SPECIAL TRUCK ##########
 class DriverSZ(serializers.ModelSerializer):

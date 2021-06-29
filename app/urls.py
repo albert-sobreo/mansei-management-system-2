@@ -65,6 +65,9 @@ router.register(r"quotations", views.QuotationsAPI, 'quotations')
 ########### INWARD INVENTORY ###########
 router.register(r"inward-inventory", views.InwardInventoryNestedAPI, 'inward-inventory')
 
+########## SALES ORDER ##########
+router.register(r"sales-order", views.SalesOrderAPI, 'sales-order')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -142,4 +145,7 @@ urlpatterns = [
     path('sales-order/', login_required(views.SalesOrderView.as_view())),
     path('so-list/', login_required(views.SOListView.as_view())),
     path('save-sales-order/', login_required(views.SaveSalesOrder.as_view())),
+    path('so-nonapproved/', login_required(views.SOnonapprovedView.as_view())),
+    path('so-approved/', login_required(views.SOapprovedView.as_view())),
+    path('so-approval/<int:pk>/', login_required(views.SOApprovalAPI.as_view()))
 ]

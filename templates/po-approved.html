@@ -82,7 +82,7 @@
                             </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Purchase Request</label><br>
-                                <span class="font-size-14 font-bold">None</span>
+                                <span class="font-size-14 font-bold" v-if="poModal.purchaseRequest != null">[[this.poModal.purchaseRequest.code]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label class="gray">Approved By</label><br>
@@ -161,7 +161,6 @@
                                     <th><span class="font-bold gray">Item Code - Item Classifcation</span></th>
                                     <th><span class="font-bold gray">Qty</span></th>
                                     <th><span class="font-bold gray">Amount</span></th>
-                                    <th><span class="font-bold gray">Input VAT</span></th>
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
@@ -170,7 +169,6 @@
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.qty]]</td>
                                         <td>₱[[formatPrice(item.purchasingPrice)]]</td>
-                                        <td>[[formatPrice(item.inputVat)]]%</td>
                                         <td>₱[[formatPrice(item.totalPrice)]]</td>
                                     </tr>
                                 </tbody>

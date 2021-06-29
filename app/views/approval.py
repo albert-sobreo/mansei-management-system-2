@@ -439,9 +439,9 @@ class SOApprovalAPI(APIView):
         salesOrder.save()
 
         for element in salesOrder.soitemsmerch.all():
-            element.merchInventory.qtyA -= element.qty
+            element.merchInventory.qtyT -= element.qty
             element.merchInventory.qtyR += element.qty
-            element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
+            element.merchInventory.qtyA = element.merchInventory.qtyT - element.merchInventory.qtyR
             element.merchInventory.save()
 
         salesOrder.save()

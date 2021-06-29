@@ -248,7 +248,7 @@ class SalesOrderView(View):
     def get(self, request, format=None):
         
         try:
-            so = request.user.branch.quotations.latest('pk')
+            so = request.user.branch.salesOrder.latest('pk')
 
             listed_code = so.code.split('-')
             listed_date = str(now.today()).split('-')
