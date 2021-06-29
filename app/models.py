@@ -499,9 +499,6 @@ class SalesOrder(models.Model):
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "soApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default = False)
-    journal = models.ForeignKey(Journal, related_name="salesorder", on_delete=models.PROTECT, null=True, blank=True)
-    fullyPaid = models.BooleanField(null = True, default = False)
-    runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     
 class SOItemsMerch(models.Model):
     salesOrder = models.ForeignKey(SalesOrder, related_name="soitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
