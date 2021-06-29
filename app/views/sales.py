@@ -208,13 +208,16 @@ class SaveQuotations(APIView):
         for item in quotes['items']:
             qqitemsmerch = QQItemsMerch()
             qqitemsmerch.quotations = qq
-            qqitemsmerch.amount = item['pricePerCubic']
+            qqitemsmerch.pricePerCubic = item['pricePerCubic']
             qqitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
             qqitemsmerch.remaining = item['remaining']
             qqitemsmerch.qty = item['quantity']
-            qqitemsmerch.amountTotal = Decimal(item['totalCost'])
+            qqitemsmerch.totalCost = Decimal(item['totalCost'])
+            qqitemsmerch.cbm = item['cbm']
+            qqitemsmerch.vol = item['vol']
 
-            print(qqitemsmerch.amountTotal)
+
+            print(qqitemsmerch.totalCost)
             
             qqitemsmerch.save()
             request.user.branch.qqitemsMerch.add(qqitemsmerch)
