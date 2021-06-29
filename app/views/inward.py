@@ -101,8 +101,6 @@ class ImportInwardInventory(View):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return redirect('/inward-inventory/')
 
-<<<<<<< HEAD
-=======
 class InwardAdjustmentSave(APIView):
     def post(self, request, pk, format=None):
         inward = request.data
@@ -135,4 +133,3 @@ class InwardAdjustmentSave(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
->>>>>>> f7a9d5a71a0f985fb61bf9a2bf81f7fda8f5f677
