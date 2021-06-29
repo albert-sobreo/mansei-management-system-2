@@ -713,6 +713,15 @@
                 .then(res=>{
                     console.log(res.data)
                     var pr = res.data
+                    this.purchaseOrder.items = [{
+                        type: '',
+                        code: '',
+                        remaining: null,
+                        quantity: null,
+                        vatable: 0.00,
+                        inputVAT: 0,
+                        totalCost: null
+                    }]
                     pr.pritemsmerch.forEach((item, index)=>{
                         console.log(item.merchInventory.id)
                         var invObject = this.merchandiseInventory.find(x=>x.id==item.merchInventory.id)

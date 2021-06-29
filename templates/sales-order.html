@@ -780,9 +780,10 @@
                     type: '',
                     code: '',
                     remaining: null,
-                    quantity: null,
-                    vatable: 0.00,
-                    inputVAT: 0,
+                    quantity: 0,
+                    cbm: 'm3',
+                    vol: null,
+                    pricePerCubic: 0.00,
                     totalCost: null
                 })
             },
@@ -861,7 +862,17 @@
                     item = res.data
                     this.order.customer = item.party.id
                     this.order.taxType = item.taxType
-                    this.order.taxRate = item.taxRate
+                    this.order.taxRate = Number(item.taxRate).toFixed(0)
+                    this.order.items = [{
+                        type: '',
+                        code: '',
+                        remaining: null,
+                        quantity: 0,
+                        cbm: 'm3',
+                        vol: null,
+                        pricePerCubic: 0.00,
+                        totalCost: null
+                    }]
                     item.qqitemsmerch.forEach((el,index)=>{
                         if (index==0){
                             this.order.items[index].type = el.type = 'Merchandise'
@@ -894,6 +905,9 @@
                     })
                     this.order.taxPeso = item.taxPeso
                     this.order.withholdingTax = item.wep
+                    this.order.remarks = item.remakrs
+                    this.order.amountDue = item.amountDue
+                    this.order.amountTotal = item.amountTotal
                 })
             }
         },

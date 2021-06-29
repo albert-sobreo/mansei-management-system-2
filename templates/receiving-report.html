@@ -622,12 +622,12 @@
 
             addLine(){
                 this.purchaseOrder.items.push({
+                    poID: null,
                     type: '',
                     code: '',
                     remaining: null,
                     quantity: null,
                     vatable: 0.00,
-                    inputVAT: 0,
                     totalCost: null
                 })
             },
@@ -681,6 +681,15 @@
 					this.purchaseOrder.vendor = po.party.id
 					this.purchaseOrder.taxType = po.taxType
 					this.purchaseOrder.taxRate = Number(po.taxRate).toFixed(0)
+					this.purchaseOrder.items = [{
+						poID: null,
+						type: '',
+						code: '',
+						remaining: null,
+						quantity: null,
+						vatable: 0.00,
+						totalCost: null
+					}]
 					po.poitemsmerch.forEach((item, index)=>{
 						if(index==0){
 							this.purchaseOrder.items[0].poID = item.id
@@ -694,7 +703,7 @@
 							this.purchaseOrder.items.push({
 								poID: item.id,
 								type: 'Merchandise',
-                    			code: item.merchandiseInventory.id,
+                    			code: item.merchInventory.id,
                     			remaining: item.remaining,
                     			quantity: item.qty - item.qtyReceived,
                     			vatable: item.purchasingPrice,
