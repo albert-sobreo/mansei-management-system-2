@@ -79,6 +79,7 @@ class SaveSalesContract(APIView):
         sc.dueDate = salesContract['dueDate']
         sc.bank = salesContract['bank']
         sc.remarks = salesContract['remarks']
+        sc.wep = Decimal(salesContract['withholdingTax'])
 
         if request.user.is_authenticated:
             sc.createdBy = request.user
@@ -183,6 +184,7 @@ class SaveQuotations(APIView):
         qq.taxType = quotes['taxType']
         qq.taxRate = Decimal(quotes['taxRate'])
         qq.taxPeso = Decimal(quotes['taxPeso'])
+        qq.wep = Decimal(quotes['withholdingTax'])
 
         if request.user.is_authenticated:
             qq.createdBy = request.user

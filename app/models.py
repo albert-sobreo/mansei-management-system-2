@@ -291,6 +291,7 @@ class PurchaseOrder(models.Model):
     fullyPaid = models.BooleanField(null = True, blank = True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     fullyReceived = models.BooleanField(default=False)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     
     class Meta:
         verbose_name = "Purchase Order"
@@ -348,6 +349,7 @@ class ReceivingReport(models.Model):
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     qtyReceived = models.IntegerField(null = True, blank = True)
     fullyReceived = models.BooleanField(null = True, blank = True)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
     class Meta:
         verbose_name = "Receiving Report"
@@ -438,9 +440,11 @@ class Quotations(models.Model):
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "qCreatedBy")
+    remarks = models.TextField(null = True, blank=True)
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "qApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(default=False)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
     class Meta:
         verbose_name = "Quotation"
@@ -501,6 +505,7 @@ class SalesOrder(models.Model):
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "soApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default = False)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
     class Meta:
         verbose_name = "Sales Order"

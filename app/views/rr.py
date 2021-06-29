@@ -85,6 +85,7 @@ class SaveReceivingReport(APIView):
         rr.bank = receivingReport['bank']
         rr.remarks = receivingReport['remarks']
         rr.purchaseOrder = PurchaseOrder.objects.get(pk=receivingReport['po'])
+        rr.wep = Decimal(receivingReport['withholdingTax'])
         rr.purchaseOrder.save()
         
         if request.user.is_authenticated:
