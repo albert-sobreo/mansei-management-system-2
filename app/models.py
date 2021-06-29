@@ -5,6 +5,7 @@ from django.contrib.auth.hashers import (
 )
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.aggregates import Min
+from django.db.models.deletion import PROTECT
 
 #CHOICES
 parties = [
@@ -474,12 +475,62 @@ class QQatc(models.Model):
     code = models.ForeignKey(ATC, related_name="qqatc",on_delete=models.PROTECT, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
 
+class SalesOrder(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    dateSold = models.DateField()
+    party = models.ForeignKey(Party, related_name="salesorder", on_delete=models.PROTECT, null=True, blank=True)
+    quotations = models.ForeignKey(Quotations, related_name = "salesorder", on_delete = models.PROTECT, null = True, blank = True)
+    amountPaid = models.DecimalField(max_digits=18, decimal_places=5, null = True)
+    amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)
+    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    taxType = models.CharField(max_length=20, null = True, blank = True)
+    taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
+    paymentMethod = models.CharField(max_length=50)
+    paymentPeriod = models.CharField(max_length=50)
+    chequeNo = models.CharField(max_length=50, null=True, blank=True)
+    dueDate = models.DateField(null = True, blank = True)
+    bank = models.CharField(max_length=50, null = True, blank = True)
+    remarks = models.TextField(null = True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "soCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "soApprovedBy")
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    approved = models.BooleanField(null = True, default = False)
+    journal = models.ForeignKey(Journal, related_name="salesorder", on_delete=models.PROTECT, null=True, blank=True)
+    fullyPaid = models.BooleanField(null = True, default = False)
+    runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    
+class SOItemsMerch(models.Model):
+    salesOrder = models.ForeignKey(SalesOrder, related_name="soitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="soitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.IntegerField()
+    cbm = models.CharField(max_length=10, null = True)
+    vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    delivered = models.BooleanField(null = True, default = False)
+
+class SOOtherFees(models.Model):
+    salesOrder = models.ForeignKey(SalesOrder, related_name="sootherfees", on_delete=models.PROTECT, null=True, blank=True)
+    fee = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
+    description = models.CharField(max_length=255, null = True)
+
+class SOatc(models.Model):
+    salesOrder = models.ForeignKey(SalesOrder, related_name="soatc", on_delete=models.PROTECT, null=True, blank=True)
+    code = models.ForeignKey(ATC, related_name="soatc",on_delete=models.PROTECT, null=True, blank=True)
+    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+
+
 class SalesContract(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     dateSold = models.DateField()
     party = models.ForeignKey(Party, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
-    #salesOrder = models.IntegerField()
+    salesOrder = models.ForeignKey(SalesOrder, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
     amountPaid = models.DecimalField(max_digits=18, decimal_places=5, null = True)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
@@ -705,6 +756,12 @@ class Branch(models.Model):
     qqitemsMerch = models.ManyToManyField(QQItemsMerch, blank = True)
     qqOtherFees = models.ManyToManyField(QQCOtherFees, blank = True)
     qqatc = models.ManyToManyField(QQatc, blank = True)
+
+    ##### SALES ORDER #####
+    salesOrder = models.ManyToManyField(SalesOrder, blank = True)
+    soitemsMerch = models.ManyToManyField(SOItemsMerch, blank = True)
+    soOtherFees = models.ManyToManyField(SOOtherFees, blank = True)
+    soatc = models.ManyToManyField(SOatc, blank = True)
 
     ##### SALES CONTRACT #####
     salesContract = models.ManyToManyField(SalesContract, blank = True)
