@@ -138,5 +138,6 @@ urlpatterns = [
     path('ii-nonapproved/', login_required(views.IInonapprovedView.as_view())),
     path('ii-approved/', login_required(views.IIapprovedView.as_view())),
     path('save-inward-inventory/<int:pk>/', login_required(views.InwardAdjustmentSave.as_view())),
-    path('ii-approval/<int:pk>/', login_required(views.IIApprovalAPI.as_view()))
+    path('ii-approval/<int:pk>/', login_required(views.IIApprovalAPI.as_view())),
+    path('sales-order/', login_required(views.SalesOrderView.as_view()))
 ]

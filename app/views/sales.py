@@ -228,3 +228,17 @@ class SaveQuotations(APIView):
             request.user.branch.qqOtherFees.add(f)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+
+
+
+
+
+
+
+
+
+########## SALES ORDER ##########
+class SalesOrderView(View):
+    def get(self, request, format=None):
+        return render(request, 'sales-order.html')
