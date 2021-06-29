@@ -28,14 +28,16 @@
         <div class="row">
             <div class="col col-3 pr-2">
                 <label for="">Reference No.</label>
-                <select name="" id="" class="form-control">
+                <select @change="getII(order.code)" v-model="order.code" class="form-control">
                     <option value="" selected disabled>Select an Inward Inventory</option>
-                    <option value="0">0</option>
+                    {% for item in ii %}
+                    <option value="{{item.pk}}">{{item.code}}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="col col-2 pl-2">
                 <label>Date</label>
-                <input type="date" class="form-control">
+                <input v-model="order.date" type="date" class="form-control">
             </div>
         </div>
     </div>
@@ -86,40 +88,40 @@
             <div class="col-12 px-5">
                 <div class="row font-semibold">
                     <div class="col px-1 ">
-                        <span>w001</span>
+                        <span>[[item.code]]</span>
                     </div>
                     <div class="col px-1 ">
-                        <span></span>
+                        <span>[[item.name]]</span>
                     </div>
                     <div class="col px-1 ">
-                        <span></span>
+                        <span>[[item.classification]]</span>
                     </div>
                     <div class="col-1 px-1 ">
-                        <span></span>
+                        <span>[[item.type]]</span>
                     </div>
                     <div class="col-1 px-1 ">
-                        <span>2000mm</span>
+                        <span>[[formatPrice(item.length)]]mm</span>
                     </div>
                     <div class="col-1 px-1 ">
-                        <span>2000mm</span>
+                        <span>[[formatPrice(item.width)]]mm</span>
                     </div>
                     <div class="col-1 px-1 ">
-                        <span>100mm</span>
+                        <span>[[formatPrice(item.thickness)]]mm</span>
                     </div>
                     <div class="col-1 px-1">
-                        <span>.40000m³</span>
+                        <span>[[item.vol]]m³</span>
                     </div>
                     <div class="col-1 px-1 ">
-                        <span>5</span>
+                        <span>[[item.qty]]</span>
                     </div>
                     <div class="col-1 px-1 ">
-                        <span></span>
+                        <span>[[item.pricePerCubic]]</span>
                     </div>
                     <div class="col px-1 ">
-                        <span>₱200.00</span>
+                        <span>₱[[formatPrice(item.amount)]]</span>
                     </div>
                     <div class="col px-1 ">
-                        <span>₱2,000.00</span>
+                        <span>₱[[formatPrice(item.amountTotal)]]</span>
                     </div>
                     <i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
                 </div>
@@ -127,55 +129,40 @@
             <div class="col-12 px-5" v-for="(item1, index1) in item.adjusted">
                 <div class="row">
                     <div class="col px-1">
-                        <input type="text" class="form-control" placeholder="Barcode">
+                        <input v-model="item1.code" type="text" class="form-control" placeholder="Barcode">
                     </div>
                     <div class="col px-1">
-                        <input type="text" class="form-control" placeholder="Item Name">
+                        <input v-model="item1.name" type="text" class="form-control" placeholder="Item Name">
                     </div>
                     <div class="col px-1">
-                        <input type="text" class="form-control" placeholder="Item Class">
+                        <input v-model="item1.classification" type="text" class="form-control" placeholder="Item Class">
                     </div>
                     <div class="col-1 px-1">
-                        <input type="text" class="form-control" placeholder="Item Type">
+                        <input v-model="item1.type" type="text" class="form-control" placeholder="Item Type">
                     </div>
                     <div class="col-1 px-1">
-                        <input type="text" class="form-control" placeholder="Length" onkeypress="validate()">
+                        <input @change="solveVol(index, index1)" v-model="item1.length" type="text" class="form-control" placeholder="Length" onkeypress="validate()">
                     </div>
                     <div class="col-1 px-1">
-                        <input type="text" class="form-control" placeholder="Width" onkeypress="validate()">
+                        <input @change="solveVol(index, index1)" v-model="item1.width" type="text" class="form-control" placeholder="Width" onkeypress="validate()">
                     </div>
                     <div class="col-1 px-1">
-                        <input type="text" class="form-control" placeholder="Thickness" onkeypress="validate()">
+                        <input @change="solveVol(index, index1)" v-model="item1.thickness" type="text" class="form-control" placeholder="Thickness" onkeypress="validate()">
                     </div>
                     <div class="col-1 px-1">
-                        <input type="text" class="form-control" placeholder="Vol" onkeypress="validate()">
+                        <input v-model="item1.vol" type="text" class="form-control" placeholder="Vol" onkeypress="validate()">
                     </div>
                     <div class="col-1 px-1">
-                        <input type="text" class="form-control" placeholder="Qty" onkeypress="validate()">
+                        <input @change="solveAmountTotal(index, index1)" v-model="item1.qty" type="text" class="form-control" placeholder="Qty" onkeypress="validate()">
                     </div>
                     <div class="col px-1">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">₱</span>
-                            </div>
-                            <input type="text" class="form-control box-shadow-off" placeholder="Price per m³" onkeypress="validate()">
-                        </div>
+                        <input v-model="item1.pricePerCubic" type="text" class="form-control" placeholder="Price per m³" onkeypress="validate()">
                     </div>
                     <div class="col px-1">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">₱</span>
-                            </div>
-                            <input type="text" class="form-control box-shadow-off" placeholder="Amount" onkeypress="validate()">
-                        </div>
+                        <input @change="solveAmountTotal(index, index1)" v-model="item1.amount" type="text" class="form-control" placeholder="Amount" onkeypress="validate()">
                     </div>
                     <div class="col px-1">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">₱</span>
-                            </div>
-                            <input type="text" class="form-control box-shadow-off" placeholder="Total Amount" onkeypress="validate()" readonly>
-                        </div>
+                        <input :value="formatPrice(item1.amountTotal)" type="text" class="form-control" placeholder="Total Amount" onkeypress="validate()" readonly>
                     </div>
                     <i @click="removeAdjustments(index, index1)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
                 </div>
@@ -195,14 +182,15 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">₱</span>
                     </div>
-                    <input type="text" class="form-control box-shadow-off" placeholder="Total Amount" onkeypress="validate()" readonly>
+                    <input v-model="order.amountTotal" type="text" class="form-control box-shadow-off" placeholder="Total Amount" onkeypress="validate()" readonly>
                 </div>
             </div>
         </div>
     </div>
-    <div @click="checkForm()" class="mx-5 border container-extend btn-bottom">
+    <div @click="checkForm(order.code)" class="mx-5 border container-extend btn-bottom">
         REQUEST FOR APPROVAL
     </div>
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -215,14 +203,17 @@
         el: "#app",
 
         data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
             order: {
-                code: null,
-                date: null,
+                code: '',
+                date: new Date().toISOString().split('T')[0],
+                amountTotal: null,
                 items: [{
                     code: null,
-                    name: null,
-                    classification: null,
-                    type: null,
                     length: null,
                     width: null,
                     thickness: null,
@@ -240,31 +231,219 @@
                         thickness: null,
                         vol: null,
                         qty: null,
+                        pricePerCubic: null,
                         amount: null,
                         amountTotal: null,
                     }]
                 }]
+            },
+            errors: []
+        },
+        computed:{
+            amountTotal(){
+                var x = this.order.items.map(item=>item.adjusted)
+                return x.map(item=>item.amountTotal)
+            }
+        },
+
+        watch: {
+            amountTotal(){
+                console.log(this.amountTotal)
+                this.order.amountTotal = this.amountTotal.reduce((a,b)=>Number(a)+Number(b),0)
             }
         },
 
         methods: {
+            solveVol(index, index1){
+                var l = Number(this.order.items[index].adjusted[index1].length)/1000
+                var w = Number(this.order.items[index].adjusted[index1].width)/1000
+                var t = Number(this.order.items[index].adjusted[index1].thickness)/1000
+                this.order.items[index].adjusted[index1].vol = l*w*t
+            },
+
+            solveAmountTotal(index, index1){
+                var qty = this.order.items[index].adjusted[index1].qty
+                var amount = this.order.items[index].adjusted[index1].amount
+
+                this.order.items[index].adjusted[index1].amountTotal = qty*amount
+            },
             addAdjustments(index){
                 this.order.items[index].adjusted.push({
-                    code: null,
-                        name: null,
-                        classification: null,
-                        type: null,
-                        length: null,
-                        width: null,
-                        thickness: null,
-                        vol: null,
-                        qty: null,
-                        amount: null,
-                        amountTotal: null,
+                    code: this.order.items[index].code,
+                    name: null,
+                    classification: null,
+                    type: null,
+                    length: this.order.items[index].length,
+                    width: this.order.items[index].width,
+                    thickness: this.order.items[index].thickness,
+                    vol: this.order.items[index].vol,
+                    qty: null,
+                    pricePerCubic: null,
+                    amount: this.order.items[index].amount,
+                    amountTotal: this.order.items[index].amountTotal,
                 })
             },
             removeAdjustments(index, index1){
                 this.$delete(this.order.items[index].adjusted, index)
+            },
+
+            submit(id){
+                axios.post(`/save-inward-inventory/${id}`, this.order, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                console.log(id)
+            },
+
+            checkForm(id){
+                success = []
+                loop = 0
+                for(var item of this.order.items){
+                    for(var item1 of item.adjusted){
+                        if(
+                            item1.code &&
+                            item1.name &&
+                            item1.classification &&
+                            item1.type &&
+                            item1.length &&
+                            item1.width &&
+                            item1.thickness &&
+                            item1.vol &&
+                            item1.qty &&
+                            item1.amount &&
+                            item1.amountTotal
+                        ){
+                            success.push(1)
+                        } else {
+                            success.push(0)
+                            break
+                        }
+                    }
+
+                    if(success.includes(0)){
+                        break  
+                    }
+                    loop++
+                }
+
+                if(!success.includes(0)){
+                    this.submit(id)
+                    return
+                }
+
+                this.errors = []
+                this.order.items.forEach((item,index)=>{
+                    item.adjusted.forEach((item1,index1)=>{
+                        if(!item1.code){
+                            this.errors.push('Barcode Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                        if(!item1.name){
+                            this.errors.push('Name Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                        if(!item1.classification){
+                            this.errors.push('Classification Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                        if(!item1.type){
+                            this.errors.push('Type Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                        if(!item1.length){
+                            this.errors.push('Length Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                        if(!item1.width){
+                            this.errors.push('Width Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                        if(!item1.thickness){
+                            this.errors.push('Thickness Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                        if(!item1.vol){
+                            this.errors.push('Vol Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                        if(!item1.qty){
+                            this.errors.push('Qty Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                        if(!item1.amount){
+                            this.errors.push('Amount Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                        if(!item1.amountTotal){
+                            this.errors.push('Amount Total Required at index: ' + String(index+1) + "-" + String(index1+1))
+                        }
+                    })
+                })
+
+                Swal.fire({
+                    title: "Unfilled Inputs",
+                    html: this.errors.join('<br>'),
+                    icon: 'warning'
+                })
+            },
+            
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+            getII(id){
+                axios.get(`/api/inward-inventory/${id}`)
+                .then(res=>{
+                    console.log(res.data)
+                    var iiitemsmerch = res.data.iiitemsmerch
+                    console.log(iiitemsmerch)
+                    
+                    iiitemsmerch.forEach((item,index)=>{
+                        if(index==0){
+                            this.order.items[index].id = item.id
+                            this.order.items[index].code = item.code
+                            this.order.items[index].length = item.length
+                            this.order.items[index].width = item.width
+                            this.order.items[index].thickness = item.thicc
+                            this.order.items[index].vol = item.vol
+                            this.order.items[index].qty = item.qty
+                            this.order.items[index].amount = item.amount
+                            this.order.items[index].amountTotal = item.totalCost
+                            this.order.items[index].adjusted = [{
+                                code: item.code,
+                                name: null,
+                                classification: null,
+                                type: null,
+                                length: item.length,
+                                width: item.width,
+                                thickness: item.thicc,
+                                vol: item.vol,
+                                qty: null,
+                                pricePerCubic: null,
+                                amount: item.amount,
+                                amountTotal: item.totalCost,
+                            }]
+                        } else {
+                            this.order.items.push({
+                                id: item.id,
+                                code: item.code,
+                                length: item.length,
+                                width: item.width,
+                                thickness: item.thicc,
+                                vol: item.vol,
+                                qty: item.qty,
+                                amount: item.amount,
+                                amountTotal: item.totalCost,
+                                adjusted: [{
+                                    code: item.code,
+                                    name: null,
+                                    classification: null,
+                                    type: null,
+                                    length: item.length,
+                                    width: item.width,
+                                    thickness: item.thicc,
+                                    vol: item.vol,
+                                    qty: null,
+                                    pricePerCubic: null,
+                                    amount: item.amount,
+                                    amountTotal: item.totalCost,
+                                }]
+                            })
+                        }
+                    })
+                })
             }
         }
     })

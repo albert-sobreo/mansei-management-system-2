@@ -26,7 +26,10 @@ class InwardView(View):
 
 class InwardAdjustmentsView(View):
     def get(self, request, format=None):
-        return render(request, 'inward-adjustment.html')
+        context = {
+            'ii': request.user.branch.inwardInventory.filter()
+        }
+        return render(request, 'inward-adjustment.html', context)
 
 class ImportInwardInventory(View):
     def post(self, request, format= None):
@@ -98,3 +101,38 @@ class ImportInwardInventory(View):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return redirect('/inward-inventory/')
 
+<<<<<<< HEAD
+=======
+class InwardAdjustmentSave(APIView):
+    def post(self, request, pk, format=None):
+        inward = request.data
+        
+        for item in inward['items']:
+            for item1 in item['adjusted']:
+                print(item1)
+                adjusted = IIAdjustedItems()
+                adjusted.inwardInventory = InwardInventory.objects.get(pk=pk)
+                adjusted.iiItemsMerch = IIItemsMerch.objects.get(pk=item['id'])
+                adjusted.code = item1['code']
+                adjusted.name = item1['name']
+                adjusted.classfication = item1['classification']
+                adjusted.type = item1['type']
+                adjusted.length = item1['length']
+                adjusted.width = item1['width']
+                adjusted.thicc = item1['thickness']
+                adjusted.vol = item1['vol']
+                adjusted.qty = item1['qty']
+                adjusted.amount = item1['amount']
+                adjusted.totalCost = item1['amountTotal']
+                adjusted.pricePerCubic = item1['pricePerCubic']
+                adjusted.save()
+                request.user.branch.iiAdjustedItems.add(adjusted)
+        
+        inwardInventory = InwardInventory.objects.get(pk=pk)
+        inwardInventory.adjusted = True
+        inwardInventory.amountTotal = inward['amountTotal']
+        inwardInventory.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+>>>>>>> f7a9d5a71a0f985fb61bf9a2bf81f7fda8f5f677
