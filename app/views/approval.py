@@ -315,7 +315,7 @@ class RRApprovalAPI(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
-################# QUOTATIONS #################
+################# INWARD INVENTORY #################
 class IIapprovedView(View):
     def get(self, request, format=None):
 
@@ -409,7 +409,45 @@ class QQApprovalAPI(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+################# SALES ORDER #################
+class SOapprovedView(View):
+    def get(self, request, format=None):
 
+        user = request.user
+        context = {
+            'salesorder': user.branch.salesOrder.filter(approved=True),
+        }
+        return render(request, 'so-approved.html', context)
+
+class SOnonapprovedView(View):
+    def get(self, request, format=None):
+
+        user = request.user
+        context = {
+            'salesorder': user.branch.salesOrder.filter(approved=False),
+        }
+        return render(request, 'so-nonapproved.html', context)
+
+class SOApprovalAPI(APIView):
+    def put(self, request, pk, format = None):
+
+        salesOrder = SalesOrder.objects.get(pk=pk)
+
+        salesOrder.datetimeApproved = datetime.now()
+        salesOrder.approved = True
+        salesOrder.approvedBy = request.user
+        salesOrder.save()
+
+        for element in salesOrder.soitemsmerch.all():
+            element.merchInventory.qtyA -= element.qty
+            element.merchInventory.qtyR += element.qty
+            element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
+            element.merchInventory.save()
+
+        salesOrder.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
 
 ################# SALES #################
 
