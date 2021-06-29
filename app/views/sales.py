@@ -282,7 +282,7 @@ class SaveSalesOrder(APIView):
         so = SalesOrder()
 
         so.code = salesOrder['code']
-        so.datetimeCreated = salesOrder['datatimeCreated']
+        so.datetimeCreated = salesOrder['dateTimeCreated']
         
         if salesOrder['retroactive']:
             so.dateSold = salesOrder['retroactive']
@@ -298,7 +298,7 @@ class SaveSalesOrder(APIView):
         so.taxRate = Decimal(salesOrder['taxRate'])
         so.taxPeso = Decimal(salesOrder['taxPeso'])
         so.paymentMethod = salesOrder['paymentMethod']
-        so.paymentPeriod = salesOrder['paymenntPeriod']
+        so.paymentPeriod = salesOrder['paymentPeriod']
         so.chequeNo = salesOrder['chequeNo']
         so.dueDate = salesOrder['dueDate']
         so.bank = salesOrder['bank']
@@ -315,14 +315,14 @@ class SaveSalesOrder(APIView):
         so.save()
         request.user.branch.salesOrder.add(so)
 
-        atc = SOatc
-
         for jsonatc in salesOrder['atc']:
+
+            atc = SOatc()
             print(jsonatc)
             atc.code = ATC.objects.get(pk=jsonatc['code'])
             atc.amountWithheld = jsonatc['amountWithheld']
             atc.salesOrder = so
-            atc.save
+            atc.save()
             request.user.branch.soatc.add(atc)
 
         for item in salesOrder['items']:
@@ -342,7 +342,7 @@ class SaveSalesOrder(APIView):
             request.user.branch.soitemsMerch.add(soitemsmerch)
 
         for fee in salesOrder['otherFees']:
-            f = SOOtherFees
+            f = SOOtherFees()
             f.salesOrder = so
             f.fee = fee['fee']
             f.description = fee['description']

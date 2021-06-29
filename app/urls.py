@@ -141,5 +141,5 @@ urlpatterns = [
     path('ii-approval/<int:pk>/', login_required(views.IIApprovalAPI.as_view())),
     path('sales-order/', login_required(views.SalesOrderView.as_view())),
     path('so-list/', login_required(views.SOListView.as_view())),
-    path('save-salesorder/', login_required(views.SaveSalesOrder.as_view())),
+    path('save-sales-order/', login_required(views.SaveSalesOrder.as_view())),
 ]
