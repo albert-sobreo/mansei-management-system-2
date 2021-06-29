@@ -97,3 +97,4 @@ class ImportInwardInventory(View):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return redirect('/inward-inventory/')
+
