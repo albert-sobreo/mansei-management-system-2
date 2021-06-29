@@ -857,6 +857,7 @@
                 console.log(id)
                 axios.get(`/api/quotations/${id}`)
                 .then(res=>{
+                    console.log(res.data)
                     item = res.data
                     this.order.customer = item.party.id
                     this.order.taxType = item.taxType
@@ -866,8 +867,29 @@
                             this.order.items[index].type = el.type = 'Merchandise'
                             this.order.items[index].code = el.merchInventory.id
                             this.order.items[index].remaining = el.merchInventory.qtyA
-                            this.order.items[index].quantity = el.qtyA
+                            this.order.items[index].quantity = el.qty
                             this.order.items[index].vol = el.merchInventory.vol
+                            this.order.items[index].pricePerCubic = el.pricePerCubic
+                            this.order.items[index].totalCost = el.totalCost
+                        } else {
+                            this.order.items.push({
+                                type: 'Merchandise',
+                                code: el.merchInventory.id,
+                                remaining: el.merchInventory.qtyA,
+                                quantity: el.qty,
+                                vol: el.merchInventory.vol,
+                                pricePerCubic: el.pricePerCubic,
+                                totalCost: el.totalCost,
+                                cbm: 'm3',
+                            })
+                        }
+                    })
+                    item.qqatc.forEach((el, index)=>{
+                        if (index==0){
+                            this.order.atc[0].code = el.code.id
+                            this.order.atc[0].amount = item.amountDue
+                            this.order.atc[0].taxRate = (el.code.rate*100)
+                            this.order.atc[0].amountWithheld = el.amountWithheld
                         }
                     })
                 })

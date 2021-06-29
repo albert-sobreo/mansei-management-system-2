@@ -455,8 +455,10 @@ class QQItemsMerch(models.Model):
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="qqitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
-    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True)
-    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    cbm = models.CharField(max_length=10, null = True)
+    vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    totalCost = models.DecimalField(max_digits=18, decimal_places=5)
 
     class Meta:
         verbose_name = 'QQ Items Merch'
@@ -499,6 +501,14 @@ class SalesOrder(models.Model):
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "soApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default = False)
+
+    class Meta:
+        verbose_name = "Sales Order"
+        verbose_name_plural = "Sales Orders"
+
+    def __str__(self):
+        return self.code
+
     
 class SOItemsMerch(models.Model):
     salesOrder = models.ForeignKey(SalesOrder, related_name="soitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
@@ -510,6 +520,13 @@ class SOItemsMerch(models.Model):
     pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null = True)
     totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
     delivered = models.BooleanField(null = True, default = False)
+
+    class Meta:
+        verbose_name = 'SO Items Merch'
+        verbose_name_plural = "SO Items Merchs"
+
+    def __str__(self):
+        return self.salesOrder.code + " - " + self.merchInventory.code
 
 class SOOtherFees(models.Model):
     salesOrder = models.ForeignKey(SalesOrder, related_name="sootherfees", on_delete=models.PROTECT, null=True, blank=True)
@@ -549,6 +566,7 @@ class SalesContract(models.Model):
     journal = models.ForeignKey(Journal, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     
 
     class Meta:
