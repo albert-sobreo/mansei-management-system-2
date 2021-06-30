@@ -803,7 +803,23 @@ class Branch(models.Model):
     iiItemsMerch = models.ManyToManyField(IIItemsMerch, blank=True)
     iiAdjustedItems = models.ManyToManyField(IIAdjustedItems, blank=True)
 
-    
-
     def __str__(self):
         return self.name
+
+class BranchProfile(models.Model):
+    branch = models.ForeignKey(Branch, related_name='branchprofile', on_delete=models.PROTECT)
+
+class BranchDefaultChildAccount(models.Model):
+    ##### CASH AND CASH EQUIVALENTS #####
+    cashOnHand = models.ForeignKey(AccountChild, related_name='branchcashonhand', on_delete=models.PROTECT, blank=True, null=True)
+    cashInBank = models.ManyToManyField(AccountChild, related_name='branchcashinbank', blank=True)
+    pettyCash = models.ForeignKey(AccountChild, related_name='branchpettycash', on_delete=models.PROTECT, blank=True, null=True)
+    merchInventory = models.ForeignKey(AccountChild, related_name='branchmerchinventory', on_delete=models.PROTECT, blank=True, null=True)
+    manuInventory = models.ForeignKey(AccountChild, related_name='branchmanuinventory', on_delete=models.PROTECT, blank=True, null=True)
+    ppeProperty = models.ForeignKey(AccountChild, related_name='branchppeproperty', on_delete=models.PROTECT, blank=True, null=True)
+    ppePlant = models.ForeignKey(AccountChild, related_name='branchppeplant', on_delete=models.PROTECT, blank=True, null=True)
+    ppeEquipment = models.ForeignKey(AccountChild, related_name='branchppeequipment', on_delete=models.PROTECT, blank=True, null=True)
+    inputVat = models.ForeignKey(AccountChild, related_name='branchinputvat', on_delete=models.PROTECT, blank=True, null=True)
+    outputVat = models.ForeignKey(AccountChild, related_name="branchoutputvat", on_delete=models.PROTECT, blank=True, null=True)
+    ewp = models.ForeignKey(AccountChild, related_name='branchewp', on_delete=models.PROTECT, blank=True, null=True)
+    advancesToSupplier = models.ManyToManyField(AccountChild, related_name="branchadvancestosupplier", blank=True)
