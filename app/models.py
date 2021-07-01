@@ -427,6 +427,26 @@ class IIAdjustedItems(models.Model):
     vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
     pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null = True)
 
+class Voucher(models.Model):
+    code = models.CharField(max_length = 50, null = True)
+    datetimeCreated = models.DateTimeField(null = True)
+    paymentDate = models.DateField(null = True)
+    party = models.ForeignKey(Party, related_name= "voucher", on_delete=models.PROTECT, null = True)
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name= "voucher", on_delete=models.PROTECT, null = True)
+    receivingReport = models.ForeignKey(ReceivingReport, related_name= "voucher", on_delete=models.PROTECT, null = True)
+    journal = models.ForeignKey(Journal, related_name= "voucher", on_delete=models.PROTECT, null = True)
+    remarks = models.TextField(null = True)
+    dueDate = models.DateField(null = True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vApprovedBy")
+    datetimeApproved = models.DateTimeField(null = True)
+
+class VoucherItems(models.Model):
+    voucher = models.ForeignKey(Voucher, related_name= "voucheritems", on_delete=models.PROTECT, null = True)
+    normally = models.CharField(max_length=50, choices=normally)
+    accountChild = models.ForeignKey(AccountChild, related_name="voucheritems", on_delete=models.PROTECT, null=True, blank=True)
+    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,default= 0)
+
 class Quotations(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()

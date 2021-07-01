@@ -1,0 +1,276 @@
+{% extends "base-template.html" %}
+{% block title %}Payment Vouchers{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-purchase" photo="/media/{{request.user.image}}"></navbar-gas>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Payment Voucher</span>
+        </div>
+
+        <!-- TABLE -->
+        <table  id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead class="thead-dark">
+                <th>PV Code</th>
+                <th>Vendor</th>
+                <th>Amount</th>
+                <th>Created By</th>
+                <th>Approval Status</th>
+                <th>Datetime Approved</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="link" data-toggle="modal" data-target="#pvModal">PV-2021-01-0005</td>
+                    <td>Juken Sangyo</td>
+                    <td>₱1,750.00</td>
+                    <td>Clark</td>
+                    <td>Pending</td>
+                    <td>Apr. 15,2021 9:00am</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="modal fade" id="addPV">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content b-radius-15 px-3 py-2">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Create Payment Voucher</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <!-- START -->
+                        <div class="row">
+                            <div class="col col-3 pr-2">
+                                <div class="form-group">
+                                    <label>Date</label>
+                                    <input  type="date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col col-3 px-2">
+                                <div class="form-group">
+                                    <label>Retroactive <span class="font-size-10 gray">optional</span></label>
+                                    <input  type="date" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="col-3 px-2"></div>
+                            <div class="col-3 pl-2">
+                                <div class="form-group">
+                                    <label>Reference No.</label>
+                                    <input type="text" class="form-control" placeholder="Enter Reference No.">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DEBIT -->
+                        <div class="row">
+                            <div class="col col-7">
+                                <label>Debit Account</label>
+                            </div>
+                            <div class="col col-5">
+                                <label>Amount</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col col-7 pr-2">
+                                <select  class="form-control">
+                                    {% for debit in request.user.branch.subGroup.all %}
+                                    <option value="" selected disabled class="gray">Choose Account</option>
+                                    <optgroup label="{{debit.name}}">
+                                        {% for child in debit.accountchild.all %}
+                                        <option value="{{child.pk}}">{{child.name}}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                            <div class="col pl-2">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input  type="text" class="form-control box-shadow-off" style="margin-top: 0px;">
+                                </div>                            
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-minus-circle stop text-shadow-small" @click="removeDebit(index)"></i>
+                            </div>
+                        </div>
+                        <div class="row" >
+                            <div class="col">
+                                <button class="btn btn-warning my-2">+ Add new debit</button>
+                            </div>
+                        </div>
+
+                        <!-- CREDIT -->
+                        <div class="row">
+                            <div class="col col-7">
+                                <label>Credit Account</label>
+                            </div>
+                            <div class="col col-5">
+                                <label>Amount</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col col-7 pr-2">
+                                <select  class="form-control">
+                                    {% for credit in request.user.branch.subGroup.all %}
+                                    <option value="" selected disabled class="gray">Choose Account</option>
+                                    <optgroup label="{{credit.name}}">
+                                        {% for child in credit.accountchild.all %}
+                                        <option value="{{child.pk}}">{{child.name}}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col pl-2">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;">
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-minus-circle stop text-shadow-small" @click="removeCredit(index)"></i>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button @click="addLineCredit()" class="btn btn-warning my-2">+ Add new credit</button>
+                            </div>
+                        </div>
+
+                        <!-- DESCRIPTION -->
+                        <div class="row">
+                            <div class="col">
+                                <label>Description</label>
+                                <textarea  class="form-control" id="" cols="30" rows="2" placeholder="Enter Description"></textarea>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col col-6 text-right font-bold font-size-14"></div>
+                            <div class="col col-3 pr-2">
+                                <label>Debit</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
+                                </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
+                            </div>
+                            <div class="col col-3 pl-2">
+                                <label>Credit</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
+                                </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col col-12">
+                                <div class="d-flex flex-row-reverse">
+                                    <button @click="submitJournal()" class="btn btn-primary mt-2" id="save" disabled>Add Journal Entry</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ["[[", "]]"],
+        el: "#app"
+    })
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#table').DataTable({
+            language: { search: '', searchPlaceholder: 'Search'},
+            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+
+            buttons: {
+                buttons: [
+                {
+                    text: '<i class="fas fa-plus"></i>',
+                    className: 'btn btn-warning btn-table',
+                    titleAttr: 'Add Inventory',
+                    action: function(){
+                        $("#addPV").modal('show')
+                    }
+                },
+                
+                {
+                    text: '<i class="fas fa-file-excel"></i>',
+                    className: 'btn text-success btn-table',
+                    titleAttr: 'Export Excel',
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fas fa-file-csv"></i>',
+                    className: 'btn text-warning btn-table',
+                    titleAttr: 'Export CSV',
+                    extend: 'csv'
+                },
+                {
+                    text: '<i class="fas fa-print"></i>',
+                    className: 'btn btn-table',
+                    titleAttr: 'Print',
+                    extend: 'print'
+                },
+                {
+                    text: "RAW",
+                    className: 'btn btn-table font-size-10',
+                    titleAttr: 'View Raw Numbers',
+                    action: function(){
+                        app.roundToggler()
+                    }
+                }
+                ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
+                }
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            },
+        
+        });
+    });
+    $('option').mousedown(function(e) {
+        e.preventDefault();
+        $(this).prop('selected', !$(this).prop('selected'));
+        return false;
+    });
+</script>
+
+{% endblock %}
