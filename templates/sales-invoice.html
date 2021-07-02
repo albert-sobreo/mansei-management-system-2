@@ -5,7 +5,7 @@
 
 <div id="app" v-cloak>
     <!-- NAVIGATION BAR -->
-    <navbar-gas active="nav-purchase" photo="/media/{{request.user.image}}"></navbar-gas>
+    <navbar-gas active="nav-sales" photo="/media/{{request.user.image}}"></navbar-gas>
     <app-card></app-card>
     <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
 
@@ -45,10 +45,6 @@
                         <div class="mb-4">
                             <div class="d-flex align-items-center justify-content-between">
                                 <span class="modal-title">Create Sales Invoice</span>
-                                <div class="form-group d-flex align-items-center">
-                                    <input @change="changeModalBody()" type="checkbox" v-model="voucherToggle">
-                                    <label class="font-semibold">Custom Payment Voucher</label>
-                                </div>
                             </div>
                         </div>
 
@@ -209,26 +205,26 @@
                                 <div class="col col-3 pr-2">
                                     <div class="form-group">
                                         <label for="">Reference No.</label>
-                                        <input type="text" class="form-control" placeholder="Enter Reference No.">
+                                        <input v-model="create.code" type="text" class="form-control" placeholder="Enter Reference No.">
                                     </div>
                                 </div>
                                 <div class="col col-3 px-2">
                                     <div class="form-group">
                                         <label for="">Date</label>
-                                        <input type="date" class="form-control" readonly>
+                                        <input v-model="create.date" type="date" class="form-control" readonly>
                                     </div>
                                 </div>
                                 <div class="col col-3 px-2">
                                     <div class="form-group">
                                         <label for="">Retroactive <span class="font-size-10 gray">optional</span></label>
-                                        <input type="date" class="form-control">
+                                        <input v-model="create.retroactive" type="date" class="form-control">
                                     </div>
                                 </div>
                                 <div class="col-3 pl-2">
                                     <div class="form-group">
-                                        <label for="">Select PO/RR</label>
-                                        <select class="form-control">
-                                            <option value="" disabled selected>Select PO/RR</option>
+                                        <label for="">Select SO/SC</label>
+                                        <select v-model="create.poCode" class="form-control">
+                                            <option value="" disabled selected>Select SO/SC</option>
                                         </select>
                                     </div>
                                 </div>
@@ -237,25 +233,33 @@
                             <!-- ORDER CARD -->
                             <div class="order-card py-3" style="margin-left: -32px; margin-right: -32px; padding-left: 32px; padding-right: 32px">
                                 <div class="row">
-                                    <div class="col">
-                                        <label class="gray">Running Balance</label><br>
-                                        <span class="font-size-14 font-bold">P12,500.00</span>
+                                    <div class="col-4">
+                                        <label class="gray">Cash Payment Due</label><br>
+                                        <span class="font-size-14 font-bold">₱[[create.sc.runningBalance]]</span>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-4">
+                                        <label class="gray">To be Withheld</label><br>
+                                        <span class="font-size-14 font-bold">₱[[create.sc.wep]]</span>
+                                    </div>
+                                    <div class="col-4">
                                         <label class='gray'>Vendor</label><br>
-                                        <span class="font-size-14 font-bold">Juken Sangyo</span>
+                                        <span class="font-size-14 font-bold">[[create.party.name]]</span>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-4">
                                         <label class="gray">ATC Code</label><br>
-                                        <span class="font-size-14 font-bold">WI 021</span>
+                                        <span class="font-size-14 font-bold">[[create.sc.atc.code]]</span>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-4">
                                         <label for="" class="gray">ATC Rate</label><br>
-                                        <span class="font-size-14 font-bold">20%</span>
+                                        <span class="font-size-14 font-bold">[[create.sc.atc.rate]]%</span>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-4">
                                         <label for="" class="gray">VAT Rate</label><br>
-                                        <span class="font-size-14 font-bold">12%</span>
+                                        <span class="font-size-14 font-bold">[[create.sc.taxRate]]%</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <label for="" class="gray">Due Date</label><br>
+                                        <span class="font-size-14 font-bold">[[create.sc.dueDate]]</span>
                                     </div>
                                 </div>
                             </div>
@@ -272,12 +276,12 @@
                                 </div>
                                 <div class="col-6 pr-2">
                                     <div class="form-group">
-                                        <label for="">Witholding Tax</label>
+                                        <label for="">Amount Withheld</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">₱</span>
                                             </div>
-                                            <input type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()">
+                                            <input type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Withheld" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -288,7 +292,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">₱</span>
                                             </div>
-                                            <input type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()">
+                                            <input type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Paid">
                                         </div>
                                     </div>
                                 </div>
@@ -322,6 +326,35 @@
         el: "#app", 
 
         data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            create: {
+                code: null,
+                date: new Date().toISOString().split('T')[0],
+                retroactive: null,
+                poCode: null,
+                sc: {
+                    code: null,
+                    runningBalance: null,
+                    wep: null,
+                    party: {
+                        name: null,
+                    },
+                    atc: {
+                        code: null,
+                        rate: null,
+                    },
+                    taxRate: null,
+                    dueDate: null,
+                },
+                paymentMethod: null,
+                wep: null,
+                amountPaid: null,
+                description: null
+            },
             voucherToggle: false,
         },
         

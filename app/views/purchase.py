@@ -16,6 +16,7 @@ from ..models import *
 import sweetify
 from datetime import date as now
 from decimal import Decimal
+from datetime import datetime
 
 class PurchaseOrderView(View):
     def get(self, request, format=None):
@@ -61,7 +62,7 @@ class SavePurchaseOrder(APIView):
             print (key, value)
 
         po.code = purchaseOrder['code']
-        po.datetimeCreated = purchaseOrder['dateTimeCreated']
+        po.datetimeCreated = datetime.now
 
         if purchaseOrder['retroactive']:
             po.datePurchased = purchaseOrder['retroactive']

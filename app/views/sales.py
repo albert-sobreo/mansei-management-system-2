@@ -16,6 +16,7 @@ from ..models import *
 import sweetify
 from datetime import date as now
 from decimal import Decimal
+from datetime import datetime
 
 ########## SALES CONTRACT ##########
 class SalesContractView(View):
@@ -58,7 +59,7 @@ class SaveSalesContract(APIView):
         sc = SalesContract()
 
         sc.code = salesContract['code']
-        sc.datetimeCreated = salesContract['dateTimeCreated']
+        sc.datetimeCreated = datetime.now
 
         if salesContract['retroactive']:
             sc.dateSold = salesContract['retroactive']
@@ -176,7 +177,7 @@ class SaveQuotations(APIView):
         qq = Quotations()
 
         qq.code = quotes['code']
-        qq.datetimeCreated = quotes['dateTimeCreated']
+        qq.datetimeCreated = datetime.now
         qq.dateQuoted = quotes['date']
         qq.party = Party.objects.get(pk=quotes['customer'])
         qq.amountDue = Decimal(quotes['amountDue'])
@@ -282,7 +283,7 @@ class SaveSalesOrder(APIView):
         so = SalesOrder()
 
         so.code = salesOrder['code']
-        so.datetimeCreated = salesOrder['dateTimeCreated']
+        so.datetimeCreated = datetime.now
         
         if salesOrder['retroactive']:
             so.dateSold = salesOrder['retroactive']

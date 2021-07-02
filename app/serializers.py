@@ -206,11 +206,6 @@ class InwardInventoryAdjustedNestedSZ(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
-
-
-
-
-
 ########## SALES CONTRACT ##########
 class SCItemsMerchNestedSZ(serializers.ModelSerializer):
     merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
@@ -493,8 +488,23 @@ class ReceivingReportNestedSZ(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+########## VOUCHER ##########
+class VoucherSZ(serializers.ModelSerializer):
+    purchaseOrder = PurchaseOrderNestedSZ(read_only=True)
+    receivingReport = ReceivingReportNestedSZ(read_only=True)
+    class Meta:
+        model = PaymentVoucher 
+        fields = '__all__'
+        depth = 1
 
-
+########## SALES INVOICE ##########
+class SalesInvoiceSZ(serializers.ModelSerializer):
+    salesOrder = SalesOrderNestedSZ(read_only=True)
+    salesContract = SalesContractNestedSZ(read_only=True)
+    class Meta:
+        model = SalesInvoice 
+        fields = '__all__'
+        depth = 1
 
 
 

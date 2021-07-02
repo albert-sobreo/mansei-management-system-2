@@ -45,10 +45,6 @@
                         <div class="mb-4">
                             <div class="d-flex align-items-center justify-content-between">
                                 <span class="modal-title">Create Payment Voucher</span>
-                                <div class="form-group d-flex align-items-center">
-                                    <input @change="changeModalBody()" type="checkbox" v-model="voucherToggle">
-                                    <label class="font-semibold">Custom Payment Voucher</label>
-                                </div>
                             </div>
                         </div>
 
@@ -236,25 +232,33 @@
                             <!-- ORDER CARD -->
                             <div class="order-card py-3" style="margin-left: -32px; margin-right: -32px; padding-left: 32px; padding-right: 32px">
                                 <div class="row">
-                                    <div class="col">
-                                        <label class="gray">Running Balance</label><br>
-                                        <span class="font-size-14 font-bold">P12,500.00</span>
+                                    <div class="col-4">
+                                        <label class="gray">Cash Payment Due</label><br>
+                                        <span class="font-size-14 font-bold">P12,100.00</span>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-4">
+                                        <label class="gray">To be Withheld</label><br>
+                                        <span class="font-size-14 font-bold">P400.00</span>
+                                    </div>
+                                    <div class="col-4">
                                         <label class='gray'>Vendor</label><br>
                                         <span class="font-size-14 font-bold">Juken Sangyo</span>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-4">
                                         <label class="gray">ATC Code</label><br>
                                         <span class="font-size-14 font-bold">WI 021</span>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-4">
                                         <label for="" class="gray">ATC Rate</label><br>
                                         <span class="font-size-14 font-bold">20%</span>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-4">
                                         <label for="" class="gray">VAT Rate</label><br>
                                         <span class="font-size-14 font-bold">12%</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <label for="" class="gray">Due Date</label><br>
+                                        <span class="font-size-14 font-bold">Apr. 12, 2021</span>
                                     </div>
                                 </div>
                             </div>
@@ -271,12 +275,12 @@
                                 </div>
                                 <div class="col-6 pr-2">
                                     <div class="form-group">
-                                        <label for="">Witholding Tax</label>
+                                        <label for="">Amount Withheld</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">₱</span>
                                             </div>
-                                            <input type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()">
+                                            <input type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -322,6 +326,29 @@
         el: "#app",
 
         data: {
+            create: {
+                code: null,
+                date: new Date().toISOString().split('T')[0],
+                poCode: null,
+                po: {
+                    code: null,
+                    runningBalance: null,
+                    wep: null,
+                    party: {
+                        name: null,
+                    },
+                    atc: {
+                        code: null,
+                        rate: null,
+                    },
+                    taxRate: null,
+                    dueDate: null,
+                },
+                paymentMethod: null,
+                wep: null,
+                amountPaid: null,
+                description: null
+            },
             voucherToggle: false,
         },
         

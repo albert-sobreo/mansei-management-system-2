@@ -17,6 +17,7 @@ from ..models import *
 import sweetify
 from datetime import date as now
 from django.http.response import Http404
+from datetime import datetime
 
 class DeliveriesView(View):
     def get(self, request, format=None):
@@ -128,7 +129,7 @@ class SaveDelivery(APIView):
         d = Deliveries()
 
         d.code = deliveries['code']
-        d.datetimeCreated = deliveries['dateTimeCreated']
+        d.datetimeCreated = datetime.now
         d.truck = Truck.objects.get(pk=deliveries['truck'])
         d.driver = Driver.objects.get(pk=deliveries['driver'])
         d.scheduleStart = deliveries['scheduleStart']

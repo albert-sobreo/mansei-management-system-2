@@ -15,6 +15,7 @@ from ..models import *
 import sweetify
 from datetime import date as now
 from decimal import Decimal
+from datetime import datetime
 
 class ReceivingReportView(View):
     def get(self, request, format=None):
@@ -59,7 +60,7 @@ class SaveReceivingReport(APIView):
             print (key, value)
 
         rr.code = receivingReport['code']
-        rr.datetimeCreated = receivingReport['datetimeCreated']
+        rr.datetimeCreated = datetime.now
 
         if receivingReport['retroactive']:
             rr.dateReceived = receivingReport['retroactive']
