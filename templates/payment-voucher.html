@@ -43,148 +43,264 @@
                 <div class="modal-content b-radius-15 px-3 py-2">
                     <div class="modal-body">
                         <div class="mb-4">
-                            <span class="modal-title">Create Payment Voucher</span>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-
-                        <!-- START -->
-                        <div class="row">
-                            <div class="col col-3 pr-2">
-                                <div class="form-group">
-                                    <label>Date</label>
-                                    <input  type="date" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="col col-3 px-2">
-                                <div class="form-group">
-                                    <label>Retroactive <span class="font-size-10 gray">optional</span></label>
-                                    <input  type="date" class="form-control" disabled>
-                                </div>
-                            </div>
-                            <div class="col-3 px-2"></div>
-                            <div class="col-3 pl-2">
-                                <div class="form-group">
-                                    <label>Reference No.</label>
-                                    <input type="text" class="form-control" placeholder="Enter Reference No.">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="modal-title">Create Payment Voucher</span>
+                                <div class="form-group d-flex align-items-center">
+                                    <input @change="changeModalBody()" type="checkbox" v-model="voucherToggle">
+                                    <label class="font-semibold">Custom Payment Voucher</label>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- DEBIT -->
-                        <div class="row">
-                            <div class="col col-7">
-                                <label>Debit Account</label>
+                        <!-- CUSTOM VOUCHER -->
+                        <div id="custom" style="display: none;">
+                            <!-- START -->
+                            <div class="row">
+                                <div class="col-3 pr-2">
+                                    <div class="form-group">
+                                        <label>Reference No.</label>
+                                        <input type="text" class="form-control" placeholder="Enter Reference No.">
+                                    </div>
+                                </div>
+                                <div class="col col-3 px-2">
+                                    <div class="form-group">
+                                        <label>Date</label>
+                                        <input  type="date" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col col-3 pl-2">
+                                    <div class="form-group">
+                                        <label>Retroactive <span class="font-size-10 gray">optional</span></label>
+                                        <input  type="date" class="form-control" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-3 pl-2">
+                                    <div class="form-group">
+                                        <label for="">Vendor</label>
+                                        <select name="" id="" class="form-control">
+                                            <option value="" disabled selected>Select Vendor</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col col-5">
-                                <label>Amount</label>
+
+                            <!-- DEBIT -->
+                            <div class="row">
+                                <div class="col col-7">
+                                    <label>Debit Account</label>
+                                </div>
+                                <div class="col col-5">
+                                    <label>Amount</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col col-7 pr-2">
-                                <select  class="form-control">
-                                    {% for debit in request.user.branch.subGroup.all %}
-                                    <option value="" selected disabled class="gray">Choose Account</option>
-                                    <optgroup label="{{debit.name}}">
-                                        {% for child in debit.accountchild.all %}
-                                        <option value="{{child.pk}}">{{child.name}}</option>
+                            <div class="row">
+                                <div class="col col-7 pr-2">
+                                    <select  class="form-control">
+                                        {% for debit in request.user.branch.subGroup.all %}
+                                        <option value="" selected disabled class="gray">Choose Account</option>
+                                        <optgroup label="{{debit.name}}">
+                                            {% for child in debit.accountchild.all %}
+                                            <option value="{{child.pk}}">{{child.name}}</option>
+                                            {% endfor %}
+                                        </optgroup>
                                         {% endfor %}
-                                    </optgroup>
-                                    {% endfor %}
-                                </select>
+                                    </select>
 
-                            </div>
-                            <div class="col pl-2">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">₱</span>
-                                    </div>
-                                    <input  type="text" class="form-control box-shadow-off" style="margin-top: 0px;">
-                                </div>                            
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-minus-circle stop text-shadow-small" @click="removeDebit(index)"></i>
-                            </div>
-                        </div>
-                        <div class="row" >
-                            <div class="col">
-                                <button class="btn btn-warning my-2">+ Add new debit</button>
-                            </div>
-                        </div>
-
-                        <!-- CREDIT -->
-                        <div class="row">
-                            <div class="col col-7">
-                                <label>Credit Account</label>
-                            </div>
-                            <div class="col col-5">
-                                <label>Amount</label>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col col-7 pr-2">
-                                <select  class="form-control">
-                                    {% for credit in request.user.branch.subGroup.all %}
-                                    <option value="" selected disabled class="gray">Choose Account</option>
-                                    <optgroup label="{{credit.name}}">
-                                        {% for child in credit.accountchild.all %}
-                                        <option value="{{child.pk}}">{{child.name}}</option>
-                                        {% endfor %}
-                                    </optgroup>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col pl-2">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">₱</span>
-                                    </div>
-                                    <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;">
+                                </div>
+                                <div class="col pl-2">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input  type="text" class="form-control box-shadow-off" style="margin-top: 0px;">
+                                    </div>                            
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-minus-circle stop text-shadow-small" @click="removeDebit(index)"></i>
                                 </div>
                             </div>
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-minus-circle stop text-shadow-small" @click="removeCredit(index)"></i>
+                            <div class="row" >
+                                <div class="col">
+                                    <button class="btn btn-warning my-2">+ Add new debit</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <button @click="addLineCredit()" class="btn btn-warning my-2">+ Add new credit</button>
+
+                            <!-- CREDIT -->
+                            <div class="row">
+                                <div class="col col-7">
+                                    <label>Credit Account</label>
+                                </div>
+                                <div class="col col-5">
+                                    <label>Amount</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-7 pr-2">
+                                    <select  class="form-control">
+                                        {% for credit in request.user.branch.subGroup.all %}
+                                        <option value="" selected disabled class="gray">Choose Account</option>
+                                        <optgroup label="{{credit.name}}">
+                                            {% for child in credit.accountchild.all %}
+                                            <option value="{{child.pk}}">{{child.name}}</option>
+                                            {% endfor %}
+                                        </optgroup>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col pl-2">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;">
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-minus-circle stop text-shadow-small" @click="removeCredit(index)"></i>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button @click="addLineCredit()" class="btn btn-warning my-2">+ Add new credit</button>
+                                </div>
+                            </div>
+
+                            <!-- DESCRIPTION -->
+                            <div class="row">
+                                <div class="col">
+                                    <label>Description</label>
+                                    <textarea  class="form-control" id="" cols="30" rows="2" placeholder="Enter Description"></textarea>
+                                </div>
+                            </div>
+                            <div class="row my-2">
+                                <div class="col col-3 pr-2">
+                                    <label>Debit</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
+                                    </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
+                                </div>
+                                <div class="col col-3 pl-2">
+                                    <label>Credit</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
+                                    </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-12">
+                                    <div class="d-flex flex-row-reverse">
+                                        <button @click="submitJournal()" class="btn btn-primary mt-2" id="save" disabled>Add Journal Entry</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- DESCRIPTION -->
-                        <div class="row">
-                            <div class="col">
-                                <label>Description</label>
-                                <textarea  class="form-control" id="" cols="30" rows="2" placeholder="Enter Description"></textarea>
-                            </div>
-                        </div>
-                        <div class="row my-2">
-                            <div class="col col-6 text-right font-bold font-size-14"></div>
-                            <div class="col col-3 pr-2">
-                                <label>Debit</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">₱</span>
+                        <!-- DEFAULT VOUCHER -->
+                        <div id="default">
+                            <!-- START -->
+                            <div class="row">
+                                <div class="col col-3 pr-2">
+                                    <div class="form-group">
+                                        <label for="">Reference No.</label>
+                                        <input type="text" class="form-control" placeholder="Enter Reference No.">
                                     </div>
-                                    <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
-                                </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
-                            </div>
-                            <div class="col col-3 pl-2">
-                                <label>Credit</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">₱</span>
+                                </div>
+                                <div class="col col-3 px-2">
+                                    <div class="form-group">
+                                        <label for="">Date</label>
+                                        <input type="date" class="form-control" readonly>
                                     </div>
-                                    <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
-                                </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
+                                </div>
+                                <div class="col col-3 px-2">
+                                    <div class="form-group">
+                                        <label for="">Retroactive <span class="font-size-10 gray">optional</span></label>
+                                        <input type="date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-3 pl-2">
+                                    <div class="form-group">
+                                        <label for="">Select PO/RR</label>
+                                        <select class="form-control">
+                                            <option value="" disabled selected>Select PO/RR</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col col-12">
-                                <div class="d-flex flex-row-reverse">
-                                    <button @click="submitJournal()" class="btn btn-primary mt-2" id="save" disabled>Add Journal Entry</button>
+
+                            <!-- ORDER CARD -->
+                            <div class="order-card py-3" style="margin-left: -32px; margin-right: -32px; padding-left: 32px; padding-right: 32px">
+                                <div class="row">
+                                    <div class="col">
+                                        <label class="gray">Running Balance</label><br>
+                                        <span class="font-size-14 font-bold">P12,500.00</span>
+                                    </div>
+                                    <div class="col">
+                                        <label class='gray'>Vendor</label><br>
+                                        <span class="font-size-14 font-bold">Juken Sangyo</span>
+                                    </div>
+                                    <div class="col">
+                                        <label class="gray">ATC Code</label><br>
+                                        <span class="font-size-14 font-bold">WI 021</span>
+                                    </div>
+                                    <div class="col">
+                                        <label for="" class="gray">ATC Rate</label><br>
+                                        <span class="font-size-14 font-bold">20%</span>
+                                    </div>
+                                    <div class="col">
+                                        <label for="" class="gray">VAT Rate</label><br>
+                                        <span class="font-size-14 font-bold">12%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PAYMENT METHOD -->
+                            <div class="row my-2">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="">Payment Method</label>
+                                        <select name="" id="" class="form-control">
+                                            <option value="" selected disabled>Choose Payment Method</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-6 pr-2">
+                                    <div class="form-group">
+                                        <label for="">Witholding Tax</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">₱</span>
+                                            </div>
+                                            <input type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 pl-2">
+                                    <div class="form-group">
+                                        <label for="">Amount Paid</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">₱</span>
+                                            </div>
+                                            <input type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="">Description</label>
+                                        <textarea cols="30" rows="2" class="form-control" placeholder="Enter Description"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button class="col btn btn-primary">Create</button>
                                 </div>
                             </div>
                         </div>
@@ -192,6 +308,7 @@
                 </div>
             </div>
         </div>
+        <pre>[[$data]]</pre>
     </div>
 </div>
 
@@ -202,7 +319,28 @@
 <script>
     var app = new Vue({
         delimiters: ["[[", "]]"],
-        el: "#app"
+        el: "#app",
+
+        data: {
+            voucherToggle: false,
+        },
+        
+        methods: {
+            changeModalBody(){
+                var body = {
+                    custom: document.getElementById('custom'),
+                    default: document.getElementById('default'),
+                }
+
+                if(this.voucherToggle){
+                    body.custom.style.display = 'block'
+                    body.default.style.display = 'none'
+                } else {
+                    body.custom.style.display = 'none'
+                    body.default.style.display = 'block'
+                }
+            }
+        }
     })
 </script>
 
