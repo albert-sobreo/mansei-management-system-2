@@ -124,6 +124,7 @@
                                         <label for="">Payment Method</label>
                                         <select v-model="create.paymentMethod" name="" id="" class="form-control">
                                             <option value="" selected disabled>Choose Payment Method</option>
+                                            <option value="Cash on Hand">Cash on Hand</option>
                                         </select>
                                     </div>
                                 </div>
@@ -158,7 +159,7 @@
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <button class="col btn btn-primary">Create</button>
+                                    <button @click="submit()" class="col btn btn-primary">Create</button>
                                 </div>
                             </div>
                         </div>
@@ -244,6 +245,10 @@
 
                 })
             },
+            submit(){
+                axios.post('/save-sales-invoice/', this.create, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            }
             
         }
     })

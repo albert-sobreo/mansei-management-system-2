@@ -273,6 +273,7 @@
                                         <label for="">Payment Method</label>
                                         <select v-model="create.paymentMethod" name="" id="" class="form-control">
                                             <option value="" selected disabled>Choose Payment Method</option>
+                                            <option value="Cash on Hand">Cash on Hand</option>
                                         </select>
                                     </div>
                                 </div>
@@ -307,7 +308,7 @@
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <button class="col btn btn-primary">Create</button>
+                                    <button @click="submit()" class="col btn btn-primary">Create</button>
                                 </div>
                             </div>
                         </div>
@@ -329,8 +330,13 @@
         el: "#app",
 
         data: {
+            config: {
+				headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+			},
             create: {
-                code: null,
+                code: '{{new_code}}',
                 date: new Date().toISOString().split('T')[0],
                 retroactive: null,
                 poCode: '',
@@ -388,6 +394,10 @@
 
                 })
             },
+            submit(){
+                axios.post('/save-payment-voucher/', this.create, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            }
         }
     })
 </script>

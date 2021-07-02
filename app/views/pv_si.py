@@ -16,6 +16,7 @@ import sweetify
 from datetime import date as now
 from decimal import Decimal
 from datetime import datetime
+from datetime import date
 
 class PaymentVoucherView(View):
     def get(self, request, format=None):
@@ -52,8 +53,8 @@ class SavePaymentVoucher(APIView):
 
         pv = PaymentVoucher()
         pv.code = paymentVoucher['code']
-        pv.datetimeCreated = datetime.now
-        pv.remarks = paymentVoucher['remarks']
+        pv.datetimeCreated = datetime.now()
+        pv.remarks = paymentVoucher['description']
         if paymentVoucher['retroactive']:
             pv.paymentDate = paymentVoucher['retroactive']
         else:
@@ -63,7 +64,7 @@ class SavePaymentVoucher(APIView):
         pv.paymentMethod = paymentVoucher['paymentMethod']
         pv.amountPaid = paymentVoucher['amountPaid']
         pv.wep = paymentVoucher['wep']
-        pv.purchaseOrder = PurchaseOrder.object.get(pk=paymentVoucher['po'])
+        pv.purchaseOrder = PurchaseOrder.objects.get(pk=paymentVoucher['po']['code'])
         pv.save()
         request.user.branch.paymentVoucher.add(pv)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
@@ -103,8 +104,8 @@ class SaveSalesInvoice(APIView):
 
         si = SalesInvoice()
         si.code = salesInvoice['code']
-        si.datetimeCreated = datetime.now
-        si.remarks = salesInvoice['remarks']
+        si.datetimeCreated = datetime.now()
+        si.remarks = salesInvoice['description']
         if salesInvoice['retroactive']:
             si.paymentDate = salesInvoice['retroactive']
         else:
@@ -114,8 +115,8 @@ class SaveSalesInvoice(APIView):
         si.paymentMethod = salesInvoice['paymentMethod']
         si.amountPaid = salesInvoice['amountPaid']
         si.wep = salesInvoice['wep']
-        si.salesContract = SalesContract.object.get(pk=salesInvoice['po'])
+        si.salesContract = SalesContract.objects.get(pk=salesInvoice['sc']['code'])
         si.save()
-        request.user.branch.paymentVoucher.add(si)
+        request.user.branch.salesInvoice.add(si)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
