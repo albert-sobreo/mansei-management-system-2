@@ -4,7 +4,7 @@
 {% block body %}
 
 <div id="app" v-cloak>
-    <navbar-gas active="nav-sales" photo="/media/{{request.user.image}}"></navbar-gas>
+    <navbar-gas active="nav-approvals" photo="/media/{{request.user.image}}"></navbar-gas>
     <app-card></app-card>
     <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
 

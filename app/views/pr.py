@@ -15,6 +15,7 @@ from ..models import *
 import sweetify
 from datetime import date as now
 from decimal import Decimal
+from datetime import datetime
 
 class PurchaseRequestView(View):
     def get(self, request, format=None):
@@ -57,7 +58,7 @@ class SavePurchaseRequest(APIView):
         pr = PurchaseRequest()
 
         pr.code = purchaseRequest['code']
-        pr.datetimeCreated = purchaseRequest['dateTimeCreated']
+        pr.datetimeCreated = datetime.now
         pr.dateRequested = purchaseRequest['date']
 
         pr.dateNeeded = purchaseRequest['dateNeeded']

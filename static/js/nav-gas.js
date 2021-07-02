@@ -41,7 +41,7 @@ Vue.component('navbar-gas', {
                     <a href="/sales-contract/" class="dropdown-item d-item-gas font-size-12 font-semibold">Sales Contract</a> 
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Exports</a> 
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">DR/LS</a>
-                    <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Invoice</a> 
+                    <a href="/sales-invoice/" class="dropdown-item d-item-gas font-size-12 font-semibold">Invoice</a> 
                 </div>
             </div>
             <div class="btn-group mx-3">
@@ -52,7 +52,7 @@ Vue.component('navbar-gas', {
                     <a href="/receiving-report/" class="dropdown-item d-item-gas font-size-12 font-semibold">Receiving Report</a>
                     <a href="/inward-inventory/" class="dropdown-item d-item-gas font-size-12 font-semibold">Inward Inventory</a> 
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Completion Report</a> 
-                    <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Vouchers</a>
+                    <a href="/payment-voucher/" class="dropdown-item d-item-gas font-size-12 font-semibold">Vouchers</a>
                 </div>
             </div>
             <a href="/ledger/" class="mx-3" id="nav-reports">Reports</a>

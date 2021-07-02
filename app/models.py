@@ -345,7 +345,7 @@ class ReceivingReport(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default=False)
     journal = models.ForeignKey(Journal, related_name="receivingreport", on_delete=models.PROTECT, null=True, blank=True)
-    fullyPaid = models.BooleanField(null = True, default = False)
+    fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     qtyReceived = models.IntegerField(null = True, blank = True)
     fullyReceived = models.BooleanField(null = True, blank = True)
@@ -394,7 +394,7 @@ class InwardInventory(models.Model):
     datetimeAdjusted = models.DateTimeField(null=True, blank=True)
     adjusted = models.BooleanField(null = True, default = False)
     journal = models.ForeignKey(Journal, related_name="inwardinventory", on_delete=models.PROTECT, null=True, blank=True)
-    fullyPaid = models.BooleanField(null = True, default = False)
+    fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class IIItemsMerch(models.Model):
@@ -426,6 +426,21 @@ class IIAdjustedItems(models.Model):
     thicc = models.DecimalField(max_digits=10, decimal_places=2, null = True)
     vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
     pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+
+class PaymentVoucher(models.Model):
+    code = models.CharField(max_length = 50, null = True)
+    datetimeCreated = models.DateTimeField(null = True)
+    paymentDate = models.DateField(null = True)
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
+    receivingReport = models.ForeignKey(ReceivingReport, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
+    journal = models.ForeignKey(Journal, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
+    remarks = models.TextField(null = True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vApprovedBy")
+    datetimeApproved = models.DateTimeField(null = True)
+    paymentMethod = models.CharField(max_length = 50, null = True)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class Quotations(models.Model):
     code = models.CharField(max_length=50)
@@ -569,7 +584,7 @@ class SalesContract(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default = False)
     journal = models.ForeignKey(Journal, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
-    fullyPaid = models.BooleanField(null = True, default = False)
+    fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     
@@ -633,6 +648,22 @@ class SCatc(models.Model):
     salesContract = models.ForeignKey(SalesContract, related_name="scatc",on_delete=models.PROTECT, null=True, blank=True)
     code = models.ForeignKey(ATC, related_name="scatc",on_delete=models.PROTECT, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+
+
+class SalesInvoice(models.Model):
+    code = models.CharField(max_length = 50, null = True)
+    datetimeCreated = models.DateTimeField(null = True)
+    paymentDate = models.DateField(null = True)
+    salesOrder = models.ForeignKey(SalesOrder, related_name= "salesinvoice", on_delete=models.PROTECT, null = True)
+    salesContract = models.ForeignKey(SalesContract, related_name= "salesinvoice", on_delete=models.PROTECT, null = True)
+    journal = models.ForeignKey(Journal, related_name= "salesinvoice", on_delete=models.PROTECT, null = True)
+    remarks = models.TextField(null = True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="siCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="siApprovedBy")
+    datetimeApproved = models.DateTimeField(null = True)
+    paymentMethod = models.CharField(max_length = 50, null = True)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class VendorQuotesMerch(models.Model):
     purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="vendorquotesmerch",on_delete=models.PROTECT, null=True, blank=True)
@@ -802,6 +833,10 @@ class Branch(models.Model):
     inwardInventory = models.ManyToManyField(InwardInventory, blank=True)
     iiItemsMerch = models.ManyToManyField(IIItemsMerch, blank=True)
     iiAdjustedItems = models.ManyToManyField(IIAdjustedItems, blank=True)
+
+    #### PAYMENT VOUCHER & SALES INVOICE
+    paymentVoucher = models.ManyToManyField(PaymentVoucher, blank = True)
+    salesInvoice = models.ManyToManyField(SalesInvoice, blank = True)
 
     def __str__(self):
         return self.name

@@ -253,3 +253,13 @@ class SalesOrderAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesOrderNestedSZ
     queryset = SalesOrder.objects.all()
+
+
+
+
+
+########## SALES CONTRACT ##########
+class SalesContractAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SalesContractSZ
+    queryset = SalesContract.objects.all()

@@ -17,6 +17,7 @@ from rest_framework import viewsets
 from ..models import *
 import json
 from datetime import date as now
+from datetime import datetime
 
 class JournalView(View):
     def get(self, request):
@@ -63,7 +64,7 @@ class SaveJournal(APIView):
         j.code = journal['code']
         j.journalDate = journal['date']
         j.remarks = journal['remarks']
-        j.datetimeCreated = journal['datetimeCreated']
+        j.datetimeCreated = datetime.now
         j.createdBy = User.objects.get(pk=request.session.get('_auth_user_id'))
 
         j.save()
