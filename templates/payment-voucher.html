@@ -197,33 +197,36 @@
                             </div>
                         </div>
 
-                        <!-- DEFAULT VOUCHER -->
+                        <!-- DEFAULT INVOICE -->
                         <div id="default">
                             <!-- START -->
                             <div class="row">
                                 <div class="col col-3 pr-2">
                                     <div class="form-group">
                                         <label for="">Reference No.</label>
-                                        <input type="text" class="form-control" placeholder="Enter Reference No.">
+                                        <input v-model="create.code" type="text" class="form-control" placeholder="Enter Reference No.">
                                     </div>
                                 </div>
                                 <div class="col col-3 px-2">
                                     <div class="form-group">
                                         <label for="">Date</label>
-                                        <input type="date" class="form-control" readonly>
+                                        <input v-model="create.date" type="date" class="form-control" readonly>
                                     </div>
                                 </div>
                                 <div class="col col-3 px-2">
                                     <div class="form-group">
                                         <label for="">Retroactive <span class="font-size-10 gray">optional</span></label>
-                                        <input type="date" class="form-control">
+                                        <input v-model="create.retroactive" type="date" class="form-control">
                                     </div>
                                 </div>
                                 <div class="col-3 pl-2">
                                     <div class="form-group">
-                                        <label for="">Select PO/RR</label>
-                                        <select class="form-control">
-                                            <option value="" disabled selected>Select PO/RR</option>
+                                        <label for="">Select PO</label>
+                                        <select @change="getPO(create.poCode)" v-model="create.poCode" class="form-control">
+                                            <option value="" disabled selected>Select PO</option>
+                                            {% for item in po %}
+                                            <option value="{{item.pk}}">{{item.code}}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
@@ -234,31 +237,31 @@
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="gray">Cash Payment Due</label><br>
-                                        <span class="font-size-14 font-bold">P12,100.00</span>
+                                        <span class="font-size-14 font-bold">₱[[create.po.runningBalance]]</span>
                                     </div>
                                     <div class="col-4">
                                         <label class="gray">To be Withheld</label><br>
-                                        <span class="font-size-14 font-bold">P400.00</span>
+                                        <span class="font-size-14 font-bold">₱[[create.po.wep]]</span>
                                     </div>
                                     <div class="col-4">
                                         <label class='gray'>Vendor</label><br>
-                                        <span class="font-size-14 font-bold">Juken Sangyo</span>
+                                        <span class="font-size-14 font-bold">[[create.po.party.name]]</span>
                                     </div>
                                     <div class="col-4">
                                         <label class="gray">ATC Code</label><br>
-                                        <span class="font-size-14 font-bold">WI 021</span>
+                                        <span class="font-size-14 font-bold">[[create.po.atc.code]]</span>
                                     </div>
                                     <div class="col-4">
                                         <label for="" class="gray">ATC Rate</label><br>
-                                        <span class="font-size-14 font-bold">20%</span>
+                                        <span class="font-size-14 font-bold">[[create.po.atc.rate]]%</span>
                                     </div>
                                     <div class="col-4">
                                         <label for="" class="gray">VAT Rate</label><br>
-                                        <span class="font-size-14 font-bold">12%</span>
+                                        <span class="font-size-14 font-bold">[[create.po.taxRate]]%</span>
                                     </div>
                                     <div class="col-4">
                                         <label for="" class="gray">Due Date</label><br>
-                                        <span class="font-size-14 font-bold">Apr. 12, 2021</span>
+                                        <span class="font-size-14 font-bold">[[create.po.dueDate]]</span>
                                     </div>
                                 </div>
                             </div>
@@ -268,7 +271,7 @@
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label for="">Payment Method</label>
-                                        <select name="" id="" class="form-control">
+                                        <select v-model="create.paymentMethod" name="" id="" class="form-control">
                                             <option value="" selected disabled>Choose Payment Method</option>
                                         </select>
                                     </div>
@@ -280,7 +283,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">₱</span>
                                             </div>
-                                            <input type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" readonly>
+                                            <input v-model="create.wep" type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Withheld" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -291,14 +294,14 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">₱</span>
                                             </div>
-                                            <input type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()">
+                                            <input v-model="create.amountPaid" type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Paid">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label for="">Description</label>
-                                        <textarea cols="30" rows="2" class="form-control" placeholder="Enter Description"></textarea>
+                                        <textarea v-model="create.description" cols="30" rows="2" class="form-control" placeholder="Enter Description"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -329,7 +332,8 @@
             create: {
                 code: null,
                 date: new Date().toISOString().split('T')[0],
-                poCode: null,
+                retroactive: null,
+                poCode: '',
                 po: {
                     code: null,
                     runningBalance: null,
@@ -344,7 +348,7 @@
                     taxRate: null,
                     dueDate: null,
                 },
-                paymentMethod: null,
+                paymentMethod: '',
                 wep: null,
                 amountPaid: null,
                 description: null
@@ -366,7 +370,24 @@
                     body.custom.style.display = 'none'
                     body.default.style.display = 'block'
                 }
-            }
+            },
+            getPO(id){
+                axios.get(`/api/purchase-order/${id}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    var item = res.data
+                    console.log(item.party.name)
+                    this.create.po.code = item.id
+                    this.create.po.runningBalance = item.runningBalance
+                    this.create.po.wep = item.wep
+                    this.create.po.party = item.party
+                    this.create.po.atc.code = item.poatc[0].code.code
+                    this.create.po.atc.rate = Number(item.poatc[0].code.rate).toFixed(2)
+                    this.create.po.taxRate = Number(item.taxRate).toFixed(0)
+                    this.create.po.dueDate = item.dueDate
+
+                })
+            },
         }
     })
 </script>

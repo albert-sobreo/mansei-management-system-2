@@ -345,7 +345,7 @@ class ReceivingReport(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default=False)
     journal = models.ForeignKey(Journal, related_name="receivingreport", on_delete=models.PROTECT, null=True, blank=True)
-    fullyPaid = models.BooleanField(null = True, default = False)
+    fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     qtyReceived = models.IntegerField(null = True, blank = True)
     fullyReceived = models.BooleanField(null = True, blank = True)
@@ -394,7 +394,7 @@ class InwardInventory(models.Model):
     datetimeAdjusted = models.DateTimeField(null=True, blank=True)
     adjusted = models.BooleanField(null = True, default = False)
     journal = models.ForeignKey(Journal, related_name="inwardinventory", on_delete=models.PROTECT, null=True, blank=True)
-    fullyPaid = models.BooleanField(null = True, default = False)
+    fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class IIItemsMerch(models.Model):
@@ -584,7 +584,7 @@ class SalesContract(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default = False)
     journal = models.ForeignKey(Journal, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
-    fullyPaid = models.BooleanField(null = True, default = False)
+    fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     

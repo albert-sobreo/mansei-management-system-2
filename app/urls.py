@@ -68,6 +68,9 @@ router.register(r"inward-inventory", views.InwardInventoryNestedAPI, 'inward-inv
 ########## SALES ORDER ##########
 router.register(r"sales-order", views.SalesOrderAPI, 'sales-order')
 
+########## SALES CONTRACT ##########
+router.register(r"sales-contract", views.SalesContractAPI, 'sales-contract')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),

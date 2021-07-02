@@ -87,7 +87,6 @@ class SalesInvoiceView(View):
                 new_code = 'SI-{}-{}-0001'.format(listed_date[0], listed_date[1])
 
         except Exception as e:
-            print(e)
             listed_date = str(now.today()).split('-')
             new_code = 'SI-{}-{}-0001'.format(listed_date[0], listed_date[1])
 
@@ -96,7 +95,7 @@ class SalesInvoiceView(View):
             'sc': request.user.branch.salesContract.filter(approved=True, fullyPaid=False)
         }
 
-        return render(request, 'sales-invoice.html')
+        return render(request, 'sales-invoice.html', context)
 
 class SaveSalesInvoice(APIView):
     def post(self, request, format = None):

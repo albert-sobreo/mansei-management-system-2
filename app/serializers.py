@@ -275,6 +275,25 @@ class SalesOrderNestedSZ(serializers.ModelSerializer):
 
 
 
+
+
+########## SALES CONTRACT ##########
+class SCatcSZ(serializers.ModelSerializer):
+    code = ATCSZ(read_only=True)
+    class Meta:
+        model = SCatc
+        fields = "__all__"
+
+class SalesContractSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    scatc = SCatcSZ(read_only=True, many=True)
+    class Meta:
+        model = SalesContract
+        fields = "__all__"
+        depth = 1
+
+
+
     
 ########## SPECIAL TRUCK ##########
 class DriverSZ(serializers.ModelSerializer):
@@ -491,7 +510,6 @@ class ReceivingReportNestedSZ(serializers.ModelSerializer):
 ########## VOUCHER ##########
 class VoucherSZ(serializers.ModelSerializer):
     purchaseOrder = PurchaseOrderNestedSZ(read_only=True)
-    receivingReport = ReceivingReportNestedSZ(read_only=True)
     class Meta:
         model = PaymentVoucher 
         fields = '__all__'
@@ -499,7 +517,6 @@ class VoucherSZ(serializers.ModelSerializer):
 
 ########## SALES INVOICE ##########
 class SalesInvoiceSZ(serializers.ModelSerializer):
-    salesOrder = SalesOrderNestedSZ(read_only=True)
     salesContract = SalesContractNestedSZ(read_only=True)
     class Meta:
         model = SalesInvoice 
