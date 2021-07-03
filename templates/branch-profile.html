@@ -23,15 +23,21 @@
         </div>
         
         <!-- BODY -->
+        <div class="row">
+            <div class="col">
+                <button @click="submit()" class="btn btn-primary col">Save</button>
+            </div>
+        </div>
+
         <form action="#" method="POST">{% csrf_token %}
             <div class="form-group">
                 <label for="">Cash on Hand</label>
                 <select v-model="daccount.cashOnHand" class="form-control">
-                    <option value="" selected disabled>Choose Account</option>
+                    <option value="">None</option>
                     {% for subgroup in request.user.branch.subGroup.all %}
                     <optgroup label="{{subgroup.name}}">
                         {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
                         {% endfor %}
                     </optgroup>
                     {% endfor %}
@@ -40,11 +46,11 @@
             <div class="form-group">
                 <label for="">Petty Cash</label>
                 <select v-model="daccount.pettyCash" class="form-control">
-                    <option value="" selected disabled>Choose Account</option>
+                    <option value="">None</option>
                     {% for subgroup in request.user.branch.subGroup.all %}
                     <optgroup label="{{subgroup.name}}">
                         {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
                         {% endfor %}
                     </optgroup>
                     {% endfor %}
@@ -53,11 +59,11 @@
             <div class="form-group">
                 <label for="">Merchandise Inventory</label>
                 <select v-model="daccount.merchInventory" class="form-control">
-                    <option value="" selected disabled>Choose Account</option>
+                    <option value="">None</option>
                     {% for subgroup in request.user.branch.subGroup.all %}
                     <optgroup label="{{subgroup.name}}">
                         {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
                         {% endfor %}
                     </optgroup>
                     {% endfor %}
@@ -66,11 +72,11 @@
             <div class="form-group">
                 <label for="">Manufacturing Inventory</label>
                 <select v-model="daccount.manuInventory" class="form-control">
-                    <option value="" selected disabled>Choose Account</option>
+                    <option value="">None</option>
                     {% for subgroup in request.user.branch.subGroup.all %}
                     <optgroup label="{{subgroup.name}}">
                         {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
                         {% endfor %}
                     </optgroup>
                     {% endfor %}
@@ -79,11 +85,11 @@
             <div class="form-group">
                 <label for="">PPE - Property</label>
                 <select v-model="daccount.ppeProperty" class="form-control">
-                    <option value="" selected disabled>Choose Account</option>
+                    <option value="">None</option>
                     {% for subgroup in request.user.branch.subGroup.all %}
                     <optgroup label="{{subgroup.name}}">
                         {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
                         {% endfor %}
                     </optgroup>
                     {% endfor %}
@@ -92,11 +98,11 @@
             <div class="form-group">
                 <label for="">PPE - Plant</label>
                 <select v-model="daccount.ppePlant" class="form-control">
-                    <option value="" selected disabled>Choose Account</option>
+                    <option value="">None</option>
                     {% for subgroup in request.user.branch.subGroup.all %}
                     <optgroup label="{{subgroup.name}}">
                         {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
                         {% endfor %}
                     </optgroup>
                     {% endfor %}
@@ -105,11 +111,11 @@
             <div class="form-group">
                 <label for="">PPE - Equipment</label>
                 <select v-model="daccount.ppeEquipment" class="form-control">
-                    <option value="" selected disabled>Choose Account</option>
+                    <option value="">None</option>
                     {% for subgroup in request.user.branch.subGroup.all %}
                     <optgroup label="{{subgroup.name}}">
                         {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
                         {% endfor %}
                     </optgroup>
                     {% endfor %}
@@ -118,11 +124,11 @@
             <div class="form-group">
                 <label for="">Input VAT</label>
                 <select v-model="daccount.inputVat" class="form-control">
-                    <option value="" selected disabled>Choose Account</option>
+                    <option value="">None</option>
                     {% for subgroup in request.user.branch.subGroup.all %}
                     <optgroup label="{{subgroup.name}}">
                         {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
                         {% endfor %}
                     </optgroup>
                     {% endfor %}
@@ -131,11 +137,11 @@
             <div class="form-group">
                 <label for="">Output VAT</label>
                 <select v-model="daccount.outputVat" class="form-control">
-                    <option value="" selected disabled>Choose Account</option>
+                    <option value="">None</option>
                     {% for subgroup in request.user.branch.subGroup.all %}
                     <optgroup label="{{subgroup.name}}">
                         {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
                         {% endfor %}
                     </optgroup>
                     {% endfor %}
@@ -144,11 +150,11 @@
             <div class="form-group">
                 <label for="">EWP</label>
                 <select v-model="daccount.ewp" class="form-control">
-                    <option value="" selected disabled>Choose Account</option>
+                    <option value="">None</option>
                     {% for subgroup in request.user.branch.subGroup.all %}
                     <optgroup label="{{subgroup.name}}">
                         {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
                         {% endfor %}
                     </optgroup>
                     {% endfor %}
@@ -156,31 +162,38 @@
             </div>
             <div class="form-group">
                 <label for="">Cash in Bank</label>
-                <select v-model="daccount.cashInBank" class="form-control" multiple>
-                    <option value="" selected disabled>Choose Account</option>
+                <div class="multi-select-container">
                     {% for subgroup in request.user.branch.subGroup.all %}
-                    <optgroup label="{{subgroup.name}}">
-                        {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
-                        {% endfor %}
-                    </optgroup>
+                    <div class="multi-select-optgroup">{{subgroup.name}}</div>
+                    {% for child in subgroup.accountchild.all %}
+                    <div class="d-flex align-items-center multi-select-items">
+                        <input type="checkbox" value="{{child.pk}}" v-model="daccount.cashInBank">&nbsp;
+                        <label class="font-semibold">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</label>
+                    </div>
                     {% endfor %}
-                </select>
+                    {% endfor %}
+                </div>
             </div>
             <div class="form-group">
                 <label for="">Advances to Supplier</label>
-                <select v-model="daccount.advancesToSupplier" class="form-control" multiple>
-                    <option value="" selected disabled>Choose Account</option>
+                <div class="multi-select-container">
                     {% for subgroup in request.user.branch.subGroup.all %}
-                    <optgroup label="{{subgroup.name}}">
-                        {% for child in subgroup.accountchild.all %}
-                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
-                        {% endfor %}
-                    </optgroup>
+                    <div class="multi-select-optgroup">{{subgroup.name}}</div>
+                    {% for child in subgroup.accountchild.all %}
+                    <div class="d-flex align-items-center multi-select-items">
+                        <input type="checkbox" value="{{child.pk}}" v-model="daccount.advancesToSupplier">&nbsp;
+                        <label class="font-semibold">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</label>
+                    </div>
                     {% endfor %}
-                </select>
+                    {% endfor %}
+                </div>
             </div>
         </form>
+        <div class="row">
+            <div class="col">
+                <button @click="submit()" class="btn btn-primary col">Save</button>
+            </div>
+        </div>
     </div>
     <pre>[[$data]]</pre>
 </div>
@@ -195,6 +208,11 @@
         el: "#app",
 
         data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
             daccount: {
                 cashInBank: [],
                 advancesToSupplier: []
@@ -206,6 +224,11 @@
                 .then(res=>{
                     this.daccount = res.data
                 })
+            },
+
+            submit(){
+                axios.put('/save-default-accounts/', this.daccount, this.config)
+                .then(res=>res.data==0?location.reload():'')
             }
         },
         mounted(){

@@ -159,5 +159,6 @@ urlpatterns = [
     path('sales-invoice/', login_required(views.SalesInvoiceView.as_view())),
     path('save-sales-invoice/', login_required(views.SaveSalesInvoice.as_view())),
 
-    path('branch-profile/', login_required(views.BranchProfileView.as_view()))
+    path('branch-profile/', login_required(views.BranchProfileView.as_view())),
+    path('save-default-accounts/', login_required(views.SaveDefaultAccounts.as_view()))
 ]
