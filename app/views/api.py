@@ -263,3 +263,13 @@ class SalesContractAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesContractSZ
     queryset = SalesContract.objects.all()
+
+
+
+
+
+########### BranchDefaultChildAccount ##########
+class BranchDefaultChildAccountAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = BranchDefaultChildAccountSZ
+    queryset = BranchDefaultChildAccount.objects.all()

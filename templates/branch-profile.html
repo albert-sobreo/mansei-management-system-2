@@ -1,0 +1,217 @@
+{% extends "base-template.html" %}
+{% block title %}Branch Profile{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-plain photo="/media/{{request.user.image}}"></navbar-plain>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/branch-profile/" class="active-imps mx-2">Accounting</a>
+                <a href="#" class="mx-2">Others</a>
+            </div>
+        </div>
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Default Accounts</span>
+        </div>
+        
+        <!-- BODY -->
+        <form action="#" method="POST">{% csrf_token %}
+            <div class="form-group">
+                <label for="">Cash on Hand</label>
+                <select v-model="daccount.cashOnHand" class="form-control">
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Petty Cash</label>
+                <select v-model="daccount.pettyCash" class="form-control">
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Merchandise Inventory</label>
+                <select v-model="daccount.merchInventory" class="form-control">
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Manufacturing Inventory</label>
+                <select v-model="daccount.manuInventory" class="form-control">
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">PPE - Property</label>
+                <select v-model="daccount.ppeProperty" class="form-control">
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">PPE - Plant</label>
+                <select v-model="daccount.ppePlant" class="form-control">
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">PPE - Equipment</label>
+                <select v-model="daccount.ppeEquipment" class="form-control">
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Input VAT</label>
+                <select v-model="daccount.inputVat" class="form-control">
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Output VAT</label>
+                <select v-model="daccount.outputVat" class="form-control">
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">EWP</label>
+                <select v-model="daccount.ewp" class="form-control">
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Cash in Bank</label>
+                <select v-model="daccount.cashInBank" class="form-control" multiple>
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Advances to Supplier</label>
+                <select v-model="daccount.advancesToSupplier" class="form-control" multiple>
+                    <option value="" selected disabled>Choose Account</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.name}} --- {{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+    <pre>[[$data]]</pre>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            daccount: {
+                cashInBank: [],
+                advancesToSupplier: []
+            }
+        },
+        methods: {
+            loadData(id){
+                axios.get(`/api/branch-default-child-account/${id}/`)
+                .then(res=>{
+                    this.daccount = res.data
+                })
+            }
+        },
+        mounted(){
+            this.loadData('{{request.user.branch.branchProfile.branchDefaultChildAccount.pk}}')
+        }
+    })
+</script>
+
+{% endblock %}

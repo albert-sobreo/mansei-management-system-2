@@ -525,6 +525,16 @@ class SalesInvoiceSZ(serializers.ModelSerializer):
 
 
 
+
+
+########## BranchDefaultChildAccount ##########
+class BranchDefaultChildAccountSZ(serializers.ModelSerializer):
+    class Meta:
+        model = BranchDefaultChildAccount
+        fields = "__all__"
+
+
+
 # MAIN SERIALIZER
 class PurchaseRequestSZ(serializers.ModelSerializer):
     pritemsmerch = PRItemsMerchSZ(read_only=True, many=True)
