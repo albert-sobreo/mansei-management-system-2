@@ -779,6 +779,7 @@ class BranchDefaultChildAccount(models.Model):
     outputVat = models.ForeignKey(AccountChild, related_name="branchoutputvat", on_delete=models.PROTECT, blank=True, null=True)
     ewp = models.ForeignKey(AccountChild, related_name='branchewp', on_delete=models.PROTECT, blank=True, null=True)
     advancesToSupplier = models.ManyToManyField(AccountChild, related_name="branchadvancestosupplier", blank=True)
+    prepaidExpense = models.ForeignKey(AccountChild, related_name="prepaidexpense", on_delete=models.PROTECT, blank = True, null = True)
 
 class BranchProfile(models.Model):
     branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.PROTECT, null=True, blank=True)

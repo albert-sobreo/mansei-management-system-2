@@ -62,7 +62,7 @@ class SavePurchaseOrder(APIView):
             print (key, value)
 
         po.code = purchaseOrder['code']
-        po.datetimeCreated = datetime.now
+        po.datetimeCreated = datetime.now()
 
         if purchaseOrder['retroactive']:
             po.datePurchased = purchaseOrder['retroactive']
