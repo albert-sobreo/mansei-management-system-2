@@ -36,7 +36,7 @@
                 <th>Created By</th>
             </thead>
             <tbody>
-                {% for po in request.user.branch.purchaseOrder.all reversed %}
+                {%for po in request.user.branch.purchaseOrder.all reversed%}
                 <tr>
                     <td class="link" @click="viewPO('{{po.pk}}')" data-toggle="modal" data-target="#poModal">{{po.code}}</td>
                     <td>{{po.party.name}}</td>
@@ -196,6 +196,8 @@
             dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            
+            "order": [[ 0, "desc" ]],
 
             buttons: {
                 buttons: [

@@ -536,6 +536,7 @@
             },
 
             amountPaid(){
+                this.watchers()
                 if (this.amountPaid == this.amountTotal){
                     this.order.paymentPeriod = 'Full Payment'
                 } else {
@@ -583,7 +584,6 @@
         methods:{
             watchers(){
                 this.order.otherFeesTotal = this.otherFeesTotal.reduce((a,b)=>Number(a)+Number(b), 0)
-                this.order.withholdingTax = this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)
                 this.order.amountDue = this.amountDue.reduce((a,b)=>Number(a)+Number(b),0)
                 this.order.taxPeso = this.order.amountDue * (this.order.taxRate/100)
                 this.order.atc[0].amount = this.order.amountDue - this.order.taxPeso
@@ -594,7 +594,8 @@
                 else if (this.order.discountType == 'peso'){
                     this.order.totalDiscount = this.order.discount
                 }
-                this.order.amountTotal = this.order.amountDue + this.order.otherFeesTotal - this.order.withholdingTax - this.order.totalDiscount
+                this.order.amountTotal = this.order.amountDue + this.order.otherFeesTotal - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)) - this.order.totalDiscount
+                this.order.withholdingTax = Number(this.order.amountPaid/((1+(this.order.taxRate/100)-(this.order.atc[0].taxRate)/100))) * (this.order.atc[0].taxRate)/100
             },
 
             loadData(){
@@ -815,7 +816,7 @@
                 this.$delete(this.order.items, index)
             },
             submit(){
-                if(Number(this.order.amountTotal) >= Number(this.order.amountPaid)){
+                if(Number(this.order.amountTotal).toFixed(2) >= Number(this.order.amountPaid).toFixed(2)){
                     axios.post('/save-sales-order/', this.order, this.config)
                     .then(res=>res.data==0?location.reload():'')
                 } else {

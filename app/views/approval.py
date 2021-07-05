@@ -88,208 +88,199 @@ class POApprovalAPI(APIView):
         
 
         purchase.save()
-        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         
-        if purchase.amountPaid != 0:
-            j = Journal()
+        # if not purchase.amountPaid:
+        #     j = Journal()
+        #     j.code = purchase.code
+        #     j.datetimeCreated = purchase.datetimeApproved
+        #     j.createdBy = purchase.createdBy
+        #     j.journalDate = datetime.now()
+        #     j.save()
+        #     request.user.branch.journal.add(j)
 
-            j.code = purchase.code
-            j.datetimeCreated = purchase.datetimeApproved
-            j.createdBy = purchase.createdBy
-            j.journalDate = datetime.now()
-            j.save()
-            request.user.branch.journal.add(j)
-
-        
-            wep = JournalEntries()
-            wep.journal = j
-            wep.normally = 'Credit'
-            # wep.accountChild = AccountChild.objects.get(name="Withholding Expanded Payables")
-            wep.accountChild = dChildAccount.ewp
-            wep.amount = purchase.wep
-            wep.accountChild.amount = wep.amount
-            wep.accountChild.accountSubGroup.amount += wep.amount
-            wep.accountChild.accountSubGroup.accountGroup.amount += wep.amount
-            wep.accountChild.save()
-            wep.accountChild.accountSubGroup.save()
-            wep.accountChild.accountSubGroup.accountGroup.save()
-            wep.balance = wep.accountChild.amount
-            wep.save()
-            request.user.branch.journalEntries.add(wep)
             
-
-            vat = JournalEntries()
-            vat.journal = j
-            vat.normally = 'Debit'
-            # vat.accountChild = AccountChild.objects.get(name="VAT Amount")
-            vat.accountChild = dChildAccount.inputVat
-            vat.amount = purchase.taxPeso
-            vat.accountChild.accountSubGroup.amount += vat.amount
-            vat.accountChild.accountSubGroup.accountGroup.amount += vat.amount
-            vat.accountChild.save()
-            vat.accountChild.accountSubGroup.save()
-            vat.accountChild.accountSubGroup.accountGroup.save()
-            vat.balance = vat.accountChild.amount
-            vat.save()
-            request.user.branch.journalEntries.add(vat)
+        #     wep = JournalEntries()
+        #     wep.journal = j
+        #     wep.normally = 'Credit'
+        #     # wep.accountChild = AccountChild.objects.get(name="Withholding Expanded Payables")
+        #     wep.accountChild = dChildAccount.ewp
+        #     wep.amount = purchase.wep
+        #     wep.accountChild.amount = wep.amount
+        #     wep.accountChild.accountSubGroup.amount += wep.amount
+        #     wep.accountChild.accountSubGroup.accountGroup.amount += wep.amount
+        #     wep.accountChild.save()
+        #     wep.accountChild.accountSubGroup.save()
+        #     wep.accountChild.accountSubGroup.accountGroup.save()
+        #     wep.balance = wep.accountChild.amount
+        #     wep.save()
+        #     request.user.branch.journalEntries.add(wep)
             
-            je = JournalEntries()
-            je2 = JournalEntries()
+        #     vat = JournalEntries()
+        #     vat.journal = j
+        #     vat.normally = 'Debit'
+        #     # vat.accountChild = AccountChild.objects.get(name="VAT Amount")
+        #     vat.accountChild = dChildAccount.inputVat
+        #     vat.amount = purchase.taxPeso
+        #     vat.accountChild.accountSubGroup.amount += vat.amount
+        #     vat.accountChild.accountSubGroup.accountGroup.amount += vat.amount
+        #     vat.accountChild.save()
+        #     vat.accountChild.accountSubGroup.save()
+        #     vat.accountChild.accountSubGroup.accountGroup.save()
+        #     vat.balance = vat.accountChild.amount
+        #     vat.save()
+        #     request.user.branch.journalEntries.add(vat)
 
-            if purchase.paymentPeriod == 'Full Payment':
-                if purchase.paymentMethod == dChildAccount.cashOnHand.name:
-                    je.journal = j
-                    je.normally = 'Credit'
-                    # je.accountChild = AccountChild.objects.get(name="Cash on Hand")
-                    je.accountChild = dChildAccount.cashOnHand
-                    je.amount = purchase.amountPaid
-                    je.accountChild.amount -= je.amount
-                    je.accountChild.accountSubGroup.amount -= je.amount
-                    je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
-                    je.accountChild.save()
-                    je.accountChild.accountSubGroup.save()
-                    je.accountChild.accountSubGroup.accountGroup.save()
-                    je.balance = je.accountChild.amount
-                    je.save()
-                    request.user.branch.journalEntries.add(je)
-                    je2.journal = j
-                    je2.normally = 'Debit'
-                    je2.accountChild = dChildAccount.prepaidExpense
-                    je2.amount = purchase.amountDue - purchase.taxPeso
-                    je2.accountChild.amount += je2.amount
-                    je2.accountChild.accountSubGroup.amount += je2.amount
-                    je2.accountChild.accountSubGroup.accountGroup.amount += je2.amount
-                    je2.accountChild.save()
-                    je2.accountChild.accountSubGroup.save()
-                    je2.accountChild.accountSubGroup.accountGroup.save()
-                    je2.balance = je2.accountChild.amount
-                    je2.save()
-                    request.user.branch.journalEntries.add(je2)
-
-                elif re.search('[Cc]ash [Ii]n [Bb]ank', purchase.paymentMethod):
-                    je.journal = j
-                    je.normally = 'Credit'
-                    # je.accountChild = AccountChild.objects.get(name="Cash in Bank")
-                    je.accountChild = dChildAccount.cashInBank.get(name=purchase.paymentMethod)
-                    je.amount = purchase.amountPaid
-                    je.accountChild.amount -= je.amount
-                    je.accountChild.accountSubGroup.amount -= je.amount
-                    je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
-                    je.accountChild.save()
-                    je.accountChild.accountSubGroup.save()
-                    je.accountChild.accountSubGroup.accountGroup.save()
-                    je.balance = je.accountChild.amount
-                    je.save()
-                    request.user.branch.journalEntries.add(je)
-                    je2.journal = j
-                    je2.normally = 'Debit'
-                    je2.accountChild = dChildAccount.prepaidExpense
-                    je2.amount = purchase.amountDue - purchase.taxPeso
-                    je2.accountChild.amount += je2.amount
-                    je2.accountChild.accountSubGroup.amount += je2.amount
-                    je2.accountChild.accountSubGroup.accountGroup.amount += je2.amount
-                    je2.accountChild.save()
-                    je2.accountChild.accountSubGroup.save()
-                    je2.accountChild.accountSubGroup.accountGroup.save()
-                    je2.balance = je2.accountChild.amount
-                    je2.save()
-                    request.user.branch.journalEntries.add(je2)
-            elif purchase.paymentPeriod == 'Partial Payment':
-                print('b0ss plis')
-                if purchase.paymentMethod == dChildAccount.cashOnHand.name:
-                    je.journal = j
-                    je.normally = 'Credit'
-                    # je.accountChild = AccountChild.objects.get(name="Cash on Hand")
-                    je.accountChild = dChildAccount.cashOnHand
-                    je.amount = purchase.amountPaid
-                    je.accountChild.amount -= je.amount
-                    je.accountChild.accountSubGroup.amount -= je.amount
-                    je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
-                    je.accountChild.save()
-                    je.accountChild.accountSubGroup.save()
-                    je.accountChild.accountSubGroup.accountGroup.save()
-                    je.balance = je.accountChild.amount
-                    je.save()
-                    request.user.branch.journalEntries.add(je)
-                    je2.journal = j
-                    je2.normally = 'Debit'
-                    je2.accountChild = dChildAccount.prepaidExpense
-                    je2.amount = purchase.amountDue - purchase.taxPeso
-                    je2.accountChild.amount += je2.amount
-                    je2.accountChild.accountSubGroup.amount += je2.amount
-                    je2.accountChild.accountSubGroup.accountGroup.amount += je2.amount
-                    je2.accountChild.save()
-                    je2.accountChild.accountSubGroup.save()
-                    je2.accountChild.accountSubGroup.accountGroup.save()
-                    je2.balance = je2.accountChild.amount
-                    je2.save()
-                    request.user.branch.journalEntries.add(je2)
-
-                    payables = JournalEntries()
-
-                    payables.journal = j
-                    payables.normally = "Credit"
-                    payables.accountChild = purchase.party.accountChild.get(name__regex=r"[Pp]ayable")
-                    payables.amount = purchase.amountTotal - purchase.amountPaid
-                    payables.accountChild.amount += je.amount
-                    payables.accountChild.accountSubGroup.amount += je.amount
-                    payables.accountChild.accountSubGroup.accountGroup.amount += je.amount
-                    payables.accountChild.save()
-                    payables.accountChild.accountSubGroup.save()
-                    payables.accountChild.accountSubGroup.accountGroup.save()
-                    payables.balance = je.accountChild.amount
-                    payables.save()
-                    request.user.branch.journalEntries.add(payables)
-
-                #elif purchase.paymentMethod == 'Cash in Bank':
-                elif re.search('[Cc]ash [Ii]n [Bb]ank', purchase.paymentMethod):
-                    je.journal = j
-                    je.normally = 'Credit'
-                    # je.accountChild = AccountChild.objects.get(name="Cash in Bank")
-                    je.accountChild = dChildAccount.cashInBank.get(name=purchase.paymentMethod)
-                    je.amount = purchase.amountPaid
-                    je.accountChild.amount -= je.amount
-                    je.accountChild.accountSubGroup.amount -= je.amount
-                    je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
-                    je.accountChild.save()
-                    je.accountChild.accountSubGroup.save()
-                    je.accountChild.accountSubGroup.accountGroup.save()
-                    je.balance = je.accountChild.amount
-                    je.save()
-                    request.user.branch.journalEntries.add(je)
-                    je2.journal
-                    je2.normally = 'Debit'
-                    je2.accountChild = dChildAccount.prepaidExpense
-                    je2.amount = purchase.amountDue - purchase.taxPeso
-                    je2.accountChild.amount += je2.amount
-                    je2.accountChild.accountSubGroup.amount += je2.amount
-                    je2.accountChild.accountSubGroup.accountGroup.amount += je2.amount
-                    je2.accountChild.save()
-                    je2.accountChild.accountSubGroup.save()
-                    je2.accountChild.accountSubGroup.accountGroup.save()
-                    je2.balance = je2.accountChild.amount
-                    je2.save()
-                    request.user.branch.journalEntries.add(je2)
-
-                    payables = JournalEntries()
-
-                    payables.journal = j
-                    payables.normally = "Credit"
-                    ############
-                    # payables.accountChild = purchase.party.accountChild.get(name__regex=r"[Pp]ayable")
-                    # ########.accountChild = purchase.party.accountChild.get(name__regex=r"[Rr]eceivable")
-                    ############
-                    payables.accountChild = purchase.party.accountChild.get(name__regex=r"[Pp]ayable")
-                    payables.amount = purchase.amountTotal - purchase.amountPaid
-                    payables.accountChild.amount += je.amount
-                    payables.accountChild.accountSubGroup.amount += je.amount
-                    payables.accountChild.accountSubGroup.accountGroup.amount += je.amount
-                    payables.accountChild.save()
-                    payables.accountChild.accountSubGroup.save()
-                    payables.accountChild.accountSubGroup.accountGroup.save()
-                    payables.balance = je.accountChild.amount
-                    payables.save()
-                    request.user.branch.journalEntries.add(payables)
+            
+        #     je = JournalEntries()
+        #     pe = JournalEntries()
+        #     if purchase.paymentPeriod == 'Full Payment':
+        #         if purchase.paymentMethod == dChildAccount.cashOnHand.name:
+        #             je.journal = j
+        #             je.normally = 'Credit'
+        #             # je.accountChild = AccountChild.objects.get(name="Cash on Hand")
+        #             je.accountChild = dChildAccount.cashOnHand
+        #             je.amount = purchase.amountPaid
+        #             je.accountChild.amount -= je.amount
+        #             je.accountChild.accountSubGroup.amount -= je.amount
+        #             je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
+        #             je.accountChild.save()
+        #             je.accountChild.accountSubGroup.save()
+        #             je.accountChild.accountSubGroup.accountGroup.save()
+        #             je.balance = je.accountChild.amount
+        #             je.save()
+        #             request.user.branch.journalEntries.add(je)
+        #             pe.journal = j
+        #             pe.normally = 'Debit'
+        #             pe.accountChild = dChildAccount.prepaidExpense
+        #             pe.amount = purchase.amountDue - purchase.taxPeso
+        #             pe.accountChild.amount += pe.amount
+        #             pe.accountChild.accountSubGroup.amount += pe.amount
+        #             pe.accountChild.accountSubGroup.accountGroup.amount += pe.amount
+        #             pe.accountChild.save()
+        #             pe.accountChild.accountSubGroup.save()
+        #             pe.accountChild.accountSubGroup.accountGroup.save()
+        #             pe.balance = pe.accountChild.amount
+        #             pe.save()
+        #             request.user.branch.journalEntries.add(pe)
+        #         elif re.search('[Cc]ash [Ii]n [Bb]ank', purchase.paymentMethod):
+        #             je.journal = j
+        #             je.normally = 'Credit'
+        #             # je.accountChild = AccountChild.objects.get(name="Cash in Bank")
+        #             je.accountChild = dChildAccount.cashInBank.get(name=purchase.paymentMethod)
+        #             je.amount = purchase.amountPaid
+        #             je.accountChild.amount -= je.amount
+        #             je.accountChild.accountSubGroup.amount -= je.amount
+        #             je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
+        #             je.accountChild.save()
+        #             je.accountChild.accountSubGroup.save()
+        #             je.accountChild.accountSubGroup.accountGroup.save()
+        #             je.balance = je.accountChild.amount
+        #             je.save()
+        #             request.user.branch.journalEntries.add(je)
+        #             pe.journal = j
+        #             pe.normally = 'Debit'
+        #             pe.accountChild = dChildAccount.prepaidExpense
+        #             pe.amount = purchase.amountDue - purchase.taxPeso
+        #             pe.accountChild.amount += pe.amount
+        #             pe.accountChild.accountSubGroup.amount += pe.amount
+        #             pe.accountChild.accountSubGroup.accountGroup.amount += pe.amount
+        #             pe.accountChild.save()
+        #             pe.accountChild.accountSubGroup.save()
+        #             pe.accountChild.accountSubGroup.accountGroup.save()
+        #             pe.balance = pe.accountChild.amount
+        #             pe.save()
+        #             request.user.branch.journalEntries.add(pe)
+        #     elif purchase.paymentPeriod == 'Partial Payment':
+        #         print('b0ss plis')
+        #         if purchase.paymentMethod == dChildAccount.cashOnHand.name:
+        #             je.journal = j
+        #             je.normally = 'Credit'
+        #             # je.accountChild = AccountChild.objects.get(name="Cash on Hand")
+        #             je.accountChild = dChildAccount.cashOnHand
+        #             je.amount = purchase.amountPaid
+        #             je.accountChild.amount -= je.amount
+        #             je.accountChild.accountSubGroup.amount -= je.amount
+        #             je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
+        #             je.accountChild.save()
+        #             je.accountChild.accountSubGroup.save()
+        #             je.accountChild.accountSubGroup.accountGroup.save()
+        #             je.balance = je.accountChild.amount
+        #             je.save()
+        #             request.user.branch.journalEntries.add(je)
+        #             pe.journal = j
+        #             pe.normally = 'Debit'
+        #             pe.accountChild = dChildAccount.prepaidExpense
+        #             pe.amount = purchase.amountDue - purchase.taxPeso
+        #             pe.accountChild.amount += pe.amount
+        #             pe.accountChild.accountSubGroup.amount += pe.amount
+        #             pe.accountChild.accountSubGroup.accountGroup.amount += pe.amount
+        #             pe.accountChild.save()
+        #             pe.accountChild.accountSubGroup.save()
+        #             pe.accountChild.accountSubGroup.accountGroup.save()
+        #             pe.balance = pe.accountChild.amount
+        #             pe.save()
+        #             request.user.branch.journalEntries.add(pe)
+        #             payables = JournalEntries()
+        #             payables.journal = j
+        #             payables.normally = "Credit"
+        #             payables.accountChild = purchase.party.accountChild.get(name__regex=r"[Pp]ayable")
+        #             payables.amount = purchase.amountTotal - purchase.amountPaid
+        #             payables.accountChild.amount += je.amount
+        #             payables.accountChild.accountSubGroup.amount += je.amount
+        #             payables.accountChild.accountSubGroup.accountGroup.amount += je.amount
+        #             payables.accountChild.save()
+        #             payables.accountChild.accountSubGroup.save()
+        #             payables.accountChild.accountSubGroup.accountGroup.save()
+        #             payables.balance = je.accountChild.amount
+        #             payables.save()
+        #             request.user.branch.journalEntries.add(payables)
+        #         #elif purchase.paymentMethod == 'Cash in Bank':
+        #         elif re.search('[Cc]ash [Ii]n [Bb]ank', purchase.paymentMethod):
+        #             je.journal = j
+        #             je.normally = 'Credit'
+        #             # je.accountChild = AccountChild.objects.get(name="Cash in Bank")
+        #             je.accountChild = dChildAccount.cashInBank.get(name=purchase.paymentMethod)
+        #             je.amount = purchase.amountPaid
+        #             je.accountChild.amount -= je.amount
+        #             je.accountChild.accountSubGroup.amount -= je.amount
+        #             je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
+        #             je.accountChild.save()
+        #             je.accountChild.accountSubGroup.save()
+        #             je.accountChild.accountSubGroup.accountGroup.save()
+        #             je.balance = je.accountChild.amount
+        #             je.save()
+        #             request.user.branch.journalEntries.add(je)
+        #             pe.journal
+        #             pe.normally = 'Debit'
+        #             pe.accountChild = dChildAccount.prepaidExpense
+        #             pe.amount = purchase.amountDue - purchase.taxPeso
+        #             pe.accountChild.amount += pe.amount
+        #             pe.accountChild.accountSubGroup.amount += pe.amount
+        #             pe.accountChild.accountSubGroup.accountGroup.amount += pe.amount
+        #             pe.accountChild.save()
+        #             pe.accountChild.accountSubGroup.save()
+        #             pe.accountChild.accountSubGroup.accountGroup.save()
+        #             pe.balance = pe.accountChild.amount
+        #             pe.save()
+        #             request.user.branch.journalEntries.add(pe)
+        #             payables = JournalEntries()
+        #             payables.journal = j
+        #             payables.normally = "Credit"
+        #             ############
+        #             # payables.accountChild = purchase.party.accountChild.get(name__regex=r"[Pp]ayable")
+        #             # ########.accountChild = purchase.party.accountChild.get(name__regex=r"[Rr]eceivable")
+        #             ############
+        #             payables.accountChild = purchase.party.accountChild.get(name__regex=r"[Pp]ayable")
+        #             payables.amount = purchase.amountTotal - purchase.amountPaid
+        #             payables.accountChild.amount += je.amount
+        #             payables.accountChild.accountSubGroup.amount += je.amount
+        #             payables.accountChild.accountSubGroup.accountGroup.amount += je.amount
+        #             payables.accountChild.save()
+        #             payables.accountChild.accountSubGroup.save()
+        #             payables.accountChild.accountSubGroup.accountGroup.save()
+        #             payables.balance = je.accountChild.amount
+        #             payables.save()
+        #             request.user.branch.journalEntries.add(payables)
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -319,6 +310,8 @@ class RRapproved(View):
 
 class RRApprovalAPI(APIView):
     def put(self, request, pk, format = None):
+        
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         receive = ReceivingReport.objects.get(pk=pk)
 
@@ -345,30 +338,96 @@ class RRApprovalAPI(APIView):
 
         receive.save()
 
-        # j = Journal()
+        j = Journal()
 
-        # j.code = receive.code
-        # j.datetimeCreated = receive.datetimeApproved
-        # j.createdBy = receive.createdBy
-        # j.journalDate = datetime.now()
-        # j.save()
-        # request.user.branch.journal.add(j)
+        j.code = receive.code
+        j.datetimeCreated = receive.datetimeApproved
+        j.createdBy = receive.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
 
-        # je = JournalEntries()
+        je = JournalEntries()
 
-        # je.journal = j
-        # je.normally = 'Debit'
-        # je.accountChild = AccountChild.objects.get(name='Merchandise Inventory')
-        # je.amount = receive.amountDue
-        # je.accountChild.amount += je.amount
-        # je.accountChild.accountSubGroup.amount += je.amount
-        # je.accountChild.accountSubGroup.accountGroup.amount += je.amount
-        # je.accountChild.save()
-        # je.accountChild.accountSubGroup.save()
-        # je.accountChild.accountSubGroup.accountGroup.save()
-        # je.balance = je.accountChild.amount
-        # je.save()
-        # request.user.branch.journalEntries.add(je)
+        if receive.purchaseOrder.runningBalance == receive.purchaseOrder.amountTotal:
+            je.journal = j
+            je.normally = 'Debit'
+            # je.accountChild = AccountChild.objects.get(name='Merchandise Inventory')
+            je.accountChild = dChildAccount.merchInventory
+            je.amount = receive.amountDue - receive.taxPeso
+            je.accountChild.amount += je.amount
+            je.accountChild.accountSubGroup.amount += je.amount
+            je.accountChild.accountSubGroup.accountGroup.amount += je.amount
+            je.accountChild.save()
+            je.accountChild.accountSubGroup.save()
+            je.accountChild.accountSubGroup.accountGroup.save()
+            je.balance = je.accountChild.amount
+            je.save()
+            request.user.branch.journalEntries.add(je)
+
+            vat = JournalEntries()
+            vat.journal = j
+            vat.normally = 'Debit'
+            vat.accountChild = dChildAccount.inputVat
+            vat.amount = receive.taxPeso
+            vat.accountChild.amount += vat.amount
+            vat.accountChild.accountSubGroup.amount += vat.amount
+            vat.accountChild.accountSubGroup.accountGroup.amount += vat.amount
+            vat.accountChild.save()
+            vat.accountChild.accountSubGroup.save()
+            vat.accountChild.accountSubGroup.accountGroup.save()
+            vat.balance = vat.accountChild.amount
+            vat.save()
+            request.user.branch.journalEntries.add(vat)
+
+            payables = JournalEntries()
+            payables.journal = j
+            payables.normally = 'Credit'
+            payables.amount = receive.amountDue
+            payables.accountChild = receive.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable")
+            payables.accountChild.accountSubGroup.amount += payables.amount
+            payables.accountChild.accountSubGroup.accountGroup.amount += payables.amount
+            payables.accountChild.save()
+            payables.accountChild.accountSubGroup.save()
+            payables.accountChild.accountSubGroup.accountGroup.save()
+            payables.balance = payables.accountChild.amount
+            payables.save()
+            request.user.branch.journalEntries.add(payables)
+
+
+
+        else: 
+            je.journal = j
+            je.normally = 'Debit'
+            # je.accountChild = AccountChild.objects.get(name='Merchandise Inventory')
+            je.accountChild = dChildAccount.merchInventory
+            je.amount = receive.amountDue - receive.taxPeso
+            je.accountChild.amount += je.amount
+            je.accountChild.accountSubGroup.amount += je.amount
+            je.accountChild.accountSubGroup.accountGroup.amount += je.amount
+            je.accountChild.save()
+            je.accountChild.accountSubGroup.save()
+            je.accountChild.accountSubGroup.accountGroup.save()
+            je.balance = je.accountChild.amount
+            je.save()
+            request.user.branch.journalEntries.add(je)
+
+            
+            pe = JournalEntries()
+            pe.journal = j
+            pe.normally = 'Credit'
+            pe.accountChild = dChildAccount.prepaidExpense
+            pe.amount = receive.amountDue - receive.taxPeso
+            pe.accountChild.amount -= pe.amount
+            pe.accountChild.accountSubGroup.amount -= pe.amount
+            pe.accountChild.accountSubGroup.accountGroup.amount -= pe.amount
+            pe.accountChild.save()
+            pe.accountChild.accountSubGroup.save()
+            pe.accountChild.accountSubGroup.accountGroup.save()
+            pe.balance = pe.accountChild.amount
+            pe.save()
+            request.user.branch.journalEntries.add(pe)
+
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -434,7 +493,256 @@ class IIApprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+################# PAYMENT VOUCHER #################
+class PVapprovedView(View):
+    def get(self, request, format=None):
+
+        user = request.user
+        context = {
+            'voucher': user.branch.paymentVoucher.filter(approved=True),
+        }
+        return render(request, 'pv-approved.html', context)
+
+class PVnonapprovedView(View):
+    def get(self, request, format=None):
+
+        user = request.user
+        context = {
+            'voucher': user.branch.paymentVoucher.filter(approved=False),
+        }
+        return render(request, 'pv-nonapproved.html', context)
+
+class PVApprovalAPI(APIView):
+    def put(self, request, pk, format = None):
+        voucher = PaymentVoucher.objects.get(pk=pk)
+
+        voucher.datetimeApproved = datetime.now()
+        voucher.approved = True
+        voucher.approvedBy = request.user
+
+        voucher.save()
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+        j = Journal()
+        j.code = voucher.code
+        j.datetimeCreated = voucher.datetimeApproved
+        j.createdBy = voucher.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+
+        if voucher.purchaseOrder.runningBalance == voucher.purchaseOrder.amountTotal:
+            if voucher.purchaseOrder.receivingreport.first() != None:
+                if voucher.purchaseOrder.receivingreport.first().approve == True:
+                    payables = JournalEntries()
+                    payables.journal = j
+                    payables.normally = 'Debit'
+                    payables.amount = (voucher.purchaseOrder.runningBalance) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)
+                    payables.accountChild = voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable")
+                    payables.accountChild.accountSubGroup.amount += payables.amount
+                    payables.accountChild.accountSubGroup.accountGroup.amount += payables.amount
+                    payables.accountChild.save()
+                    payables.accountChild.accountSubGroup.save()
+                    payables.accountChild.accountSubGroup.accountGroup.save()
+                    payables.balance = payables.accountChild.amount
+                    payables.save()
+                    request.user.branch.journalEntries.add(payables)
+                else:
+                    vat = JournalEntries()
+                    vat.journal = j
+                    vat.normally = 'Debit'
+                    # vat.accountChild = AccountChild.objects.get(name="VAT Amount")
+                    vat.accountChild = dChildAccount.inputVat
+                    vat.amount = voucher.purchaseOrder.taxPeso
+                    vat.accountChild.accountSubGroup.amount += vat.amount
+                    vat.accountChild.accountSubGroup.accountGroup.amount += vat.amount
+                    vat.accountChild.save()
+                    vat.accountChild.accountSubGroup.save()
+                    vat.accountChild.accountSubGroup.accountGroup.save()
+                    vat.balance = vat.accountChild.amount
+                    vat.save()
+                    request.user.branch.journalEntries.add(vat)
+
+                    pe = JournalEntries()
+                    pe.journal = j
+                    pe.normally = 'Debit'
+                    pe.accountChild = dChildAccount.prepaidExpense
+                    pe.amount = voucher.purchaseOrder.amountDue - voucher.purchaseOrder.taxPeso
+                    pe.accountChild.amount += pe.amount
+                    pe.accountChild.accountSubGroup.amount += pe.amount
+                    pe.accountChild.accountSubGroup.accountGroup.amount += pe.amount
+                    pe.accountChild.save()
+                    pe.accountChild.accountSubGroup.save()
+                    pe.accountChild.accountSubGroup.accountGroup.save()
+                    pe.balance = pe.accountChild.amount
+                    pe.save()
+                    request.user.branch.journalEntries.add(pe)
+            else:
+                vat = JournalEntries()
+                vat.journal = j
+                vat.normally = 'Debit'
+                # vat.accountChild = AccountChild.objects.get(name="VAT Amount")
+                vat.accountChild = dChildAccount.inputVat
+                vat.amount = voucher.purchaseOrder.taxPeso
+                vat.accountChild.accountSubGroup.amount += vat.amount
+                vat.accountChild.accountSubGroup.accountGroup.amount += vat.amount
+                vat.accountChild.save()
+                vat.accountChild.accountSubGroup.save()
+                vat.accountChild.accountSubGroup.accountGroup.save()
+                vat.balance = vat.accountChild.amount
+                vat.save()
+                request.user.branch.journalEntries.add(vat)
+
+                pe = JournalEntries()
+                pe.journal = j
+                pe.normally = 'Debit'
+                pe.accountChild = dChildAccount.prepaidExpense
+                pe.amount = voucher.purchaseOrder.amountDue - voucher.purchaseOrder.taxPeso
+                pe.accountChild.amount += pe.amount
+                pe.accountChild.accountSubGroup.amount += pe.amount
+                pe.accountChild.accountSubGroup.accountGroup.amount += pe.amount
+                pe.accountChild.save()
+                pe.accountChild.accountSubGroup.save()
+                pe.accountChild.accountSubGroup.accountGroup.save()
+                pe.balance = pe.accountChild.amount
+                pe.save()
+                request.user.branch.journalEntries.add(pe)
+        else:
+            payables = JournalEntries()
+            payables.journal = j
+            payables.normally = 'Debit'
+            payables.amount = (voucher.purchaseOrder.runningBalance) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)
+            payables.accountChild = voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable")
+            payables.accountChild.accountSubGroup.amount += payables.amount
+            payables.accountChild.accountSubGroup.accountGroup.amount += payables.amount
+            payables.accountChild.save()
+            payables.accountChild.accountSubGroup.save()
+            payables.accountChild.accountSubGroup.accountGroup.save()
+            payables.balance = payables.accountChild.amount
+            payables.save()
+            request.user.branch.journalEntries.add(payables)
+
+        voucher.purchaseOrder.wep += voucher.wep
+        voucher.purchaseOrder.save()
+        wep = JournalEntries()
+        wep.journal = j
+        wep.normally = 'Credit'
+        # wep.accountChild = AccountChild.objects.get(name="Withholding Expanded Payables")
+        wep.accountChild = dChildAccount.ewp
+        wep.amount = voucher.wep
+        wep.accountChild.amount = wep.amount
+        wep.accountChild.accountSubGroup.amount += wep.amount
+        wep.accountChild.accountSubGroup.accountGroup.amount += wep.amount
+        wep.accountChild.save()
+        wep.accountChild.accountSubGroup.save()
+        wep.accountChild.accountSubGroup.accountGroup.save()
+        wep.balance = wep.accountChild.amount
+        wep.save()
+        request.user.branch.journalEntries.add(wep)
         
+        je = JournalEntries()
+        
+        if voucher.paymentPeriod == 'Full Payment':
+            if voucher.paymentMethod == dChildAccount.cashOnHand.name:
+                je.journal = j
+                je.normally = 'Credit'
+                # je.accountChild = AccountChild.objects.get(name="Cash on Hand")
+                je.accountChild = dChildAccount.cashOnHand
+                je.amount = voucher.amountPaid
+                je.accountChild.amount -= je.amount
+                je.accountChild.accountSubGroup.amount -= je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
+                je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
+                je.balance = je.accountChild.amount
+                je.save()
+                request.user.branch.journalEntries.add(je)
+            elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
+                je.journal = j
+                je.normally = 'Credit'
+                # je.accountChild = AccountChild.objects.get(name="Cash in Bank")
+                je.accountChild = dChildAccount.cashInBank.get(name=voucher.paymentMethod)
+                je.amount = voucher.amountPaid
+                je.accountChild.amount -= je.amount
+                je.accountChild.accountSubGroup.amount -= je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
+                je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
+                je.balance = je.accountChild.amount
+                je.save()
+                request.user.branch.journalEntries.add(je)
+        elif voucher.paymentPeriod == 'Partial Payment':
+            print('b0ss plis')
+            if voucher.paymentMethod == dChildAccount.cashOnHand.name:
+                je.journal = j
+                je.normally = 'Credit'
+                # je.accountChild = AccountChild.objects.get(name="Cash on Hand")
+                je.accountChild = dChildAccount.cashOnHand
+                je.amount = voucher.amountPaid
+                je.accountChild.amount -= je.amount
+                je.accountChild.accountSubGroup.amount -= je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
+                je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
+                je.balance = je.accountChild.amount
+                je.save()
+                request.user.branch.journalEntries.add(je)
+                payables = JournalEntries()
+                payables.journal = j
+                payables.normally = "Credit"
+                payables.accountChild = voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable")
+                payables.amount = (voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)
+                payables.accountChild.amount += je.amount
+                payables.accountChild.accountSubGroup.amount += je.amount
+                payables.accountChild.accountSubGroup.accountGroup.amount += je.amount
+                payables.accountChild.save()
+                payables.accountChild.accountSubGroup.save()
+                payables.accountChild.accountSubGroup.accountGroup.save()
+                payables.balance = je.accountChild.amount
+                payables.save()
+                request.user.branch.journalEntries.add(payables)
+            #elif purchase.paymentMethod == 'Cash in Bank':
+            elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
+                je.journal = j
+                je.normally = 'Credit'
+                # je.accountChild = AccountChild.objects.get(name="Cash in Bank")
+                je.accountChild = dChildAccount.cashInBank.get(name=voucher.paymentMethod)
+                je.amount = voucher.amountPaid
+                je.accountChild.amount -= je.amount
+                je.accountChild.accountSubGroup.amount -= je.amount
+                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
+                je.accountChild.save()
+                je.accountChild.accountSubGroup.save()
+                je.accountChild.accountSubGroup.accountGroup.save()
+                je.balance = je.accountChild.amount
+                je.save()
+                request.user.branch.journalEntries.add(je)
+                payables = JournalEntries()
+                payables.journal = j
+                payables.normally = "Credit"
+                ############
+                # payables.accountChild = purchase.party.accountChild.get(name__regex=r"[Pp]ayable")
+                # ########.accountChild = purchase.party.accountChild.get(name__regex=r"[Rr]eceivable")
+                ############
+                payables.accountChild = voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable")
+                payables.amount = (voucher.purchaseOrder.runningBalance - voucher.amountPaid) - (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)
+                payables.accountChild.amount += je.amount
+                payables.accountChild.accountSubGroup.amount += je.amount
+                payables.accountChild.accountSubGroup.accountGroup.amount += je.amount
+                payables.accountChild.save()
+                payables.accountChild.accountSubGroup.save()
+                payables.accountChild.accountSubGroup.accountGroup.save()
+                payables.balance = je.accountChild.amount
+                payables.save()
+                request.user.branch.journalEntries.add(payables)            
+        voucher.purchaseOrder.runningBalance -= voucher.amountPaid
+        voucher.purchaseOrder.save()
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)        
+
 ################# QUOTATIONS #################
 class QQapprovedView(View):
     def get(self, request, format=None):

@@ -65,6 +65,9 @@ router.register(r"quotations", views.QuotationsAPI, 'quotations')
 ########### INWARD INVENTORY ###########
 router.register(r"inward-inventory", views.InwardInventoryNestedAPI, 'inward-inventory')
 
+########### PAYMENT VOUCHER ###########
+router.register(r"payment-voucher", views.PaymentVoucherAPI, 'payment-voucher')
+
 ########## SALES ORDER ##########
 router.register(r"sales-order", views.SalesOrderAPI, 'sales-order')
  
@@ -156,6 +159,9 @@ urlpatterns = [
     path('so-approval/<int:pk>/', login_required(views.SOApprovalAPI.as_view())),
     path('payment-voucher/', login_required(views.PaymentVoucherView.as_view())),
     path('save-payment-voucher/', login_required(views.SavePaymentVoucher.as_view())),
+    path('pv-nonapproved/', login_required(views.PVnonapprovedView.as_view())),
+    path('pv-approved/', login_required(views.PVapprovedView.as_view())),
+    path('pv-approval/<int:pk>/', login_required(views.PVApprovalAPI.as_view())),
     path('sales-invoice/', login_required(views.SalesInvoiceView.as_view())),
     path('save-sales-invoice/', login_required(views.SaveSalesInvoice.as_view())),
 

@@ -232,7 +232,12 @@ class InwardInventoryNestedAPI(viewsets.ModelViewSet):
     queryset = InwardInventory.objects.all()
 
 
+########## PAYMENT VOUCHER ##########
 
+class PaymentVoucherAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = VoucherSZ
+    queryset = PaymentVoucher.objects.all()
 
 
 

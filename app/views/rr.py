@@ -60,7 +60,7 @@ class SaveReceivingReport(APIView):
             print (key, value)
 
         rr.code = receivingReport['code']
-        rr.datetimeCreated = datetime.now
+        rr.datetimeCreated = datetime.now()
 
         if receivingReport['retroactive']:
             rr.dateReceived = receivingReport['retroactive']

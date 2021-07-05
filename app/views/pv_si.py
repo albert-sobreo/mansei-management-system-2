@@ -62,6 +62,7 @@ class SavePaymentVoucher(APIView):
         if request.user.is_authenticated:
             pv.createdBy = request.user
         pv.paymentMethod = paymentVoucher['paymentMethod']
+        pv.paymentPeriod = paymentVoucher['paymentPeriod']
         pv.amountPaid = paymentVoucher['amountPaid']
         pv.wep = paymentVoucher['wep']
         pv.purchaseOrder = PurchaseOrder.objects.get(pk=paymentVoucher['po']['code'])

@@ -251,22 +251,13 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6 px-1">
+                                <div class="col-12 px-1">
                                     <label>Total Input VAT</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
                                         </div>
                                         <input :value="formatPrice(order.taxPeso)" type="text" class="form-control box-shadow-off" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-6 px-1">
-                                    <label>Amount Withheld/label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">₱</span>
-                                        </div>
-                                        <input :value="formatPrice(order.withholdingTax)" type="text" class="form-control box-shadow-off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -518,7 +509,6 @@
         methods:{
             watchers(){
                 this.order.otherFeesTotal = this.otherFeesTotal.reduce((a,b)=>Number(a)+Number(b), 0)
-                this.order.withholdingTax = this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)
                 this.order.amountDue = this.amountDue.reduce((a,b)=>Number(a)+Number(b),0)
                 this.order.taxPeso = this.order.amountDue * (this.order.taxRate/100)
                 this.order.atc[0].amount = this.order.amountDue - this.order.taxPeso

@@ -208,7 +208,7 @@
 					<div class="p-4 order-card-darker b-radius-15">
 						<div class="row">
 							<div class="col px-1">
-								<label>Amount Duel</label>
+								<label>Amount Due</label>
 								<div class="input-group">
 									<div class="input-group-prepend">
 										<span class="input-group-text">₱</span>
@@ -423,12 +423,21 @@
 
 		methods:{
 			watchers(){
-                this.purchaseOrder.withholdingTax = this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)
+                //this.purchaseOrder.withholdingTax = this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)
+                var amountDue = this.purchaseOrder.amountDue
+                var VATrate = this.purchaseOrder.taxRate/100
+                var ATCrate = this.purchaseOrder.atc[0].taxRate/100
+                var realCost = amountDue * (1.00/(1+VATrate))
+
                 this.purchaseOrder.amountDue = this.amountDue.reduce((a,b)=>Number(a)+Number(b),0)
-                this.purchaseOrder.taxPeso = this.purchaseOrder.amountDue * (this.purchaseOrder.taxRate/100)
-                this.purchaseOrder.atc[0].amount = this.purchaseOrder.amountDue - this.purchaseOrder.taxPeso
+                this.purchaseOrder.taxPeso = this.purchaseOrder.amountDue * ((this.purchaseOrder.taxRate/100)/(1+(this.purchaseOrder.taxRate/100)))
+                this.purchaseOrder.atc[0].amount = this.purchaseOrder.amountDue * (1.00/(1+(this.purchaseOrder.taxRate/100)))
                 this.purchaseOrder.atc[0].amountWithheld = (((this.purchaseOrder.atc[0].taxRate)/100) * this.purchaseOrder.atc[0].amount)
-                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - this.purchaseOrder.withholdingTax
+                this.purchaseOrder.amountTotal = this.purchaseOrder.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0))
+                // this.purchaseOrder.withholdingTax = (this.purchaseOrder.atc[0].amountWithheld * (1-(this.purchaseOrder.amountDue - this.purchaseOrder.amountPaid)/this.purchaseOrder.amountDue))
+
+                //this.purchaseOrder.withholdingTax = Number(this.purchaseOrder.atc[0].amountWithheld) * (1-((Number(this.purchaseOrder.amountDue) - ((Number(this.purchaseOrder.amountPaid)/(1-(((this.purchaseOrder.atc[0].taxRate)/100)/(1+(this.purchaseOrder.taxRate/100)))))))/Number(this.purchaseOrder.amountDue)))
+                this.purchaseOrder.withholdingTax = Number(this.purchaseOrder.amountPaid/((1+(this.purchaseOrder.taxRate/100)-(this.purchaseOrder.atc[0].taxRate)/100))) * (this.purchaseOrder.atc[0].taxRate)/100
             },
 
             loadData(){
@@ -655,7 +664,7 @@
                 this.$delete(this.purchaseOrder.items, index)
             },
             submit(){
-                if(Number(this.purchaseOrder.amountTotal) >= Number(this.purchaseOrder.amountPaid)){
+                if(Number(this.purchaseOrder.amountTotal).toFixed(2) >= Number(this.purchaseOrder.amountPaid).toFixed(2)){
                     axios.post('/save-receiving-report/', this.purchaseOrder, this.config)
                     .then(res=>res.data==0?location.reload():'')
                 } else {

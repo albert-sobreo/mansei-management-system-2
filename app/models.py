@@ -271,13 +271,13 @@ class PurchaseOrder(models.Model):
     datePurchased = models.DateField()
     party = models.ForeignKey(Party, related_name="purchaseorder", on_delete=models.PROTECT)
     purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="purchaseorder",on_delete=models.PROTECT, null=True, blank=True)
-    amountPaid = models.DecimalField(max_digits=18, decimal_places=5)
+    amountPaid = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5)
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True)
-    paymentMethod = models.CharField(max_length=50)
+    paymentMethod = models.CharField(max_length=50, null=True, blank=True)
     paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True, blank=True)
     dueDate = models.DateField(null = True, blank = True)
@@ -291,7 +291,7 @@ class PurchaseOrder(models.Model):
     fullyPaid = models.BooleanField(null = True, blank = True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     fullyReceived = models.BooleanField(default=False)
-    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default = 0.0)
     
     class Meta:
         verbose_name = "Purchase Order"
@@ -436,10 +436,12 @@ class PaymentVoucher(models.Model):
     journal = models.ForeignKey(Journal, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
     remarks = models.TextField(null = True)
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vCreatedBy")
+    approved = models.BooleanField(default = 'False', null = True, blank = True)
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vApprovedBy")
     datetimeApproved = models.DateTimeField(null = True)
     paymentMethod = models.CharField(max_length = 50, null = True)
-    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    paymentPeriod = models.CharField(max_length = 50, null = True, blank = True)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default = 0.0)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class Quotations(models.Model):

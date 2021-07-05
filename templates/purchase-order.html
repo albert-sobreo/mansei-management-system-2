@@ -220,7 +220,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6 px-1">
+                                <div class="col-12 px-1">
                                     <label>Total Input VAT</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
@@ -229,7 +229,7 @@
                                         <input :value="formatPrice(purchaseOrder.taxPeso)" type="text" class="form-control box-shadow-off" readonly>
                                     </div>
                                 </div>
-                                <div class="col-6 px-1">
+                                <div class="col-6 px-1" hidden>
                                     <label>Amount Withheld</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
@@ -240,7 +240,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6 px-1">
+                                <div class="col-12 px-1">
                                     <label>Total Amount Due</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
@@ -249,7 +249,7 @@
                                         <input type="text" :value="formatPrice(purchaseOrder.amountTotal)" class="form-control box-shadow-off" readonly>
                                     </div>
                                 </div>
-                                <div class="col-6 px-1">
+                                <div class="col-6 px-1" hidden>
                                     <label>Amount Paid</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
@@ -261,22 +261,22 @@
                             </div>
                             <div class="row mt-4">
                                 <div class="col-12 px-1">
-                                    <label>Payment Method</label>
+                                    <label>Payment Period</label>
                                 </div>
                                 <div class="col-12 px-1">
                                     <div class="d-flex align-items-center">
-                                        <select v-model="purchaseOrder.paymentMethod" class="col col-5 form-control">
+                                        <select hidden v-model="purchaseOrder.paymentMethod" class="col col-5 form-control">
                                             <option value="" selected disabled>Choose Payment Method</option>
                                             <option value="Cash on Hand">Cash on Hand</option>
                                             <option value="Cash in Bank">Cash in Bank</option>
                                             <option value="Cheque">Cheque</option>
                                             <option value="Other">Other</option>
                                         </select>
-                                        <div class="col ml-2 form-check form-check-inline">
+                                        <div class="col ml-2 my-2 form-check form-check-inline">
                                             <input v-model="purchaseOrder.paymentPeriod" value="Full Payment" name="radios" type="radio" class="form-check-input">
                                             <label class="form-check-label">Full Payment</label>
                                         </div>
-                                        <div class="col form-check form-check-inline">
+                                        <div class="col my-2 form-check form-check-inline">
                                             <input v-model="purchaseOrder.paymentPeriod" value="Partial Payment" name="radios" type="radio" class="form-check-input">
                                             <label class="form-check-label">Partial Payment</label>
                                         </div>
@@ -284,11 +284,11 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6 px-1">
+                                <div class="col-6 px-1" hidden>
                                     <label>Cheque No.</label>
                                     <input v-model="purchaseOrder.chequeNo" type="text" class="form-control" placeholder="Leave blank if applicable">
                                 </div>
-                                <div class="col-6 px-1">
+                                <div class="col-12 px-1">
                                     <label>Due Date</label>
                                     <input v-model="purchaseOrder.dueDate" type="date" class="form-control">
                                 </div>
@@ -561,9 +561,6 @@
                     this.purchaseOrder.code &&
                     this.purchaseOrder.date &&
                     this.purchaseOrder.vendor &&
-                    this.purchaseOrder.amountPaid &&
-                    this.purchaseOrder.paymentMethod &&
-                    this.purchaseOrder.paymentPeriod &&
                     this.purchaseOrder.taxType &&
                     this.purchaseOrder.taxRate
                     )
@@ -600,15 +597,6 @@
                 }
                 if (!this.purchaseOrder.vendor){
                     this.errors.push('Vendor Required')
-                }
-                if (!this.purchaseOrder.amountPaid){
-                    this.errors.push('Amount Paid Required')
-                }
-                if (!this.purchaseOrder.paymentMethod){
-                    this.errors.push("Payment Method Required")
-                }
-                if (!this.purchaseOrder.paymentPeriod){
-                    this.errors.push('Payment Period Required')
                 }
                 if (!this.purchaseOrder.taxType){
                     this.errors.push('Tax Type Required')
