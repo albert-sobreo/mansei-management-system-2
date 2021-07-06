@@ -59,7 +59,7 @@ class SaveSalesContract(APIView):
         sc = SalesContract()
 
         sc.code = salesContract['code']
-        sc.datetimeCreated = datetime.now
+        sc.datetimeCreated = datetime.now()
 
         if salesContract['retroactive']:
             sc.dateSold = salesContract['retroactive']
@@ -68,14 +68,11 @@ class SaveSalesContract(APIView):
 
         sc.party = Party.objects.get(pk=salesContract['customer'])
         
-        sc.amountPaid = Decimal(salesContract['amountPaid'])
         sc.amountDue = Decimal(salesContract['amountDue'])
         sc.amountTotal = Decimal(salesContract['amountTotal'])
         sc.taxType = salesContract['taxType']
         sc.taxRate = Decimal(salesContract['taxRate'])
         sc.taxPeso = Decimal(salesContract['taxPeso'])
-        sc.paymentMethod = salesContract['paymentMethod']
-        sc.paymentPeriod = salesContract['paymentPeriod']
         sc.chequeNo = salesContract['chequeNo']
         sc.dueDate = salesContract['dueDate']
         sc.bank = salesContract['bank']

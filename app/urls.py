@@ -36,7 +36,6 @@ router.register(r'purchase-order', views.PurchaseOrderAPI, 'purchase-order')
 
 router.register(r'sales-contract-non-approved', views.SalesContractApprovalNonApprovedAPI, 'sales-contract-non-approved')
 router.register(r'sales-contract-approved', views.SalesContractApprovalApprovedAPI, 'sales-contract-approved')
-router.register(r'sales-contract', views.SalesContractAPI, 'sales-contract')
 
 ########## SPECIAL TRUCK ##########
 router.register(r"special-truck", views.SpecialTruckAPI, 'special-truck')
@@ -64,9 +63,13 @@ router.register(r"quotations", views.QuotationsAPI, 'quotations')
 
 ########### INWARD INVENTORY ###########
 router.register(r"inward-inventory", views.InwardInventoryNestedAPI, 'inward-inventory')
+router.register(r"inward-inventory-basic", views.InwardInventoryAPI, 'inward-inventory-basic')
 
 ########### PAYMENT VOUCHER ###########
 router.register(r"payment-voucher", views.PaymentVoucherAPI, 'payment-voucher')
+
+########## SALES INVOICE ##########
+router.register(r"sales-invoice", views.SalesInvoiceAPI, 'sales-input')
 
 ########## SALES ORDER ##########
 router.register(r"sales-order", views.SalesOrderAPI, 'sales-order')
@@ -166,5 +169,6 @@ urlpatterns = [
     path('save-sales-invoice/', login_required(views.SaveSalesInvoice.as_view())),
 
     path('branch-profile/', login_required(views.BranchProfileView.as_view())),
-    path('save-default-accounts/', login_required(views.SaveDefaultAccounts.as_view()))
+    path('save-default-accounts/', login_required(views.SaveDefaultAccounts.as_view())),
+    path('received-payment/', login_required(views.ReceivedPaymentView.as_view()))
 ]

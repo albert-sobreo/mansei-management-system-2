@@ -433,6 +433,7 @@ class PaymentVoucher(models.Model):
     paymentDate = models.DateField(null = True)
     purchaseOrder = models.ForeignKey(PurchaseOrder, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
     receivingReport = models.ForeignKey(ReceivingReport, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
+    inwardInventory = models.ForeignKey(InwardInventory, related_name= "inwardinventory", on_delete=models.PROTECT, null = True, blank = True)
     journal = models.ForeignKey(Journal, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
     remarks = models.TextField(null = True)
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vCreatedBy")
@@ -504,7 +505,6 @@ class SalesOrder(models.Model):
     dateSold = models.DateField()
     party = models.ForeignKey(Party, related_name="salesorder", on_delete=models.PROTECT, null=True, blank=True)
     quotations = models.ForeignKey(Quotations, related_name = "salesorder", on_delete = models.PROTECT, null = True, blank = True)
-    amountPaid = models.DecimalField(max_digits=18, decimal_places=5, null = True)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
     discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
@@ -512,8 +512,6 @@ class SalesOrder(models.Model):
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
-    paymentMethod = models.CharField(max_length=50)
-    paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True, blank=True)
     dueDate = models.DateField(null = True, blank = True)
     bank = models.CharField(max_length=50, null = True, blank = True)
@@ -625,7 +623,7 @@ class TempSCItemsMerch(models.Model):
 
 class TempSCOtherFees(models.Model):
     salesContract = models.ForeignKey(SalesContract, related_name='scotherfees', on_delete=models.PROTECT)
-    fee = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
+    fee = models.DecimalField(max_digits=20, decimal_places=5)
     description = models.CharField(max_length=255, null = True)
 
 class SCItemsMerch(models.Model):
@@ -675,6 +673,22 @@ class VendorQuotesItemsMerch(models.Model):
     vendorquotesmerch = models.ForeignKey(VendorQuotesMerch, related_name="vendorquotesitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     price = models.DecimalField(max_digits=18, decimal_places=5)
     party = models.ForeignKey(Party, related_name="vendorquotesitemsmerch", on_delete=models.PROTECT)
+
+class ReceivePayment(models.Model):
+    code = models.CharField(max_length=50, null = True)
+    datetimeCreated = models.DateTimeField(null = True)
+    paymentDate = models.DateField(null = True)
+    salesContract = models.ForeignKey(SalesContract, related_name= "receivepayment", on_delete=models.PROTECT, null = True)
+    journal = models.ForeignKey(Journal, related_name= "receivepayment", on_delete=models.PROTECT, null = True)
+    remarks = models.TextField(null = True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="rpCreatedBy")
+    paymentMethod = models.CharField(max_length = 50, null = True)
+    paymentPeriod = models.CharField(max_length = 50, null = True)
+    amountDue = models.DecimalField(max_digits=18, decimal_places=5)
+    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    outputVat = models.DecimalField(max_digits=20, decimal_places=5, null = True, default = 0.0)
+    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+
 
 class Driver(models.Model):
     driverID = models.CharField(max_length=50, default='0')
@@ -858,6 +872,7 @@ class Branch(models.Model):
     #### PAYMENT VOUCHER & SALES INVOICE
     paymentVoucher = models.ManyToManyField(PaymentVoucher, blank = True)
     salesInvoice = models.ManyToManyField(SalesInvoice, blank = True)
+    receivePayment = models.ManyToManyField(ReceivePayment, blank = True)
 
     def __str__(self):
         return self.name

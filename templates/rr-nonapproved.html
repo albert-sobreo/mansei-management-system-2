@@ -35,7 +35,7 @@
               <th>RR Code</th>
               <th>PO Code</th>
               <th>Amount Due</th>
-              <th>Amount Paid</th>
+              <th>Running Balance</th>
               <th>Date Created</th>
               <th>Created by</th>
             </thead>
@@ -45,7 +45,11 @@
                     <td class="link" @click="viewPO('{{po.pk}}')" data-toggle="modal" data-target="#rrlistmodal">{{po.code}}</td>
                     <td>{{po.purchaseOrder.code}}</td>
                     <td>₱[[roundNumber2({{po.amountDue}})]]</td>
-                    <td>₱[[roundNumber2({{po.amountPaid}})]]</td>
+                    {% if po.runningBalance %}
+                    <td>₱[[roundNumber2({{po.runningBalance}})]]</td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
                     <td>{{po.datetimeCreated}}</td>
                     <td>{{po.createdBy.first_name}} {{po.createdBy.last_name}}</td>
                 </tr>
@@ -115,8 +119,8 @@
                                 <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountTotal)]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label class="gray">Amount Paid</label><br>
-                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.amountPaid)]]</span>
+                                <label class="gray">Running Balance/label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(this.poModal.runningBalance)]]</span>
                             </div>
 
                             <!-- LVL 2 ***-->
@@ -284,6 +288,7 @@
 
                 amountDue: null,
                 amountPaid: null,
+                runningBalance: null,
                 amountTotal: null,
                 paymentMethod: null,
                 paymentPeriod: null,

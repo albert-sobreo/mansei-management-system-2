@@ -298,6 +298,7 @@
                 return x.reduce((a,b)=>Number(a)+Number(b), 0)
             }
         },
+        
         methods: {
             viewSC(code){
                 axios.get(`/api/sales-contract/${code}/`)

@@ -39,10 +39,19 @@
                     <label><span>Retroactive</span>&nbsp;<span class="font-size-10 gray">(optional)</span></label>
                     <input v-model="order.retroactive" type="date" class="form-control" name="retroactiveDate">
                 </div>
+                <div class="col col-2 pl-2">
+                    <label>Sales Order</label>
+                    <select @change="getSO(order.salesOrder)" v-model="order.salesOrder" class="form-control">
+                        <option value="" selected disabled>Choose Sales Order</option>
+                        {% for item in request.user.branch.salesOrder.all %}
+                        <option value="{{item.pk}}">{{item.code}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
             <!-- VENDOR -->
             <div class="row mt-2 mb-4">
-                <div class="col col-3 pr-2">
+                <div class="col col-5 pr-2">
                     <label>Customer</label>
                     <select v-model="order.customer" class="form-control">
                         <option value="" selected disabled>Choose Customer</option>
@@ -251,22 +260,13 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6 px-1">
+                                <div class="col-12 px-1">
                                     <label>Total Input VAT</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
                                         </div>
                                         <input :value="formatPrice(order.taxPeso)" type="text" class="form-control box-shadow-off" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-6 px-1">
-                                    <label>Amount Withheld</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">₱</span>
-                                        </div>
-                                        <input :value="formatPrice(order.withholdingTax)" type="text" class="form-control box-shadow-off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -298,8 +298,8 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6 px-1">
-                                    <label class="font-size-14">Total Amount Due</label>
+                                <div class="col-12 px-1">
+                                    <label class="font-size-18">Total Amount Due</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
@@ -307,54 +307,11 @@
                                         <input type="text" :value="formatPrice(order.amountTotal)" class="form-control box-shadow-off" readonly>
                                     </div>
                                 </div>
-                                <div class="col-6 px-1">
-                                    <label class="font-size-14">Amount Paid</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">₱</span>
-                                        </div>
-                                        <input v-model="order.amountPaid" type="number" step="0.01" class="form-control box-shadow-off" min="0" :max="order.amountDue">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-4">
-                                <div class="col-12 px-1">
-                                    <label>Payment Method</label>
-                                </div>
-                                <div class="col-12 px-1">
-                                    <div class="d-flex align-items-center">
-                                        <select v-model="order.paymentMethod" class="col col-5 form-control">
-                                            <option value="" selected disabled>Choose Payment Method</option>
-                                            <option value="Cash on Hand">Cash on Hand</option>
-                                            <option value="Cash in Bank">Cash in Bank</option>
-                                            <option value="Cheque">Cheque</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                        <div class="col ml-2 form-check form-check-inline">
-                                            <input v-model="order.paymentPeriod" value="Full Payment" name="radios" type="radio" class="form-check-input">
-                                            <label class="form-check-label">Full Payment</label>
-                                        </div>
-                                        <div class="col form-check form-check-inline">
-                                            <input v-model="order.paymentPeriod" value="Partial Payment" name="radios" type="radio" class="form-check-input">
-                                            <label class="form-check-label">Partial Payment</label>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                             <div class="row">
-                                <div class="col-6 px-1">
-                                    <label>Cheque No.</label>
-                                    <input v-model="order.chequeNo" type="text" class="form-control" placeholder="Leave blank if applicable">
-                                </div>
-                                <div class="col-6 px-1">
+                                <div class="col-12 px-1">
                                     <label>Due Date</label>
                                     <input v-model="order.dueDate" type="date" class="form-control">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12 px-1">
-                                    <label>Bank</label>
-                                    <input v-model="order.bank" type="text" class="form-control" placeholder="Leave blank if applicable">
                                 </div>
                             </div>
                         </div>
@@ -394,6 +351,7 @@
                 date: new Date().toISOString().split('T')[0],
                 dateTimeCreated: new Date().toISOString(),
                 retroactive: null,
+                salesOrder: '',
                 customer: '',
                 taxType: '',
                 taxRate: '',
@@ -657,9 +615,6 @@
                     this.order.code &&
                     this.order.date &&
                     this.order.customer &&
-                    this.order.amountPaid &&
-                    this.order.paymentMethod &&
-                    this.order.paymentPeriod &&
                     this.order.taxType &&
                     this.order.taxRate
                     )
@@ -706,15 +661,6 @@
                 }
                 if (!this.order.customer){
                     this.errors.push('Customer Required')
-                }
-                if (!this.order.amountPaid){
-                    this.errors.push('Amount Paid Required')
-                }
-                if (!this.order.paymentMethod){
-                    this.errors.push("Payment Method Required")
-                }
-                if (!this.order.paymentPeriod){
-                    this.errors.push('Payment Period Required')
                 }
                 if (!this.order.taxType){
                     this.errors.push('Tax Type Required')
@@ -805,16 +751,8 @@
                 this.$delete(this.order.items, index)
             },
             submit(){
-                if(Number(this.order.amountTotal).toFixed(2) >= Number(this.order.amountPaid).toFixed(2)){
-                    axios.post('/save-sales-contract/', this.order, this.config)
-                    .then(res=>res.data==0?location.reload():'')
-                } else {
-                    Swal.fire({
-                        title: 'Something went wrong',
-                        html: "Total should be less than or equal to Amount Due.",
-                        icon: 'warning'
-                    })
-                }
+                axios.post('/save-sales-contract/', this.order, this.config)
+                .then(res=>res.data==0?location.reload():'')
                 
             },
             setATCRate(code, index){
@@ -844,6 +782,61 @@
             removeFee(index){
                 this.$delete(this.order.otherFees, index)
             },
+            getSO(id){
+                console.log(id)
+                axios.get(`/api/sales-order/${id}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    item = res.data
+                    this.order.customer = item.party.id
+                    this.order.taxType = item.taxType
+                    this.order.taxRate = Number(item.taxRate).toFixed(0)
+                    this.order.items = [{
+                        type: '',
+                        code: '',
+                        remaining: null,
+                        quantity: 0,
+                        cbm: 'm3',
+                        vol: null,
+                        pricePerCubic: 0.00,
+                        totalCost: null
+                    }]
+                    item.soitemsmerch.forEach((el,index)=>{
+                        if (index==0){
+                            this.order.items[index].type = el.type = 'Merchandise'
+                            this.order.items[index].code = el.merchInventory.id
+                            this.order.items[index].remaining = el.merchInventory.qtyA
+                            this.order.items[index].quantity = el.qty
+                            this.order.items[index].vol = el.merchInventory.vol
+                            this.order.items[index].pricePerCubic = el.pricePerCubic
+                            this.order.items[index].totalCost = el.totalCost
+                        } else {
+                            this.order.items.push({
+                                type: 'Merchandise',
+                                code: el.merchInventory.id,
+                                remaining: el.merchInventory.qtyA,
+                                quantity: el.qty,
+                                vol: el.merchInventory.vol,
+                                pricePerCubic: el.pricePerCubic,
+                                totalCost: el.totalCost,
+                                cbm: 'm3',
+                            })
+                        }
+                    })
+                    item.soatc.forEach((el, index)=>{
+                        if (index==0){
+                            this.order.atc[0].code = el.code.id
+                            this.order.atc[0].amount = item.amountDue
+                            this.order.atc[0].taxRate = (el.code.rate*100)
+                            this.order.atc[0].amountWithheld = el.amountWithheld
+                        }
+                    })
+                    this.order.taxPeso = item.taxPeso
+                    this.order.withholdingTax = item.wep
+                    this.order.amountDue = item.amountDue
+                    this.order.amountTotal = item.amountTotal
+                })
+            }
         },
         mounted(){
             this.loadData()

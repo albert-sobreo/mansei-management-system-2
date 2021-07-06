@@ -221,7 +221,7 @@ class SCatcSZ(serializers.ModelSerializer):
 
 class SCOtherFeesSZ(serializers.ModelSerializer):
     class Meta:
-        model = TempSCOtherFees(serializers.ModelSerializer)
+        model = TempSCOtherFees
         fields = '__all__'
 
 class SalesContractNestedSZ(serializers.ModelSerializer):
@@ -229,9 +229,9 @@ class SalesContractNestedSZ(serializers.ModelSerializer):
     createdBy = UserSZ(read_only=True)
     approvedBy = UserSZ(read_only=True)
     journal = JournalSZ(read_only=True)
+    scotherfees = SCOtherFeesSZ(read_only=True, many=True)
     scitemsmerch = SCItemsMerchNestedSZ(read_only=True, many=True)
     scatc = SCatcSZ(read_only=True, many=True)
-    scotherfees = SCOtherFeesSZ(read_only=True, many=True)
 
     class Meta:
         model = SalesContract
@@ -514,6 +514,31 @@ class VoucherSZ(serializers.ModelSerializer):
         model = PaymentVoucher 
         fields = '__all__'
         depth = 1
+
+
+
+
+########## RECEIVED PAYMENT ##########
+class ReceivedPayment(serializers.ModelSerializer):
+    salesContract = SalesContractNestedSZ(read_only=True)
+    class Meta:
+        model = ReceivePayment
+        fields = '__all__'
+        depth = 1
+
+
+
+
+########## INWARD BASIC ##########
+class InwardInventorySZ(serializers.ModelSerializer):
+    class Meta:
+        model = InwardInventory
+        fields = '__all__'
+        depth = 1
+
+
+
+
 
 ########## SALES INVOICE ##########
 class SalesInvoiceSZ(serializers.ModelSerializer):

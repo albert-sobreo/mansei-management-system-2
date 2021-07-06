@@ -129,6 +129,7 @@ class InwardAdjustmentSave(APIView):
         inwardInventory = InwardInventory.objects.get(pk=pk)
         inwardInventory.adjusted = True
         inwardInventory.amountTotal = inward['amountTotal']
+        inwardInventory.runningBalance = inward['amountTotal']
         inwardInventory.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')

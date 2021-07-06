@@ -242,14 +242,15 @@
         computed:{
             amountTotal(){
                 var x = this.order.items.map(item=>item.adjusted)
-                return x.map(item=>item.amountTotal)
+                return x.map(item2=>item2.map(item=>item.amountTotal))
+                //return y.map(item=>item.amountTotal)
             }
         },
 
         watch: {
             amountTotal(){
                 console.log(this.amountTotal)
-                this.order.amountTotal = this.amountTotal.reduce((a,b)=>Number(a)+Number(b),0)
+                this.order.amountTotal = this.amountTotal.reduce((a,b)=>Number(a)+Number(b.reduce((x,y)=>Number(x)+Number(y)), 0),0)
             }
         },
 
@@ -284,11 +285,11 @@
                 })
             },
             removeAdjustments(index, index1){
-                this.$delete(this.order.items[index].adjusted, index)
+                this.$delete(this.order.items[index].adjusted, index1)
             },
 
             submit(id){
-                axios.post(`/save-inward-inventory/${id}`, this.order, this.config)
+                axios.post(`/save-inward-inventory/${id}/`, this.order, this.config)
                 .then(res=>res.data==0?location.reload():'')
                 console.log(id)
             },
@@ -386,9 +387,7 @@
             getII(id){
                 axios.get(`/api/inward-inventory/${id}`)
                 .then(res=>{
-                    console.log(res.data)
                     var iiitemsmerch = res.data.iiitemsmerch
-                    console.log(iiitemsmerch)
                     
                     iiitemsmerch.forEach((item,index)=>{
                         if(index==0){

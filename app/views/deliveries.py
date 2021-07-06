@@ -129,7 +129,7 @@ class SaveDelivery(APIView):
         d = Deliveries()
 
         d.code = deliveries['code']
-        d.datetimeCreated = datetime.now
+        d.datetimeCreated = datetime.now()
         d.truck = Truck.objects.get(pk=deliveries['truck'])
         d.driver = Driver.objects.get(pk=deliveries['driver'])
         d.scheduleStart = deliveries['scheduleStart']
@@ -152,7 +152,7 @@ class SaveDelivery(APIView):
             for itemMerch in item['transacItems']:
                 if itemMerch['delivered']:
                     if item['type'] == 'Sales Contract':
-                        scitemsmerch = TempSCItemsMerch.objects.get(pk=itemMerch['id'])
+                        scitemsmerch = SCItemsMerch.objects.get(pk=itemMerch['id'])
                         scitemsmerch.delivered = True
                         scitemsmerch.save()
                     dim = DeliveryItemMerch()

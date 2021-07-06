@@ -254,7 +254,7 @@
             fetchItemsList(id, index, type){
                 if (type == "Sales Contract"){
                     item = this.sales.find(x=>x.id==id)
-                    var d = (item.tempscitemsmerch).filter(x=>x.delivered==false)
+                    var d = (item.scitemsmerch).filter(x=>x.delivered==false)
                     this.delivery.items[index].itemList = d
                     this.delivery.items[index].transacItems = [];
                     this.delivery.items[index].itemList.forEach((item)=>{

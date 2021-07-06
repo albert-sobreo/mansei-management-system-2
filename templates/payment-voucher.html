@@ -30,7 +30,11 @@
                 {% for item in request.user.branch.paymentVoucher.all %}
                 <tr>
                     <td @click="getPO2({{item.pk}})" class="link" data-toggle="modal" data-target="#pvModal">{{item.code}}</td>
+                    {% if item.purchaseOrder %}
                     <td>{{item.purchaseOrder.party.name}}</td>
+                    {% else %}
+                    <td>{{item.inwardInventory.party.name}}</td>
+                    {% endif %}
                     <td>₱[[formatPrice({{item.amountPaid}})]]</td>
                     <td>{{item.createdBy.first_name}} {{item.createdBy.last_name}}</td>
                     <td></td>
@@ -83,12 +87,12 @@
                             <div class="col-4 mt-3">
                                 <label for="" class="gray">PO Code</label>
                                 <br>
-                                <span class="font-size-14 font-bold">[[pvModal.purchaseOrder.code]]</span>
+                                <span class="font-size-14 font-bold" v-if="pvModal.purchaseOrder != null">[[pvModal.purchaseOrder.code]]</span>
                             </div>
                             <div class="col-4 mt-3">
                                 <label for="" class="gray">Vendor</label>
                                 <br>
-                                <span class="font-size-14 font-bold">[[pvModal.purchaseOrder.party.name]]</span>
+                                <span class="font-size-14 font-bold" v-if="pvModal.purchaseOrder != null">[[pvModal.purchaseOrder.party.name]]</span>
                             </div>
                             <div class="col-4 mt-3">
                                 <label for="" class="gray">Amount Paid</label>
@@ -128,7 +132,7 @@
                                     <th><span class="font-bold gray">Amount</span></th>
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
-                                <tbody>
+                                <tbody v-if="pvModal.purchaseOrder != null">
                                     <tr v-for="item in pvModal.purchaseOrder.poitemsmerch">
                                         <td>Merchandise</td>
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
@@ -156,154 +160,12 @@
                         <div class="mb-4">
                             <div class="d-flex align-items-center justify-content-between">
                                 <span class="modal-title">Create Payment Voucher</span>
-                            </div>
-                        </div>
-
-                        <!-- CUSTOM VOUCHER -->
-                        <div id="custom" style="display: none;">
-                            <!-- START -->
-                            <div class="row">
-                                <div class="col-3 pr-2">
-                                    <div class="form-group">
-                                        <label>Reference No.</label>
-                                        <input type="text" class="form-control" placeholder="Enter Reference No.">
-                                    </div>
-                                </div>
-                                <div class="col col-3 px-2">
-                                    <div class="form-group">
-                                        <label>Date</label>
-                                        <input  type="date" class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="col col-3 pl-2">
-                                    <div class="form-group">
-                                        <label>Retroactive <span class="font-size-10 gray">optional</span></label>
-                                        <input  type="date" class="form-control" disabled>
-                                    </div>
-                                </div>
-                                <div class="col-3 pl-2">
-                                    <div class="form-group">
-                                        <label for="">Vendor</label>
-                                        <select name="" id="" class="form-control">
-                                            <option value="" disabled selected>Select Vendor</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- DEBIT -->
-                            <div class="row">
-                                <div class="col col-7">
-                                    <label>Debit Account</label>
-                                </div>
-                                <div class="col col-5">
-                                    <label>Amount</label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col col-7 pr-2">
-                                    <select  class="form-control">
-                                        {% for debit in request.user.branch.subGroup.all %}
-                                        <option value="" selected disabled class="gray">Choose Account</option>
-                                        <optgroup label="{{debit.name}}">
-                                            {% for child in debit.accountchild.all %}
-                                            <option value="{{child.pk}}">{{child.name}}</option>
-                                            {% endfor %}
-                                        </optgroup>
-                                        {% endfor %}
-                                    </select>
-
-                                </div>
-                                <div class="col pl-2">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">₱</span>
-                                        </div>
-                                        <input  type="text" class="form-control box-shadow-off" style="margin-top: 0px;">
-                                    </div>                            
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-minus-circle stop text-shadow-small" @click="removeDebit(index)"></i>
-                                </div>
-                            </div>
-                            <div class="row" >
-                                <div class="col">
-                                    <button class="btn btn-warning my-2">+ Add new debit</button>
-                                </div>
-                            </div>
-
-                            <!-- CREDIT -->
-                            <div class="row">
-                                <div class="col col-7">
-                                    <label>Credit Account</label>
-                                </div>
-                                <div class="col col-5">
-                                    <label>Amount</label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col col-7 pr-2">
-                                    <select  class="form-control">
-                                        {% for credit in request.user.branch.subGroup.all %}
-                                        <option value="" selected disabled class="gray">Choose Account</option>
-                                        <optgroup label="{{credit.name}}">
-                                            {% for child in credit.accountchild.all %}
-                                            <option value="{{child.pk}}">{{child.name}}</option>
-                                            {% endfor %}
-                                        </optgroup>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col pl-2">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">₱</span>
-                                        </div>
-                                        <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;">
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-minus-circle stop text-shadow-small" @click="removeCredit(index)"></i>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <button @click="addLineCredit()" class="btn btn-warning my-2">+ Add new credit</button>
-                                </div>
-                            </div>
-
-                            <!-- DESCRIPTION -->
-                            <div class="row">
-                                <div class="col">
-                                    <label>Description</label>
-                                    <textarea  class="form-control" id="" cols="30" rows="2" placeholder="Enter Description"></textarea>
-                                </div>
-                            </div>
-                            <div class="row my-2">
-                                <div class="col col-3 pr-2">
-                                    <label>Debit</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">₱</span>
-                                        </div>
-                                        <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
-                                    </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
-                                </div>
-                                <div class="col col-3 pl-2">
-                                    <label>Credit</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">₱</span>
-                                        </div>
-                                        <input  type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
-                                    </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col col-12">
-                                    <div class="d-flex flex-row-reverse">
-                                        <button @click="submitJournal()" class="btn btn-primary mt-2" id="save" disabled>Create</button>
-                                    </div>
+                                <div class="form-group d-flex align-items-center">
+                                    <input v-model="create.selectType" value="PO" type="radio" name='rad'>
+                                    <label for="">Help</label>
+                                    &nbsp;
+                                    <input v-model="create.selectType" value="II" type="radio" name="rad">
+                                    <label for="">me</label>
                                 </div>
                             </div>
                         </div>
@@ -331,11 +193,20 @@
                                     </div>
                                 </div>
                                 <div class="col-3 pl-2">
-                                    <div class="form-group">
+                                    <div class="form-group" v-if="create.selectType == 'PO'">
                                         <label for="">Select PO</label>
                                         <select @change="getPO(create.poCode)" v-model="create.poCode" class="form-control">
                                             <option value="" disabled selected>Select PO</option>
                                             {% for item in po reversed %}
+                                            <option value="{{item.pk}}">{{item.code}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group" v-else-if="create.selectType == 'II'">
+                                        <label for="">Select II</label>
+                                        <select @change="getII(create.iiCode)" v-model="create.iiCode" class="form-control">
+                                            <option value="" disabled selected>Select II</option>
+                                            {% for item in request.user.branch.inwardInventory.all reversed %}
                                             <option value="{{item.pk}}">{{item.code}}</option>
                                             {% endfor %}
                                         </select>
@@ -495,9 +366,11 @@
                 wep:null
             },
             create: {
+                selectType: 'PO',
                 code: '{{new_code}}',
                 date: new Date().toISOString().split('T')[0],
                 retroactive: null,
+                iiCode: '',
                 poCode: '',
                 po: {
                     code: null,
@@ -619,9 +492,17 @@
 
                 })
             },
+            getII(id){
+                axios.get(`/api/inward-inventory-basic/${id}/`)
+                .then(res=>{
+                    var item = res.data
+                    this.create.po.code = item.id
+                    this.create.po.runningBalance = item.runningBalance
+                    this.create.po.party = item.party
+                })
+            },
             checkForm(){
                 if (
-                    this.create.poCode &&
                     this.create.paymentMethod &&
                     this.create.paymentPeriod &&
                     this.create.amountPaid
@@ -631,10 +512,6 @@
                 }
 
                 this.errors = []
-
-                if(!this.create.poCode){
-                    this.errors.push("PO Required")
-                }
                 if(!this.create.paymentMethod){
                     this.errors.push("Payment Method Required")
                 }

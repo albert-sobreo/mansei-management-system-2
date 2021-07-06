@@ -231,6 +231,15 @@ class InwardInventoryNestedAPI(viewsets.ModelViewSet):
     serializer_class = InwardInventoryNestedSZ
     queryset = InwardInventory.objects.all()
 
+class InwardInventoryAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = InwardInventorySZ
+    queryset = InwardInventory.objects.all()
+
+
+
+
+
 
 ########## PAYMENT VOUCHER ##########
 
@@ -238,6 +247,17 @@ class PaymentVoucherAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = VoucherSZ
     queryset = PaymentVoucher.objects.all()
+
+
+
+
+
+########## INVOICE ##########
+class SalesInvoiceAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SalesInvoiceSZ
+    queryset = SalesInvoice.objects.all()
+
 
 
 
@@ -258,16 +278,6 @@ class SalesOrderAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesOrderNestedSZ
     queryset = SalesOrder.objects.all()
-
-
-
-
-
-########## SALES CONTRACT ##########
-class SalesContractAPI(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    serializer_class = SalesContractSZ
-    queryset = SalesContract.objects.all()
 
 
 

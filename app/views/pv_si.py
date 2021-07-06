@@ -42,7 +42,8 @@ class PaymentVoucherView(View):
 
         context = {
             'new_code': new_code,
-            'po': request.user.branch.purchaseOrder.filter(approved=True, fullyPaid=False)
+            'po': request.user.branch.purchaseOrder.filter(approved=True, fullyPaid=False),
+            'ii': request.user.branch.inwardInventory.filter(approved=True, fullyPaid=False)
         }
 
         return render(request, 'payment-voucher.html', context)
@@ -53,6 +54,10 @@ class SavePaymentVoucher(APIView):
 
         pv = PaymentVoucher()
         pv.code = paymentVoucher['code']
+        if paymentVoucher['poCode']:
+            pv.purchaseOrder = PurchaseOrder.objects.get(pk=paymentVoucher['po']['code'])
+        if paymentVoucher['iiCode']:
+            pv.inwardInventory = InwardInventory.objects.get(pk=paymentVoucher['po']['code'])
         pv.datetimeCreated = datetime.now()
         pv.remarks = paymentVoucher['description']
         if paymentVoucher['retroactive']:
@@ -65,7 +70,7 @@ class SavePaymentVoucher(APIView):
         pv.paymentPeriod = paymentVoucher['paymentPeriod']
         pv.amountPaid = paymentVoucher['amountPaid']
         pv.wep = paymentVoucher['wep']
-        pv.purchaseOrder = PurchaseOrder.objects.get(pk=paymentVoucher['po']['code'])
+        
         pv.save()
         request.user.branch.paymentVoucher.add(pv)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
