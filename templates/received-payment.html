@@ -23,8 +23,6 @@
                 <th>Customer</th>
                 <th>Amount</th>
                 <th>Created By</th>
-                <th>Approval Status</th>
-                <th>Datetime Approved</th>
             </thead>
             <tbody>
                 {% for item in request.user.branch.receivePayment.all %}
@@ -33,8 +31,6 @@
                     <td>{{item.salesContract.party.name}}</td>
                     <td>₱[[formatPrice({{item.amountPaid}})]]</td>
                     <td>{{item.createdBy.first_name}} {{item.createdBy.last_name}}</td>
-                    <td></td>
-                    <td>{{item.datetimeApproved}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -130,7 +126,7 @@
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="item in rpModal.salesContract.rpitemsmerch">
+                                    <tr v-for="item in rpModal.salesContract.scitemsmerch">
                                         <td>Merchandise</td>
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.vol]]</td>

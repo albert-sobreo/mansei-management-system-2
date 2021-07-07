@@ -251,6 +251,15 @@ class PaymentVoucherAPI(viewsets.ModelViewSet):
 
 
 
+########## RECEIVED PAYMENTS ##########
+class ReceivedPaymentAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReceivedPaymentsSZ
+    queryset = ReceivePayment.objects.all()
+
+
+
+
 
 ########## INVOICE ##########
 class SalesInvoiceAPI(viewsets.ModelViewSet):
