@@ -88,14 +88,14 @@ class SaveReceivePayment(APIView):
 
         ################# DEBIT SIDE #################
         if rp.wep!= 0.0:
-            jeAPI(request, j, 'Debit', dChildAccount.ewp, rp.wep)
+            jeAPI(request, j, 'Debit', dChildAccount.cwit, rp.wep)
 
         if rp.paymentMethod == dChildAccount.cashOnHand.name:
             jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, rp.amountPaid)
         elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
             jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
         
-        rp.salesContract.runningBalance -= rp.amountPaid
+        rp.salesContract.runningBalance -= (rp.amountPaid + rp.wep)
         if rp.salesContract.runningBalance == 0:
             rp.salesContract.fullyPaid = True
         rp.salesContract.save()
