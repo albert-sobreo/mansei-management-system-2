@@ -213,6 +213,19 @@
                 </select>
             </div>
             <div class="form-group">
+                <label for="">Creditable Withholding Income Tax</label>
+                <select v-model="daccount.cwit" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in request.user.branch.subGroup.all %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="">Cash in Bank</label>
                 <div class="multi-select-container">
                     {% for subgroup in request.user.branch.subGroup.all %}
