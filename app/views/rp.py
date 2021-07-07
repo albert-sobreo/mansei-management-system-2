@@ -97,7 +97,7 @@ class SaveReceivePayment(APIView):
         
         rp.salesContract.runningBalance -= rp.amountPaid
         if rp.salesContract.runningBalance == 0:
-            rp.salesContract.fullyPaid == True
+            rp.salesContract.fullyPaid = True
         rp.salesContract.save()
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
