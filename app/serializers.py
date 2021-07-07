@@ -518,6 +518,18 @@ class VoucherSZ(serializers.ModelSerializer):
 
 
 
+########## RECEIVED PAYMENTS ##########
+class ReceivedPaymentsSZ(serializers.ModelSerializer):
+    salesContract = SalesContractNestedSZ(read_only=True)
+    class Meta:
+        model = ReceivePayment
+        fields = '__all__'
+        depth = 1
+
+
+
+
+
 ########## RECEIVED PAYMENT ##########
 class ReceivedPayment(serializers.ModelSerializer):
     salesContract = SalesContractNestedSZ(read_only=True)

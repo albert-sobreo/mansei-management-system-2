@@ -68,6 +68,9 @@ router.register(r"inward-inventory-basic", views.InwardInventoryAPI, 'inward-inv
 ########### PAYMENT VOUCHER ###########
 router.register(r"payment-voucher", views.PaymentVoucherAPI, 'payment-voucher')
 
+########## RECEIVED PAYMENT ##########
+router.register(r"received-payment", views.ReceivedPaymentAPI, 'received-payment')
+
 ########## SALES INVOICE ##########
 router.register(r"sales-invoice", views.SalesInvoiceAPI, 'sales-input')
 
