@@ -37,20 +37,26 @@
               <th>Running Balance</th>
               <th>Date Created</th>
               <th>Created by</th>
+              <th>Status</th>
             </thead>
             <tbody>
-                {% for po in request.user.branch.receivingReport.all %}
+                {% for rr in request.user.branch.receivingReport.all %}
                 <tr>
-                    <td class="link" @click="viewPO('{{po.pk}}')" data-toggle="modal" data-target="#rrlistmodal">{{po.code}}</td>
-                    <td>{{po.purchaseOrder.code}}</td>
-                    <td>₱[[roundNumber2({{po.amountDue}})]]</td>
-                    {% if po.runningBalance %}
-                    <td>₱[[roundNumber2({{po.runningBalance}})]]</td>
+                    <td class="link" @click="viewPO('{{rr.pk}}')" data-toggle="modal" data-target="#rrlistmodal">{{rr.code}}</td>
+                    <td>{{rr.purchaseOrder.code}}</td>
+                    <td>₱[[roundNumber2({{rr.amountDue}})]]</td>
+                    {% if rr.runningBalance %}
+                    <td>₱[[roundNumber2({{rr.runningBalance}})]]</td>
                     {% else %}
                     <td></td>
                     {% endif %}
-                    <td>{{po.datetimeCreated}}</td>
-                    <td>{{po.createdBy.first_name}} {{po.createdBy.last_name}}</td>
+                    <td>{{rr.datetimeCreated}}</td>
+                    <td>{{rr.createdBy.first_name}} {{rr.createdBy.last_name}}</td>
+                    {% if rr.approved %}
+                    <td><span class="approved">Approved</span></td>
+                    {% else %}
+                    <td><span class="pending">Pending</span></td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -296,7 +302,8 @@
             dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-
+            "order": [[ 0, "desc" ]],
+            "pageLength": 25,
             buttons: {
                 buttons: [
                 {

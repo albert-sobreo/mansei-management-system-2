@@ -1,11 +1,11 @@
 {% extends "base-template.html" %}
-{% block title %}Inward Inventory{% endblock %}
+{% block title %}Inward Inventory | Approved{% endblock %}
 
 {% block body %}
 
 <div id="app" v-cloak>
     <!-- NAVIGATION -->
-    <navbar-gas active="nav-purchase" photo="/media/{{request.user.image}}"></navbar-gas>
+    <navbar-gas active="nav-approvals" photo="/media/{{request.user.image}}"></navbar-gas>
     <app-card></app-card>
     <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
 
@@ -14,8 +14,8 @@
         <!-- MORE NAVIGATION -->
         <div class="d-flex font-semibold mb-2 justify-content-center">
             <div class="justify-content-center c-nav-links gas-nav">
-                <a href="/inward-inventory/" class="active-gas mx-2">List</a>
-                <a href="/inward-adjustments/" class="mx-2">Adjustments</a>
+                <a href="/ii-nonapproved/" class="mx-2">Pending</a>
+                <a href="/ii-approved/" class="active-gas mx-2">Approved</a>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
                 <th>Date Approved</th>
             </thead>
             <tbody>
-                {% for item in request.user.branch.inwardInventory.all %}
+                {% for item in inward %}
                 <tr>
                     <td @click="viewModal({{item.pk}})" class="link" data-toggle="modal" data-target="#orderModal">{{item.code}}</td>
                     <td>{{item.dateInward}}</td>
@@ -74,7 +74,7 @@
                                 <div class="col-12">
                                     <label for="">Select Excel file</label>
                                     <br>
-                                    <input type="file" name="excel" accept=".xls,.xlsx,.csv" required>
+                                    <input type="file" name="excel" accept=".xls,.xlsx,.csv">
                                 </div>
                                 <div class="col-12 mt-4">
                                     <button type="submit" class="btn btn-primary col">Import</button>
@@ -202,7 +202,7 @@
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="item in order.adjusted">
+                                    <tr v-for="item in order.iiadjusteditems">
                                         <td>[[item.code]]</td>
                                         <td>[[item.name]]-[[item.classification]]-[[item.type]]</td>
                                         <td>[[item.length]]mm</td>
@@ -216,8 +216,6 @@
                                 </tbody>
                             </table>
                         </div>
-                        <a href="#">Go to Adjustments</a>
-                        <a href="#" class="ml-3">Go to Approvals</a>
                     </div>
                 </div>
             </div>
@@ -236,6 +234,11 @@
         el: "#app",
 
         data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
             order: {
                 code: null,
                 dateInward: null,
@@ -292,6 +295,10 @@
             viewModal(id){
                 axios.get(`/api/inward-inventory/${id}`)
                 .then(res=>this.order=res.data)
+            },
+            approveII(id){
+                axios.put(`/ii-approval/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
             },
             formatDate(value){
                 const months = [

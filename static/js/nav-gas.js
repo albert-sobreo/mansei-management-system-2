@@ -41,7 +41,7 @@ Vue.component('navbar-gas', {
                     <a href="/sales-contract/" class="dropdown-item d-item-gas font-size-12 font-semibold">Sales Contract</a> 
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">Exports</a> 
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">DR/LS</a>
-                    <a href="/sales-invoice/" class="dropdown-item d-item-gas font-size-12 font-semibold">Invoice</a> 
+                    <a href="/received-payment/" class="dropdown-item d-item-gas font-size-12 font-semibold">Received Payments</a> 
                 </div>
             </div>
             <div class="btn-group mx-3">

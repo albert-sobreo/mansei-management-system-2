@@ -188,7 +188,7 @@
                                         <label for="">Select SC</label>
                                         <select @change="getSC(create.poCode)" v-model="create.poCode" class="form-control">
                                             <option value="" disabled selected>Select SC</option>
-                                            {% for item in rp %}
+                                            {% for item in sc %}
                                             <option value="{{item.pk}}">{{item.code}}</option>
                                             {% endfor %}
                                         </select>
@@ -210,18 +210,6 @@
                                     <div class="col-4">
                                         <label class='gray'>Vendor</label><br>
                                         <span class="font-size-14 font-bold">[[create.sc.party.name]]</span>
-                                    </div>
-                                    <div class="col-4">
-                                        <label class="gray">ATC Code</label><br>
-                                        <span class="font-size-14 font-bold">[[create.sc.atc.code]]</span>
-                                    </div>
-                                    <div class="col-4">
-                                        <label for="" class="gray">ATC Rate</label><br>
-                                        <span class="font-size-14 font-bold">[[create.sc.atc.rate]]%</span>
-                                    </div>
-                                    <div class="col-4">
-                                        <label for="" class="gray">VAT Rate</label><br>
-                                        <span class="font-size-14 font-bold">[[create.sc.taxRate]]%</span>
                                     </div>
                                     <div class="col-4">
                                         <label for="" class="gray">Due Date</label><br>
@@ -260,7 +248,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">₱</span>
                                             </div>
-                                            <input value="create.wep" type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Withheld">
+                                            <input v-model="create.wep" type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Withheld">
                                         </div>
                                     </div>
                                 </div>
@@ -269,7 +257,7 @@
                                         <label for="">Cheque No.</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"></span>
+                                                <span class="input-group-text"><i class="fas fa-money-check"></i></span>
                                             </div>
                                             <input v-model="create.chequeNo" type="text" class="form-control box-shadow-off" style="margin-top: 0px" placeholder="Leave blank if applicable">
                                         </div>
@@ -288,8 +276,8 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="form-group">
-                                        <label for="">Derpription</label>
-                                        <textarea v-model="create.derpription" cols="30" rows="2" class="form-control" placeholder="Enter Derpription"></textarea>
+                                        <label for="">Description</label>
+                                        <textarea v-model="create.description" cols="30" rows="2" class="form-control" placeholder="Enter Description"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -372,7 +360,7 @@
                 paymentPeriod: null,
                 chequeNo: null,
                 amountPaid: null,
-                derpription: null
+                description: null
             },
             voucherToggle: false,
             roundToggle: false,
@@ -445,15 +433,11 @@
                 .then(res=>{
                     console.log(res.data)
                     var item = res.data
-                    console.log(item.party.name)
-                    this.create.rp.code = item.id
-                    this.create.rp.runningBalance = item.runningBalance
-                    this.create.rp.wep = item.wep
-                    this.create.rp.party = item.party
-                    this.create.rp.atc.code = item.rpatc[0].code.code
-                    this.create.rp.atc.rate = Number(item.rpatc[0].code.rate).toFixed(2)
-                    this.create.rp.taxRate = Number(item.taxRate).toFixed(0)
-                    this.create.rp.dueDate = item.dueDate
+                    this.create.sc.code = item.id
+                    this.create.sc.runningBalance = item.runningBalance
+                    this.create.sc.party = item.party
+                    this.create.sc.taxRate = Number(item.taxRate).toFixed(0)
+                    this.create.sc.dueDate = item.dueDate
 
                 })
             },
@@ -533,7 +517,8 @@
             dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-
+            "order": [[ 0, "desc" ]],
+            "pageLength": 25,
             buttons: {
                 buttons: [
                 {

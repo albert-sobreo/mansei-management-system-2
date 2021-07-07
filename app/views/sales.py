@@ -70,6 +70,7 @@ class SaveSalesContract(APIView):
         
         sc.amountDue = Decimal(salesContract['amountDue'])
         sc.amountTotal = Decimal(salesContract['amountTotal'])
+        sc.runningBalance = sc.amountTotal
         sc.taxType = salesContract['taxType']
         sc.taxRate = Decimal(salesContract['taxRate'])
         sc.taxPeso = Decimal(salesContract['taxPeso'])

@@ -34,6 +34,7 @@
                 <th>Running Balance</th>
                 <th>Date Created</th>
                 <th>Created By</th>
+                <th>Status</th>
             </thead>
             <tbody>
                 {%for po in request.user.branch.purchaseOrder.all reversed%}
@@ -48,6 +49,11 @@
                     {% endif %}
                     <td>{{po.datetimeCreated}}</td>
                     <td>{{po.createdBy.first_name}} {{po.createdBy.last_name}}</td>
+                    {% if po.approved %}
+                    <td><span class="approved">Approved</span></td>
+                    {% else %}
+                    <td><span class="pending">Pending</span></td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -202,6 +208,7 @@
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
             
             "order": [[ 0, "desc" ]],
+            "pageLength": 25,
 
             buttons: {
                 buttons: [
