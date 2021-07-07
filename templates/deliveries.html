@@ -96,7 +96,7 @@
                         <!-- MORE V-FOR -->
                         <div class="form-check d-flex align-content-center" v-for="(merch, index) in item.itemList">
                             <input type="checkbox" class="form-check-input" v-model="item.transacItems[index].delivered">
-                            <label class="form-check-label font-semibold">[[merch.merchInventory.code]] - [[merch.merchInventory.classification]] [[merch.merchInventory.type]] - [[roundNumber0(merch.merchInventory.length)]] x [[roundNumber0(merch.merchInventory.width)]] x [[roundNumber0(merch.merchInventory.thickness)]]    Qty: [[item.transacItems[index].qty]]</label>
+                            <label class="form-check-label font-semibold">[[merch.merchInventory.code]] - [[merch.merchInventory.classification]] [[merch.merchInventory.type]] - [[roundNumber0(merch.merchInventory.length)]] x [[roundNumber0(merch.merchInventory.width)]] x [[roundNumber0(merch.merchInventory.thickness)]]    Qty: [[item.transacItems[index].qty]]    Cost: ₱[[formatPrice(item.transacItems[index].totalCost)]]</label>
                         </div>
                     </div>
                 </div>
@@ -105,6 +105,11 @@
                     <div class="col px-1">
                         <button @click="addItemLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
                     </div>
+                </div>
+
+                <div class="row my-3">
+                    <span>Total Amount: </span><br>
+                    <span>₱[[formatPrice(this.delivery.amountTotal)]]</span>
                 </div>
 
                 <div class="row my-4">
@@ -171,10 +176,14 @@
                 driver: '',
                 scheduleStart: null,
                 scheduleEnd: null,
+                amountTotal: null,
                 items:[{
                     type: '',
                     code: '',
-                    transacItems: [],
+                    transacItems: [{
+                        delivered: null,
+                        totalCost: null,
+                    }],
                     itemList: []
                 }],
                 destinations: [
@@ -189,7 +198,26 @@
             sales: [],
             errors: []
         },
+        computed: {
+            totalCost(){
+                return this.delivery.items.map(item=>item.transacItems.filter(item2=>item2.delivered==true))
+            }
+        },
+        watch:{
+            totalCost(){
+                var x = this.totalCost.map(item=>item.map(item2=>item2.totalCost))
+                this.delivery.amountTotal = x.reduce((a,b)=>Number(a) + Number(b.reduce((x, y)=>Number(x)+Number(y), 0)), 0)
+            }
+        },
         methods: {
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
             loadData(){
                 axios.get('/api/purchase-order-approved/')
                 .then(res=>this.purchase=res.data)
@@ -262,7 +290,8 @@
                             delivered: false,
                             code: item.merchInventory.id,
                             qty: item.qty,
-                            id: item.id
+                            id: item.id,
+                            totalCost: item.totalCost
                         })
                     })
                 }

@@ -534,7 +534,7 @@
                 this.order.otherFeesTotal = this.otherFeesTotal.reduce((a,b)=>Number(a)+Number(b), 0)
                 this.order.amountDue = this.amountDue.reduce((a,b)=>Number(a)+Number(b),0)
                 this.order.taxPeso = this.order.amountDue * (this.order.taxRate/100)
-                this.order.atc[0].amount = this.order.amountDue - this.order.taxPeso
+                this.order.atc[0].amount = this.order.amountDue
                 this.order.atc[0].amountWithheld = (((this.order.atc[0].taxRate)/100) * this.order.atc[0].amount)
                 if (this.order.discountType == 'percent'){
                     this.order.totalDiscount = (this.order.amountDue*(this.order.discount / 100))
@@ -609,18 +609,22 @@
             },
 
             checkCRTE(customer){
-                if (customer.crte){
-                    this.order.taxType = ''
-                    this.order.taxRate = '0'
-                } else {
-                    this.order.taxType = 'VAT'
-                    this.order.taxRate = '12'
-                }
+                axios.get(`/api/customer/${customer}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    if (res.data.crte){
+                        this.order.taxType = 'VAT'
+                        this.order.taxRate = '0'
+                    } else {
+                        this.order.taxType = 'VAT'
+                        this.order.taxRate = '12'
+                    }
+                })
+                
             },
 
             checkForm(e){
                 var success1 = false
-                var success2 = false
                 if (
                     this.order.code &&
                     this.order.date &&
@@ -642,21 +646,7 @@
                             break
                         }
                     }
-                    for(var item of this.order.atc){
-                        if(
-                            item.code &&
-                            item.amount &&
-                            item.taxRate &&
-                            item.amountWithheld
-                        )
-                        {
-                            success2=true
-                        } else {
-                            success2=false
-                            break
-                        }
-                    }
-                    if(success1 && success2){
+                    if(success1){
                         this.submit()
                         return
                     }
@@ -688,21 +678,6 @@
                     }
                     if(!item.totalCost){
                         this.errors.push('Total Cost Required at index: ' + String(index+1))
-                    }
-                })
-
-                this.order.atc.forEach((item, index)=>{
-                    if(!item.code){
-                        this.errors.push('ATC Code Required at index: ' + String(index+1))
-                    }
-                    if(!item.amount){
-                        this.errors.push('ATC Amount Required at index: ' + String(index+1))
-                    }
-                    if(!item.taxRate){
-                        this.errors.push('ATC Tax Rate Required at index: ' + String(index+1))
-                    }
-                    if(!item.amountWithheld){
-                        this.errors.push('ATC Amount Withheld Required at index: ' + String(index+1))
                     }
                 })
 

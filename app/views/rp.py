@@ -55,7 +55,7 @@ class SaveReceivePayment(APIView):
 
         rp = ReceivePayment()
         rp.code = receivePayment['code']
-        rp.datetimeCreated = datetime.now
+        rp.datetimeCreated = datetime.now()
         rp.remarks = receivePayment['description']
         if receivePayment['retroactive']:
             rp.paymentDate = receivePayment['retroactive']
@@ -63,14 +63,14 @@ class SaveReceivePayment(APIView):
             rp.paymentDate = receivePayment['date']
         if request.user.is_authenticated:
             rp.createdBy = request.user
+        rp.salesContract = SalesContract.objects.get(pk=receivePayment['sc']['code'])
         rp.paymentMethod = receivePayment['paymentMethod']
         rp.paymentPeriod = receivePayment['paymentPeriod']
-        rp.amountDue = receivePayment['amountDue']
-        rp.amountTotal = receivePayment['amountTotal']
-        rp.outputVat = receivePayment['outputVat']
-        rp.amountPaid = receivePayment['amountPaid']
-        rp.salesContract = SalesContract.object.get(pk=receivePayment['sc']['code'])
-        rp.wep = receivePayment['wep']
+        
+        rp.wep = Decimal(receivePayment['wep'])
+        rp.amountPaid = Decimal(receivePayment['amountPaid']) - rp.wep
+        rp.salesContract.wep += rp.wep
+        rp.salesContract.save()
         rp.save()
         request.user.branch.receivePayment.add(rp)
 
@@ -83,26 +83,21 @@ class SaveReceivePayment(APIView):
         j.save()
         request.user.branch.journal.add(j)
 
-        ################# DEBIT SIDE #################
-        jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.amountTotal)
-
         ################# CREDIT SIDE #################
-        if rp.wep!= 0.0:
-            jeAPI(request, j, 'Credit', dChildAccount.ewp, rp.wep)
+        jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
 
-        if rp.paymentPeriod == 'Full Payment':
-            if rp.paymentMethod == dChildAccount.cashOnHand.name:
-                jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, rp.amountPaid)
-            elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
-                jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
-        elif rp.paymentPeriod == 'Partial Payment':
-            print('b0ss plis')
-            if rp.paymentMethod == dChildAccount.cashOnHand.name:
-                jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, rp.amountPaid)
-                jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), ((rp.salesContract.runningBalance - rp.amountPaid) + (rp.salesContract.scatc.first().amountWithheld - rp.salesContract.wep)))
-            elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
-                jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
-                jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), ((rp.salesContract.runningBalance - rp.amountPaid) + (rp.salesContract.scatc.first().amountWithheld - rp.salesContract.wep)))
+        ################# DEBIT SIDE #################
+        if rp.wep!= 0.0:
+            jeAPI(request, j, 'Debit', dChildAccount.ewp, rp.wep)
+
+        if rp.paymentMethod == dChildAccount.cashOnHand.name:
+            jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, rp.amountPaid)
+        elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
+            jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
         
+        rp.salesContract.runningBalance -= rp.amountPaid
+        if rp.salesContract.runningBalance == 0:
+            rp.salesContract.fullyPaid == True
+        rp.salesContract.save()
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

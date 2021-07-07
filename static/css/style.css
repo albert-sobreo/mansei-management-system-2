@@ -7,6 +7,8 @@
     --dashboard-violet-text: #C52DFB;
 }
 
+[v-cloak] { display:none; }
+
 .form-container .form-container-1{
     background: white;
     border-radius: 15px;

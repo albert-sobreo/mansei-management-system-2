@@ -170,5 +170,6 @@ urlpatterns = [
 
     path('branch-profile/', login_required(views.BranchProfileView.as_view())),
     path('save-default-accounts/', login_required(views.SaveDefaultAccounts.as_view())),
-    path('received-payment/', login_required(views.ReceivedPaymentView.as_view()))
+    path('received-payment/', login_required(views.ReceivedPaymentView.as_view())),
+    path('save-received-payment/', login_required(views.SaveReceivePayment.as_view()))
 ]

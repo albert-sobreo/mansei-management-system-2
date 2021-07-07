@@ -373,10 +373,10 @@ class PVApprovalAPI(APIView):
                     jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
         
             voucher.purchaseOrder.runningBalance -= voucher.amountPaid
-            voucher.purchaseOrder.save()
+            
             if voucher.purchaseOrder.runningBalance == 0:
                 voucher.purchaseOrder.fullyPaid == True
-
+            voucher.purchaseOrder.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)        
@@ -515,7 +515,7 @@ class SCApprovalAPI(APIView):
         if sale.taxPeso != 0.0:
             jeAPI(request, j, 'Credit', dChildAccount.outputVat, sale.taxPeso)
 
-        jeAPI(request, j, 'Credit', sale.party.accountChild.get(name__regex=r"[Rr]eceivable"), sale.amountTotal)
+        jeAPI(request, j, 'Debit', sale.party.accountChild.get(name__regex=r"[Rr]eceivable"), sale.amountTotal)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -576,6 +576,8 @@ class DeliveriesApprovalAPI(APIView):
 
 
         d.datetimeApproved = datetime.now()
+
+        d.approvedBy = request.user
         d.approved = True
         d.truck.status = 'In-transit'
         d.truck.driver = d.driver
@@ -594,9 +596,9 @@ class DeliveriesApprovalAPI(APIView):
         j.save()
         request.user.branch.journal.add(j)
 
-        jeAPI(request, j, 'Credit', dChildAccount.merchInventory, )
+        jeAPI(request, j, 'Credit', dChildAccount.merchInventory, d.amountTotal)
 
-        jeAPI(request, j, 'Debit', dChildAccount.costOfSales, )
+        jeAPI(request, j, 'Debit', dChildAccount.costOfSales, d.amountTotal)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

@@ -27,7 +27,7 @@
                 <th>Datetime Approved</th>
             </thead>
             <tbody>
-                {% for item in request.user.branch.receivedPayment.all %}
+                {% for item in request.user.branch.receivePayment.all %}
                 <tr>
                     <td @click="getSC2({{item.pk}})" class="link" data-toggle="modal" data-target="#rpModal">{{item.code}}</td>
                     <td>{{item.salesContract.party.name}}</td>
@@ -141,11 +141,6 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row">
-                            <div class="col">
-                                <button class="col btn btn-primary" @click="approveRP([[rpModal.id]])">Approve</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -186,9 +181,9 @@
                                 <div class="col-3 pl-2">
                                     <div class="form-group">
                                         <label for="">Select SC</label>
-                                        <select @change="getSC(create.poCode)" v-model="create.poCode" class="form-control">
+                                        <select @change="getSC(create.scCode)" v-model="create.scCode" class="form-control">
                                             <option value="" disabled selected>Select SC</option>
-                                            {% for item in sc %}
+                                            {% for item in sc reversed %}
                                             <option value="{{item.pk}}">{{item.code}}</option>
                                             {% endfor %}
                                         </select>
@@ -283,7 +278,7 @@
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <button @click="submit()" class="col btn btn-primary">Create</button>
+                                    <button @click="checkForm()" class="col btn btn-primary">Create</button>
                                 </div>
                             </div>
                         </div>
@@ -359,8 +354,9 @@
                 paymentMethod: '',
                 paymentPeriod: null,
                 chequeNo: null,
-                amountPaid: null,
-                description: null
+                amountPaid: 0,
+                description: null,
+                wep: 0
             },
             voucherToggle: false,
             roundToggle: false,
@@ -438,6 +434,7 @@
                     this.create.sc.party = item.party
                     this.create.sc.taxRate = Number(item.taxRate).toFixed(0)
                     this.create.sc.dueDate = item.dueDate
+                    this.create.sc.wep = item.scatc[0].amountWithheld - item.wep
 
                 })
             },
@@ -493,12 +490,12 @@
                 this.roundToggle = !this.roundToggle
             },
             submit(){
-                axios.post('/save-sales-invoice/', this.create, this.config)
+                axios.post('/save-received-payment/', this.create, this.config)
                 .then(res=>res.data==0?location.reload():'')
             },
 
-            getPO2(id){
-                axios.get(`/api/sales-invoice/${id}/`)
+            getSC2(id){
+                axios.get(`/api/received-payment/${id}/`)
                 .then(res=>this.rpModal=res.data)
             },
             approveSC(id){

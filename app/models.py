@@ -150,7 +150,7 @@ class Party(models.Model):
     bank = models.CharField(max_length=256, blank=True, null=True)
     bankNo = models.CharField(max_length=50, blank=True, null=True)
     tin = models.CharField(max_length=50, blank=True, null=True)
-    crte = models.BooleanField(blank=True, null = True)
+    crte = models.BooleanField(default=False)
     prefferedPayment = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
@@ -685,11 +685,9 @@ class ReceivePayment(models.Model):
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="rpCreatedBy")
     paymentMethod = models.CharField(max_length = 50, null = True)
     paymentPeriod = models.CharField(max_length = 50, null = True)
-    amountDue = models.DecimalField(max_digits=18, decimal_places=5)
-    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
-    outputVat = models.DecimalField(max_digits=20, decimal_places=5, null = True, default = 0.0)
+    chequeNo = models.CharField(max_length=20, null = True, blank = True)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default= 0.0)
 
 class Driver(models.Model):
     driverID = models.CharField(max_length=50, default='0')
@@ -726,8 +724,11 @@ class Deliveries(models.Model):
     driver = models.ForeignKey(Driver, related_name="deliveries", on_delete=models.PROTECT, null=True, blank=True)
     scheduleStart = models.DateTimeField(null=True, blank=True)
     scheduleEnd = models.DateTimeField(null=True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="deCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="deApprovedBy")
     approved = models.BooleanField(null = True, default=False)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
+    amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
 
     class Meta:
         verbose_name = "Delivery"

@@ -134,6 +134,10 @@ class SaveDelivery(APIView):
         d.driver = Driver.objects.get(pk=deliveries['driver'])
         d.scheduleStart = deliveries['scheduleStart']
         d.scheduleEnd = deliveries['scheduleEnd']
+        d.amountTotal = deliveries['amountTotal']
+        if request.user.is_authenticated:
+            d.createdBy = request.user
+
 
         d.save()
         request.user.branch.deliveries.add(d)
