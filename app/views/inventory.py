@@ -70,9 +70,9 @@ class ImportMerchandiseInventory(View):
             merch.width = item['Width']
             merch.thickness = item['Thickness']
 
-            item['Purchasing-Price'] = str(item['Purchasing-Price']).replace('₱', '')
-            item['Purchasing-Price'] = item['Purchasing-Price'].replace(',', '')
-            merch.purchasingPrice = item['Purchasing-Price']
+            item['Unit-Cost'] = str(item['Unit-Cost']).replace('₱', '')
+            item['Unit-Cost'] = item['Unit-Cost'].replace(',', '')
+            merch.purchasingPrice = item['Unit-Cost']
 
             item['Selling-Price'] = str(item['Selling-Price']).replace('₱', '')
             item['Selling-Price'] = item['Selling-Price'].replace(',', '')
@@ -88,8 +88,7 @@ class ImportMerchandiseInventory(View):
             merch.um = item['U/M']
             merch.description = item['Description']
             merch.totalCost = item['Total-Cost']
-
-            print(merch.code, merch.name, merch.classification, merch.type, merch.length, merch.width, merch.thickness, merch.purchasingPrice, merch.sellingPrice, merch.vol, merch.pricePerCubic, merch.qtyA, merch.qtyR, merch.qtyT, merch.um, merch.description, merch.totalCost)
+            merch.inventoryDate = item['Inventory-Date']
 
             merch.save()
             try:
@@ -102,5 +101,6 @@ class ImportMerchandiseInventory(View):
                 request.user.branch.warehouse.add(w)
                 merch.warehouse.add(w)
             request.user.branch.merchInventory.add(merch)
-        
+
+        sweetify.sweetalert(request, icon="success", title="Success!", persistent="Dismiss")
         return redirect('/merchinventory/')

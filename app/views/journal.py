@@ -18,6 +18,7 @@ from ..models import *
 import json
 from datetime import date as now
 from datetime import datetime
+from .journalAPI import jeAPI
 
 class JournalView(View):
     def get(self, request):
@@ -64,7 +65,7 @@ class SaveJournal(APIView):
         j.code = journal['code']
         j.journalDate = journal['date']
         j.remarks = journal['remarks']
-        j.datetimeCreated = datetime.now
+        j.datetimeCreated = datetime.now()
         j.createdBy = User.objects.get(pk=request.session.get('_auth_user_id'))
 
         j.save()
@@ -72,59 +73,10 @@ class SaveJournal(APIView):
         request.user.branch.journal.add(j)
 
         for item in debit:
-            je = JournalEntries()
-
-            je.journal = j
-            je.normally = item['normally']
-            je.accountChild = AccountChild.objects.get(pk=(item['accountChild']))
-            je.amount = Decimal(item['amount'])
-
-            if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
-                je.accountChild.amount += je.amount
-                je.accountChild.accountSubGroup.amount += je.amount
-                je.accountChild.accountSubGroup.accountGroup.amount += je.amount
-                je.accountChild.save()
-                je.accountChild.accountSubGroup.save()
-                je.accountChild.accountSubGroup.accountGroup.save()
-                je.balance = je.accountChild.amount
-            else:
-                je.accountChild.amount -= je.amount
-                je.accountChild.accountSubGroup.amount -= je.amount
-                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
-                je.accountChild.save()
-                je.accountChild.accountSubGroup.save()
-                je.accountChild.accountSubGroup.accountGroup.save()
-                je.balance = je.accountChild.amount
-            je.save()
-            
-            request.user.branch.journalEntries.add(je)
+            jeAPI(request, j, item['normally'], AccountChild.objects.get(pk=(item['accountChild'])), Decimal(item['amount']))
 
         for item in credit:
-            je = JournalEntries()
-
-            je.journal = j
-            je.normally = item['normally']
-            je.accountChild = AccountChild.objects.get(pk=item['accountChild'])
-            je.amount = Decimal(item['amount'])
-
-            if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
-                je.accountChild.amount += je.amount
-                je.accountChild.accountSubGroup.amount += je.amount
-                je.accountChild.accountSubGroup.accountGroup.amount += je.amount
-                je.accountChild.save()
-                je.accountChild.accountSubGroup.save()
-                je.accountChild.accountSubGroup.accountGroup.save()
-                je.balance = je.accountChild.amount
-            else:
-                je.accountChild.amount -= je.amount
-                je.accountChild.accountSubGroup.amount -= je.amount
-                je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
-                je.accountChild.save()
-                je.accountChild.accountSubGroup.save()
-                je.accountChild.accountSubGroup.accountGroup.save()
-                je.balance = je.accountChild.amount 
-            je.save()
-            request.user.branch.journalEntries.add(je)
+            jeAPI(request, j, item['normally'], AccountChild.objects.get(pk=(item['accountChild'])), Decimal(item['amount']))
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

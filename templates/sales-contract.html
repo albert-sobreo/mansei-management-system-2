@@ -53,7 +53,7 @@
             <div class="row mt-2 mb-4">
                 <div class="col col-5 pr-2">
                     <label>Customer</label>
-                    <select v-model="order.customer" class="form-control">
+                    <select @change="checkCRTE(order.customer)" v-model="order.customer" class="form-control">
                         <option value="" selected disabled>Choose Customer</option>
                         <option v-for="customer in customers" :value="customer.id">[[customer.name]]</option>
                     </select>
@@ -261,7 +261,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-12 px-1">
-                                    <label>Total Input VAT</label>
+                                    <label>Total Output VAT</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
@@ -542,7 +542,7 @@
                 else if (this.order.discountType == 'peso'){
                     this.order.totalDiscount = this.order.discount
                 }
-                this.order.amountTotal = this.order.amountDue + this.order.otherFeesTotal - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)) - this.order.totalDiscount
+                this.order.amountTotal = this.order.amountDue + this.order.otherFeesTotal + this.order.taxPeso - this.order.totalDiscount
                 this.order.withholdingTax = Number(this.order.amountPaid/((1+(this.order.taxRate/100)-(this.order.atc[0].taxRate)/100))) * (this.order.atc[0].taxRate)/100
             },
 
@@ -606,6 +606,16 @@
                         icon: 'error'
                     })
                 })
+            },
+
+            checkCRTE(customer){
+                if (customer.crte){
+                    this.order.taxType = ''
+                    this.order.taxRate = '0'
+                } else {
+                    this.order.taxType = 'VAT'
+                    this.order.taxRate = '12'
+                }
             },
 
             checkForm(e){

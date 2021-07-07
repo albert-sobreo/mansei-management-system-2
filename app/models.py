@@ -188,7 +188,7 @@ class JournalEntries(models.Model):
         verbose_name_plural = "Journal Entries"
 
     def __str__(self):
-        return self.journal.code + " " + self.normally + " " + self.accountChild.name
+        return self.normally + " " + self.accountChild.name
 
 class Warehouse(models.Model):
     name = models.CharField(max_length=256)
@@ -221,6 +221,7 @@ class MerchandiseInventory(models.Model):
     turnover = models.DecimalField(max_digits=10, decimal_places=5, null = True, blank=True)
     warehouse = models.ManyToManyField(Warehouse, related_name="merchandiseinventory", blank=True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, default=0.00,)
+    inventoryDate = models.DateField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Merchandise Inventory"
@@ -642,7 +643,7 @@ class SCItemsMerch(models.Model):
         verbose_name_plural = "SC Items Merchs"
 
     def __str__(self):
-        return self.merchInventory.name
+        return self.merchInventory.code
 
 class SCatc(models.Model):
     salesContract = models.ForeignKey(SalesContract, related_name="scatc",on_delete=models.PROTECT, null=True, blank=True)
@@ -688,7 +689,7 @@ class ReceivePayment(models.Model):
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
     outputVat = models.DecimalField(max_digits=20, decimal_places=5, null = True, default = 0.0)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class Driver(models.Model):
     driverID = models.CharField(max_length=50, default='0')
@@ -795,7 +796,9 @@ class BranchDefaultChildAccount(models.Model):
     outputVat = models.ForeignKey(AccountChild, related_name="branchoutputvat", on_delete=models.PROTECT, blank=True, null=True)
     ewp = models.ForeignKey(AccountChild, related_name='branchewp', on_delete=models.PROTECT, blank=True, null=True)
     advancesToSupplier = models.ManyToManyField(AccountChild, related_name="branchadvancestosupplier", blank=True)
-    prepaidExpense = models.ForeignKey(AccountChild, related_name="prepaidexpense", on_delete=models.PROTECT, blank = True, null = True)
+    prepaidExpense = models.ForeignKey(AccountChild, related_name="branchprepaidexpense", on_delete=models.PROTECT, blank = True, null = True)
+    sales = models.ForeignKey(AccountChild, related_name="branchsales", on_delete=models.PROTECT, blank = True, null = True)
+    costOfSales = models.ForeignKey(AccountChild, related_name="branchcostofsales", on_delete=models.PROTECT, blank = True, null = True)
 
 class BranchProfile(models.Model):
     branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.PROTECT, null=True, blank=True)

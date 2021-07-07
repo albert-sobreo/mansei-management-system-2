@@ -162,10 +162,10 @@
                                 <span class="modal-title">Create Payment Voucher</span>
                                 <div class="form-group d-flex align-items-center">
                                     <input v-model="create.selectType" value="PO" type="radio" name='rad'>
-                                    <label for="">Help</label>
+                                    <label for="">Purchase Order</label>
                                     &nbsp;
                                     <input v-model="create.selectType" value="II" type="radio" name="rad">
-                                    <label for="">me</label>
+                                    <label for="">Inward Inventory</label>
                                 </div>
                             </div>
                         </div>
@@ -565,6 +565,8 @@
 
 <script>
     $(document).ready(function() {
+        $.fn.dataTable.moment( 'MMMM D, YYYY' );
+        $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
         $('#table').DataTable({
             language: { search: '', searchPlaceholder: 'Search'},
             dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
