@@ -76,6 +76,10 @@ class SaveDefaultAccounts(APIView):
             bdacct.otherIncome = AccountChild.objects.get(pk=items['otherIncome'])
         except: 
             pass
+        try:
+            bdacct.cwit = AccountChild.objects.get(pk=items['cwit'])
+        except:
+            pass
 
         for item in items['cashInBank']:
             bdacct.cashInBank.add(AccountChild.objects.get(pk=item))

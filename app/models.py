@@ -801,6 +801,7 @@ class BranchDefaultChildAccount(models.Model):
     sales = models.ForeignKey(AccountChild, related_name="branchsales", on_delete=models.PROTECT, blank = True, null = True)
     costOfSales = models.ForeignKey(AccountChild, related_name="branchcostofsales", on_delete=models.PROTECT, blank = True, null = True)
     otherIncome = models.ForeignKey(AccountChild, related_name="branchotherincome", on_delete=models.PROTECT, blank = True, null = True)
+    cwit = models.ForeignKey(AccountChild, related_name="branchcwit", on_delete=models.PROTECT, blank = True, null = True)
 
 class BranchProfile(models.Model):
     branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.PROTECT, null=True, blank=True)
