@@ -143,7 +143,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row">
+                        <span>[[pvModal.purchaseOrder.approved]]</span>
+                        <div class="row" v-if="!pvModal.purchaseOrder.approved">
                             <div class="col">
                                 <button class="col btn btn-primary" @click="approvePV([[pvModal.id]])">Approve</button>
                             </div>
@@ -355,6 +356,7 @@
                 datetimeApproved: null,
                 purchaseOrder: {
                     code: null,
+                    approved: null,
                     party: {
                         name: null,
                     },
