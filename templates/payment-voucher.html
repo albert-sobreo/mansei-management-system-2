@@ -37,7 +37,11 @@
                     {% endif %}
                     <td>₱[[formatPrice({{item.amountPaid}})]]</td>
                     <td>{{item.createdBy.first_name}} {{item.createdBy.last_name}}</td>
-                    <td></td>
+                    {% if item.approved %}
+                    <td><span class="approved">Approved</span></td>
+                    {% else %}
+                    <td><span class="pending">Pending</span></td>
+                    {% endif %}
                     <td>{{item.datetimeApproved}}</td>
                 </tr>
                 {% endfor %}
@@ -143,8 +147,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <span>[[pvModal.purchaseOrder.approved]]</span>
-                        <div class="row" v-if="!pvModal.purchaseOrder.approved">
+                        <div class="row" v-if="!pvModal.approved">
                             <div class="col">
                                 <button class="col btn btn-primary" @click="approvePV([[pvModal.id]])">Approve</button>
                             </div>
@@ -344,6 +347,7 @@
             pvModal:{
                 code: null,
                 approved: null,
+                approved: null,
                 createdBy: {
                     first_name: null,
                     last_name: null,
@@ -356,7 +360,6 @@
                 datetimeApproved: null,
                 purchaseOrder: {
                     code: null,
-                    approved: null,
                     party: {
                         name: null,
                     },
