@@ -509,11 +509,19 @@ class SCApprovalAPI(APIView):
         j.save()
         request.user.branch.journal.add(j)
 
-        jeAPI(request, j, 'Credit', dChildAccount.sales, sale.amountDue)
+        
+        totalFees = 0.0
 
+        for fees in sale.tempscotherfees:
+            totalFees += fees.fee
+        
+        if totalFees != 0.0:
+            jeAPI(request, j, 'Credit', dChildAccount.otherIncome, totalFees)
 
         if sale.taxPeso != 0.0:
             jeAPI(request, j, 'Credit', dChildAccount.outputVat, sale.taxPeso)
+            
+        jeAPI(request, j, 'Credit', dChildAccount.sales, sale.amountTotal - sale.taxPeso - totalFees)
 
         jeAPI(request, j, 'Debit', sale.party.accountChild.get(name__regex=r"[Rr]eceivable"), sale.amountTotal)
 
