@@ -15,6 +15,8 @@ from ..serializers import *
 from ..models import *
 import sweetify
 from datetime import date as now
+import pandas as pd
+import json
 
 class VendorView(View):
     def get(self, request):
@@ -104,3 +106,42 @@ class SaveParty(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', text='{} has been added as {}'.format(party.name, party.type), persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class ImportCustomerVendor(View):
+    def post(self, request, format=None):
+        df = pd.read_excel(request.FILES['excel'])
+        jsonDF = json.loads(df.to_json(orient='records'))
+
+        existing = []
+
+        for item in jsonDF:
+            party = Party()
+
+            if Party.objects.filter(name=item['Name']):
+                print('it exists')
+                existing.append(item['Name'])
+                continue
+            
+            party.name = item['Name']
+            party.type = item['Type']
+            party.shippingAddress = item['Shipping-Address']
+            party.officeAddress = item['Office-Address']
+            party.landline = item['Landline']
+            party.mobile =item['Mobile']
+            party.email = item['Email']
+            party.contactPerson = item['Contact-Person']
+            party.bank = item['Bank']
+            party.bankNo = item['Bank-Number']
+            party.tin = item['TIN']
+            party.crte = item['CRTE']
+            party.prefferedPayment = item['Preffered-Payment-Method']
+
+            party.save()
+            request.user.branch.party.add(party)
+        if len(existing) != 0:
+            separator = '<br>'
+            sweetify.sweetalert(request, icon='warning', title="Some aren't added to the database.", html='These customers/vendors already exist: {}'.format(separator.join(existing)), persistent="Dismiss")
+        else: 
+            sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+
+        return redirect('/customers/')

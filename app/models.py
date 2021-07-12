@@ -783,6 +783,44 @@ class DeliveryItemMerch(models.Model):
     def __str__(self):
         return self.merchInventory.code + ' ' + self.merchInventory.classification + ' ' + self.merchInventory.type
 
+class Transfer(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    remarks = models.TextField(null = True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "trCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "trApprovedBy")
+    approved = models.BooleanField(null = True, default=False)
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    newWarehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, null = True, blank = True, related_name= "transfer")
+    totalCost = models.DecimalField(max_digits=18, decimal_places=5, null = True, blank = True)
+
+class TransferItems(models.Model):
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="tritems", on_delete=models.PROTECT, null=True, blank=True)
+    transfer = models.ForeignKey(Transfer, on_delete=models.PROTECT, null = True, blank = True, related_name= "tritems")
+    qtyTransfered = models.IntegerField(null = True, blank = True)
+    oldWarehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, null = True, blank = True, related_name= "tritems")
+
+
+class Adjustments(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    remarks = models.TextField(null = True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "adCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "adApprovedBy")
+    approved = models.BooleanField(null = True, default=False)
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    totalLost = models.DecimalField(max_digits=18, decimal_places=5, null = True, blank = True)
+    type = models.CharField(max_length=50)
+
+class AdjustmentsItems(models.Model):
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="aditems", on_delete=models.PROTECT, null=True, blank=True)
+    adjustments = models.ForeignKey(Adjustments, on_delete=models.PROTECT, null = True, blank = True, related_name= "aditems")
+    qtyAdjusted = models.IntegerField(null = True, blank = True)
+
+class AdjustmentsPhotos(models.Model):
+    adjustments = models.ForeignKey(Deliveries, related_name="adjustmentsphotos", on_delete=models.PROTECT, null=True, blank=True)
+    picture = models.ImageField(null=True, blank=True, upload_to="adjustment_photos")
+
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
     cashOnHand = models.ForeignKey(AccountChild, related_name='branchcashonhand', on_delete=models.PROTECT, blank=True, null=True)
@@ -875,13 +913,19 @@ class Branch(models.Model):
     iiItemsMerch = models.ManyToManyField(IIItemsMerch, blank=True)
     iiAdjustedItems = models.ManyToManyField(IIAdjustedItems, blank=True)
 
-    #### PAYMENT VOUCHER & SALES INVOICE
+    #### PAYMENT VOUCHER & SALES INVOICE ####
     paymentVoucher = models.ManyToManyField(PaymentVoucher, blank = True)
     salesInvoice = models.ManyToManyField(SalesInvoice, blank = True)
     receivePayment = models.ManyToManyField(ReceivePayment, blank = True)
 
+    #### TRANSFER AND ADJUSTMENTS ####
+    transfer = models.ManyToManyField(Transfer, blank = True)
+    transferItems = models.ManyToManyField(TransferItems, blank = True)
+    adjustments = models.ManyToManyField(Adjustments, blank = True)
+    adjustmentItems = models.ManyToManyField(AdjustmentsItems, blank = True)
+    adjustmentPhotos = models.ManyToManyField(AdjustmentsPhotos, blank = True)
+
     def __str__(self):
         return self.name
-
 
 

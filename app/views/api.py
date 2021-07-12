@@ -288,8 +288,11 @@ class SalesOrderAPI(viewsets.ModelViewSet):
     serializer_class = SalesOrderNestedSZ
     queryset = SalesOrder.objects.all()
 
-
-
+########### TRANSFER & ADJUSTMENTS ##########
+class TransferAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TransferSZ
+    queryset = Transfer.objects.all()
 
 
 ########### BranchDefaultChildAccount ##########

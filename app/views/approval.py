@@ -481,7 +481,7 @@ class SCApprovalAPI(APIView):
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         for element in sale.scitemsmerch.all():
-            if element.merchInventory.qtyA == 0:
+            if element.merchInventory.qtyA <= 0:
                 print('b0ss')
                 sweetify.sweetalert(request, icon='error', title='Error', text="{} has {} items. You are selling {} items.".format((element.merchInventory.name + ' ' + element.merchInventory.classification + ' ' + element.merchInventory.type), element.merchInventory.qtyA, element.qty), persistent='Dismiss')
                 return JsonResponse(0, safe=False)
@@ -610,3 +610,37 @@ class DeliveriesApprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+################# TRANSFER AND ADJUSTMENT #################
+class TransferNonApproved(View):
+    def get(self, request, format=None):
+        context = {
+            'transfers': request.user.branch.transfer.filter(approved=False)
+        }
+        return render(request, 'tr-nonapproved.html', context)
+
+class TransferApproved(View):
+    def get(self, request, format=None):
+        context = {
+            'transfer': request.user.branch.transfer.filter(approved=True)
+        }
+        return render(request, 'tr-approved.html', context)
+
+class TransferApproval(APIView):
+    def put(self, request, pk, format = None):
+
+        tr = Transfer.objects.get(pk=pk)
+
+        tr.datetimeApproved = datetime.now()
+        tr.approvedBy = request.user
+        tr.approved = True
+
+        for element in tr.tritems.all():
+            element.merchInventory.warehouse = tr.newWarehouse
+            element.merchInventory.save()
+
+        tr.save()
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+        
