@@ -219,7 +219,6 @@ class MerchandiseInventory(models.Model):
     um = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
     turnover = models.DecimalField(max_digits=10, decimal_places=5, null = True, blank=True)
-    warehouse = models.ManyToManyField(Warehouse, related_name="merchandiseinventory", blank=True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, default=0.00,)
     inventoryDate = models.DateField(null=True, blank=True)
 
@@ -230,6 +229,45 @@ class MerchandiseInventory(models.Model):
     def __str__(self):
         return str(self.pk) + ' ' + str(self.code)
     
+class WarehouseItems(models.Model):
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, related_name = 'warehouseitems')
+    merchInventory = models.ForeignKey(MerchandiseInventory, on_delete=models.PROTECT, related_name = 'warehouseitems')
+    qtyT = models.IntegerField()
+    qtyR = models.IntegerField()
+    qtyA = models.IntegerField()
+
+    def initQty(self, qtyT, qtyR, qtyA):
+        self.qtyT = qtyT
+        self.qtyR = qtyR
+        self.qtyA = qtyA
+    
+    def addQty(self, qty):
+        self.qtyA += qty
+        self.qtyT += qty
+        self.merchInventory.qtyA += qty
+        self.merchInventory.qtyT += qty
+        self.merchInventory.save()
+        self.save()
+
+    def resQty(self, qty):
+        self.qtyR += qty
+        self.qtyA -= qty
+
+        self.merchInventory.qtyR += qty
+        self.merchInventory.qtyA -= qty
+        self.merchInventory.save()
+        self.save()
+
+    def salesWSO(self, qty):
+        self.qtyR -= qty
+        self.qtyT -= qty
+
+        self.merchInventory.qtyR -= qty
+        self.merchInventory.qtyT -= qty
+
+        self.merchInventory.save()
+        self.save()
+
 
 class PurchaseRequest(models.Model):
     code = models.CharField(max_length=50)
@@ -861,6 +899,7 @@ class Branch(models.Model):
 
     ##### INVENTORY #####
     warehouse = models.ManyToManyField(Warehouse, blank = True)
+    warehouseItems = models.ManyToManyField(WarehouseItems, blank=True)
     merchInventory = models.ManyToManyField(MerchandiseInventory, blank = True)
 
     ##### PURCHASE REQUEST #####

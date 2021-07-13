@@ -281,7 +281,7 @@ class SaveSalesOrder(APIView):
         so = SalesOrder()
 
         so.code = salesOrder['code']
-        so.datetimeCreated = datetime.now
+        so.datetimeCreated = datetime.now()
         
         if salesOrder['retroactive']:
             so.dateSold = salesOrder['retroactive']
@@ -290,14 +290,11 @@ class SaveSalesOrder(APIView):
 
         so.party = Party.objects.get(pk=salesOrder['customer'])
 
-        so.amountPaid = Decimal(salesOrder['amountPaid'])
         so.amountDue = Decimal(salesOrder['amountDue'])
         so.amountTotal = Decimal(salesOrder['amountTotal'])
         so.taxType = salesOrder['taxType']
         so.taxRate = Decimal(salesOrder['taxRate'])
         so.taxPeso = Decimal(salesOrder['taxPeso'])
-        so.paymentMethod = salesOrder['paymentMethod']
-        so.paymentPeriod = salesOrder['paymentPeriod']
         so.chequeNo = salesOrder['chequeNo']
         so.dueDate = salesOrder['dueDate']
         so.bank = salesOrder['bank']

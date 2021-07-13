@@ -149,9 +149,8 @@
                         <div class="row">
                             <div class="col px-1">
                                 <div class="form-group">
-                                    <label>Choose Warehouse</label><br>
-                                    <span class="font-size-10 font-medium">Hold down “Control”, or “Command” on a Mac, to select more than one.</span>
-                                    <select v-model="invModal.warehouse" class="form-control" multiple>
+                                    <label>Choose Warehouse</label>
+                                    <select v-model="invModal.warehouse" class="form-control">
                                         <option v-for="item in warehouse" :value="item.id">[[item.name]]</option>
                                     </select>
                                 </div>
