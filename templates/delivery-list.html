@@ -1,50 +1,55 @@
-{% extends 'base-template.html' %}
-{% block title %}Inventory Adjustments List{% endblock %}
+{% extends "base-template.html" %}
+{% block title %}Deliveries List{% endblock %}
 
 {% block body %}
 
 <div id="app" v-cloak>
     <!-- NAV BAR -->
-    <navbar-imps active="nav-adjustments" photo="/media/{{request.user.image}}"></navbar-imps>
+    <navbar-imps active="nav-deliveries" photo="/media/{{request.user.image}}"></navbar-imps>
     <app-card></app-card>
     <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
 
     <!-- MAIN BODY -->
     <div class="container">
         <!-- MORE NAV -->
+        <!-- MORE NAVIGATION -->
         <div class="d-flex font-semibold mb-2 justify-content-center">
             <div class="justify-content-center c-nav-links imps-nav">
-                <a href="/adjustments/" class="mx-2">Create</a>
-                <a href="/ad-list/" class="active-imps mx-2">Adjustments List</a>
+                <a href="/deliveries/" class="mx-2">Send Deliveries</a>
+                <a href="/delivery-list/" class="active-imps mx-2">Deliveries List</a>
+                <a href="/trucks/" class="mx-2">Trucks</a>
+                <a href="/drivers/" class="mx-2">Drivers</a>
+                <a href="/in-transit/" class="mx-2">In-transit</a>
             </div>
-        </div> 
+        </div>
 
         <!-- TITLE AND BUTTONS -->
         <div class="d-flex align-items-center mb-3">
-            <span class="font-size-18 font-bold mr-1 mt-3">Inventory Adjustments List</span>
+            <span class="font-size-18 font-bold mr-1 mt-3">Deliveries List</span>
         </div>
 
+        <!-- TABLE -->
         <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
             <thead class="thead-dark">
-                <th>Adjustment Code</th>
+                <th>Delivery Code</th>
                 <th>Date Created</th>
-                <th>Type of Adjustment</th>
-                <th>Total Lost</th>
+                <th>Plate and Truck</th>
+                <th>Driver</th>
             </thead>
             <tbody>
-                {% for ad in request.user.branch.adjustments.all %}
+                {% for d in request.user.branch.deliveries.all %}
                 <tr>
-                    <td @click="getAd({{ad.pk}})" class="link" data-toggle="modal" data-target="#adModal">{{ad.code}}</td>
-                    <td>{{ad.datetimeCreated}}</td>
-                    <td>{{ad.type}}</td>
-                    <td>₱[[formatPrice({{ad.totalLost}})]]</td>
+                    <td @click="viewTruck({{d.id}})" class="link" data-toggle="modal" data-target="#truckModal">{{d.code}}</td>
+                    <td>{{d.datetimeCreated}}</td>
+                    <td>{{d.truck.plate}} : {{d.truck.brand}} {{d.truck.model}}</td>
+                    <td>{{d.driver.firstName}} {{d.driver.lastName}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-
+        
         <!-- MODAL -->
-        <div class="modal fade" id="adModal">
+        <div class="modal fade" id="truckModal">
             <div class="modal-dialog">
                 <div class="modal-content b-radius-15">
                     <div class="modal-body">
@@ -52,72 +57,70 @@
                         <div class="order-card row my-2">
                             <!-- LVL 1 -->
                             <div class="col-6 mt-3">
-                                <label for="" class="gray">Adjustment Code</label><br>
-                                <span class="font-size-14 font-bold">[[modal.code]]</span>
+                                <label for="" class="gray">Delivery Code</label><br>
+                                <span class="font-size-14 font-bold">[[truckModal.code]]</span>
                             </div>
                             <div class="col-6 mt-3">
-                                <label for="" class="gray">Status</label><br>
-                                <span class="font-size-14 font-bold approved" v-if="modal.approved">Approved</span>
-                                <span class="font-size-14 font-bold pending" v-else>Pending</span>
-                            </div>
-                            <!-- LVL 2 -->
-                            <div class="col-6 mt-3">
-                                <label for="" class="gray">Type of Adjustment</label><br>
-                                <span class="font-size-14 font-bold">[[modal.type]]</span>
-                            </div>
-                            <div class="col-6 mt-3">
-                                <label for="" class="gray">Total Lost</label><br>
-                                <span class="font-size-14 font-bold">₱[[formatPrice(modal.totalLost)]]</span>
-                            </div>
-                            <!-- LVL 3 -->
-                            <div class="col-6 my-3">
                                 <label for="" class="gray">Datetime Created</label><br>
-                                <span class="font-size-14 font-bold">[[formatDateTime(modal.datetimeCreated)]]</span>
+                                <span class="font-size-14 font-bold">[[formatDateTime(truckModal.datetimeCreated)]]</span>
+                            </div>
+                            <div class="col-6 mt-3">
+                                <label class="gray">Truck</label><br>
+                                <span class="font-size-14 font-bold">[[truckModal.truck.brand]] [[truckModal.truck.model]]</span>
                             </div>
                             <div class="col-6 my-3">
-                                <label for="" class="gray">Created By</label><br>
-                                <span class="font-size-14 font-bold">[[modal.createdBy.first_name]] [[modal.createdBy.last_name]]</span>
+                                <label class="gray">Plate</label><br>
+                                <span class="font-size-14 font-bold">[[truckModal.truck.plate]]</span>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="gray">Driver</label><br>
+                                <span class="font-size-14 font-bold">[[truckModal.driver.firstName]] [[truckModal.driver.lastName]]</span>
                             </div>
                         </div>
 
-                        <!-- ITEMS -->
+                        <!-- DESTINATIONS -->
                         <div class="row mt-4">
                             <div class="col">
-                                <span class="font-bold">Items</span>
+                                <span class="font-bold">Destinations</span>
                             </div>
                         </div>
+
+                        <!-- DESTINATION ITEMS -->
                         <div class="row">
                             <table class="table table-sm table-striped">
                                 <thead>
-                                    <th>
-                                        <span class="font-bold gray">Item Code</span>
-                                    </th>
-                                    <th>
-                                        <span class="font-bold gray">Item Name</span>
-                                    </th>
-                                    <th>
-                                        <span class="font-bold gray">Quantity</span>
-                                    </th>
-                                    <th>
-                                        <span class="font-bold gray">Unit Cost</span>
-                                    </th>
-                                    <th>
-                                        <span class="font-bold gray">Lost</span>
-                                    </th>
+                                    <th><span class="font-bold gray">Destinations</span></th>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="item in modal.aditems">
-                                        <td>[[item.merchInventory.code]]</td>
-                                        <td>[[item.merchInventory.name]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
-                                        <td>[[item.qtyAdjusted]]</td>
-                                        <td>₱[[formatPrice(item.unitCost)]]</td>
-                                        <td>₱[[formatPrice(item.totalCost)]]</td>
+                                    <tr v-for="dest in truckModal.deliverydestinations">
+                                        <td>[[dest.destination]]</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <a href="/ad-approved/" v-if="modal.approved">Go to approvals</a>
-                        <a href="/ad-nonapproved" v-else>Go to approvals</a>
+
+                        <!-- LOAD -->
+                        <div class="row mt-4">
+                            <div class="col">
+                                <span class="font-bold">Load</span>
+                            </div>
+                        </div>
+
+                        <!-- LOAD ITEMS -->
+                        <div class="row">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <th><span class="font-bold gray">Item</span></th>
+                                    <th><span class="font-bold gray">Qty</span></th>
+                                </thead>
+                                <tbody v-for="itemgroup in truckModal.deliveryitemsgroup">
+                                    <tr v-for="item in itemgroup.deliveryitemsmerch">
+                                        <td>[[item.merchInventory.code]] - [[item.merchInventory.name]] [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
+                                        <td>[[item.qty]]</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -129,7 +132,6 @@
 {% endblock %}
 
 {% block scripts %}
-
 <script>
     $(document).ready(function() {
         $.fn.dataTable.moment( 'MMMM D, YYYY' );
@@ -197,34 +199,41 @@
         el: "#app",
 
         data: {
-            modal: {
-                code: null,
-                approved: null,
-                type: null,
-                totalLost: null,
-                datetimeCreated: null,
-                createdBy: {
-                    first_name: null,
-                    last_name: null,
+            truckModal: {
+                truck: {
+                    brand: null,
+                    model: null,
+                    plate: null,
                 },
-                aditems: []
+                driver: {
+                    firstName: null,
+                    lastName: null,
+                },
+                deliverydestination: [{
+                    destination: null,
+                }],
+                deliveryitemsgroup: [{
+                    deliveryitemmerch: [{
+                        qty: null,
+                        merchInventory: {
+                            code: null,
+                            name: null
+                        }
+
+                    }]
+                }]
             }
         },
+
         methods: {
-            getAd(id){
-                axios.get(`/api/adjustments/${id}`)
-                .then(res=>{
-                    console.log(res.data)
-                    this.modal = res.data
-                })
+            viewTruck(currentDelivery){
+                axios.get(`/api/special-truck/${currentDelivery}`)
+                .then(res=>this.truckModal = res.data)
             },
-            formatPrice(val){
-                val = Number(val).toFixed(2)
-                var num = val.replace(/,/gi, "");
-                var num1 = num.split('.')
-                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
-                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
-                return val
+            returnTruck(id){
+                $("#truckModal").modal('hide')
+                axios.put(`/return-truck/${id}/`, null, this.config)
+                .then(res=>res.data==0?location.reload():'')
             },
             formatDateTime(value){
                 const months = [
@@ -264,7 +273,8 @@
 
                 return formatted
             },
-        }
+        },
+
     })
 </script>
 

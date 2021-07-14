@@ -51,6 +51,10 @@ class DeliveriesView(View):
 
         return render(request, 'deliveries.html', context)
 
+class DeliveriesListView(View):
+    def get(self, request, format=None):
+        return render(request, 'delivery-list.html')
+
 class TruckView(View):
     def post(self, request, format=None):
         request.data = json.loads(request.body)
