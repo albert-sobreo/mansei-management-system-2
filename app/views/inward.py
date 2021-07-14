@@ -78,7 +78,7 @@ class ImportInwardInventory(View):
             iiitemsMerch.productMark = item['productMark']
             iiitemsMerch.length = item['length']
             iiitemsMerch.width = item['width']
-            iiitemsMerch.thicc = item['thicc']
+            iiitemsMerch.thicc = item['thickness']
             iiitemsMerch.vol = item['vol']
             iiitemsMerch.qty = item['qty']
 

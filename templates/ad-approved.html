@@ -1,0 +1,279 @@
+{% extends 'base-template.html' %}
+{% block title %}Inventory Adjustments | Approved{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-imps active="nav-approvals" photo="/media/{{request.user.image}}"></navbar-imps>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAV -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links imps-nav">
+                <a href="/ad-nonapproved/" class="mx-2">Pending</a>
+                <a href="/ad-approved/" class="active-imps mx-2">Approved</a>
+            </div>
+        </div> 
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1 mt-3">Inventory Adjustments</span>
+        </div>
+
+        <table  id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead class="thead-dark">
+                <th>Adjustment Code</th>
+                <th>Date Created</th>
+                <th>Type of Adjustment</th>
+                <th>Total Lost</th>
+            </thead>
+            <tbody>
+                {% for ad in adjusts %}
+                <tr>
+                    <td @click="getAd({{ad.pk}})" class="link" data-toggle="modal" data-target="#adModal">{{ad.code}}</td>
+                    <td>{{ad.datetimeCreated}}</td>
+                    <td>{{ad.type}}</td>
+                    <td>₱[[formatPrice({{ad.totalLost}})]]</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- MODAL -->
+        <div class="modal fade" id="adModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <div class="order-card row my-2">
+                            <!-- LVL 1 -->
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Adjustment Code</label><br>
+                                <span class="font-size-14 font-bold">[[modal.code]]</span>
+                            </div>
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Status</label><br>
+                                <span class="font-size-14 font-bold approved" v-if="modal.approved">Approved</span>
+                                <span class="font-size-14 font-bold pending" v-else>Pending</span>
+                            </div>
+                            <!-- LVL 2 -->
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Type of Adjustment</label><br>
+                                <span class="font-size-14 font-bold">[[modal.type]]</span>
+                            </div>
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Total Lost</label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(modal.totalLost)]]</span>
+                            </div>
+                            <!-- LVL 3 -->
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">Datetime Created</label><br>
+                                <span class="font-size-14 font-bold">[[formatDateTime(modal.datetimeCreated)]]</span>
+                            </div>
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">Created By</label><br>
+                                <span class="font-size-14 font-bold">[[modal.createdBy.first_name]] [[modal.createdBy.last_name]]</span>
+                            </div>
+                        </div>
+
+                        <!-- ITEMS -->
+                        <div class="row mt-4">
+                            <div class="col">
+                                <span class="font-bold">Items</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <th>
+                                        <span class="font-bold gray">Item Code</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Item Name</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Quantity</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Unit Cost</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Lost</span>
+                                    </th>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in modal.aditems">
+                                        <td>[[item.merchInventory.code]]</td>
+                                        <td>[[item.merchInventory.name]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
+                                        <td>[[item.qtyAdjusted]]</td>
+                                        <td>₱[[formatPrice(item.unitCost)]]</td>
+                                        <td>₱[[formatPrice(item.totalCost)]]</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <pre>[[$data]]</pre>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    $(document).ready(function() {
+        $.fn.dataTable.moment( 'MMMM D, YYYY' );
+        $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
+        $('#table').DataTable({
+            language: { search: '', searchPlaceholder: 'Search'},
+            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            "order": [[ 0, "desc" ]],
+            "pageLength": 25,
+            buttons: {
+                buttons: [
+                {
+                    text: '<i class="fas fa-file-excel"></i>',
+                    className: 'btn text-success btn-table',
+                    titleAttr: 'Export Excel',
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fas fa-file-csv"></i>',
+                    className: 'btn text-warning btn-table',
+                    titleAttr: 'Export CSV',
+                    extend: 'csv'
+                },
+                {
+                    text: '<i class="fas fa-print"></i>',
+                    className: 'btn btn-table',
+                    titleAttr: 'Print',
+                    extend: 'print'
+                },
+                {
+                    text: "RAW",
+                    className: 'btn btn-table font-size-10',
+                    titleAttr: 'View Raw Numbers',
+                    action: function(){
+                        app.roundToggler()
+                    }
+                }
+                ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
+                }
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            },
+        
+        });
+    });
+    $('option').mousedown(function(e) {
+        e.preventDefault();
+        $(this).prop('selected', !$(this).prop('selected'));
+        return false;
+    });
+</script>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            modal: {
+                code: null,
+                approved: null,
+                type: null,
+                totalLost: null,
+                datetimeCreated: null,
+                createdBy: {
+                    first_name: null,
+                    last_name: null,
+                },
+                aditems: []
+            }
+        },
+        methods: {
+            approveAD(id){
+                $("#poModal").modal('hide')
+                axios.put(`/ad-approval/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+            getAd(id){
+                axios.get(`/api/adjustments/${id}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    this.modal = res.data
+                })
+            },
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+        }
+    })
+</script>
+
+{% endblock %}

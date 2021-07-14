@@ -28,6 +28,8 @@ router.register(r"warehouse", views.WarehouseAPI, 'warehouse')
 
 ########## MERCH INVENTORY ##########
 router.register(r"merchinventory", views.MerchandiseInventoryAPI, 'merchinvetory')
+router.register(r"nestedmerchinventory", views.MerchandiseInventoryNestedAPI, 'nestedmerchinventory')
+
 
 ########## ACCOUNTING APPROVALS ##########
 router.register(r'purchase-order-non-approved', views.PurchaseApprovalNonApprovedAPI, 'purchase-order-non-approved')
@@ -82,6 +84,7 @@ router.register(r"sales-contract", views.SalesContractAPI, 'sales-contract')
 
 ########## TRANSFER & ADJUSTMENTS ##########
 router.register(r"transfer", views.TransferAPI, 'transfer')
+router.register(r"adjustments", views.AdjustmentAPI, 'adjustments')
 
 ########## BRANCH DEFAULT CHILD ACCOUNT ##########
 router.register(r"branch-default-child-account", views.BranchDefaultChildAccountAPI, 'branch-default-child-account')
@@ -185,4 +188,10 @@ urlpatterns = [
     path('tr-nonapproved/', login_required(views.TransferNonApproved.as_view())),
     path('tr-approved/', login_required(views.TransferApproved.as_view())),
     path('tr-approval/<int:pk>/', login_required(views.TransferApproval.as_view())),
+    path('adjustments/', login_required(views.AdjustmentsView.as_view())),
+    path('save-adjustments/', login_required(views.SaveAdjustments.as_view())),
+    path('ad-nonapproved/', login_required(views.AdjustmentsNonApproved.as_view())),
+    path('ad-approved/', login_required(views.AdjustmentsApproved.as_view())),
+    path('ad-approval/<int:pk>/', login_required(views.AdjustmentApproval.as_view())),
+    path('ad-list/', login_required(views.AdjustmentList.as_view()))
 ]

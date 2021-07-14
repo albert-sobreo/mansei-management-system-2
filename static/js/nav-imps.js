@@ -36,7 +36,7 @@ Vue.component('navbar-imps', {
             <a href='/merchinventory/' class="mx-3" id="nav-inventory">Inventory</a>
             <a href="#" class="mx-3" id="nav-job-order">Job Order</a>
             <a href="/transfer/" class="mx-3" id="nav-transfer">Transfer</a>
-            <a href="#" class="mx-3" id="nav-adjustments">Adjustments</a>
+            <a href="/adjustments/" class="mx-3" id="nav-adjustments">Adjustments</a>
             <a href="/deliveries/" class="mx-3" id="nav-deliveries">Deliveries</a>
             <a href="/warehouse/" class="mx-3" id="nav-warehouse">Warehouse</a>
             <a href="#" class="mx-3" id="nav-reports">Reports</a>
@@ -45,7 +45,7 @@ Vue.component('navbar-imps', {
                 <div class="dropdown-menu b-radius-5 py-0">
                     <a href="#" class="dropdown-item d-item-imps font-size-12 font-semibold">Job Orders</a>
                     <a href="/tr-nonapproved/" class="dropdown-item d-item-imps font-size-12 font-semibold">Transfers</a>
-                    <a href="#" class="dropdown-item d-item-imps font-size-12 font-semibold">Adjustments</a>
+                    <a href="/ad-nonapproved/" class="dropdown-item d-item-imps font-size-12 font-semibold">Adjustments</a>
                     <a href="/deliveriesnonapproved/" class="dropdown-item d-item-imps font-size-12 font-semibold">Deliveries</a>
                 </div>
             </div>

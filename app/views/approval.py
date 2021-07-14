@@ -658,11 +658,58 @@ class TransferApproval(APIView):
         tr.approved = True
 
         for element in tr.tritems.all():
-            element.merchInventory.warehouse = tr.newWarehouse
-            element.merchInventory.save()
+            ow = WarehouseItems.objects.get(merchInventory=element.merchInventory, warehouse=element.warehouse)
+            ow.addQty(-element.qtyTransfered)
+            try:
+                nw = WarehouseItems.objects.get(merchInventory=element.merchInventory, warehouse=tr.newWarehouse)
+                nw.addQty(element.qtyTransfered)
+            except:
+                nw = WarehouseItems()
+                nw.merchInventory = element.merchInventory
+                nw.warehouse = tr.newWarehouse
+                nw.initQty(nw.merchInventory.qtyT, nw.merchInventory.qtyR, nw.merchInventory.qtyA)
+                nw.save()
+                nw.addQty(element.qtyTransfered)
+            # element.merchInventory.warehouse = tr.newWarehouse
+            # element.merchInventory.save()
 
         tr.save()
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+class AdjustmentsNonApproved(View):
+    def get(self, request, format=None):
+        context = {
+            'adjusts': request.user.branch.adjustments.filter(approved=False)
+        }
+        return render(request, 'ad-nonapproved.html', context)
+
+class AdjustmentsApproved(View):
+    def get(self, request, format=None):
+        context = {
+            'adjusts': request.user.branch.adjustments.filter(approved=True)
+        }
+        return render(request, 'ad-approved.html', context)
+
+class AdjustmentApproval(APIView):
+    def put(self, request, pk, format = None):
+
+        ad = Adjustments.objects.get(pk=pk)
+
+        ad.datetimeApproved = datetime.now()
+        ad.approvedBy = request.user
+        ad.approved = True
+
+        for element in ad.aditems.all():
+            # element.merchInventory.qtyA -= element.qtyAdjusted
+            # element.merchInventory.qtyT -= element.qtyAdjusted
+            wi = WarehouseItems.objects.get(merchInventory = element.merchInventory)
+            wi.addQty(-element.qtyAdjusted)
+            element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
+            element.merchInventory.totalCost -= element.totalCost
+            element.merchInventory.save()
+
+        ad.save()
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
         

@@ -90,6 +90,11 @@ class MerchandiseInventoryAPI(viewsets.ModelViewSet):
     serializer_class = MerchandiseInventorySZ
     queryset = MerchandiseInventory.objects.all()
 
+class MerchandiseInventoryNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = MerchandiseInventoryNestedSZ
+    queryset = MerchandiseInventory.objects.all()
+
 
 
 
@@ -293,6 +298,11 @@ class TransferAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = TransferSZ
     queryset = Transfer.objects.all()
+
+class AdjustmentAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdjustmentSZ
+    queryset = Adjustments.objects.all()
 
 
 ########### BranchDefaultChildAccount ##########

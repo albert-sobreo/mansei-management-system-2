@@ -854,6 +854,9 @@ class AdjustmentsItems(models.Model):
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="aditems", on_delete=models.PROTECT, null=True, blank=True)
     adjustments = models.ForeignKey(Adjustments, on_delete=models.PROTECT, null = True, blank = True, related_name= "aditems")
     qtyAdjusted = models.IntegerField(null = True, blank = True)
+    remaining = models.IntegerField(null = True, blank = True)
+    unitCost = models.DecimalField(max_digits = 20, decimal_places=5, null = True, blank = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class AdjustmentsPhotos(models.Model):
     adjustments = models.ForeignKey(Deliveries, related_name="adjustmentsphotos", on_delete=models.PROTECT, null=True, blank=True)
