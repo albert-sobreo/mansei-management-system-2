@@ -230,7 +230,7 @@
                         </div>
                         <div class="row">
                             <div class="col px-1">
-                                <button @click="submitEdit()" class="btn btn-primary col">Save Item</button>
+                                <button @click="submitEdit(editModal.id)" class="btn btn-primary col">Save Item</button>
                             </div>
                         </div>
                     </div>
@@ -405,6 +405,7 @@
                 totalCost: 0
             },
             editModal: {
+                id: null,
                 code: null,
                 name: null,
                 classification: null,
@@ -481,8 +482,8 @@
             edit(){
                 this.editModal = this.modal
             },
-            submitEdit(){
-                axios.put('/api/???/', this.editModal, this.config)
+            submitEdit(id){
+                axios.put(`/editmerchinventory/${id}/`, this.editModal, this.config)
                 .then(res=>res.data==0?location.reload():'')
             }
         },

@@ -120,3 +120,24 @@ class ImportMerchandiseInventory(View):
 
         sweetify.sweetalert(request, icon="success", title="Success!", persistent="Dismiss")
         return redirect('/merchinventory/')
+
+
+
+class EditInventory(APIView):
+    def put(self, request, pk, format = None):
+        
+        merch = MerchandiseInventory.objects.get(pk=pk)
+
+        edit = request.data
+
+        merch.code = edit['code']
+        merch.name = edit['name']
+        merch.classification = edit['classification']
+        merch.type = edit['type']
+        merch.pricePerCubic = edit['pricePerCubic']
+        merch.um = edit['um']
+
+        merch.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)

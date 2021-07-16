@@ -145,3 +145,24 @@ class ImportCustomerVendor(View):
             sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
 
         return redirect('/customers/')
+
+class EditParty(APIView):
+    def put(self, request, pk, format = None):
+        party = Party.objects.get(pk=pk)
+        edit = request.data
+
+        party.shippingAddress = edit['shippingAddress']
+        party.officeAddress = edit['officeAddress']
+        party.landline = edit['landline']
+        party.mobile = edit['mobile']
+        party.email = edit['email']
+        party.contactPerson = edit['contactPerson']
+        party.bank = edit['bank']
+        party.bankNo = edit['bankNo']
+        party.tin = edit['tin']
+        party.crte = edit['crte']
+        party.prefferedPayment = edit['prefferedPayment']
+
+        party.save()
+        sweetify.sweetalert(request, icon='success', title='Success!',  persistent='Dismiss')
+        return JsonResponse(0, safe=False)
