@@ -13,6 +13,7 @@ router = routers.DefaultRouter()
 router.register(r"group", views.AccountGroupAPI, 'group')
 router.register(r"sub-group", views.AccountSubGroupAPI, 'sub-group')
 router.register(r"child", views.AccountChildAPI, 'child')
+router.register(r"child-nested", views.AccountChildNestedAPI, 'child-nested')
 
 ########## LEDGER URLS ##########
 router.register(r"ledger", views.LedgerAPI, 'ledger')
@@ -100,6 +101,7 @@ urlpatterns = [
     path('ledger/', login_required(views.LedgerView.as_view())),
     path('save-account-child/', login_required(views.SaveAccountChild.as_view())),
     path('save-account-group/', login_required(views.SaveAccountGroup.as_view())),
+    
     path('edit-account-child/<int:pk>/', login_required(views.EditChildGroup.as_view())),
     path('edit-sub-group/<int:pk>/', login_required(views.EditSubGroup.as_view())),
     path('customers/', login_required(views.CustomerView.as_view())),
@@ -110,6 +112,7 @@ urlpatterns = [
     path('addmerchinventory/', login_required(views.AddMerchInventoryAPI.as_view())),
     path('editmerchinventory/<int:pk>/', login_required(views.EditInventory.as_view())),
     path('warehouse/', login_required(views.WarehouseView.as_view())),
+    
     path('addwarehouse/', login_required(views.AddWarehoseAPI.as_view())),
     path('purchase-request/', login_required(views.PurchaseRequestView.as_view())),
     path('pr-list/', login_required(views.PRListView.as_view())),
@@ -120,6 +123,7 @@ urlpatterns = [
     path('po-list/', login_required(views.POListView.as_view())),
     path('save-purchase-order/', login_required(views.SavePurchaseOrder.as_view())),
     path('po-nonapproved/', login_required(views.POnonapprovedView.as_view())),
+    
     path('po-approved/', login_required(views.POapprovedView.as_view())),
     path('po-approval/<int:pk>/', login_required(views.POApprovalAPI.as_view())),
     path('purchase-order-list/', login_required(views.POListView.as_view())),
@@ -130,6 +134,7 @@ urlpatterns = [
     path('sc-approved/', login_required(views.SCapprovedView.as_view())),
     path('sales-contract-list/', login_required(views.SCListView.as_view())),
     path('sc-approval/<int:pk>/', login_required(views.SCApprovalAPI.as_view())),
+    
     path('deliveries/', login_required(views.DeliveriesView.as_view())),
     path('trucks/', login_required(views.TruckView.as_view())),
     path('drivers/', login_required(views.DriverView.as_view())),
@@ -140,6 +145,7 @@ urlpatterns = [
     path('in-transit/', login_required(views.InTransitView.as_view())),
     path('deliveriesnonapproved/', login_required(views.DeliveriesNonApproved.as_view())),
     path('deliveriesapproved/', login_required(views.DeliveriesApproved.as_view())),
+    
     path('approve-deliveries/<int:pk>/', login_required(views.DeliveriesApprovalAPI.as_view())),
     path('return-truck/<int:pk>/', login_required(views.ReturnTruck.as_view())),
     path('import-atc/', login_required(views.ImportATC.as_view())),
@@ -150,6 +156,7 @@ urlpatterns = [
     path('save-receivingreport/', login_required(views.SaveReceivingReport.as_view())),
     path('rr-nonapproved/', login_required(views.RRnonapproved.as_view())),
     path('rr-approved/', login_required(views.RRapproved.as_view())),
+    
     path('rr-approval/<int:pk>/', login_required(views.RRApprovalAPI.as_view())),
     path('import-merch-inventory/', login_required(views.ImportMerchandiseInventory.as_view())),
     path('sales-quotations/', login_required(views.SalesQuotationsView.as_view())),
@@ -160,6 +167,7 @@ urlpatterns = [
     path('qq-approval/<int:pk>/', login_required(views.QQApprovalAPI.as_view())),
     path('inward-inventory/', login_required(views.InwardView.as_view())),
     path('import-inwardinventory/', login_required(views.ImportInwardInventory.as_view())),
+    
     path('pr-approval/<int:pk>/', login_required(views.PRApprovalAPI.as_view())),
     path('inward-adjustments/', login_required(views.InwardAdjustmentsView.as_view())),
     path('save-receiving-report/', login_required(views.SaveReceivingReport.as_view())),
@@ -170,6 +178,7 @@ urlpatterns = [
     path('sales-order/', login_required(views.SalesOrderView.as_view())),
     path('so-list/', login_required(views.SOListView.as_view())),
     path('save-sales-order/', login_required(views.SaveSalesOrder.as_view())),
+    
     path('so-nonapproved/', login_required(views.SOnonapprovedView.as_view())),
     path('so-approved/', login_required(views.SOapprovedView.as_view())),
     path('so-approval/<int:pk>/', login_required(views.SOApprovalAPI.as_view())),
@@ -191,6 +200,7 @@ urlpatterns = [
     path('transfer-list/', login_required(views.TransferList.as_view())),
     path('tr-nonapproved/', login_required(views.TransferNonApproved.as_view())),
     path('tr-approved/', login_required(views.TransferApproved.as_view())),
+    
     path('tr-approval/<int:pk>/', login_required(views.TransferApproval.as_view())),
     path('adjustments/', login_required(views.AdjustmentsView.as_view())),
     path('save-adjustments/', login_required(views.SaveAdjustments.as_view())),

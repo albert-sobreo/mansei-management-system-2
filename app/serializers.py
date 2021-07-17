@@ -32,6 +32,22 @@ class AccountChildSZ(serializers.ModelSerializer):
 
 
 
+class SubGroupNestedSZ(serializers.ModelSerializer):
+    accountGroup = AccountGroupSZ(read_only=True)
+    class Meta:
+        model = AccountSubGroup
+        fields = "__all__"
+
+class AccountChildNestedSZ(serializers.ModelSerializer):
+    accountSubGroup = SubGroupNestedSZ(read_only=True)
+    class Meta:
+        model = AccountSubGroup
+        fields = "__all__"
+
+
+
+
+
 
 ########## ATC ##########
 class ATCSZ(serializers.ModelSerializer):

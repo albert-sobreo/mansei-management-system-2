@@ -31,6 +31,12 @@ class AccountChildAPI(viewsets.ModelViewSet):
     serializer_class = AccountChildSZ
     queryset = AccountChild.objects.all().order_by('code')
 
+
+class AccountChildNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AccountChildNestedSZ
+    queryset = AccountChild.objects.all()
+
 class AccountSubGroupAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SubGroupSZ
