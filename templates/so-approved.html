@@ -34,7 +34,11 @@
             </thead>
             <tbody>
                 {% for sale in salesorder %}
+                {% if sale.voided %}
+                <tr class="voided">
+                {% else %}
                 <tr>
+                {% endif %}
                     <td @click="viewSC('{{sale.pk}}')" class="link" data-toggle="modal" data-target="#scModal">{{sale.code}}</td>
                     <td>{{sale.party.name}}</td>
                     <td>₱[[roundNumber2({{sale.amountTotal}})]]</td>
@@ -158,6 +162,12 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- VOID BUTTON -->
+                        <div class="row" v-if="orderModal.voided == false">
+                            <div class="col">
+                                <button class="col btn btn-danger" @click="voidCheck([[orderModal.id]])">Void</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -244,6 +254,7 @@
             },
 
             orderModal: {
+                voided: null,
                 code: null,
                 createdBy: {
                     first_name: null,
@@ -301,6 +312,23 @@
             }
         },
         methods: {
+            voidCheck(id){
+                Swal.fire({
+                    title: 'Warning',
+                    html: 'Are you sure you want to void this item?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result)=>{
+                    if(result.isConfirmed) {
+                        this.voidSO(id)
+                    }
+                })
+            },
+            voidSO(id){
+                axios.put(`/so-void/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
             viewSC(code){
                 axios.get(`/api/sales-order/${code}/`)
                 .then(res=>this.orderModal=res.data)

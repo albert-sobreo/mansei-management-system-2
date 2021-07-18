@@ -34,7 +34,11 @@
             </thead>
             <tbody>
                 {% for sale in sales %}
+                {% if sale.voided %}
+                <tr class="voided">
+                {% else %}
                 <tr>
+                {% endif %}
                     <td @click="viewSC('{{sale.pk}}')" class="link" data-toggle="modal" data-target="#scModal">{{sale.code}}</td>
                     <td>{{sale.party.name}}</td>
                     <td>₱[[roundNumber2({{sale.amountTotal}})]]</td>
@@ -161,9 +165,9 @@
                             </table>
                         </div>
                         <!-- APPROVE BUTTON -->
-                        <div class="row">
+                        <div class="row" v-if="orderModal.voided == false">
                             <div class="col">
-                                <button class="col btn btn-primary" @click="approveSC([[orderModal.id]])">Approve</button>
+                                <button class="col btn btn-danger" @click="voidCheck([[orderModal.id]])">Void</button>
                             </div>
                         </div>
                     </div>
@@ -252,6 +256,7 @@
             },
 
             orderModal: {
+                voided: null,
                 code: null,
                 createdBy: {
                     first_name: null,
@@ -309,6 +314,23 @@
             }
         },
         methods: {
+            voidCheck(id){
+                Swal.fire({
+                    title: 'Warning',
+                    html: 'Are you sure you want to void this item?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result)=>{
+                    if(result.isConfirmed) {
+                        this.voidSC(id)
+                    }
+                })
+            },
+            voidSC(id){
+                axios.put(`/sc-void/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
             viewSC(code){
                 axios.get(`/api/sales-contract/${code}/`)
                 .then(res=>this.orderModal=res.data)

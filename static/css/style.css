@@ -878,3 +878,7 @@ select.form-control{
 .multi-select-items{
     margin:2px 0px;
 }
+
+.voided{
+    background-color: rgb(255, 236, 236) !important;
+}
