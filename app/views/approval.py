@@ -93,6 +93,17 @@ class POApprovalAPI(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+class POVoid(APIView):
+    def put(self, request, pk, format = None):
+        po = PurchaseOrder.objects.get(pk=pk)
+        po.voided = True
+        po.voidedBy = request.user
+        po.datetimeVoided = datetime.now()
+        po.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
 
 
 
@@ -522,21 +533,6 @@ class SCApprovalAPI(APIView):
         sale.approved = True
         sale.approvedBy = request.user
 
-
-        for element in sale.scitemsmerch.all():
-            # element.merchInventory.qtyA -= element.qty
-            # element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
-
-            wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
-            if sale.salesOrder:
-                wi.salesWSO(element.qty)
-            else:
-                wi.addQty(-element.qty)
-            element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
-            element.merchInventory.totalCost -= element.totalCost                
-            # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
-            element.merchInventory.save()
-
         sale.save()
 
         j = Journal()
@@ -577,15 +573,15 @@ class SCVoid(APIView):
         sale.voided = True
         sale.voidedBy = request.user
 
-        for element in sale.scitemsmerch.all():
-            wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
-            if sale.salesOrder:
-                wi.salesWSO(-element.qty)
-            else:
-                wi.addQty(element.qty)
-            element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
-            element.merchInventory.totalCost += element.totalCost 
-            element.merchInventory.save()
+        # for element in sale.scitemsmerch.all():
+        #     wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
+        #     if sale.salesOrder:
+        #         wi.salesWSO(-element.qty)
+        #     else:
+        #         wi.addQty(element.qty)
+        #     element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
+        #     element.merchInventory.totalCost += element.totalCost 
+        #     element.merchInventory.save()
         
         if sale.receivepayment:
             for item in sale.receivepayment.all():
@@ -613,6 +609,8 @@ class SCVoid(APIView):
 
         if sale.taxPeso != 0.0:
             jeAPI(request, j, 'Debit', dChildAccount.outputVat, sale.taxPeso)
+
+
 
         if sale.receivepayment:
             for rp in sale.receivepayment.all():
@@ -708,6 +706,24 @@ class DeliveriesApprovalAPI(APIView):
         d.driver.save()
         d.save()
 
+        
+        for item in d.deliveryitemsgroup.all():
+            if item.deliveryType == 'Sales Contract':
+                sc = SalesContract.objects.get(pk=item.referenceNo)
+                for element in sc.scitemsmerch.all():
+                    # element.merchInventory.qtyA -= element.qty
+                    # element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
+
+                    wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
+                    if sc.salesOrder:
+                        wi.salesWSO(element.qty)
+                    else:
+                        wi.addQty(-element.qty)
+                    element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
+                    element.merchInventory.totalCost -= element.totalCost                
+                    # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
+                    element.merchInventory.save()
+
         j = Journal()
 
         j.code = d.code
@@ -723,6 +739,59 @@ class DeliveriesApprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class DeliveriesVoid(APIView):
+    def put(self, request, pk, format = None):
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+        d = Deliveries.objects.get(pk=pk)
+
+        d.voided = True
+        d.voidedBy = request.user
+        d.datetimeVoided = datetime.now()
+
+        d.truck.status = "Available"
+        # print(d.truck.driver)
+        d.truck.driver.status = "Available"
+        d.truck.driver.save()
+        d.truck.driver = None
+        d.truck.currentDelivery = None
+        d.truck.save()
+        d.save()
+
+        for item in d.deliveryitemsgroup.all():
+            if item.deliveryType == 'Sales Contract':
+                sc = SalesContract.objects.get(pk=item.referenceNo)
+                for element in sc.scitemsmerch.all():
+                    # element.merchInventory.qtyA -= element.qty
+                    # element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
+
+                    wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
+                    if sc.salesOrder:
+                        wi.salesWSO(-element.qty)
+                    else:
+                        wi.addQty(element.qty)
+                    element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
+                    element.merchInventory.totalCost += element.totalCost                
+                    # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
+                    element.merchInventory.save()
+
+        j = Journal()
+
+        j.code = d.code
+        j.datetimeCreated = d.datetimeApproved
+        j.createdBy = d.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+
+        jeAPI(request, j, 'Debit', dChildAccount.merchInventory, d.amountTotal)
+
+        jeAPI(request, j, 'Credit', dChildAccount.costOfSales, d.amountTotal)
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+
 
 ################# TRANSFER AND ADJUSTMENT #################
 class TransferNonApproved(View):

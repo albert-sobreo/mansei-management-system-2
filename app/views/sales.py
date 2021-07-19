@@ -111,10 +111,10 @@ class SaveSalesContract(APIView):
             scitemsmerch.qty = item['quantity']
             scitemsmerch.cbm = item['cbm']
             scitemsmerch.vol = item['vol']
-            scitemsmerch.pricePerCubic = item['pricePerCubic']
+            scitemsmerch.pricePerCubic = Decimal(item['pricePerCubic'])
             scitemsmerch.totalCost = Decimal(item['totalCost'])
 
-            print(scitemsmerch.totalCost)
+            print(item['pricePerCubic'], item['totalCost'])
             
             scitemsmerch.save()
             request.user.branch.scitemsMerch.add(scitemsmerch)

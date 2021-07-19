@@ -210,5 +210,7 @@ urlpatterns = [
     path('ad-list/', login_required(views.AdjustmentList.as_view())),
     path('delivery-list/', login_required(views.DeliveriesListView.as_view())),
     path('so-void/<int:pk>/', login_required(views.SOVoid.as_view())),
-    path('sc-void/<int:pk>/', login_required(views.SCVoid.as_view()))
+    path('sc-void/<int:pk>/', login_required(views.SCVoid.as_view())),
+    path('rp-void/<int:pk>/', login_required(views.RPVoid.as_view())),
+    path('delivery-void/<int:pk>/', login_required(views.DeliveriesVoid.as_view()))
 ]

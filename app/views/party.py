@@ -115,10 +115,52 @@ class ImportCustomerVendor(View):
         existing = []
 
         for item in jsonDF:
+            childAR = AccountChild()
+            childAP = AccountChild()
+
+            user = request.user
+
+            try:
+                subGroupAR = request.user.branch.subGroup.get(name="Accounts Receivable")
+                ARcode = subGroupAR.accountchild.latest('pk')
+                current_AR = int(ARcode.code)
+                current_AR += 1
+                new_AR = str(current_AR).zfill(3)
+
+            except Exception as e:
+                print(e)
+                new_AR = '001'
+
+            try:
+                subGroupAP = request.user.branch.subGroup.get(name="Accounts Payables")
+                APcode = subGroupAP.accountchild.latest('pk')
+                current_AP = int(APcode.code)
+                current_AP += 1
+                new_AP = str(current_AP).zfill(3)
+
+            except Exception as e:
+                print(e)
+                new_AP = '001'
+
+            childAR.code = new_AR 
+            childAR.name = 'Trade Receivable - ' + item['Name']
+            childAR.accountSubGroup = AccountSubGroup.objects.get(name='Accounts Receivable')
+            childAR.me = AccountChild.objects.get(name='Trade Receivable')
+            childAR.amount = 0.0
+            childAR.description = " "
+            childAR.save()
+
+            childAP.code = new_AP
+            childAP.name = 'Trade Payables - ' + item['Name']
+            childAP.accountSubGroup = AccountSubGroup.objects.get(name='Accounts Payables')
+            childAP.me = AccountChild.objects.get(name='Trade Payables')
+            childAP.amount = 0.0
+            childAP.description = ""
+            childAP.save()
+
             party = Party()
 
             if Party.objects.filter(name=item['Name']):
-                print('it exists')
                 existing.append(item['Name'])
                 continue
             
@@ -137,6 +179,13 @@ class ImportCustomerVendor(View):
             party.prefferedPayment = item['Preffered-Payment-Method']
 
             party.save()
+
+
+            party.accountChild.add(childAR)
+            party.accountChild.add(childAP)
+
+            request.user.branch.accountChild.add(childAR)
+            request.user.branch.accountChild.add(childAP)
             request.user.branch.party.add(party)
         if len(existing) != 0:
             separator = '<br>'
