@@ -49,6 +49,17 @@ class PRApprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class PRVoid(APIView):
+    def put(self, request, pk, format = None):
+        pr = PurchaseRequest.objects.get(pk=pk)
+        pr.voided = True
+        pr.datetimeVoided = datetime.now()
+        pr.voidedBy = request.user
+        pr.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
         
         
         
@@ -154,7 +165,7 @@ class RRApprovalAPI(APIView):
             wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
             wi.addQty(element.qty)
             element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
-            print(element.merchInventory.qtyT, element.merchInventory.qtyA, element.merchInventory.pk)
+            # print(element.merchInventory.qtyT, element.merchInventory.qtyA, element.merchInventory.pk)
             element.merchInventory.totalCost += element.totalPrice                
             element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
             element.merchInventory.save()
@@ -173,6 +184,8 @@ class RRApprovalAPI(APIView):
         je = JournalEntries()
 
         if receive.purchaseOrder.runningBalance == receive.purchaseOrder.amountTotal:
+            receive.first = True
+            receive.save()
             jeAPI(request, j, 'Debit', dChildAccount.merchInventory, (receive.amountDue - receive.taxPeso))
         
             jeAPI(request, j, 'Debit', dChildAccount.inputVat, (receive.taxPeso))
@@ -186,6 +199,56 @@ class RRApprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class RRVoid(APIView):
+    def put(self, request, pk, format = None):
+
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
+        rr = ReceivingReport.objects.get(pk=pk)
+        rr.voided = True
+        rr.datetimeVoided = datetime.now()
+        rr.voidedBy = request.user
+
+        for element in rr.rritemsmerch.all():
+            element.poitemsmerch.qtyReceived -= element.qty
+            element.poitemsmerch.purchaseOrder.fullyReceived = False
+            element.poitemsmerch.purchaseOrder.save()
+            element.poitemsmerch.save()
+            wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
+            wi.addQty(-element.qty)
+            element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
+            element.merchInventory.totalCost += element.totalPrice                
+            element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
+            element.merchInventory.save()
+        rr.save()
+
+        j = Journal()
+
+        j.code = rr.code
+        j.datetimeCreated = rr.datetimeVoided
+        j.createdBy = rr.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+
+        je = JournalEntries()
+
+        if rr.first == True:
+            jeAPI(request, j, 'Credit', dChildAccount.merchInventory, (rr.amountDue - rr.taxPeso))
+        
+            jeAPI(request, j, 'Credit', dChildAccount.inputVat, (rr.taxPeso))
+ 
+            jeAPI(request, j, 'Debit', rr.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), rr.amountDue)
+
+        else:
+            jeAPI(request, j, 'Credit', dChildAccount.merchInventory, (rr.amountDue - rr.taxPeso))
+
+            jeAPI(request, j, 'Debit', dChildAccount.prepaidExpense, (rr.amountDue - rr.taxPeso))
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
 
 ################# INWARD INVENTORY #################
 class IIapprovedView(View):
@@ -266,6 +329,41 @@ class IIApprovalAPI(APIView):
         jeAPI(request, j, 'Debit', dChildAccount.merchInventory, (ii.amountTotal))
 
         jeAPI(request, j, 'Credit', ii.party.accountChild.get(name__regex=r"[Pp]ayable"), ii.amountTotal)
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+class IIVoid(APIView):
+    def put(self, request, pk, format = None):
+        ii = InwardInventory.objects.get(pk=pk)
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+        ii.voided = True
+        ii.datetimeVoided = datetime.now()
+        ii.voidedBy = request.user
+        
+        for element in ii.iiadjusteditems.all():
+            merch = MerchandiseInventory.objects.get(code = element.code)
+            wi = WarehouseItems.objects.get(merchInventory = merch)
+            wi.addQty(-element.qty)
+
+            merch = MerchandiseInventory.objects.get(code=element.code)
+            merch.totalCost -= element.totalCost
+            merch.purchasingPrice = (Decimal(merch.totalCost / merch.qtyT))
+            merch.save()
+        ii.save()
+
+        j = Journal()
+
+        j.code = ii.code
+        j.datetimeCreated = ii.datetimeApproved
+        j.createdBy = ii.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+
+        jeAPI(request, j, 'Credit', dChildAccount.merchInventory, (ii.amountTotal))
+
+        jeAPI(request, j, 'Debit', ii.party.accountChild.get(name__regex=r"[Pp]ayable"), ii.amountTotal)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -403,7 +501,16 @@ class PVApprovalAPI(APIView):
             voucher.purchaseOrder.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
-        return JsonResponse(0, safe=False)        
+        return JsonResponse(0, safe=False)
+
+class PVVoid(APIView):
+    def put(self, request, pk, format = None):
+        voucher = PaymentVoucher.objects.get(pk=pk)
+        voucher.voided = True
+        voucher.datetimeVoided = datetime.now()
+        voucher.voidedBy = request.user
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
 
 ################# QUOTATIONS #################
 class QQapprovedView(View):
@@ -572,16 +679,6 @@ class SCVoid(APIView):
         sale.datetimeVoided = datetime.now()
         sale.voided = True
         sale.voidedBy = request.user
-
-        # for element in sale.scitemsmerch.all():
-        #     wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
-        #     if sale.salesOrder:
-        #         wi.salesWSO(-element.qty)
-        #     else:
-        #         wi.addQty(element.qty)
-        #     element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
-        #     element.merchInventory.totalCost += element.totalCost 
-        #     element.merchInventory.save()
         
         if sale.receivepayment:
             for item in sale.receivepayment.all():
@@ -612,24 +709,57 @@ class SCVoid(APIView):
 
 
 
-        if sale.receivepayment:
+        if sale.receivepayment.all():
+            
+            j2 = Journal()
+
+            j2.code = sale.code
+            j2.datetimeCreated = sale.datetimeApproved
+            j2.createdBy = sale.createdBy
+            j2.journalDate = datetime.now()
+            j2.save()
+            request.user.branch.journal.add(j2)
+
+            toJournal = [{}]
+            accountReceivable = Decimal(0.0)
+            wep = Decimal(0.0)
+            cashOnHand = Decimal(0.0)
+            bankAccount = {}
             for rp in sale.receivepayment.all():
                 ################# DEBIT SIDE #################
-                jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
-
+                # jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+                accountReceivable += (rp.amountPaid + rp.wep)
                 ################# CREDIT SIDE #################
                 if rp.wep!= 0.0:
-                    jeAPI(request, j, 'Credit', dChildAccount.cwit, rp.wep)
+                    # jeAPI(request, j, 'Credit', dChildAccount.cwit, rp.wep)
+                    wep += rp.wep
 
                 if rp.paymentMethod == dChildAccount.cashOnHand.name:
-                    jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, rp.amountPaid)
+                    # jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, rp.amountPaid)
+                    cashOnHand += rp.amountPaid
                 elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
-                    jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
-
+                    if rp.paymentMethod in bankAccount:
+                        bankAccount[rp.paymentMethod] += rp.amountPaid
+                    else:
+                        bankAccount[rp.paymentMethod] = rp.amountPaid
+                    # jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
+                    # cashInBank += rp.amountPaid
                 rp.salesContract.runningBalance += (rp.amountPaid + rp.wep)
-                if rp.salesContract.runningBalance == 0:
-                    rp.salesContract.fullyPaid = True
+                rp.salesContract.fullyPaid = False
                 rp.salesContract.save()
+
+            ################# DEBIT SIDE #################
+            jeAPI(request, j2, 'Debit', sale.party.accountChild.get(name__regex=r"[Rr]eceivable"), Decimal(accountReceivable))
+
+            ################# CREDIT SIDE #################
+            if wep != 0.0:
+                jeAPI(request, j2, 'Credit', dChildAccount.cwit, Decimal(wep))
+            if cashOnHand != 0.0:
+                jeAPI(request, j2, 'Credit', dChildAccount.cashOnHand, Decimal(cashOnHand))
+            for key, val in bankAccount.items():
+                jeAPI(request, j2, 'Credit', dChildAccount.cashInBank.get(name=key), Decimal(val))
+            # if cashInBank != 0.0:
+                # jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), cashInBank)
 
         jeAPI(request, j, 'Debit', dChildAccount.sales, sale.amountTotal - sale.taxPeso - totalFees)
 

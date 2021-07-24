@@ -91,8 +91,8 @@ class ATC(models.Model):
         return self.code
 
 class AccountGroup(models.Model):
-    code = models.CharField(max_length=50)
-    name = models.CharField(max_length=50)
+    code = models.CharField(max_length=256)
+    name = models.CharField(max_length=256)
     normally = models.CharField(max_length=50, choices=normally)
     permanence = models.CharField(max_length=50)
     amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,  default= 0.0)
@@ -105,8 +105,8 @@ class AccountGroup(models.Model):
         return self.name + " " + self.code
 
 class AccountSubGroup(models.Model):
-    code = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
+    code = models.CharField(max_length=256)
+    name = models.CharField(max_length=256)
     accountGroup = models.ForeignKey(AccountGroup, related_name="accountsubgroup", on_delete=models.PROTECT, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,  default= 0.0)
@@ -119,8 +119,8 @@ class AccountSubGroup(models.Model):
         return self.name + " " + self.code
 
 class AccountChild(models.Model):
-    code = models.CharField(max_length=50)
-    name = models.CharField(max_length=50)
+    code = models.CharField(max_length=256)
+    name = models.CharField(max_length=256)
     accountSubGroup = models.ForeignKey(AccountSubGroup,related_name="accountchild", on_delete=models.PROTECT, null=True, blank=True)
     me = models.ForeignKey('self', related_name="accountchild", null=True,blank=True, on_delete=models.PROTECT)
     contra = models.BooleanField(null = True, blank=True, default=False)
@@ -203,7 +203,7 @@ class Warehouse(models.Model):
 
 class MerchandiseInventory(models.Model):
     code = models.CharField(max_length=50)
-    name = models.CharField(max_length=50, null = True, blank = True)
+    name = models.CharField(max_length=256, null = True, blank = True)
     classification = models.CharField(max_length=50, null = True, blank = True)
     type = models.CharField(max_length=50, null = True, blank = True)
     length =  models.DecimalField(max_digits=20, decimal_places=5)
@@ -284,6 +284,9 @@ class PurchaseRequest(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(default=False)
     poed = models.BooleanField(default = False)
+    voided = models.BooleanField(null = True, default = False)
+    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "prVoidedBy")
+    datetimeVoided = models.DateTimeField(null = True, blank = True)
     
 
     class Meta:
@@ -395,6 +398,10 @@ class ReceivingReport(models.Model):
     qtyReceived = models.IntegerField(null = True, blank = True)
     fullyReceived = models.BooleanField(null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    voided = models.BooleanField(null = True, default = False)
+    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "rrVoidedBy")
+    datetimeVoided = models.DateTimeField(null = True, blank = True)
+    first = models.BooleanField(null = True, default = False)
 
     class Meta:
         verbose_name = "Receiving Report"
@@ -441,6 +448,9 @@ class InwardInventory(models.Model):
     journal = models.ForeignKey(Journal, related_name="inwardinventory", on_delete=models.PROTECT, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    voided = models.BooleanField(null = True, default = False)
+    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "iiVoidedBy")
+    datetimeVoided = models.DateTimeField(null = True, blank = True)
 
 class IIItemsMerch(models.Model):
     inwardInventory = models.ForeignKey(InwardInventory, related_name="iiitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
@@ -489,6 +499,9 @@ class PaymentVoucher(models.Model):
     paymentPeriod = models.CharField(max_length = 50, null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default = 0.0)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    voided = models.BooleanField(null = True, default = False)
+    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "pvVoidedBy")
+    datetimeVoided = models.DateTimeField(null = True, blank = True)
 
 class Quotations(models.Model):
     code = models.CharField(max_length=50)
