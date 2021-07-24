@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from ..models import MerchandiseInventory, Warehouse
+from ..models import MerchandiseInventory, Warehouse, WarehouseItems
 from django import views
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import query
@@ -43,9 +43,17 @@ class AddMerchInventoryAPI(APIView):
         a.vol = (a.width / 1000) * (a.length / 1000) * (a.thickness / 1000)
         a.totalCost = 0.0
         a.save()
-        for warehouse in request.data['warehouse']:
-            a.warehouse.add(warehouse)
+        
+        w = Warehouse.objects.get(pk=request.data['warehouse'])
 
+        wi = WarehouseItems()
+
+        wi.merchInventory = a
+        wi.warehouse = w
+        wi.initQty(a.qtyT, a.qtyR, a.qtyA)
+        wi.save()
+
+        request.user.branch.warehouseItems.add(wi)
         request.user.branch.merchInventory.add(a)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
@@ -91,15 +99,23 @@ class ImportMerchandiseInventory(View):
             merch.inventoryDate = item['Inventory-Date']
 
             merch.save()
+            
+            wi = WarehouseItems()
+            wi.merchInventory = merch
             try:
-                merch.warehouse.add(Warehouse.objects.get(name=item['Warehouse']))
+                wi.warehouse = Warehouse.objects.get(name=item['Warehouse'])
+
             except:
                 w = Warehouse()
                 w.name = item['Warehouse']
                 w.address = '---'
                 w.save()
                 request.user.branch.warehouse.add(w)
-                merch.warehouse.add(w)
+                wi.warehouse = w
+
+            wi.initQty(merch.qtyT, merch.qtyR, merch.qtyA)
+            wi.save()
+            request.user.branch.warehouseItems.add(wi)
             request.user.branch.merchInventory.add(merch)
 
         sweetify.sweetalert(request, icon="success", title="Success!", persistent="Dismiss")

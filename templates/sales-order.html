@@ -615,9 +615,6 @@
                     this.order.code &&
                     this.order.date &&
                     this.order.customer &&
-                    this.order.amountPaid &&
-                    this.order.paymentMethod &&
-                    this.order.paymentPeriod &&
                     this.order.taxType &&
                     this.order.taxRate
                     )
@@ -664,15 +661,6 @@
                 }
                 if (!this.order.customer){
                     this.errors.push('Customer Required')
-                }
-                if (!this.order.amountPaid){
-                    this.errors.push('Amount Paid Required')
-                }
-                if (!this.order.paymentMethod){
-                    this.errors.push("Payment Method Required")
-                }
-                if (!this.order.paymentPeriod){
-                    this.errors.push('Payment Period Required')
                 }
                 if (!this.order.taxType){
                     this.errors.push('Tax Type Required')

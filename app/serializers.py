@@ -560,7 +560,20 @@ class SalesInvoiceSZ(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+########## TRANSFER & ADJUSTMENTS ##########
+class TransferItemsSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventorySZ(read_only=True)
+    class Meta:
+        model = TransferItems
+        fields = '__all__'
+        depth = 1
 
+class TransferSZ(serializers.ModelSerializer):
+    transferItems = TransferItemsSZ(read_only = True)
+    class Meta:
+        model = Transfer
+        fields = '__all__'
+        depth = 1
 
 
 

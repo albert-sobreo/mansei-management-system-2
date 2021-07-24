@@ -80,6 +80,9 @@ router.register(r"sales-order", views.SalesOrderAPI, 'sales-order')
 ########## SALES CONTRACT ##########
 router.register(r"sales-contract", views.SalesContractAPI, 'sales-contract')
 
+########## TRANSFER & ADJUSTMENTS ##########
+router.register(r"transfer", views.TransferAPI, 'transfer')
+
 ########## BRANCH DEFAULT CHILD ACCOUNT ##########
 router.register(r"branch-default-child-account", views.BranchDefaultChildAccountAPI, 'branch-default-child-account')
 
@@ -174,5 +177,12 @@ urlpatterns = [
     path('branch-profile/', login_required(views.BranchProfileView.as_view())),
     path('save-default-accounts/', login_required(views.SaveDefaultAccounts.as_view())),
     path('received-payment/', login_required(views.ReceivedPaymentView.as_view())),
-    path('save-received-payment/', login_required(views.SaveReceivePayment.as_view()))
+    path('save-received-payment/', login_required(views.SaveReceivePayment.as_view())),
+    path('import-customer-vendor/', login_required(views.ImportCustomerVendor.as_view())),
+    path('transfer/', login_required(views.TransferView.as_view())),
+    path('save-transfer/', login_required(views.SaveTransfer.as_view())),
+    path('transfer-list/', login_required(views.TransferList.as_view())),
+    path('tr-nonapproved/', login_required(views.TransferNonApproved.as_view())),
+    path('tr-approved/', login_required(views.TransferApproved.as_view())),
+    path('tr-approval/<int:pk>/', login_required(views.TransferApproval.as_view())),
 ]

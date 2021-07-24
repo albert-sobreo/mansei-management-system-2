@@ -35,22 +35,16 @@ Vue.component('navbar-imps', {
         <div class="imps-nav justify-content-center font-semibold navbar">
             <a href='/merchinventory/' class="mx-3" id="nav-inventory">Inventory</a>
             <a href="#" class="mx-3" id="nav-job-order">Job Order</a>
-            <a href="#" class="mx-3" id="nav-transfer">Transfer</a>
+            <a href="/transfer/" class="mx-3" id="nav-transfer">Transfer</a>
             <a href="#" class="mx-3" id="nav-adjustments">Adjustments</a>
             <a href="/deliveries/" class="mx-3" id="nav-deliveries">Deliveries</a>
             <a href="/warehouse/" class="mx-3" id="nav-warehouse">Warehouse</a>
-            <div class="btn-group mx-3">
-                <a href="#" class="mx-3" id="nav-logs" data-toggle="dropdown">Logs</a>
-                <div class="dropdown-menu b-radius-5 py-0">
-                    <a href="/logs/deliveries/" class="dropdown-item d-item-imps font-size-12 font-semibold">Deliveries</a>
-                </div>
-            </div>
             <a href="#" class="mx-3" id="nav-reports">Reports</a>
             <div class="btn-group mx-3">
                 <a id="nav-approvals" href="#" data-toggle="dropdown">Approvals</a>
                 <div class="dropdown-menu b-radius-5 py-0">
                     <a href="#" class="dropdown-item d-item-imps font-size-12 font-semibold">Job Orders</a>
-                    <a href="#" class="dropdown-item d-item-imps font-size-12 font-semibold">Transfers</a>
+                    <a href="/tr-nonapproved/" class="dropdown-item d-item-imps font-size-12 font-semibold">Transfers</a>
                     <a href="#" class="dropdown-item d-item-imps font-size-12 font-semibold">Adjustments</a>
                     <a href="/deliveriesnonapproved/" class="dropdown-item d-item-imps font-size-12 font-semibold">Deliveries</a>
                 </div>

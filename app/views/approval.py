@@ -130,7 +130,7 @@ class RRApprovalAPI(APIView):
         fullyReceived = []
         for element in receive.rritemsmerch.all():
             element.poitemsmerch.qtyReceived += element.qty
-            if element.poitemsmerch.qtyReceived == element.poitemsmerch.qty:
+            if element.poitemsmerch.qtyReceived >= element.poitemsmerch.qty:
                 fullyReceived.append(1)
             else:
                 fullyReceived.append(0)
@@ -138,8 +138,12 @@ class RRApprovalAPI(APIView):
                 element.poitemsmerch.purchaseOrder.fullyReceived = True
                 element.poitemsmerch.purchaseOrder.save()
             element.poitemsmerch.save()
-            element.merchInventory.qtyA += element.qty
-            element.merchInventory.qtyT = element.merchInventory.qtyA + element.merchInventory.qtyR
+            # element.merchInventory.qtyA += element.qty
+            # element.merchInventory.qtyT = element.merchInventory.qtyA + element.merchInventory.qtyR
+            wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
+            wi.addQty(element.qty)
+            element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
+            print(element.merchInventory.qtyT, element.merchInventory.qtyA, element.merchInventory.pk)
             element.merchInventory.totalCost += element.totalPrice                
             element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
             element.merchInventory.save()
@@ -203,8 +207,11 @@ class IIApprovalAPI(APIView):
         for element in ii.iiadjusteditems.all():
             if MerchandiseInventory.objects.filter(code=element.code):
                 merch = MerchandiseInventory.objects.get(code=element.code)
-                merch.qtyA += element.qty
-                merch.qtyT = merch.qtyA + merch.qtyR
+
+                wi = WarehouseItems.objects.get(merchInventory=merch)
+                wi.addQty(element.qty)
+
+                merch = MerchandiseInventory.objects.get(code=element.code)
                 merch.totalCost += element.totalCost
                 merch.purchasingPrice = (Decimal(merch.totalCost / merch.qtyT))
                 merch.save()
@@ -227,6 +234,12 @@ class IIApprovalAPI(APIView):
                 newMerch.pricePerCubic = element.pricePerCubic
                 newMerch.inventoryDate = datetime.now()
                 newMerch.save()
+                wi = WarehouseItems()
+                wi.merchInventory = newMerch
+                wi.warehouse = Warehouse.objects.get(name='SBMA')
+                wi.initQty(newMerch.qtyT, newMerch.qtyR, newMerch.qtyA)
+                wi.save()
+                request.user.branch.warehouseItems.add(wi)
                 request.user.branch.merchInventory.add(newMerch)
         ii.save()       
 
@@ -443,10 +456,12 @@ class SOApprovalAPI(APIView):
         salesOrder.save()
 
         for element in salesOrder.soitemsmerch.all():
-            element.merchInventory.qtyT -= element.qty
-            element.merchInventory.qtyR += element.qty
-            element.merchInventory.qtyA = element.merchInventory.qtyT - element.merchInventory.qtyR
-            element.merchInventory.save()
+            wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
+            wi.resQty(element.qty)
+            # element.merchInventory.qtyT -= element.qty
+            # element.merchInventory.qtyR += element.qty
+            # element.merchInventory.qtyA = element.merchInventory.qtyT - element.merchInventory.qtyR
+            # element.merchInventory.save()
 
         salesOrder.save()
 
@@ -481,7 +496,7 @@ class SCApprovalAPI(APIView):
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         for element in sale.scitemsmerch.all():
-            if element.merchInventory.qtyA == 0:
+            if element.merchInventory.qtyA <= 0:
                 print('b0ss')
                 sweetify.sweetalert(request, icon='error', title='Error', text="{} has {} items. You are selling {} items.".format((element.merchInventory.name + ' ' + element.merchInventory.classification + ' ' + element.merchInventory.type), element.merchInventory.qtyA, element.qty), persistent='Dismiss')
                 return JsonResponse(0, safe=False)
@@ -492,8 +507,15 @@ class SCApprovalAPI(APIView):
 
 
         for element in sale.scitemsmerch.all():
-            element.merchInventory.qtyA -= element.qty
-            element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
+            # element.merchInventory.qtyA -= element.qty
+            # element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
+
+            wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
+            if sale.salesOrder:
+                wi.salesWSO(element.qty)
+            else:
+                wi.addQty(-element.qty)
+            element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
             element.merchInventory.totalCost += element.totalCost                
             # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
             element.merchInventory.save()
@@ -610,3 +632,37 @@ class DeliveriesApprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+################# TRANSFER AND ADJUSTMENT #################
+class TransferNonApproved(View):
+    def get(self, request, format=None):
+        context = {
+            'transfers': request.user.branch.transfer.filter(approved=False)
+        }
+        return render(request, 'tr-nonapproved.html', context)
+
+class TransferApproved(View):
+    def get(self, request, format=None):
+        context = {
+            'transfer': request.user.branch.transfer.filter(approved=True)
+        }
+        return render(request, 'tr-approved.html', context)
+
+class TransferApproval(APIView):
+    def put(self, request, pk, format = None):
+
+        tr = Transfer.objects.get(pk=pk)
+
+        tr.datetimeApproved = datetime.now()
+        tr.approvedBy = request.user
+        tr.approved = True
+
+        for element in tr.tritems.all():
+            element.merchInventory.warehouse = tr.newWarehouse
+            element.merchInventory.save()
+
+        tr.save()
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+        
