@@ -236,6 +236,9 @@ class WarehouseItems(models.Model):
     qtyR = models.IntegerField()
     qtyA = models.IntegerField()
 
+    def __str__(self):
+        return self.merchInventory.code
+
     def initQty(self, qtyT, qtyR, qtyA):
         self.qtyT = qtyT
         self.qtyR = qtyR
@@ -331,7 +334,10 @@ class PurchaseOrder(models.Model):
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     fullyReceived = models.BooleanField(default=False)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default = 0.0)
-    
+    voided = models.BooleanField(null = True, default= False)
+    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "poVoidedBy")
+    datetimeVoided = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         verbose_name = "Purchase Order"
         verbose_name_plural = "Purchase Orders"
@@ -560,6 +566,9 @@ class SalesOrder(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default = False)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    voided = models.BooleanField(null = True, default = False)
+    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "soVoidedBy")
+    datetimeVoided = models.DateTimeField(null = True, blank = True)
 
     class Meta:
         verbose_name = "Sales Order"
@@ -622,6 +631,9 @@ class SalesContract(models.Model):
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "tempscApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default = False)
+    voided = models.BooleanField(null = True, default = False)
+    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name= "scVoidedBy")
+    datetimeVoided = models.DateTimeField(null = True, blank = True)
     journal = models.ForeignKey(Journal, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
@@ -671,9 +683,9 @@ class SCItemsMerch(models.Model):
     remaining = models.IntegerField()
     qty = models.IntegerField()
     cbm = models.CharField(max_length=10, null = True)
-    vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     delivered = models.BooleanField(null = True, default = False)
 
     class Meta:
@@ -726,6 +738,7 @@ class ReceivePayment(models.Model):
     chequeNo = models.CharField(max_length=20, null = True, blank = True)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default= 0.0)
+    voided = models.BooleanField(default = False)
 
 class Driver(models.Model):
     driverID = models.CharField(max_length=50, default='0')
@@ -767,6 +780,9 @@ class Deliveries(models.Model):
     approved = models.BooleanField(null = True, default=False)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
+    voided = models.BooleanField(null = True, default=False)
+    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name="deVoidedBy")
+    datetimeVoided = models.DateTimeField(null = True, blank = True)
 
     class Meta:
         verbose_name = "Delivery"
@@ -854,6 +870,9 @@ class AdjustmentsItems(models.Model):
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="aditems", on_delete=models.PROTECT, null=True, blank=True)
     adjustments = models.ForeignKey(Adjustments, on_delete=models.PROTECT, null = True, blank = True, related_name= "aditems")
     qtyAdjusted = models.IntegerField(null = True, blank = True)
+    remaining = models.IntegerField(null = True, blank = True)
+    unitCost = models.DecimalField(max_digits = 20, decimal_places=5, null = True, blank = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class AdjustmentsPhotos(models.Model):
     adjustments = models.ForeignKey(Deliveries, related_name="adjustmentsphotos", on_delete=models.PROTECT, null=True, blank=True)

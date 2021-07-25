@@ -63,5 +63,37 @@ class SaveAccountGroup(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', text="{} has added to {}".format(subGroup.name, subGroup.accountGroup.name), persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+class EditSubGroup(APIView):
+    def put(self, request, pk, format = None):
+        subGroup = AccountSubGroup.objects.get(pk=pk)
+        edit = request.data
+
+        subGroup.code = edit['code']
+        subGroup.name = edit['name']
+        subGroup.description = edit['description']
+
+        subGroup.save()
+        sweetify.sweetalert(request, icon='success', title='Success!',  persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+class EditChildGroup(APIView):
+    def put(self, request, pk, format = None):
+        childAccount = AccountChild.object.get(pk=pk)
+        edit = request.data
+
+        childAccount.code = edit['code']
+        childAccount.name = edit['name']
+        childAccount.description = edit['description']
+        childAccount.contra = edit['contra']
+
+        try:
+            childAccount.me = AccountChild.objects.get(pk=edit['me'])
+        except Exception as e:
+            print(e)
+
+        childAccount.save()
+        sweetify.sweetalert(request, icon='success', title='Success!',  persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
 
 

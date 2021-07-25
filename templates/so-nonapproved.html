@@ -34,7 +34,11 @@
             </thead>
             <tbody>
                 {% for sale in salesorder %}
+                {% if sale.voided %}
+                <tr class="voided">
+                {% else %}
                 <tr>
+                {% endif %}
                     <td @click="viewSC('{{sale.pk}}')" class="link" data-toggle="modal" data-target="#scModal">{{sale.code}}</td>
                     <td>{{sale.party.name}}</td>
                     <td>₱[[roundNumber2({{sale.amountTotal}})]]</td>

@@ -75,11 +75,9 @@
               </div>
               <div class="col-3 px-1">
                   <!-- V-IF ELSE FOR DIFFERENT INVENTORY LIST -->
-                  <select v-model="item.oldWarehouse" class="form-control">
+                  <select v-model="item.oldWarehouse" @change="getRemaining2(item.code, item.oldWarehouse, index)" class="form-control">
                       <option value="" selected disabled>Choose Old Warehouse</option>
-                      {% for warehouse in request.user.branch.warehouse.all %}
-                      <option value="{{warehouse.pk}}">{{warehouse.name}}</option>
-                      {% endfor %}
+                      <option v-for="warehouse in item.warehouseList" :value="warehouse.id">[[warehouse.name]]</option>
                   </select>
                   <!-- END -->
               </div>
@@ -204,6 +202,7 @@
                     qty: null,
                     purchasingPrice: null,
                     totalCost: null,
+                    warehouseList: [],
                 }],
                 newWarehouse: '',
                 remarks: null,
@@ -291,18 +290,33 @@
                     qty: null,
                     purchasingPrice: null,
                     totalCost: null,
+                    warehouseList: [],
                 })
             },
             removeLine(index){
                 this.$delete(this.order.items, index)
             },
             getRemaining(id, index){
-                axios.get(`/api/merchinventory/${id}/`)
+                axios.get(`/api/nestedmerchinventory/${id}/`)
                 .then(res=>{
                     console.log(res.data)
-                    this.order.items[index].remaining = res.data.qtyA
                     this.order.items[index].purchasingPrice = res.data.purchasingPrice
-                    this.order.items[index].oldWarehouse = res.data.warehouse[0]
+                    this.order.items[index].warehouseList = []
+                    res.data.warehouseitems.forEach((item)=>{
+                        this.order.items[index].warehouseList.push({
+                            id: item.warehouse.id,
+                            name: item.warehouse.name
+                        })
+                    })
+                })
+            },
+            getRemaining2(id, id2, index){
+                axios.get(`/api/nestedmerchinventory/${id}/`)
+                .then(res=>{
+                    console.log(id2)
+                    console.log(res.data.warehouseitems.find(item=>item.warehouse.id=id2))
+                    warehouseitems = res.data.warehouseitems.find(item=>item.warehouse.id=id2)
+                    this.order.items[index].remaining = warehouseitems.qtyA
                 })
             },
             getLineCost(index){

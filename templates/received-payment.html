@@ -26,7 +26,12 @@
             </thead>
             <tbody>
                 {% for item in request.user.branch.receivePayment.all %}
+
+                {% if item.voided %}
+                <tr class="voided">
+                {% else %}
                 <tr>
+                {% endif %}
                     <td @click="getSC2({{item.pk}})" class="link" data-toggle="modal" data-target="#rpModal">{{item.code}}</td>
                     <td>{{item.salesContract.party.name}}</td>
                     <td>₱[[formatPrice({{item.amountPaid}})]]</td>

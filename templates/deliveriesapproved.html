@@ -36,7 +36,11 @@
             </thead>
             <tbody>
                 {% for delivery in deliveries %}
+                {% if delivery.voided %}
+                <tr class="voided">
+                {% else %}
                 <tr>
+                {% endif %}
                     <td @click="viewD('{{delivery.pk}}')" class="link" data-toggle="modal" data-target="#dModal">{{delivery.code}}</td>
                     <td>{{delivery.datetimeCreated}}</td>
                     <td>{{delivery.truck.plate}}</td>
@@ -138,6 +142,11 @@
                                 </table>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-danger col" @click="voidCheck(dModal.id)">Void</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -214,6 +223,7 @@
                 }
             },
             dModal: {
+                voided: null,
                 code: null,
                 datetimeCreated: null,
                 truck: {
@@ -249,6 +259,23 @@
             }
         },
         methods: {
+            voidCheck(id){
+                Swal.fire({
+                    title: 'Warning',
+                    html: 'Are you sure you want to void this item?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result)=>{
+                    if(result.isConfirmed) {
+                        this.voidDelivery(id)
+                    }
+                })
+            },
+            voidDelivery(id){
+                axios.put(`/delivery-void/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
             viewD(code){
                 axios.get(`/api/deliveries/${code}`)
                 .then(res=>this.dModal=res.data)

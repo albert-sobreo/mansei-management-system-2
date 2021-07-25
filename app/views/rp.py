@@ -49,7 +49,7 @@ class ReceivedPaymentView(View):
         return render(request, 'received-payment.html', context)
 
 class SaveReceivePayment(APIView):
-    def post(self, request, formay = None):
+    def post(self, request, format = None):
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         receivePayment = request.data
 
@@ -81,6 +81,8 @@ class SaveReceivePayment(APIView):
         j.createdBy = rp.createdBy
         j.journalDate = datetime.now()
         j.save()
+        rp.journal = j
+        rp.save()
         request.user.branch.journal.add(j)
 
         ################# CREDIT SIDE #################
@@ -99,5 +101,47 @@ class SaveReceivePayment(APIView):
         if rp.salesContract.runningBalance == 0:
             rp.salesContract.fullyPaid = True
         rp.salesContract.save()
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class RPVoid(APIView):
+    def put(self, request, pk, format = None):
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+        
+        rp = ReceivedPayment.objects.get(pk=pk)
+        rp.voided = True
+        rp.datetimeVoided = datetime.now()
+        rp.voidedBy = request.user
+
+        j = Journal()
+
+        j.code = rp.code
+        j.datetimeCreated = rp.datetimeCreated
+        j.createdBy = rp.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        rp.journal = j
+        rp.save()
+        request.user.branch.journal.add(j)
+
+        ################# DEBIT SIDE #################
+        jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+
+        ################# CREDIT SIDE #################
+        if rp.wep!= 0.0:
+            jeAPI(request, j, 'Credit', dChildAccount.cwit, rp.wep)
+
+        if rp.paymentMethod == dChildAccount.cashOnHand.name:
+            jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, rp.amountPaid)
+        elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
+            jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
+        
+        rp.salesContract.runningBalance += (rp.amountPaid + rp.wep)
+        if rp.salesContract.runningBalance == 0:
+            rp.salesContract.fullyPaid = True
+        rp.salesContract.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+        

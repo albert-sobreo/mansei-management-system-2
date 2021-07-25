@@ -1,0 +1,303 @@
+{% extends "base-template.html" %}
+{% block title %}Inventory Adjustments{% endblock %}
+
+
+{% block body %}
+
+<div id="app" v-cloak> <!-- #app -->
+        <!-- NAVIGATION BAR -->
+        <navbar-imps active="nav-adjustments" photo="/media/{{request.user.image}}"></navbar-imps>
+        <app-card></app-card>
+        <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+        <!-- END NAVIGATION -->
+
+
+    <!-- MAIN BODY -->
+    <div class="container"><!-- .container -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links imps-nav">
+                <a href="/adjustments/" class="active-imps mx-2">Create</a>
+                <a href="/ad-list/" class="mx-2">Adjustments List</a>
+            </div>
+        </div> 
+
+      <!-- TITLE AND BUTTONS -->
+      <div class="d-flex align-items-center mb-3">
+        <span class="font-size-18 font-bold mr-1 mt-3">Inventory Adjustments</span>
+      </div>
+      <!-- END TITLE AND BUTTONS -->
+
+      <div> <!-- TRANSFER -->
+        <!-- REF NO AND DATES -->
+        <div class="row">
+          <div class="col col-3 pr-2">
+              <label>Reference No.</label>
+              <input v-model="order.code" type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
+          </div>
+          <div class="col col-2 px-2">
+              <label>Date</label>
+              <input v-model="order.date" type="date" class="form-control" name="date">
+          </div>
+        </div>
+        <!-- END REF NO AND DATES -->
+        <!-- ITEMS AND DETAILS -->
+         <div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
+          <div class="row">
+              <div class="col-6 px-1">
+                  <label for="code" class="m-0">Item-Code - Item name</label>
+              </div>
+              <div class="col-1 px-1">
+                  <label for="remaining" class="m-0">Remaining</label>
+              </div>
+              <div class="col px-1">
+                  <label for="order-quantity" class="m-0">Quantity</label>
+              </div>
+              <div class="col px-1">
+                  <label for="order-quantity" class="m-0">Unit Cost</label>
+              </div>
+              <div class="col px-1">
+                  <label for="Total Cost" class="m-0">Lost</label>
+              </div>
+              <i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
+          </div>
+          <!-- V-FOR ITEMS -->
+          <div class="row" v-for="(item, index) in order.items">
+              <div class="col-6 px-1">
+                  <select @change="getRemaining(item.code, index)" v-model="item.code" class="form-control">
+                      <option value="" selected disabled>Choose Item</option>
+                      {% for item in request.user.branch.merchInventory.all %}
+                      <option value="{{item.pk}}">{{item.code}} - {{item.name}} - {{item.classification}} {{item.type}}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+
+              <div class="col-1 px-1">
+                  <input v-model="item.remaining" type="number" class="form-control" readonly>
+              </div>
+              <div class="col px-1">
+                  <input @change="getLineCost(index)" v-model="item.qty" type="number" class="form-control" min="0">
+              </div>
+              <div class="col px-1">
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                          <span class="input-group-text">₱</span>
+                      </div>
+                      <input @change="getLineCost(index)" :value="formatPrice(item.purchasingPrice)" type="text" class="form-control box-shadow-off" readonly>
+                  </div>
+              </div>
+              <div class="col px-1">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">₱</span>
+                    </div>
+                    <input :value="formatPrice(item.totalLost)" type="text" class="form-control box-shadow-off" readonly>
+                </div>
+            </div>
+                <i @click="removeLine(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
+          </div>
+          <!-- ADD NEW LINE -->
+          <div class="row">
+              <div class="col px-1">
+                  <button @click="addLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
+              </div>
+          </div>
+          <!-- END ADD NEW LINE -->
+
+
+
+
+          <!-- WAREHOUSE, REMARKS -->
+          <div class="row mt-2">
+              <!-- WAREHOUSE -->
+              <div class="col pl-0"> <!-- .column -->
+                  <div class="p-4 order-card-darker b-radius-15"> <!-- card -->
+                      <div class="d-flex row">
+                            <div class="col-3 px-1">
+                                <label>Type of Adjustments</label>
+                            </div>
+                            <div class="col-3 px-1">
+                                <label>Attach a Photo</label>
+                            </div>
+                            <div class="col-3 px-1 ml-auto">
+                                <label>Total Lost</label>
+                            </div>
+                      </div>
+                      <div class="d-flex row">
+                          <div class="col-3 px-1">
+                              <select v-model="order.type" class="form-control">
+                                  <option value="" selected disabled>Choose type of adjustment</option>
+                                  <option value="Spoilage">Spoilage</option>
+                                  <option value="Donation">Donation</option>
+                                  <option value="Personal Use">Personal Use</option>
+                              </select>
+                          </div>
+                          <div class="col-3 px-1">
+                            <input type="file" class="form-control-file" id="exampleFormControlFile1">
+                            <span class="font-size-10" style="color: red;">*not working yet</span>
+                          </div>
+                          <div class="col-3 px-1 ml-auto">
+                            <div class="input-group">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text">₱</span>
+                              </div>
+                              <input :value="formatPrice(order.totalLost)" type="text" class="form-control box-shadow-off" readonly>
+                          </div>
+                          </div>
+                      </div>
+              <!-- END WAREHOUSE -->
+                  </div> <!-- card -->
+              </div><!-- .column -->
+          </div> <!-- END WAREHOUSE, REMARKS -->
+
+
+
+
+
+      </div> <!-- END ITEMS AND DETAILS -->
+      <div @click="checkForm()" class="container-extend border container-extend btn-bottom">
+          Request Adjustments
+      </div>
+        <!-- END ITEMS AND DETAILS -->
+      </div><!-- END TRANSFER -->
+    </div><!-- END .container -->
+    <pre>[[$data]]</pre>
+
+
+
+
+</div><!-- END #app -->
+
+{% endblock %}
+{% block scripts %}
+<!-- SCRIPT FROM PURCHASE-ORDER . HTML -->
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            order: {
+                code: '{{new_code}}',
+                date: new Date().toISOString().split('T')[0],
+                items: [{
+                    code: '',
+                    remaining: null,
+                    qty: null,
+                    purchasingPrice: null,
+                    totalLost: null,
+                }],
+                type: '',
+                totalLost: null,
+            },
+            errors: []
+        },
+        computed:{
+            totalLost(){
+                return this.order.items.map(item=>item.totalLost)
+            }
+        },
+        watch: {
+            totalLost(){
+                this.order.totalLost = this.totalLost.reduce((a,b)=>Number(a)+Number(b), 0)
+            }
+        },
+        methods: {
+            checkForm(){
+                var success1 = false
+                if(
+                    this.order.code &&
+                    this.order.date &&
+                    this.order.totalLost &&
+                    this.order.type
+                ) {
+                    for (var item of this.order.items){
+                        if (
+                            item.code &&
+                            item.qty
+                        ) {
+                            success1 = true
+                        } else {
+                            success1 = false
+                            break
+                        }
+                    }
+                    if(success1){
+                        this.submit()
+                        return
+                    }
+                }
+                this.errors = []
+                success = true
+                if (!this.order.code){
+                    this.errors.push('Code Required')
+                }
+                if (!this.order.date){
+                    this.errors.push('Date Required')
+                }
+                if (!this.order.totalLost){
+                    this.errors.push('Total Lost Required')
+                }
+                if (!this.order.type){
+                    this.errors.push('Type of Adjustments Required')
+                }
+
+                this.order.items.forEach((item, index)=>{
+                    if(!item.code){
+                        this.errors.push('Item Required at index: ' + String(index+1))
+                    }
+                    if(!item.qty){
+                        this.errors.push('Quantity Required at index: ' + String(index+1))
+                    }
+                })
+
+                Swal.fire({
+                    title: "Unfilled Inputs",
+                    html: this.errors.join('<br>'),
+                    icon: 'warning'
+                })
+            },
+            submit(){
+                axios.post('/save-adjustments/', this.order, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+            getRemaining(id, index){
+                axios.get(`/api/merchinventory/${id}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    this.order.items[index].remaining = res.data.qtyA
+                    this.order.items[index].purchasingPrice = res.data.purchasingPrice
+                })
+            },
+            getLineCost(index){
+                this.order.items[index].totalLost = this.order.items[index].purchasingPrice * this.order.items[index].qty
+            },
+            addLine(){
+                this.order.items.push({
+                    code: '',
+                    remaining: null,
+                    quantity: null,
+                    purchasingPrice: null,
+                    totalLost: null,
+                })
+            },
+            removeLine(index){
+                this.$delete(this.order.items, index)
+            },
+        }
+    })
+</script>
+<!-- END SCRIPT -->
+{% endblock %}

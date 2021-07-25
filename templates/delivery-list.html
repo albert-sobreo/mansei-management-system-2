@@ -1,50 +1,53 @@
 {% extends "base-template.html" %}
-{% block title %}In-Transit{% endblock %}
+{% block title %}Deliveries List{% endblock %}
 
 {% block body %}
 
 <div id="app" v-cloak>
-    <!-- NAVIGATION BAR -->
+    <!-- NAV BAR -->
     <navbar-imps active="nav-deliveries" photo="/media/{{request.user.image}}"></navbar-imps>
     <app-card></app-card>
     <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
 
     <!-- MAIN BODY -->
     <div class="container">
+        <!-- MORE NAV -->
         <!-- MORE NAVIGATION -->
         <div class="d-flex font-semibold mb-2 justify-content-center">
             <div class="justify-content-center c-nav-links imps-nav">
                 <a href="/deliveries/" class="mx-2">Send Deliveries</a>
-                <a href="/delivery-list/" class="mx-2">Deliveries List</a>
+                <a href="/delivery-list/" class="active-imps mx-2">Deliveries List</a>
                 <a href="/trucks/" class="mx-2">Trucks</a>
                 <a href="/drivers/" class="mx-2">Drivers</a>
-                <a href="/in-transit/" class="active-imps mx-2">In-transit</a>
+                <a href="/in-transit/" class="mx-2">In-transit</a>
             </div>
         </div>
+
         <!-- TITLE AND BUTTONS -->
         <div class="d-flex align-items-center mb-3">
-            <span class="font-size-18 font-bold mr-1">In-Transit</span>
+            <span class="font-size-18 font-bold mr-1 mt-3">Deliveries List</span>
         </div>
+
         <!-- TABLE -->
         <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
             <thead class="thead-dark">
-                <th>Plate Number</th>
-                <th>Brand</th>
-                <th>Model</th>
+                <th>Delivery Code</th>
+                <th>Date Created</th>
+                <th>Plate and Truck</th>
                 <th>Driver</th>
             </thead>
             <tbody>
-                {% for truck in trucks %}
+                {% for d in request.user.branch.deliveries.all %}
                 <tr>
-                    <td @click="viewTruck('{{truck.currentDelivery}}')" class="link" data-toggle="modal" data-target="#truckModal">{{truck.plate}}</td>
-                    <td>{{truck.brand}}</td>
-                    <td>{{truck.model}}</td>
-                    <td>{{truck.driver.firstName}} {{truck.driver.lastName}}</td>
+                    <td @click="viewTruck({{d.id}})" class="link" data-toggle="modal" data-target="#truckModal">{{d.code}}</td>
+                    <td>{{d.datetimeCreated}}</td>
+                    <td>{{d.truck.plate}} : {{d.truck.brand}} {{d.truck.model}}</td>
+                    <td>{{d.driver.firstName}} {{d.driver.lastName}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-
+        
         <!-- MODAL -->
         <div class="modal fade" id="truckModal">
             <div class="modal-dialog">
@@ -53,6 +56,14 @@
                         <!-- TOP CARD -->
                         <div class="order-card row my-2">
                             <!-- LVL 1 -->
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Delivery Code</label><br>
+                                <span class="font-size-14 font-bold">[[truckModal.code]]</span>
+                            </div>
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Datetime Created</label><br>
+                                <span class="font-size-14 font-bold">[[formatDateTime(truckModal.datetimeCreated)]]</span>
+                            </div>
                             <div class="col-6 mt-3">
                                 <label class="gray">Truck</label><br>
                                 <span class="font-size-14 font-bold">[[truckModal.truck.brand]] [[truckModal.truck.model]]</span>
@@ -110,18 +121,12 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <div class="row">
-                            <div class="col">
-                                <a href="#" @click="returnTruck(truckModal.truck.id)"  title="Click if truck has returned">Return Truck</a>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <pre>[[$data]]</pre>
     </div>
-    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -136,7 +141,8 @@
             dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-
+            "order": [[ 0, "desc" ]],
+            "pageLength": 25,
             buttons: {
                 buttons: [
                 {
@@ -157,6 +163,14 @@
                     titleAttr: 'Print',
                     extend: 'print'
                 },
+                {
+                    text: "RAW",
+                    className: 'btn btn-table font-size-10',
+                    titleAttr: 'View Raw Numbers',
+                    action: function(){
+                        app.roundToggler()
+                    }
+                }
                 ],
                 dom: {
                     button: {
@@ -172,6 +186,11 @@
         
         });
     });
+    $('option').mousedown(function(e) {
+        e.preventDefault();
+        $(this).prop('selected', !$(this).prop('selected'));
+        return false;
+    });
 </script>
 
 <script>
@@ -179,12 +198,7 @@
         delimiters: ['[[', ']]'],
         el: "#app",
 
-        data:{
-            config: {
-                headers: {
-                    "X-CSRFToken": getCookie('csrftoken')
-                }
-            },
+        data: {
             truckModal: {
                 truck: {
                     brand: null,
@@ -210,23 +224,57 @@
                 }]
             }
         },
+
         methods: {
             viewTruck(currentDelivery){
                 axios.get(`/api/special-truck/${currentDelivery}`)
                 .then(res=>this.truckModal = res.data)
-
-                console.log(this.truckModal)
             },
             returnTruck(id){
                 $("#truckModal").modal('hide')
                 axios.put(`/return-truck/${id}/`, null, this.config)
                 .then(res=>res.data==0?location.reload():'')
-            }
+            },
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
         },
 
-        created() {
-            this.$root.$refs.app = this;
-        },
     })
 </script>
 

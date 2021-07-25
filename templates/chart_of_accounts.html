@@ -36,7 +36,7 @@
                     {% for subgroup in group.accountsubgroup.all %}
                     {% for child in subgroup.accountchild.all %}
                     <tr>
-                        <td>{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</td>
+                        <td @click="viewChildmodal({{child.pk}})" class="link" data-toggle="modal" data-target="#viewChildModal">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</td>
                         <td>{{child.name}}</td>
                         {% if child.me == 'None' %}
                         <td></td>
@@ -53,6 +53,48 @@
             {% endfor %}
         </div>
     </div>
+
+
+    <div class="modal fade" id="viewChildModal">
+        <div class="modal-dialog">
+            <div class="modal-content b-radius-15">
+                <div class="modal-body">
+                    <!-- TOP CARD -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <span class="font-size-18 font-bold">[[viewChildModal.name]]</span>&nbsp;
+                            <span class="font-size-14 font-bold gray">[[viewChildModal.accountSubGroup.accountGroup.code]]-[[viewChildModal.accountSubGroup.code]]-[[viewChildModal.code]]</span>
+                        </div>
+                    </div>
+                    <div class="order-card row my-2">
+                        <!-- LVL 1 -->
+                        <div class="col-6 mt-3">
+                            <label for="" class="gray">Account Group</label>
+                            <br>
+                            <span class="font-size-14 font-bold">[[viewChildModal.accountSubGroup.accountGroup.name]]</span>
+                        </div>
+                        <div class="col-6 mt-3">
+                            <label for="" class="gray">Account Sub-group</label>
+                            <br>
+                            <span class="font-size-14 font-bold">[[viewChildModal.accountSubGroup.name]]</span>
+                        </div>
+                        <!-- LVL 2 -->
+                        <div class="col-12 my-3">
+                            <label for="" class="gray">Balance</label>
+                            <br>
+                            <span class="font-size-18 font-bold">₱[[formatPrice(viewChildModal.amount)]]</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <a href="#">Edit Child Account</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ADD ACCOUNT MODAL -->
     <div class="modal fade" id="addAccountModal">
         <div class="modal-dialog">
@@ -248,11 +290,28 @@
                 description: null,
                 groupCode: ''
             },
+            viewChildModal: {
+                accountSubGroup: {
+                    accountGroup: {
+                        code: null,
+                        name: null,
+                    },
+                    code: null,
+                    name: null,
+                },
+                amount: 0,
+                code: null,
+                name: null,
+            },
+            editChild: {
+                
+            },
             accounts: [],
             subGroup: [],
             group: [],
             child: [],
             toggle: false,
+
         },
         computed:{
             linkToAccount(){
@@ -291,6 +350,12 @@
                 axios.get('/api/group/').then(res=>this.group=res.data)
                 axios.get('/api/sub-group').then(res=>this.subGroup=res.data)
                 axios.get('/api/child/').then(res=>this.child=res.data)
+            },
+            viewChildmodal(id){
+                axios.get(`/api/child-nested/${id}/`)
+                .then(res=>{
+                    this.viewChildModal = res.data
+                })
             },
             accountModalInitial(){
                 return{

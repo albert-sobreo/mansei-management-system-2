@@ -32,6 +32,22 @@ class AccountChildSZ(serializers.ModelSerializer):
 
 
 
+class SubGroupNestedSZ(serializers.ModelSerializer):
+    accountGroup = AccountGroupSZ(read_only=True)
+    class Meta:
+        model = AccountSubGroup
+        fields = "__all__"
+
+class AccountChildNestedSZ(serializers.ModelSerializer):
+    accountSubGroup = SubGroupNestedSZ(read_only=True)
+    class Meta:
+        model = AccountSubGroup
+        fields = "__all__"
+
+
+
+
+
 
 ########## ATC ##########
 class ATCSZ(serializers.ModelSerializer):
@@ -83,6 +99,12 @@ class WarehouseSZ(serializers.ModelSerializer):
         model = Warehouse
         fields = '__all__'
 
+class WarehouseItemsSZ(serializers.ModelSerializer):
+    warehouse = WarehouseSZ(read_only=True)
+    class Meta:
+        model=WarehouseItems
+        fields='__all__'
+
 
 
 
@@ -95,7 +117,7 @@ class MerchandiseInventorySZ(serializers.ModelSerializer):
         fields = '__all__'
 
 class MerchandiseInventoryNestedSZ(serializers.ModelSerializer):
-    warehouse = WarehouseSZ(read_only=True, many=True)
+    warehouseitems = WarehouseItemsSZ(read_only=True, many=True)
     class Meta:
         model = MerchandiseInventory
         fields = '__all__'
@@ -572,6 +594,20 @@ class TransferSZ(serializers.ModelSerializer):
     transferItems = TransferItemsSZ(read_only = True)
     class Meta:
         model = Transfer
+        fields = '__all__'
+        depth = 1
+
+class AdjustmentItemsSZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventorySZ(read_only = True)
+    class Meta:
+        model = AdjustmentsItems
+        fields = '__all__'
+        depth = 1
+
+class AdjustmentSZ(serializers.ModelSerializer):
+    aditems = AdjustmentItemsSZ(read_only = True, many=True)
+    class Meta:
+        model = Adjustments
         fields = '__all__'
         depth = 1
 
