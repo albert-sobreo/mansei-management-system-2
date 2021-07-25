@@ -502,6 +502,7 @@ class PaymentVoucher(models.Model):
     voided = models.BooleanField(null = True, default = False)
     voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "pvVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
+    first = models.BooleanField(null = True, default = False)
 
 class Quotations(models.Model):
     code = models.CharField(max_length=50)

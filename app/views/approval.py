@@ -447,8 +447,10 @@ class PVApprovalAPI(APIView):
             ################# DEBIT SIDE #################
             ################# IF FIRST PAYMENT #################
             if voucher.purchaseOrder.runningBalance == voucher.purchaseOrder.amountTotal:
+                voucher.first = True
+                voucher.save()
                 ################# IF RR WAS DONE BEFORE PV #################
-                if voucher.purchaseOrder.receivingreport.first() != None:
+                if voucher.purchaseOrder.receivingreport.first == True:
                     ################# IF RR IS APPROVED #################
                     if voucher.purchaseOrder.receivingreport.first().approved == True:
                         
@@ -509,8 +511,107 @@ class PVVoid(APIView):
         voucher.voided = True
         voucher.datetimeVoided = datetime.now()
         voucher.voidedBy = request.user
+        
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
+        ################# INWARD INVENTORY JOURNAL #################
+        if voucher.purchaseOrder == None:
+            j = Journal()
+            j.code = voucher.code
+            j.datetimeCreated = voucher.datetimeApproved
+            j.createdBy = voucher.createdBy
+            j.journalDate = datetime.now()
+            j.save()
+            request.user.branch.journal.add(j)
+
+            jeAPI(request, j, 'Credit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.inwardInventory.runningBalance + voucher.amountPaid)
+
+            if voucher.paymentPeriod == 'Full Payment':
+                if voucher.paymentMethod == dChildAccount.cashOnHand.name:
+                    jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+                elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
+                    jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
+
+            elif voucher.paymentPeriod == 'Partial Payment':
+                # print('b0ss plis')
+                if voucher.paymentMethod == dChildAccount.cashOnHand.name:
+                    jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+                    jeAPI(request, j, 'Debit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance))
+
+                elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
+                    jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
+
+                    jeAPI(request, j, 'Debit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance))
+                    
+            voucher.inwardInventory.runningBalance += voucher.amountPaid
+            voucher.inwardInventory.save()
+            voucher.inwardInventory.fullyPaid == False
+            sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+            return JsonResponse(0, safe=False)
+
+        ################# PURCHASE ORDER JOURNAL #################
+        else:
+            if voucher.purchaseOrder.paymentvoucher.all().latest('pk') == voucher:
+                j = Journal()
+                j.code = voucher.code
+                j.datetimeCreated = voucher.datetimeApproved
+                j.createdBy = voucher.createdBy
+                j.journalDate = datetime.now()
+                j.save()
+                request.user.branch.journal.add(j)
+
+                ################# CREDIT SIDE #################wwwww
+                if voucher.first == True:
+                    ################# IF RR WAS DONE BEFORE PV ################
+                    if voucher.purchaseOrder.receivingreport.first == True:
+                        jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance + voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+                    ################# IF PV IS DONE BEFORE RR ################
+                    else:
+                        jeAPI(request, j, 'Credit', dChildAccount.inputVat, voucher.purchaseOrder.taxPeso)
+
+                        jeAPI(request, j, 'Credit', dChildAccount.prepaidExpense, (voucher.purchaseOrder.amountDue - voucher.purchaseOrder.taxPeso))
+                ################# IF NOT FIRST PAYMENT #################
+                else:
+                    jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance + voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+                
+                voucher.purchaseOrder.wep -= voucher.wep
+                voucher.purchaseOrder.save()
+
+                ################# DEBIT SIDE #################
+                jeAPI(request, j, 'Debit', dChildAccount.ewp, voucher.wep)
+
+                if voucher.paymentPeriod == 'Full Payment':
+                    if voucher.paymentMethod == dChildAccount.cashOnHand.name:
+                        jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+                    elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
+                        jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
+
+                elif voucher.paymentPeriod == 'Partial Payment':
+                    print('b0ss plis')
+                    if voucher.paymentMethod == dChildAccount.cashOnHand.name:
+                        jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+                        jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+
+                    elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
+                        jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
+
+                        jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+
+                voucher.purchaseOrder.runningBalance += voucher.amountPaid
+
+                voucher.purchaseOrder.fullyPaid == False
+                voucher.purchaseOrder.save()
+                sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+                return JsonResponse(0, safe=False)
+            else:
+                sweetify.sweetalert(request, icon='warning', title='Error!', text = 'Not Latest Payment Voucher', persistent='Dismiss')
+                return JsonResponse(0, safe=False)
+
+        
 
 ################# QUOTATIONS #################
 class QQapprovedView(View):
@@ -726,24 +827,19 @@ class SCVoid(APIView):
             cashOnHand = Decimal(0.0)
             bankAccount = {}
             for rp in sale.receivepayment.all():
-                ################# DEBIT SIDE #################
-                # jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+                
                 accountReceivable += (rp.amountPaid + rp.wep)
-                ################# CREDIT SIDE #################
+                
                 if rp.wep!= 0.0:
-                    # jeAPI(request, j, 'Credit', dChildAccount.cwit, rp.wep)
                     wep += rp.wep
 
                 if rp.paymentMethod == dChildAccount.cashOnHand.name:
-                    # jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, rp.amountPaid)
                     cashOnHand += rp.amountPaid
                 elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
                     if rp.paymentMethod in bankAccount:
                         bankAccount[rp.paymentMethod] += rp.amountPaid
                     else:
                         bankAccount[rp.paymentMethod] = rp.amountPaid
-                    # jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
-                    # cashInBank += rp.amountPaid
                 rp.salesContract.runningBalance += (rp.amountPaid + rp.wep)
                 rp.salesContract.fullyPaid = False
                 rp.salesContract.save()
