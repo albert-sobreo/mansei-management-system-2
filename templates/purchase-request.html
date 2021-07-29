@@ -86,7 +86,16 @@
 							<option value="" selected disabled>Choose Merchandise Inventory</option>
 							<option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]]</option>
 						</select>
-						<select v-model="item.code" class="form-control" v-else></select>
+						<input @blur="testData2(item.other, index)" placeholder="Type or select the item from the datalist" list="others" v-model="item.other" class="form-control" v-else-if="item.type=='Others'">
+						<select class="form-control" v-else>
+							<option value="" selected disabled>Choose Inventory Type First</option>
+						</select>
+
+						<datalist id="others">
+							{% for item in request.user.branch.otherInventory.all %}
+							<option value="{{item.name}}"></option>
+							{% endfor %}
+						</datalist>
 					</div>
 					<div class="col-2 px-1">
 						<input v-model="item.remaining" type="number" class="form-control" readonly>
@@ -169,7 +178,7 @@
 			inventoryTypes: [
         	    'Merchandise',
         	    'Manufacturing',
-				'Office Supplies'
+				'Others'
         	],
 			purchaseRequest:{
 				code: '{{new_code}}',
@@ -180,6 +189,7 @@
 				intendedFor: null,
 				items: [{
 					code: '',
+					other: null,
 					type: '',
 					remaining: null,
 					qty: null,
@@ -239,6 +249,13 @@
 
 				item = this.merchandiseInventory.find(x=>x.id==pk)
                 this.purchaseRequest.items[index].remaining = item.qtyA
+			},
+			testData2(name, index){
+				axios.post('/otherinventory/', {name:name}, this.config)
+				.then(res=>{
+					this.purchaseRequest.items[index].remaining = res.data
+				})
+
 			},
 			formatPrice(val){
 				val = Number(val).toFixed(2)

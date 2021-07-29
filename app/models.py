@@ -228,6 +228,18 @@ class MerchandiseInventory(models.Model):
 
     def __str__(self):
         return str(self.pk) + ' ' + str(self.code)
+
+class OtherInventory(models.Model):
+    name = models.CharField(max_length=100)
+    qty = models.IntegerField()
+    purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5, default=0.00)
+
+    class Meta:
+        verbose_name = "Other Inventory"
+        verbose_name_plural = "Other Inventories"
+
+    def __str__(self):
+        return self.name
     
 class WarehouseItems(models.Model):
     warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, related_name = 'warehouseitems')
@@ -309,6 +321,19 @@ class PRItemsMerch(models.Model):
 
     def __str__(self):
         return self.purchaseRequest.code + " - " + self.merchInventory.code
+
+class PRItemsOther(models.Model):
+    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="pritemsother",on_delete=models.PROTECT, null=True, blank=True)
+    otherInventory = models.ForeignKey(OtherInventory, related_name="pritemsother", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.PositiveIntegerField()
+
+    class Meta:
+        verbose_name = "PR Items Other"
+        verbose_name_plural = "PR Items Others"
+
+    def __str__(self):
+        return self.purchaseRequest.code + " - " + self.otherInventory.name
 
 class PurchaseOrder(models.Model):
     code = models.CharField(max_length=50)
@@ -935,9 +960,12 @@ class Branch(models.Model):
     warehouseItems = models.ManyToManyField(WarehouseItems, blank=True)
     merchInventory = models.ManyToManyField(MerchandiseInventory, blank = True)
 
+    otherInventory = models.ManyToManyField(OtherInventory, blank=True)
+
     ##### PURCHASE REQUEST #####
     purchaseRequest = models.ManyToManyField(PurchaseRequest, blank = True)
     pritemsMerch = models.ManyToManyField(PRItemsMerch, blank = True)
+    prItemsOther = models.ManyToManyField(PRItemsOther, blank=True)
 
     ##### VENDOR QUOTES #####
     vendorQuotesMerch = models.ManyToManyField(VendorQuotesMerch, blank = True)

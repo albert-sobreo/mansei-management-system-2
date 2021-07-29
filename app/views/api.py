@@ -1,7 +1,7 @@
 from decimal import Decimal
 from django import views
 from django.db.models import query
-from django.http.response import Http404
+from django.http.response import Http404, JsonResponse
 from rest_framework import viewsets
 from ..serializers import *
 
@@ -100,6 +100,27 @@ class MerchandiseInventoryNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = MerchandiseInventoryNestedSZ
     queryset = MerchandiseInventory.objects.all()
+
+
+
+
+
+########## OTHER INVENTORY ##########
+class OtherInventoryAPI(APIView):
+    def post(self, request, format=None):
+        try:
+            item = OtherInventory.objects.get(name=request.data['name'])
+            return JsonResponse (item.qty, safe=False)
+        except:
+            # otherInv = OtherInventory
+            # otherInv.name = request.data['name']
+            # otherInv.qty = 0
+            # otherInv.purchasingPrice = Decimal(0.0)
+            # otherInv.save()
+
+            # item = otherInv
+            return JsonResponse(0, safe=False)
+        
 
 
 

@@ -70,18 +70,38 @@ class SavePurchaseRequest(APIView):
         pr.save()
         request.user.branch.purchaseRequest.add(pr)
 
-    
         for item in purchaseRequest['items']:
-            pritemsmerch = PRItemsMerch()
-            pritemsmerch.purchaseRequest = pr
-            pritemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
-            pritemsmerch.remaining = item['remaining']
-            pritemsmerch.qty = item['qty']
+            if item['type'] == "Merchandise":
+                pritemsmerch = PRItemsMerch()
+                pritemsmerch.purchaseRequest = pr
+                pritemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
+                pritemsmerch.remaining = item['remaining']
+                pritemsmerch.qty = item['qty']
 
             
-            pritemsmerch.save()
-            request.user.branch.pritemsMerch.add(pritemsmerch)
+                pritemsmerch.save()
+                request.user.branch.pritemsMerch.add(pritemsmerch)
 
+            elif item['type'] == "Others":
+                pritemsother = PRItemsOther()
+                pritemsother.purchaseRequest = pr
+                try: 
+                    pritemsother.otherInventory = OtherInventory.objects.get(name=item['other'])
+                except:
+                    otherInv = OtherInventory()
+                    otherInv.name = item['other']
+                    otherInv.qty = 0
+                    otherInv.purchasingPrice = Decimal(0.0)
+                    otherInv.save()
+                    request.user.branch.otherInventory.add(otherInv)
+
+                    pritemsother.otherInventory = otherInv
+
+                pritemsother.remaining = item['remaining']
+                pritemsother.qty = item['qty']
+
+                pritemsother.save()
+                request.user.branch.prItemsOther.add(pritemsother)
 
         for item in vendorQuotes:
             if item['type'] == 'Merchandise':
