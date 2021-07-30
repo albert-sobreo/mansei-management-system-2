@@ -221,5 +221,6 @@ urlpatterns = [
     path('sc-void/<int:pk>/', login_required(views.SCVoid.as_view())),
     path('rp-void/<int:pk>/', login_required(views.RPVoid.as_view())),
     path('delivery-void/<int:pk>/', login_required(views.DeliveriesVoid.as_view())),
-    path('otherinventory/', login_required(views.OtherInventoryAPI.as_view()))
+    path('otherinventory/', login_required(views.OtherInventoryAPI.as_view())),
+    path('otherinventoryview/', login_required(views.OtherInventoryView.as_view()))
 ]
