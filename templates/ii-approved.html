@@ -37,7 +37,11 @@
             </thead>
             <tbody>
                 {% for item in inward %}
+                {% if item.voided %}
+                <tr class="voided">
+                {% else %}
                 <tr>
+                {% endif %}
                     <td @click="viewModal({{item.pk}})" class="link" data-toggle="modal" data-target="#orderModal">{{item.code}}</td>
                     <td>{{item.dateInward}}</td>
                     <td>₱[[formatPrice({{item.amountTotal}})]]</td>
@@ -204,7 +208,7 @@
                                 <tbody>
                                     <tr v-for="item in order.iiadjusteditems">
                                         <td>[[item.code]]</td>
-                                        <td>[[item.name]]-[[item.classification]]-[[item.type]]</td>
+                                        <td>[[item.name]]-[[item.classfication]]-[[item.type]]</td>
                                         <td>[[item.length]]mm</td>
                                         <td>[[item.width]]mm</td>
                                         <td>[[item.thicc]]mm</td>
@@ -215,6 +219,12 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <!-- VOID BUTTON -->
+                        <div class="row" v-if="order.voided != true">
+                            <div class="col">
+                                <button class="col btn btn-danger" @click="voidCheck([[order.id]])">Void</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -240,6 +250,7 @@
                 }
             },
             order: {
+                voided: null,
                 code: null,
                 dateInward: null,
                 datetimeApproved: null,
@@ -257,7 +268,7 @@
                 iitemsmerch: [{
                     code: null,
                     name: null,
-                    classification: null,
+                    classfication: null,
                     type: null,
                     length: null,
                     width: null,
@@ -284,6 +295,23 @@
         },
 
         methods: {
+            voidCheck(id){
+                Swal.fire({
+                    title: 'Warning',
+                    html: 'Are you sure you want to void this item?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result)=>{
+                    if(result.isConfirmed) {
+                        this.voidII(id)
+                    }
+                })
+            },
+            voidII(id){
+                axios.put(`/ii-void/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
             formatPrice(val){
                 val = Number(val).toFixed(2)
                 var num = val.replace(/,/gi, "");
@@ -294,7 +322,10 @@
             },
             viewModal(id){
                 axios.get(`/api/inward-inventory/${id}`)
-                .then(res=>this.order=res.data)
+                .then(res=>{
+                    console.log(res.data)
+                    this.order=res.data
+                })
             },
             approveII(id){
                 axios.put(`/ii-approval/${id}/`, '', this.config)

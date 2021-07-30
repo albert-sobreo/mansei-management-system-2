@@ -41,7 +41,11 @@
             </thead>
             <tbody>
                 {% for po in purchase %}
+                {% if po.voided %}
+                <tr class="voided">
+                {% else %}
                 <tr>
+                {% endif %}
                     <td class="link" @click="viewPO('{{po.pk}}')" data-toggle="modal" data-target="#rrlistmodal">{{po.code}}</td>
                     <td>{{po.purchaseOrder.code}}</td>
                     <td>₱[[roundNumber2({{po.amountDue}})]]</td>
@@ -183,6 +187,12 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- VOID BUTTON -->
+                        <div class="row" v-if="poModal.voided != true">
+                            <div class="col">
+                                <button class="col btn btn-danger" @click="voidCheck([[poModal.id]])">Void</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -272,6 +282,7 @@
                 }
             },
             poModal: {
+                voided: null,
                 code: null,
                 createdBy: null,
                 datetimeCreated: null,
@@ -308,6 +319,23 @@
             roundToggle: false,
         },
         methods: {
+            voidCheck(id){
+                Swal.fire({
+                    title: 'Warning',
+                    html: 'Are you sure you want to void this item?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result)=>{
+                    if(result.isConfirmed) {
+                        this.voidRR(id)
+                    }
+                })
+            },
+            voidRR(id){
+                axios.put(`/rr-void/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
             viewPO(code){
                 console.log(code)
                 axios.get(`/api/receiving-report/${code}/`)

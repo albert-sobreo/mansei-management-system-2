@@ -152,6 +152,11 @@
                                 <button class="col btn btn-primary" @click="approvePV([[pvModal.id]])">Approve</button>
                             </div>
                         </div>
+                        <div class="row" v-else>
+                            <div class="col">
+                                <button class="col btn btn-danger" @click="voidCheck([[pvModal.id]])">Void</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -428,6 +433,23 @@
         },
         
         methods: {
+            voidCheck(id){
+                Swal.fire({
+                    title: 'Warning',
+                    html: 'Are you sure you want to void this item?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result)=>{
+                    if(result.isConfirmed) {
+                        this.voidPV(id)
+                    }
+                })
+            },
+            voidPV(id){
+                axios.put(`/pv-void/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
             formatDateTime(value){
                 const months = [
                     'Jan',

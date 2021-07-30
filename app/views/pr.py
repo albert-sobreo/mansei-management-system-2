@@ -58,7 +58,7 @@ class SavePurchaseRequest(APIView):
         pr = PurchaseRequest()
 
         pr.code = purchaseRequest['code']
-        pr.datetimeCreated = datetime.now
+        pr.datetimeCreated = datetime.now()
         pr.dateRequested = purchaseRequest['date']
 
         pr.dateNeeded = purchaseRequest['dateNeeded']

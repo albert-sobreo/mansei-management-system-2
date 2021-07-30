@@ -231,9 +231,9 @@
 					},]
 					this.vendorquotes[index].item = item.id
 					this.vendorquotes[index].type = itemType
-					this.vendorquotes[index].info[0].purchasingPrice = this.formatPrice(vendor1.purchasingPrice)
+					this.vendorquotes[index].info[0].purchasingPrice = vendor1.purchasingPrice
 					this.vendorquotes[index].info[0].name = vendor1.vendor
-					this.vendorquotes[index].info[1].purchasingPrice = this.formatPrice(vendor2.purchasingPrice)
+					this.vendorquotes[index].info[1].purchasingPrice = vendor2.purchasingPrice
 					this.vendorquotes[index].info[1].name = vendor2.vendor
 				})
 
@@ -286,7 +286,7 @@
 				}
 			},
 			putPeso(value){
-				return (value!=null?'₱' + String(value):'')
+				return (value!=null?'₱' + String(this.formatPrice(value)):'')
 			}
 		},
 		mounted(){
