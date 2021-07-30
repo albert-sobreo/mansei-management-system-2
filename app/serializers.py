@@ -126,6 +126,16 @@ class MerchandiseInventoryNestedSZ(serializers.ModelSerializer):
 
 
 
+
+########## OTHER INVENTORY ##########
+class OtherInventorySZ(serializers.ModelSerializer):
+    class Meta:
+        model = OtherInventory
+        fields = "__all__"
+
+
+
+
 ########## JOURNAL ##########
 class JournalSZ(serializers.ModelSerializer):
     class Meta:
@@ -174,10 +184,17 @@ class PRItemsMerchNestedSZ(serializers.ModelSerializer):
         model = PRItemsMerch
         fields = '__all__'
 
+class PRItemsOtherSZ(serializers.ModelSerializer):
+    otherInventory = OtherInventorySZ(read_only=True)
+    class Meta:
+        model = PRItemsOther
+        fields = '__all__'
+
 class PurchaseRequestNestedSZ(serializers.ModelSerializer):
     createdBy = UserSZ(read_only=True)
     approvedBy = UserSZ(read_only=True)
     pritemsmerch = PRItemsMerchNestedSZ(read_only=True, many=True)
+    pritemsother = PRItemsOtherSZ(read_only=True, many=True)
     class Meta:
         model = PurchaseRequest
         fields = '__all__'

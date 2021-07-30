@@ -143,3 +143,5 @@ AUTH_USER_MODEL = 'app.User'
 LOGIN_REDIRECT_URL = '/'
 
 LOGIN_URL = '/login/'
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240 # higher than the count of fields

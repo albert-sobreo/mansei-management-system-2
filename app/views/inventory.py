@@ -141,3 +141,8 @@ class EditInventory(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+
+class OtherInventoryView(View):
+    def get(self, request, format=None):
+        return render(request, 'otherinventory.html')

@@ -97,6 +97,11 @@
                                         <td>[[item.remaining]]</td>
                                         <td>[[item.qty]]</td>
                                     </tr>
+                                    <tr v-for='item in prModal.pritemsother'>
+                                        <td>[[item.otherInventory.name]]</td>
+                                        <td>[[item.remaining]]</td>
+                                        <td>[[item.qty]]</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -139,6 +144,7 @@
                 </div>
             </div>
         </div>
+        <pre>[[$data]]</pre>
     </div>
 </div>
 
@@ -247,6 +253,16 @@
                     qty: null,
                 }],
 
+                pritemsother: [{
+                    id: null,
+                    otherInventory: {
+                        id: null,
+                        name: null,
+                    },
+                    remaining: null,
+                    qty: null,
+                }],
+
                 vendorquotesmerch: [{
                     id: null,
                     merchInventory: {
@@ -271,7 +287,7 @@
         methods: {
             viewPR(code){
                 console.log(code)
-                axios.get(`/api/purchase-request-non-approved/${code}/`)
+                axios.get(`/api/purchase-request-nested/${code}/`)
                 .then(res=>this.prModal=res.data)
             },
             roundNumber2(value) {

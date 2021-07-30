@@ -32,6 +32,8 @@ router.register(r"merchinventory", views.MerchandiseInventoryAPI, 'merchinvetory
 router.register(r"nestedmerchinventory", views.MerchandiseInventoryNestedAPI, 'nestedmerchinventory')
 
 
+
+
 ########## ACCOUNTING APPROVALS ##########
 router.register(r'purchase-order-non-approved', views.PurchaseApprovalNonApprovedAPI, 'purchase-order-non-approved')
 router.register(r'purchase-order-approved', views.PurchaseApprovalApprovedAPI, 'purchase-order-approved')
@@ -211,11 +213,14 @@ urlpatterns = [
     path('delivery-list/', login_required(views.DeliveriesListView.as_view())),
     path('pr-void/<int:pk>/', login_required(views.PRVoid.as_view())),
     path('po-void/<int:pk>/', login_required(views.POVoid.as_view())),
+    
     path('rr-void/<int:pk>/', login_required(views.RRVoid.as_view())),
     path('ii-void/<int:pk>/', login_required(views.IIVoid.as_view())),
     path('pv-void/<int:pk>/', login_required(views.PVVoid.as_view())),
     path('so-void/<int:pk>/', login_required(views.SOVoid.as_view())),
     path('sc-void/<int:pk>/', login_required(views.SCVoid.as_view())),
     path('rp-void/<int:pk>/', login_required(views.RPVoid.as_view())),
-    path('delivery-void/<int:pk>/', login_required(views.DeliveriesVoid.as_view()))
+    path('delivery-void/<int:pk>/', login_required(views.DeliveriesVoid.as_view())),
+    path('otherinventory/', login_required(views.OtherInventoryAPI.as_view())),
+    path('otherinventoryview/', login_required(views.OtherInventoryView.as_view()))
 ]
