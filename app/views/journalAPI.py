@@ -17,6 +17,8 @@ def jeAPI(request, journal, normally, accountChild, amount):
         je.accountChild.accountSubGroup.save()
         je.accountChild.accountSubGroup.accountGroup.save()
         je.balance = je.accountChild.amount
+        if je.accountChild.me != None:
+            je.accountChild.me.amount += je.amount
     else:
         je.accountChild.amount -= je.amount
         je.accountChild.accountSubGroup.amount -= je.amount
@@ -25,6 +27,8 @@ def jeAPI(request, journal, normally, accountChild, amount):
         je.accountChild.accountSubGroup.save()
         je.accountChild.accountSubGroup.accountGroup.save()
         je.balance = je.accountChild.amount
+        if je.accountChild.me != None:
+            je.accountChild.me.amount += je.amount
     je.save()
 
     request.user.branch.journalEntries.add(je)
