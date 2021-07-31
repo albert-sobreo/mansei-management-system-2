@@ -185,6 +185,13 @@
                                         <td>₱[[formatPrice(item.purchasingPrice)]]</td>
                                         <td>₱[[formatPrice(item.totalPrice)]]</td>
                                     </tr>
+                                    <tr v-for="item in poModal.rritemsother">
+                                        <td>[[item.type]]</td>
+                                        <td>[[item.otherInventory.name]]</td>
+                                        <td>[[item.qty]]</td>
+                                        <td>₱[[formatPrice(item.purchasingPrice)]]</td>
+                                        <td>₱[[formatPrice(item.totalPrice)]]</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>

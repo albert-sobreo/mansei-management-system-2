@@ -233,6 +233,8 @@ class OtherInventory(models.Model):
     name = models.CharField(max_length=100)
     qty = models.IntegerField()
     purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5, default=0.00)
+    accountChild = models.ForeignKey(AccountChild, on_delete=models.PROTECT, blank=True, null=True)
+        
 
     class Meta:
         verbose_name = "Other Inventory"
@@ -309,7 +311,7 @@ class PurchaseRequest(models.Model):
         return self.code
 
 
-class PRItemsMerch(models.Model):
+class PRItemsMerch(models.Model):    
     purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="pritemsmerch",on_delete=models.PROTECT, null=True, blank=True)
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="pritemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     remaining = models.IntegerField()
@@ -323,6 +325,7 @@ class PRItemsMerch(models.Model):
         return self.purchaseRequest.code + " - " + self.merchInventory.code
 
 class PRItemsOther(models.Model):
+    type = models.CharField(max_length = 255, blank=True, null=True)
     purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="pritemsother",on_delete=models.PROTECT, null=True, blank=True)
     otherInventory = models.ForeignKey(OtherInventory, related_name="pritemsother", on_delete=models.PROTECT, null=True, blank=True)
     remaining = models.IntegerField()
@@ -390,6 +393,17 @@ class POItemsMerch(models.Model):
     def __str__(self):
         return self.purchaseOrder.code + " - " + self.merchInventory.code
 
+class POItemsOther(models.Model):
+    type = models.CharField(max_length = 255, blank=True, null=True)
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poitemsother",on_delete=models.PROTECT, null=True, blank=True)
+    otherInventory = models.ForeignKey(OtherInventory, related_name="poitemsother", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.PositiveIntegerField()
+    purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
+    totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
+    delivered = models.BooleanField(null = True, default=False)
+    qtyReceived = models.IntegerField(default=0)
+
 class POatc(models.Model):
     purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poatc",on_delete=models.PROTECT, null=True, blank=True)
     code = models.ForeignKey(ATC, related_name="poatc",on_delete=models.PROTECT, null=True, blank=True)
@@ -401,14 +415,11 @@ class ReceivingReport(models.Model):
     dateReceived = models.DateField()
     party = models.ForeignKey(Party, related_name="receivingreport", on_delete=models.PROTECT)
     purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="receivingreport",on_delete=models.PROTECT, null=True, blank=True)
-    amountPaid = models.DecimalField(max_digits=18, decimal_places=5)
     amountDue = models.DecimalField(max_digits=18, decimal_places=5)
     amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True)
-    paymentMethod = models.CharField(max_length=50)
-    paymentPeriod = models.CharField(max_length=50)
     chequeNo = models.CharField(max_length=50, null=True, blank=True)
     dueDate = models.DateField(null = True, blank = True)
     bank = models.CharField(max_length=50, blank=True, null=True)
@@ -451,6 +462,17 @@ class RRItemsMerch(models.Model):
 
     def __str__(self):
         return self.receivingReport.code + " - " + self.merchInventory.code
+
+class RRItemsOther(models.Model):
+    type = models.CharField(max_length = 255, blank=True, null=True)
+    receivingReport = models.ForeignKey(ReceivingReport, related_name="rritemsother",on_delete=models.PROTECT, null=True, blank=True)
+    otherInventory = models.ForeignKey(OtherInventory, related_name="rritemsother", on_delete=models.PROTECT, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.PositiveIntegerField()
+    purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
+    totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
+    delivered = models.BooleanField(null = True, default=False)
+    poitemsother = models.ForeignKey(POItemsOther, related_name='rritemsother', on_delete=models.PROTECT, null=True, blank=True)
 
 class RRatc(models.Model):
     receivingReport = models.ForeignKey(ReceivingReport, related_name="rratc",on_delete=models.PROTECT, null=True, blank=True)
@@ -974,11 +996,13 @@ class Branch(models.Model):
     ##### PURCHASE ORDER #####
     purchaseOrder = models.ManyToManyField(PurchaseOrder, blank = True)
     poitemsMerch = models.ManyToManyField(POItemsMerch, blank = True)
+    poItemsOther = models.ManyToManyField(POItemsOther, blank = True)
     poatc = models.ManyToManyField(POatc, blank=True)
 
     ##### RECEIVING REPORT #####
     receivingReport = models.ManyToManyField(ReceivingReport, blank = True)
     rritemsMerch = models.ManyToManyField(RRItemsMerch, blank = True)
+    rrItemsOther = models.ManyToManyField(RRItemsOther, blank=True)
     rratc = models.ManyToManyField(RRatc, blank = True)
 
     ##### QUOTATIONS #####

@@ -106,7 +106,12 @@
                     <div class="col px-1">
                         <select v-model="item.type" class="form-control">
                             <option value="" selected disabled>Choose Type</option>
-                            <option v-for="type in inventoryTypes" :value="type">[[type]]</option>
+                            <optgroup label="Inventory">
+								<option v-for="type in inventoryTypes" :value="type">[[type]]</option>
+							</optgroup>
+							<optgroup label="Expenses">
+								<option v-for="expense in expenseTypes" :value="expense">[[expense]]</option>
+							</optgroup>
                         </select>
                     </div>
                     <div class="col-3 px-1">
@@ -115,7 +120,16 @@
                             <option value="" selected disabled>Choose Merchandise Inventory</option>
                             <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]]</option>
                         </select>
-                        <select v-model="item.code" class="form-control" v-else></select>
+                        <input @blur="getMerchRemaining2(item.other, index)" placeholder="Type or select the item from the datalist" list="others" v-model="item.other" class="form-control" v-else-if="item.type!='Merchandise' && item.type!='Manufacturing' && item.type!=''">
+                        <select class="form-control" v-else>
+							<option value="" selected disabled>Choose Inventory Type First</option>
+						</select>
+
+                        <datalist id="others">
+							{% for item in request.user.branch.otherInventory.all %}
+							<option value="{{item.name}}"></option>
+							{% endfor %}
+						</datalist>
                         <!-- END -->
                     </div>
                     <div class="col-1 px-1">
@@ -352,8 +366,8 @@
             inventoryTypes: [
                 'Merchandise',
                 'Manufacturing',
-                'Office'
             ],
+			expenseTypes: [],
             purchaseOrder:{
                 code: '{{new_code}}',
                 date: new Date().toISOString().split('T')[0],
@@ -366,6 +380,7 @@
                 items: [{
                     type: '',
                     code: '',
+                    other: '',
                     remaining: null,
                     quantity: null,
                     vatable: 0.00,
@@ -514,6 +529,12 @@
                     })
                 })
 
+                axios.get('/getaccountexpenses/')
+				.then(res=>{
+					y = res.data.map(x=>x.name)
+					this.expenseTypes = y
+				})
+
                 axios.get('/api/atc/')
                 .then(res=>this.atcList=res.data)
                 .then(res=>{
@@ -569,7 +590,6 @@
                         console.log(item.type, item.code, item.quantity, item.vatable, item.totalCost)
                         if(
                             item.type &&
-                            item.code &&
                             item.quantity &&
                             item.vatable &&
                             item.totalCost
@@ -589,9 +609,6 @@
                 }
                 this.errors = []
                 success = true
-                if (!this.purchaseOrder.code){
-                    this.errors.push('Code Required')
-                }
                 if (!this.purchaseOrder.date){
                     this.errors.push('Date Required')
                 }
@@ -608,9 +625,6 @@
                 this.purchaseOrder.items.forEach((item, index)=>{
                     if(!item.type){
                         this.errors.push('Item Type Required at index: ' + String(index+1))
-                    }
-                    if(!item.code){
-                        this.errors.push('Item Code Required at index: ' + String(index+1))
                     }
                     if(!item.quantity){
                         this.errors.push('Item Quantity Required at index: ' + String(index+1))
@@ -665,6 +679,13 @@
                 this.purchaseOrder.items[index].remaining = item.qtyA
             },
 
+            getMerchRemaining2(name, index){
+                axios.post('/otherinventory/', {name:name}, this.config)
+				.then(res=>{
+					this.purchaseOrder.items[index].remaining = res.data
+				})
+            },
+
             onForTotalCost(index){
                 row = this.purchaseOrder.items[index]
                 row.totalCost = Number(row.vatable * row.quantity).toFixed(4)
@@ -713,7 +734,7 @@
                     }]
                     pr.pritemsmerch.forEach((item, index)=>{
                         console.log(item.merchInventory.id)
-                        var invObject = this.merchandiseInventory.find(x=>x.id==item.merchInventory.id)
+                        var invObject = item.merchInventory
                         if(index==0){
                             this.purchaseOrder.items[0].type = 'Merchandise'
 							this.purchaseOrder.items[0].code = invObject.id
@@ -727,6 +748,23 @@
                                 remaining: invObject.qtyA,
                                 vatable: 0,
                                 totalCost: null,
+                            })
+                        }
+                    })
+
+                    pr.pritemsother.forEach((item, index)=>{
+                        var invObject = item.otherInventory
+                        if(index == 0){
+                            this.purchaseOrder.items[0].type = item.type
+                            this.purchaseOrder.items[0].other = item.otherInventory.name
+                            this.purchaseOrder.items[0].quantity = item.qty
+                            this.purchaseOrder.items[0].remaining = item.otherInventory.qty
+                        } else {
+                            this.purchaseOrder.items.push({
+                                type: item.type,
+                                other: item.otherInventory.name,
+                                quantity: item.qty,
+                                remaining: item.otherInventory.qty
                             })
                         }
                     })

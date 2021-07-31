@@ -77,14 +77,14 @@ class SavePurchaseRequest(APIView):
                 pritemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
                 pritemsmerch.remaining = item['remaining']
                 pritemsmerch.qty = item['qty']
-
             
                 pritemsmerch.save()
                 request.user.branch.pritemsMerch.add(pritemsmerch)
 
-            elif item['type'] == "Others":
+            else:
                 pritemsother = PRItemsOther()
                 pritemsother.purchaseRequest = pr
+                pritemsother.type = item['type']
                 try: 
                     pritemsother.otherInventory = OtherInventory.objects.get(name=item['other'])
                 except:
@@ -92,6 +92,7 @@ class SavePurchaseRequest(APIView):
                     otherInv.name = item['other']
                     otherInv.qty = 0
                     otherInv.purchasingPrice = Decimal(0.0)
+                    otherInv.accountChild = AccountChild.objects.get(name=item['type'])
                     otherInv.save()
                     request.user.branch.otherInventory.add(otherInv)
 

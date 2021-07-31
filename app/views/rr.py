@@ -70,17 +70,12 @@ class SaveReceivingReport(APIView):
         rr.party = Party.objects.get(pk=receivingReport['vendor'])
 
         atc = RRatc()
-
         
-        
-        rr.amountPaid = Decimal(receivingReport['amountPaid'])
         rr.amountDue = Decimal(receivingReport['amountDue'])
         rr.amountTotal = Decimal(receivingReport['amountTotal'])
         rr.taxType = receivingReport['taxType']
         rr.taxRate = Decimal(receivingReport['taxRate'])
         rr.taxPeso = Decimal(receivingReport['taxPeso'])
-        rr.paymentMethod = receivingReport['paymentMethod']
-        rr.paymentPeriod = receivingReport['paymentPeriod']
         rr.chequeNo = receivingReport['chequeNo']
         rr.dueDate = receivingReport['dueDate']
         rr.bank = receivingReport['bank']
@@ -104,16 +99,43 @@ class SaveReceivingReport(APIView):
             request.user.branch.rratc.add(atc)
 
         for item in receivingReport['items']:
-            rritemsmerch = RRItemsMerch()
-            rritemsmerch.receivingReport = rr
-            rritemsmerch.poitemsmerch = POItemsMerch.objects.get(pk=item['poID'])
-            rritemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
-            rritemsmerch.remaining = item['remaining']
-            rritemsmerch.qty = item['quantity']
-            rritemsmerch.purchasingPrice = Decimal(item['vatable'])
-            rritemsmerch.totalPrice = Decimal(item['totalCost'])
-            
-            rritemsmerch.save()
-            request.user.branch.rritemsMerch.add(rritemsmerch)
+            if item['type'] == 'Merchandise':
+                rritemsmerch = RRItemsMerch()
+                rritemsmerch.receivingReport = rr
+                rritemsmerch.poitemsmerch = POItemsMerch.objects.get(pk=item['poID'])
+                rritemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
+                rritemsmerch.remaining = item['remaining']
+                rritemsmerch.qty = item['quantity']
+                rritemsmerch.purchasingPrice = Decimal(item['vatable'])
+                rritemsmerch.totalPrice = Decimal(item['totalCost'])
+
+                rritemsmerch.save()
+                request.user.branch.rritemsMerch.add(rritemsmerch)
+
+            else: 
+                rritemsother = RRItemsOther()
+                rritemsother.receivingReport = rr
+                rritemsother.type = item['type']
+                rritemsother.poitemsother = POItemsOther.objects.get(pk=item['poID'])
+                try:
+                    rritemsother.otherInventory = OtherInventory.objects.get(name=item['other'])
+                except:
+                    otherInv = OtherInventory()
+                    otherInv.name = item['other']
+                    otherInv.qty = 0
+                    otherInv.purchasingPrice = Decimal(0.0)
+                    otherInv.accountChild = AccountChild.objects.get(name=item['type'])
+                    otherInv.save()
+                    request.user.branch.otherInventory.add(otherInv)
+                    rritemsother.otherInventory = otherInv
+
+                rritemsother.remaining = item['remaining']
+                rritemsother.qty = item['quantity']
+                rritemsother.purchasingPrice = Decimal(item['vatable'])
+                rritemsother.totalPrice = Decimal(item['totalCost'])
+
+                rritemsother.save()
+                request.user.branch.rrItemsOther.add(rritemsother)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
