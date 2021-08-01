@@ -35,6 +35,7 @@
                 <tbody>
                     {% for subgroup in group.accountsubgroup.all %}
                     {% for child in subgroup.accountchild.all %}
+                    {% if not child.me %}
                     <tr>
                         <td @click="viewChildmodal({{child.pk}})" class="link" data-toggle="modal" data-target="#viewChildModal">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</td>
                         <td>{{child.name}}</td>
@@ -46,6 +47,7 @@
                         <td>{{child.accountSubGroup.name}}</td>
                         <td>₱[[formatPrice('{{child.amount}}')]]</td>
                     </tr>
+                    {% endif %}
                     {% endfor %}
                     {% endfor %}
                 </tbody>

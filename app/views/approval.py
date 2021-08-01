@@ -94,12 +94,35 @@ class POApprovalAPI(APIView):
 
         purchase = PurchaseOrder.objects.get(pk=pk)
 
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
         purchase.datetimeApproved = datetime.now()
         purchase.approved = True
         purchase.approvedBy = request.user
-        
 
         purchase.save()
+        
+        # if purchase.poitemsother.all():
+
+        #     j = Journal()
+
+        #     j.code = purchase.code
+        #     j.datetimeCreated = purchase.datetimeApproved
+        #     j.createdBy = purchase.createdBy
+        #     j.journalDate = datetime.now()
+        #     j.save()
+        #     request.user.branch.journal.add(j)
+
+        #     jeAPI(request, j, 'Credit', purchase.party.accountChild.get(name__regex=r"[Pp]ayable"), purchase.runningBalance)
+            
+        #     for element in purchase.poitemsother.all():
+                
+
+        #         if purchase.taxPeso != 0:
+        #             jeAPI(request, j, "Debit", dChildAccount.inputVat, purchase.taxPeso)
+        #         jeAPI
+
+
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -150,6 +173,7 @@ class RRApprovalAPI(APIView):
         receive.approvedBy = request.user
         
         fullyReceived = []
+        merchAmountDue = Decimal(0)
         for element in receive.rritemsmerch.all():
             element.poitemsmerch.qtyReceived += element.qty
             if element.poitemsmerch.qtyReceived >= element.poitemsmerch.qty:
@@ -166,9 +190,35 @@ class RRApprovalAPI(APIView):
             wi.addQty(element.qty)
             element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
             # print(element.merchInventory.qtyT, element.merchInventory.qtyA, element.merchInventory.pk)
+            merchAmountDue += Decimal(element.totalPrice)
             element.merchInventory.totalCost += element.totalPrice                
             element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
             element.merchInventory.save()
+
+        fullyReceived2 = []
+        expenseAmountDue = {}
+        for element in receive.rritemsother.all():
+            element.poitemsother.qtyReceived += element.qty
+            if element.poitemsother.qtyReceived >= element.poitemsother.qty:
+                fullyReceived2.append(1)
+
+            else:
+                fullyReceived2.append(0)
+
+            if 0 not in fullyReceived2:
+                element.poitemsother.purchaseOrder.fullyReceived = True
+                element.poitemsother.purchaseOrder.save()
+
+            if expenseAmountDue.get(element.poitemsother.type):
+                expenseAmountDue[element.poitemsother.type] += element.poitemsother.totalPrice
+            else:
+                expenseAmountDue[element.poitemsother.type] = element.poitemsother.totalPrice
+
+            element.poitemsother.save()
+
+            element.otherInventory.purchasingPrice = element.purchasingPrice
+            element.otherInventory.qty += element.qty
+            element.otherInventory.save()
 
         receive.save()
 
@@ -186,7 +236,12 @@ class RRApprovalAPI(APIView):
         if receive.purchaseOrder.runningBalance == receive.purchaseOrder.amountTotal:
             receive.first = True
             receive.save()
-            jeAPI(request, j, 'Debit', dChildAccount.merchInventory, (receive.amountDue - receive.taxPeso))
+            if merchAmountDue:
+                jeAPI(request, j, 'Debit', dChildAccount.merchInventory, (merchAmountDue/(1+(receive.taxRate/100))))
+
+            for key, val in expenseAmountDue.items():
+                if val:
+                    jeAPI(request, j, 'Debit', AccountChild.objects.get(name=key), (val/(1+(receive.taxRate/100))))
         
             jeAPI(request, j, 'Debit', dChildAccount.inputVat, (receive.taxPeso))
  

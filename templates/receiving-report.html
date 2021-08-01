@@ -643,7 +643,7 @@
 						totalCost: null
 					}]
 					po.poitemsmerch.forEach((item, index)=>{
-						if(index==0){
+						if(index==0 && this.purchaseOrder.items[0].poID == null){
 							this.purchaseOrder.items[0].poID = item.id
 							this.purchaseOrder.items[0].type = 'Merchandise'
 							this.purchaseOrder.items[0].code = item.merchInventory.id
@@ -665,7 +665,7 @@
 					})
 
 					po.poitemsother.forEach((item, index)=>{
-						if(index==0){
+						if(index==0 && this.purchaseOrder.items[0].poID == null){
 							this.purchaseOrder.items[0].poID = item.id
 							this.purchaseOrder.items[0].type = item.type
 							this.purchaseOrder.items[0].other = item.otherInventory.name
@@ -677,7 +677,7 @@
 							this.purchaseOrder.items.push({
 								poID: item.id,
 								type: item.type,
-                    			code: item.otherInventory.id,
+                    			other: item.otherInventory.name,
                     			remaining: item.remaining,
                     			quantity: item.qty - item.qtyReceived,
                     			vatable: item.purchasingPrice,
