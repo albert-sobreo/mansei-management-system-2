@@ -171,7 +171,6 @@
                                     <th><span class="font-bold gray">Item Code - Item Classifcation</span></th>
                                     <th><span class="font-bold gray">Qty</span></th>
                                     <th><span class="font-bold gray">Amount</span></th>
-                                    <th><span class="font-bold gray">Input VAT</span></th>
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
@@ -180,7 +179,13 @@
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.qty]]</td>
                                         <td>₱[[formatPrice(item.purchasingPrice)]]</td>
-                                        <td>[[formatPrice(item.inputVat)]]%</td>
+                                        <td>₱[[formatPrice(item.totalPrice)]]</td>
+                                    </tr>
+                                    <tr v-for="item in poModal.poitemsother">
+                                        <td>[[item.type]]</td>
+                                        <td>[[item.otherInventory.name]]</td>
+                                        <td>[[item.qty]]</td>
+                                        <td>₱[[formatPrice(item.purchasingPrice)]]</td>
                                         <td>₱[[formatPrice(item.totalPrice)]]</td>
                                     </tr>
                                 </tbody>
@@ -302,7 +307,10 @@
             viewPO(code){
                 console.log(code)
                 axios.get(`/api/purchase-order/${code}/`)
-                .then(res=>this.poModal=res.data)
+                .then(res=>{
+                    this.poModal=res.data
+                    console.log(this.poModal)
+                })
             },
             roundNumber2(value) {
                 if (this.roundToggle){

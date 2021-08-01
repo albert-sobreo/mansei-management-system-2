@@ -107,15 +107,41 @@ class SavePurchaseOrder(APIView):
             request.user.branch.poatc.add(atc)
 
         for item in purchaseOrder['items']:
-            poitemsmerch = POItemsMerch()
-            poitemsmerch.purchaseOrder = po
-            poitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
-            poitemsmerch.remaining = item['remaining']
-            poitemsmerch.qty = item['quantity']
-            poitemsmerch.purchasingPrice = Decimal(item['vatable'])
-            poitemsmerch.totalPrice = Decimal(item['totalCost'])
-            
-            poitemsmerch.save()
-            request.user.branch.poitemsMerch.add(poitemsmerch)
+            if item['type'] == 'Merchandise':
+                poitemsmerch = POItemsMerch()
+                poitemsmerch.purchaseOrder = po
+                poitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
+                poitemsmerch.remaining = item['remaining']
+                poitemsmerch.qty = item['quantity']
+                poitemsmerch.purchasingPrice = Decimal(item['vatable'])
+                poitemsmerch.totalPrice = Decimal(item['totalCost'])
+
+                poitemsmerch.save()
+                request.user.branch.poitemsMerch.add(poitemsmerch)
+            else:
+                poitemsother = POItemsOther()
+                poitemsother.purchaseOrder = po
+                poitemsother.type = item['type']
+
+                try: 
+                    poitemsother.otherInventory = OtherInventory.objects.get(name=item['other'])
+                except:
+                    otherInv = OtherInventory()
+                    otherInv.name = item['other']
+                    otherInv.qty = 0
+                    otherInv.purchasingPrice = Decimal(0.0)
+                    otherInv.accountChild = AccountChild.objects.get(name=item['type'])
+                    otherInv.save()
+                    request.user.branch.otherInventory.add(otherInv)
+                    poitemsother.otherInventory = otherInv
+                
+                poitemsother.remaining = item['remaining']
+                poitemsother.qty = item['quantity']
+                poitemsother.purchasingPrice = Decimal(item['vatable'])
+                poitemsother.totalPrice = Decimal(item['totalCost'])
+
+                poitemsother.save()
+                request.user.branch.poItemsOther.add(poitemsother)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

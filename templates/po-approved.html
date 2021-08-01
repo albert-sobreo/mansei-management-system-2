@@ -179,6 +179,13 @@
                                         <td>₱[[formatPrice(item.purchasingPrice)]]</td>
                                         <td>₱[[formatPrice(item.totalPrice)]]</td>
                                     </tr>
+                                    <tr v-for="item in poModal.poitemsother">
+                                        <td>[[item.type]]</td>
+                                        <td>[[item.otherInventory.name]]</td>
+                                        <td>[[item.qty]]</td>
+                                        <td>₱[[formatPrice(item.purchasingPrice)]]</td>
+                                        <td>₱[[formatPrice(item.totalPrice)]]</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -281,10 +288,9 @@
                 party: null,
                 approvedBy: null,
                 datetimeApproved: null,
-                runningBalance: null,
 
                 amountDue: null,
-                amountPaid: null,
+                runningBalance: null,
                 amountTotal: null,
                 paymentMethod: null,
                 paymentPeriod: null,
@@ -294,6 +300,15 @@
 
                 atcCode: null,
                 amountWithheld: null,
+
+                poatc: [{
+                    amountWithheld: null,
+                    code: {
+                        code: null,
+                        rate: null
+                    }
+
+                }]
             },
             updatePO:{},
             roundToggle: false,
@@ -315,7 +330,7 @@
             },
             viewPO(code){
                 console.log(code)
-                axios.get(`/api/purchase-order-approved/${code}/`)
+                axios.get(`/api/purchase-order/${code}/`)
                 .then(res=>this.poModal=res.data)
             },
             voidPO(id){

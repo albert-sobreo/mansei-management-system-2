@@ -157,7 +157,13 @@ class POItemsMerchNestedSZ(serializers.ModelSerializer):
     merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
     class Meta:
         model = POItemsMerch
-        fields = '__all__'  
+        fields = '__all__'
+
+class POItemsOtherNestedSZ(serializers.ModelSerializer):
+    otherInventory = OtherInventorySZ(read_only=True)
+    class Meta:
+        model = POItemsOther
+        fields = '__all__'
         
 class PurchaseOrderNestedSZ(serializers.ModelSerializer):
     party = PartySZ(read_only=True)
@@ -165,6 +171,7 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
     approvedBy = UserSZ(read_only=True)
     journal = JournalSZ(read_only=True)
     poitemsmerch = POItemsMerchNestedSZ(read_only=True, many=True)
+    poitemsother = POItemsOtherNestedSZ(read_only=True, many=True)
     poatc = POatcSZ(read_only=True, many=True)
 
     class Meta:
@@ -531,7 +538,13 @@ class RRItemsMerchNestedSZ(serializers.ModelSerializer):
     merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
     class Meta:
         model = RRItemsMerch
-        fields = '__all__'  
+        fields = '__all__'
+
+class RRItemsOtherNestedSZ(serializers.ModelSerializer):
+    otherInventory = OtherInventorySZ(read_only=True)
+    class Meta:
+        model = RRItemsOther
+        fields = '__all__'
 
 class ReceivingReportNestedSZ(serializers.ModelSerializer):
     party = PartySZ(read_only=True)
@@ -539,6 +552,7 @@ class ReceivingReportNestedSZ(serializers.ModelSerializer):
     approvedBy = UserSZ(read_only=True)
     journal = JournalSZ(read_only=True)
     rritemsmerch = RRItemsMerchNestedSZ(read_only=True, many=True)
+    rritemsother = RRItemsOtherNestedSZ(read_only=True, many=True)
     rratc = RRatcSZ(read_only=True, many=True)
 
     class Meta:

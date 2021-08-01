@@ -1,5 +1,5 @@
 {% extends "base-template.html" %}
-{% block title %}Purhcase Request{% endblock %}
+{% block title %}Purchase Request{% endblock %}
 
 
 {% block body %}
@@ -78,7 +78,12 @@
 					<div class="col-2 px-1">
 						<select v-model="item.type" class="form-control">
 							<option value="" selected disabled>Choose Type</option>
-                            <option v-for="type in inventoryTypes" :value="type">[[type]]</option>
+                            <optgroup label="Inventory">
+								<option v-for="type in inventoryTypes" :value="type">[[type]]</option>
+							</optgroup>
+							<optgroup label="Expenses">
+								<option v-for="expense in expenseTypes" :value="expense">[[expense]]</option>
+							</optgroup>
 						</select>
 					</div>
 					<div class="col px-1">
@@ -86,7 +91,7 @@
 							<option value="" selected disabled>Choose Merchandise Inventory</option>
 							<option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]]</option>
 						</select>
-						<input @blur="testData2(item.other, index)" placeholder="Type or select the item from the datalist" list="others" v-model="item.other" class="form-control" v-else-if="item.type=='Others'">
+						<input @blur="testData2(item.other, index)" placeholder="Type or select the item from the datalist" list="others" v-model="item.other" class="form-control" v-else-if="item.type!='Merchandise' && item.type!='Manufacturing' && item.type!=''">
 						<select class="form-control" v-else>
 							<option value="" selected disabled>Choose Inventory Type First</option>
 						</select>
@@ -178,8 +183,8 @@
 			inventoryTypes: [
         	    'Merchandise',
         	    'Manufacturing',
-				'Others'
         	],
+			expenseTypes: [],
 			purchaseRequest:{
 				code: '{{new_code}}',
                 date: new Date().toISOString().split('T')[0],
@@ -222,6 +227,12 @@
 						html: 'inventory failed to fetch',
 						icon: 'error'
 					})
+				})
+
+				axios.get('/getaccountexpenses/')
+				.then(res=>{
+					y = res.data.map(x=>x.name)
+					this.expenseTypes = y
 				})
 			},
 			testData(pk, index, itemType){

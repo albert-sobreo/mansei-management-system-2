@@ -1,5 +1,7 @@
 from decimal import Decimal
+from typing import List
 from django import views
+from django.contrib.auth.decorators import permission_required
 from django.db.models import query
 from django.http.response import Http404, JsonResponse
 from rest_framework import viewsets
@@ -41,6 +43,15 @@ class AccountSubGroupAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SubGroupSZ
     queryset = AccountSubGroup.objects.all().order_by('code')
+
+
+
+
+
+
+class GetAccountExpensesAPI(APIView):
+    def get(self, request, format=None):
+        return JsonResponse(list(AccountChild.objects.filter(name__regex=r'[Ee]xpense').values('name')), safe=False)
 
 
 
@@ -106,6 +117,11 @@ class MerchandiseInventoryNestedAPI(viewsets.ModelViewSet):
 
 
 ########## OTHER INVENTORY ##########
+class OtherInventoryAPI2(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OtherInventorySZ
+    queryset = OtherInventory.objects.all()
+
 class OtherInventoryAPI(APIView):
     def post(self, request, format=None):
         try:
