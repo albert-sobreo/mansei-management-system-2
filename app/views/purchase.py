@@ -84,6 +84,9 @@ class SavePurchaseOrder(APIView):
         po.bank = purchaseOrder['bank']
         po.remarks = purchaseOrder['remarks']
         po.wep = Decimal(purchaseOrder['withholdingTax'])
+
+        po.needsRR = not purchaseOrder['notNeedRR']
+
         try:
             po.purchaseRequest = PurchaseRequest.objects.get(pk=purchaseOrder['pr'])
             po.purchaseRequest.poed = True

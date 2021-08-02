@@ -368,6 +368,7 @@ class PurchaseOrder(models.Model):
     voided = models.BooleanField(null = True, default= False)
     voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "poVoidedBy")
     datetimeVoided = models.DateTimeField(null=True, blank=True)
+    needsRR = models.BooleanField(default = True)
 
     class Meta:
         verbose_name = "Purchase Order"
