@@ -1212,7 +1212,7 @@ class DeliveriesApprovalAPI(APIView):
                     if sc.salesOrder:
                         wi.salesWSO(element.qty)
                     else:
-                        wi.addQty(-element.qty)
+                        wi.salesWOSO(element.qty)
                     element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
                     element.merchInventory.totalCost -= element.totalCost                
                     # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))

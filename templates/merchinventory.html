@@ -35,9 +35,10 @@
                 <th>Thickness</th>
                 <th>Selling Price</th>
                 <th>Qty. (T)</th>
+                <th>Qty. (S)</th>
                 <th>Qty. (R)</th>
                 <th>Qty. (A)</th>
-                <th>U/M</th>
+                <!-- <th>U/M</th> -->
             </thead>
             <tbody>
                 {% for item in request.user.branch.merchInventory.all %}
@@ -59,9 +60,10 @@
                     </td>
                     <td class="align-middle">P[[roundNumber2({{item.sellingPrice}})]]</td>
                     <td class="align-middle">{{item.qtyT}}</td>
+                    <td class="align-middle">{{item.qtyS}}</td>
                     <td class="align-middle">{{item.qtyR}}</td>
                     <td class="align-middle">{{item.qtyA}}</td>
-                    <td class="align-middle">{{item.um}}</td>
+                    <!-- <td class="align-middle">{{item.um}}</td> -->
                 </tr>
                 {% endfor %}
             </tbody>
@@ -121,14 +123,19 @@
                                 <span class="font-size-14 font-bold">[[modal.qtyR]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label for="" class="gray">Total</label>
+                                <label for="" class="gray">Available</label>
                                 <br>
                                 <span class="font-size-14 font-bold">[[modal.qtyA]]</span>
                             </div>
-                            <div class="col-3 mt-3">
+                            <!-- <div class="col-3 mt-3">
                                 <label for="" class="gray">U/M</label>
                                 <br>
                                 <span class="font-size-14 font-bold">[[modal.um]]</span>
+                            </div> -->
+                            <div class="col-3 mt-3">
+                                <label for="" class="gray">Sold</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.qtyS]]</span>
                             </div>
                             <!-- LVL 2 -->
                             <div class="col-3 my-3">
@@ -390,6 +397,7 @@
                 qtyT: 0,
                 qtyR: 0,
                 qtyA: 0,
+                qtyS: 0,
                 um: 'Per Piece',
                 warehouse: [],
                 totalCost: 0
@@ -409,6 +417,7 @@
                 qtyT: 0,
                 qtyR: 0,
                 qtyA: 0,
+                qtyS: 0,
                 um: 'Per Piece',
                 warehouseitems: [],
                 totalCost: 0

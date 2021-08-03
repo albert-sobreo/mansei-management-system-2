@@ -25,7 +25,7 @@ class User(AbstractUser):
     image = models.ImageField(default='profile-pictures/person.png', upload_to='profile-pictures/', null = True, blank = True)
     idUser = models.CharField(max_length=50, null = True, blank = True)
     status = models.CharField(max_length=50, null = True, blank = True)
-    rate = models.DecimalField(max_digits=6, decimal_places=2, null = True, blank = True,  default= 0.0)
+    rate = models.DecimalField(max_digits=10, decimal_places=2, null = True, blank = True,  default= 0.0)
     dob = models.DateField(null = True, blank = True)
     sss = models.CharField(max_length=50, null = True, blank = True)
     phic = models.CharField(max_length=50, null = True, blank = True)
@@ -57,7 +57,7 @@ class Register(models.Model):
     image = models.ImageField(default='default.jpg', upload_to='profile_pics', null = True, blank = True)
     idUser = models.CharField(max_length=50, null = True, blank = True)
     status = models.CharField(max_length=50, null = True, blank = True)
-    rate = models.DecimalField(max_digits=6, decimal_places=2, null = True, blank = True,  default= 0.0)
+    rate = models.DecimalField(max_digits=10, decimal_places=2, null = True, blank = True,  default= 0.0)
     dob = models.DateField(null = True, blank = True)
     sss = models.CharField(max_length=50, null = True, blank = True)
     phic = models.CharField(max_length=50, null = True, blank = True)
@@ -84,7 +84,7 @@ class Register(models.Model):
 
 class ATC(models.Model):
     code = models.CharField(max_length=10)
-    rate = models.DecimalField(max_digits=10, decimal_places=5)
+    rate = models.DecimalField(max_digits=20, decimal_places=5)
     description = models.TextField()
 
     def __str__(self):
@@ -95,7 +95,7 @@ class AccountGroup(models.Model):
     name = models.CharField(max_length=256)
     normally = models.CharField(max_length=50, choices=normally)
     permanence = models.CharField(max_length=50)
-    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,  default= 0.0)
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,  default= 0.0)
 
     class Meta:
         verbose_name = "Account Group"
@@ -109,7 +109,7 @@ class AccountSubGroup(models.Model):
     name = models.CharField(max_length=256)
     accountGroup = models.ForeignKey(AccountGroup, related_name="accountsubgroup", on_delete=models.PROTECT, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,  default= 0.0)
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,  default= 0.0)
 
     class Meta:
         verbose_name = "Account Sub-Group"
@@ -124,7 +124,7 @@ class AccountChild(models.Model):
     accountSubGroup = models.ForeignKey(AccountSubGroup,related_name="accountchild", on_delete=models.PROTECT, null=True, blank=True)
     me = models.ForeignKey('self', related_name="accountchild", null=True,blank=True, on_delete=models.PROTECT)
     contra = models.BooleanField(null = True, blank=True, default=False)
-    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,default= 0.0)
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,default= 0.0)
     description = models.TextField(null=True, blank=True)
 
     class Meta:
@@ -180,8 +180,8 @@ class JournalEntries(models.Model):
     journal = models.ForeignKey(Journal, related_name="journalentries", on_delete=models.PROTECT, null=True, blank=True)
     normally = models.CharField(max_length=50, choices=normally)
     accountChild = models.ForeignKey(AccountChild, related_name="journalentries", on_delete=models.PROTECT, null=True, blank=True)
-    amount = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,default= 0)
-    balance = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True,default= 0)
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,default= 0)
+    balance = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,default= 0)
 
     class Meta:
         verbose_name = "Journal Entry"
@@ -209,16 +209,17 @@ class MerchandiseInventory(models.Model):
     length =  models.DecimalField(max_digits=20, decimal_places=5)
     width =  models.DecimalField(max_digits=20, decimal_places=5)
     thickness =  models.DecimalField(max_digits=20, decimal_places=5)
-    purchasingPrice =  models.DecimalField(max_digits=18, decimal_places=5)
-    sellingPrice =  models.DecimalField(max_digits=18, decimal_places=5)
-    vol = models.DecimalField(max_digits=10, decimal_places=5, null=True, blank=True)
-    pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null=True, blank=True)
+    purchasingPrice =  models.DecimalField(max_digits=20, decimal_places=5)
+    sellingPrice =  models.DecimalField(max_digits=20, decimal_places=5)
+    vol = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     qtyT = models.IntegerField()
     qtyR = models.IntegerField()
     qtyA = models.IntegerField()
+    qtyS = models.IntegerField(default = 0)
     um = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
-    turnover = models.DecimalField(max_digits=10, decimal_places=5, null = True, blank=True)
+    turnover = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, default=0.00,)
     inventoryDate = models.DateField(null=True, blank=True)
 
@@ -249,6 +250,7 @@ class WarehouseItems(models.Model):
     qtyT = models.IntegerField()
     qtyR = models.IntegerField()
     qtyA = models.IntegerField()
+    qtyS = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.merchInventory.code
@@ -257,6 +259,7 @@ class WarehouseItems(models.Model):
         self.qtyT = qtyT
         self.qtyR = qtyR
         self.qtyA = qtyA
+        self.qtyS = 0
     
     def addQty(self, qty):
         self.qtyA += qty
@@ -277,10 +280,20 @@ class WarehouseItems(models.Model):
 
     def salesWSO(self, qty):
         self.qtyR -= qty
-        self.qtyT -= qty
+        self.qtyS += qty
 
         self.merchInventory.qtyR -= qty
-        self.merchInventory.qtyT -= qty
+        self.merchInventory.qtyS += qty
+
+        self.merchInventory.save()
+        self.save()
+
+    def salesWOSO(self, qty):
+        self.qtyA -= qty
+        self.qtyS += qty
+
+        self.merchInventory.qtyA -= qty
+        self.merchInventory.qtyS += qty
 
         self.merchInventory.save()
         self.save()
@@ -344,9 +357,9 @@ class PurchaseOrder(models.Model):
     datePurchased = models.DateField()
     party = models.ForeignKey(Party, related_name="purchaseorder", on_delete=models.PROTECT)
     purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="purchaseorder",on_delete=models.PROTECT, null=True, blank=True)
-    amountPaid = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True)
-    amountDue = models.DecimalField(max_digits=18, decimal_places=5)
-    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    amountDue = models.DecimalField(max_digits=20, decimal_places=5)
+    amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True)
@@ -408,7 +421,7 @@ class POItemsOther(models.Model):
 class POatc(models.Model):
     purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poatc",on_delete=models.PROTECT, null=True, blank=True)
     code = models.ForeignKey(ATC, related_name="poatc",on_delete=models.PROTECT, null=True, blank=True)
-    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+    amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
     
 class ReceivingReport(models.Model):
     code = models.CharField(max_length=50)
@@ -416,8 +429,8 @@ class ReceivingReport(models.Model):
     dateReceived = models.DateField()
     party = models.ForeignKey(Party, related_name="receivingreport", on_delete=models.PROTECT)
     purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="receivingreport",on_delete=models.PROTECT, null=True, blank=True)
-    amountDue = models.DecimalField(max_digits=18, decimal_places=5)
-    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    amountDue = models.DecimalField(max_digits=20, decimal_places=5)
+    amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True)
@@ -478,14 +491,14 @@ class RRItemsOther(models.Model):
 class RRatc(models.Model):
     receivingReport = models.ForeignKey(ReceivingReport, related_name="rratc",on_delete=models.PROTECT, null=True, blank=True)
     code = models.ForeignKey(ATC, related_name="rratc",on_delete=models.PROTECT, null=True, blank=True)
-    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+    amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
 
 class InwardInventory(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     dateInward = models.DateField()
     party = models.ForeignKey(Party, related_name="inwardinventory", on_delete=models.PROTECT, null=True, blank=True)
-    amountTotal = models.DecimalField(max_digits=18, decimal_places=5, null=True, blank=True)
+    amountTotal = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "iiCreatedBy")
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "iiApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
@@ -505,31 +518,31 @@ class IIItemsMerch(models.Model):
     inwardInventory = models.ForeignKey(InwardInventory, related_name="iiitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="iiitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     qty = models.IntegerField()
-    amount = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     code = models.CharField(max_length=50)
     productMark = models.CharField(max_length=50)
-    length = models.DecimalField(max_digits=10, decimal_places=2, null = True)
-    width = models.DecimalField(max_digits=10, decimal_places=2, null = True)
-    thicc = models.DecimalField(max_digits=10, decimal_places=2, null = True)
-    vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    length = models.DecimalField(max_digits=20, decimal_places=2, null = True)
+    width = models.DecimalField(max_digits=20, decimal_places=2, null = True)
+    thicc = models.DecimalField(max_digits=20, decimal_places=2, null = True)
+    vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
 
 class IIAdjustedItems(models.Model):
     inwardInventory = models.ForeignKey(InwardInventory, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
     iiItemsMerch = models.ForeignKey(IIItemsMerch, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
     qty = models.IntegerField()
-    amount = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     code = models.CharField(max_length=50)
     name = models.CharField(max_length=50, null = True, blank = True)
     classfication = models.CharField(max_length=50)
     type = models.CharField(max_length=50)
-    length = models.DecimalField(max_digits=10, decimal_places=2, null = True)
-    width = models.DecimalField(max_digits=10, decimal_places=2, null = True)
-    thicc = models.DecimalField(max_digits=10, decimal_places=2, null = True)
-    vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    length = models.DecimalField(max_digits=20, decimal_places=2, null = True)
+    width = models.DecimalField(max_digits=20, decimal_places=2, null = True)
+    thicc = models.DecimalField(max_digits=20, decimal_places=2, null = True)
+    vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True)
 
 class PaymentVoucher(models.Model):
     code = models.CharField(max_length = 50, null = True)
@@ -558,9 +571,9 @@ class Quotations(models.Model):
     datetimeCreated = models.DateTimeField()
     dateQuoted = models.DateField()
     party = models.ForeignKey(Party, related_name="quotations", on_delete=models.PROTECT, null=True, blank=True)
-    amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)
-    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
-    discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    amountDue = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
+    discountPercent = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
@@ -586,9 +599,9 @@ class QQItemsMerch(models.Model):
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
     cbm = models.CharField(max_length=10, null = True)
-    vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    totalCost = models.DecimalField(max_digits=18, decimal_places=5)
+    vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5)
 
     class Meta:
         verbose_name = 'QQ Items Merch'
@@ -605,7 +618,7 @@ class QQCOtherFees(models.Model):
 class QQatc(models.Model):
     quotations = models.ForeignKey(Quotations, related_name="qqatc",on_delete=models.PROTECT, null=True, blank=True)
     code = models.ForeignKey(ATC, related_name="qqatc",on_delete=models.PROTECT, null=True, blank=True)
-    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+    amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
 
 class SalesOrder(models.Model):
     code = models.CharField(max_length=50)
@@ -613,8 +626,8 @@ class SalesOrder(models.Model):
     dateSold = models.DateField()
     party = models.ForeignKey(Party, related_name="salesorder", on_delete=models.PROTECT, null=True, blank=True)
     quotations = models.ForeignKey(Quotations, related_name = "salesorder", on_delete = models.PROTECT, null = True, blank = True)
-    amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)
-    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
+    amountDue = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
     discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     taxType = models.CharField(max_length=20, null = True, blank = True)
@@ -647,9 +660,9 @@ class SOItemsMerch(models.Model):
     remaining = models.IntegerField()
     qty = models.IntegerField()
     cbm = models.CharField(max_length=10, null = True)
-    vol = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    pricePerCubic = models.DecimalField(max_digits=10, decimal_places=5, null = True)
-    totalCost = models.DecimalField(max_digits=10, decimal_places=5, null = True)
+    vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     delivered = models.BooleanField(null = True, default = False)
 
     class Meta:
@@ -667,7 +680,7 @@ class SOOtherFees(models.Model):
 class SOatc(models.Model):
     salesOrder = models.ForeignKey(SalesOrder, related_name="soatc", on_delete=models.PROTECT, null=True, blank=True)
     code = models.ForeignKey(ATC, related_name="soatc",on_delete=models.PROTECT, null=True, blank=True)
-    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+    amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
 
 
 class SalesContract(models.Model):
@@ -676,10 +689,10 @@ class SalesContract(models.Model):
     dateSold = models.DateField()
     party = models.ForeignKey(Party, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
     salesOrder = models.ForeignKey(SalesOrder, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
-    amountPaid = models.DecimalField(max_digits=18, decimal_places=5, null = True)
-    amountDue = models.DecimalField(max_digits=18, decimal_places=5, null = True)
-    amountTotal = models.DecimalField(max_digits=18, decimal_places=5)
-    discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    amountDue = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
+    discountPercent = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
@@ -715,7 +728,7 @@ class TempSalesContract(models.Model):
     datetimeCreated = models.DateTimeField()
     dateSold = models.DateField()
     party = models.ForeignKey(Party, related_name="tempsalescontract", on_delete=models.PROTECT, null=True, blank=True)
-    subTotal = models.DecimalField(max_digits=15, decimal_places=5, validators=[MinValueValidator(0)])
+    subTotal = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
     discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
@@ -761,7 +774,7 @@ class SCItemsMerch(models.Model):
 class SCatc(models.Model):
     salesContract = models.ForeignKey(SalesContract, related_name="scatc",on_delete=models.PROTECT, null=True, blank=True)
     code = models.ForeignKey(ATC, related_name="scatc",on_delete=models.PROTECT, null=True, blank=True)
-    amountWithheld = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+    amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
 
 
 class SalesInvoice(models.Model):
@@ -785,7 +798,7 @@ class VendorQuotesMerch(models.Model):
 
 class VendorQuotesItemsMerch(models.Model):
     vendorquotesmerch = models.ForeignKey(VendorQuotesMerch, related_name="vendorquotesitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
-    price = models.DecimalField(max_digits=18, decimal_places=5)
+    price = models.DecimalField(max_digits=20, decimal_places=5)
     party = models.ForeignKey(Party, related_name="vendorquotesitemsmerch", on_delete=models.PROTECT)
 
 class ReceivePayment(models.Model):
@@ -909,7 +922,7 @@ class Transfer(models.Model):
     approved = models.BooleanField(null = True, default=False)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     newWarehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, null = True, blank = True, related_name= "transfer")
-    totalCost = models.DecimalField(max_digits=18, decimal_places=5, null = True, blank = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class TransferItems(models.Model):
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="tritems", on_delete=models.PROTECT, null=True, blank=True)
@@ -926,7 +939,7 @@ class Adjustments(models.Model):
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "adApprovedBy")
     approved = models.BooleanField(null = True, default=False)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
-    totalLost = models.DecimalField(max_digits=18, decimal_places=5, null = True, blank = True)
+    totalLost = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     type = models.CharField(max_length=50)
 
 class AdjustmentsItems(models.Model):
