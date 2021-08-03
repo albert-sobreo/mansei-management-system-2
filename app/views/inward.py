@@ -60,7 +60,7 @@ class ImportInwardInventory(View):
 
         ii.code = new_code
         ii.datetimeCreated = datetime.now()
-        ii.dateInward = datetime.now()
+        ii.dateInward = request.POST['dateInward']
         ii.party = Party.objects.get(name='Juken Sangyo')
         
         total = 0
