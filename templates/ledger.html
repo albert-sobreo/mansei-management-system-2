@@ -49,6 +49,26 @@
                         <td>₱[[formatPrice('{{je.balance}}')]]</td>
                     </tr>
                     {% endfor %}
+
+                    {% if child.accountchild.all %}
+                    {% for x in child.accountchild.all %}
+                    {% for je in x.journalentries.all %}
+                    <tr>
+                        <td>{{je.journal.journalDate}}</td>
+                        <td>{{je.journal.code}}</td>
+                        <td>{{je.journal.remarks}}</td>
+                        {% if je.normally == 'Debit' %}
+                        <td>₱[[formatPrice('{{je.amount}}')]]</td>
+                        <td></td>
+                        {% else %}
+                        <td></td>
+                        <td>₱[[formatPrice('{{je.amount}}')]]</td>
+                        {% endif %}
+                        <td>₱[[formatPrice('{{je.balance}}')]]</td>
+                    </tr>
+                    {% endfor %}
+                    {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
         </div>

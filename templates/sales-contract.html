@@ -776,6 +776,17 @@
                     this.order.customer = item.party.id
                     this.order.taxType = item.taxType
                     this.order.taxRate = Number(item.taxRate).toFixed(0)
+                    if (item.discountPercent){
+                        this.order.totalDiscount = item.discountPercent
+                        this.order.discountType = 'percent'
+                    } else {
+                        this.order.discount = item.discountPeso
+                        this.order.totalDiscount = item.discountPeso
+                        this.order.discountType = 'peso'
+                    }
+
+                    this.order.otherFees = item.sootherfees
+
                     this.order.items = [{
                         type: '',
                         code: '',

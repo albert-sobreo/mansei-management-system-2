@@ -175,7 +175,7 @@ class SaveQuotations(APIView):
         qq = Quotations()
 
         qq.code = quotes['code']
-        qq.datetimeCreated = datetime.now
+        qq.datetimeCreated = datetime.now()
         qq.dateQuoted = quotes['date']
         qq.party = Party.objects.get(pk=quotes['customer'])
         qq.amountDue = Decimal(quotes['amountDue'])
