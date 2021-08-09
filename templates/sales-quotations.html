@@ -586,7 +586,6 @@
 
             checkForm(e){
                 var success1 = false
-                var success2 = false
                 if (
                     this.order.code &&
                     this.order.date &&
@@ -609,21 +608,7 @@
                             break
                         }
                     }
-                    for(var item of this.order.atc){
-                        if(
-                            item.code &&
-                            item.amount &&
-                            item.taxRate &&
-                            item.amountWithheld
-                        )
-                        {
-                            success2=true
-                        } else {
-                            success2=false
-                            break
-                        }
-                    }
-                    if(success1 && success2){
+                    if(success1){
                         this.submit()
                         return
                     }
@@ -658,21 +643,6 @@
                     }
                     if(!item.totalCost){
                         this.errors.push('Total Cost Required at index: ' + String(index+1))
-                    }
-                })
-
-                this.order.atc.forEach((item, index)=>{
-                    if(!item.code){
-                        this.errors.push('ATC Code Required at index: ' + String(index+1))
-                    }
-                    if(!item.amount){
-                        this.errors.push('ATC Amount Required at index: ' + String(index+1))
-                    }
-                    if(!item.taxRate){
-                        this.errors.push('ATC Tax Rate Required at index: ' + String(index+1))
-                    }
-                    if(!item.amountWithheld){
-                        this.errors.push('ATC Amount Withheld Required at index: ' + String(index+1))
                     }
                 })
 
