@@ -105,10 +105,10 @@
 					<select v-model="item.type" class="form-control">
 						<option value="" selected disabled>Choose Type</option>
 						<optgroup label="Inventory">
-							<option v-for="type in inventoryTypes" :value="type">[[type]]</option>
+							<option disabled v-for="type in inventoryTypes" :value="type">[[type]]</option>
 						</optgroup>
 						<optgroup label="Expenses">
-							<option v-for="expense in expenseTypes" :value="expense">[[expense]]</option>
+							<option disabled v-for="expense in expenseTypes" :value="expense">[[expense]]</option>
 						</optgroup>
 					</select>
 				</div>

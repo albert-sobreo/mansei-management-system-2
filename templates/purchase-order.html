@@ -22,6 +22,142 @@
         <div class="d-flex align-items-center mb-3">
             <span class="font-size-18 font-bold mr-1">Purchase Order</span>
         </div>
+
+
+        <!-- ADD VENDOR MODAL -->
+        <div class="modal fade" id="addVendorModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add Vendor</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" v-model="addVendorModal.name" class="form-control" placeholder="Enter Vendor Name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Shipping Address</label>
+                                    <input type="text" v-model="addVendorModal.shippingAddress" class="form-control" placeholder="Enter Shipping Address">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Office Address</label>
+                                    <input type="text" v-model="addVendorModal.officeAddress" class="form-control" placeholder="Enter Office Address">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 pr-2">
+                                <div class="form-group">
+                                    <label>Landline</label>
+                                    <input type="tel" v-model="addVendorModal.landline" class="form-control" placeholder="Enter Landline">
+                                </div>
+                            </div>
+                            <div class="col-6 pl-2">
+                                <div class="form-group">
+                                    <label>Mobile No.</label>
+                                    <input type="tel" v-model="addVendorModal.mobile" class="form-control" placeholder="Enter Mobile No.">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" v-model="addVendorModal.email" class="form-control" placeholder="Enter Email">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Contact Person</label>
+                                    <input type="text" v-model="addVendorModal.contactPerson" class="form-control" placeholder="Enter Contact Person">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Bank</label>
+                                    <input type="text" v-model="addVendorModal.bank" class="form-control" placeholder="Enter Bank">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Bank No. / Vendor Account No.</label>
+                                    <input type="text" v-model="addVendorModal.bankNo" class="form-control" placeholder="Enter Bank No.">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>TIN</label>
+                                    <input type="text" v-model="addVendorModal.tin" class="form-control" placeholder="Enter TIN">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" v-model="addVendorModal.crte" class="form-check-input">
+                                    <label class="form-check-label font-semibold">With CRTE</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Preferred Payment Method</label>
+                                    <select v-model="addVendorModal.prefferedPayment" class="form-control py-0">
+                                        <option value="" selected disabled class="gray">Choose Preferred Payment Method</option>
+                                        <option value="Cash">Cash</option>
+                                        <option value="On Account">Account</option>
+                                        <option value="Cheque">Cheque</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-primary mt-2 col" @click="submitAddVendor()">Add Vendor</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         <!-- PURCHASE -->
         <div>
             <!-- REFERENCE NO AND DATES -->
@@ -50,8 +186,8 @@
             </div>
             <!-- VENDOR -->
             <div class="row mt-2 mb-4">
-                <div class="col col-5 pr-2">
-                    <label>Vendor</label>
+                <div class="col col-4 pr-2">
+                    <label>Vendor</label><button data-toggle="modal" data-target="#addVendorModal" title="Add Vendor" class="btn btn-warning btn-sm b-radius-5 ml-1 p-0 font-size-14" style="height: 18px; width: 18px">+</button>
                     <select v-model="purchaseOrder.vendor" name="vendor" class="form-control">
                         <option value="" selected disabled>Choose Vendor</option>
                         <option v-for="v in vendor" :value="v.id">[[v.name]]</option>
@@ -371,6 +507,23 @@
                 'Merchandise',
                 'Manufacturing',
             ],
+
+            addVendorModal:{
+                name: null,
+                type: 'Vendor',
+                shippingAddress: null,
+                officeAddress: null,
+                landline: null,
+                mobile: null,
+                email: null,
+                contactPerson: null,
+                bank: null,
+                bankNo: null,
+                tin: null,
+                crte: false,
+                prefferedPayment: ''
+            },
+
 			expenseTypes: [],
             purchaseOrder:{
                 code: '{{new_code}}',
@@ -495,6 +648,10 @@
         },
 
         methods:{
+            submitAddVendor(){
+                axios.post('/save-party/', this.addVendorModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
             watchers(){
                 //this.purchaseOrder.withholdingTax = this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)
                 var amountDue = this.purchaseOrder.amountDue

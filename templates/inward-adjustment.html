@@ -77,9 +77,6 @@
                 <label for="" class="m-0">Price per m³</label>
             </div>
             <div class="col px-1 gray">
-                <label for="" class="m-0">Amount</label>
-            </div>
-            <div class="col px-1 gray">
                 <label for="" class="m-0">Total Amount</label>
             </div>
             <i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
@@ -109,16 +106,13 @@
                         <span>[[formatPrice(item.thickness)]]mm</span>
                     </div>
                     <div class="col-1 px-1">
-                        <span>[[item.vol]]m³</span>
+                        <span>[[roundto5(item.vol)]]m³</span>
                     </div>
                     <div class="col-1 px-1 ">
                         <span>[[item.qty]]</span>
                     </div>
                     <div class="col-1 px-1 ">
-                        <span>[[item.pricePerCubic]]</span>
-                    </div>
-                    <div class="col px-1 ">
-                        <span>₱[[formatPrice(item.amount)]]</span>
+                        <span>[[roundto2(item.pricePerCubic)]]</span>
                     </div>
                     <div class="col px-1 ">
                         <span>₱[[formatPrice(item.amountTotal)]]</span>
@@ -150,16 +144,13 @@
                         <input @change="solveVol(index, index1)" v-model="item1.thickness" type="text" class="form-control" placeholder="Thickness" onkeypress="validate()">
                     </div>
                     <div class="col-1 px-1">
-                        <input v-model="item1.vol" type="text" class="form-control" placeholder="Vol" onkeypress="validate()">
+                        <input @change="solveAmountTotal(index, index1)" v-model="item1.vol" type="text" class="form-control" placeholder="Vol" onkeypress="validate()">
                     </div>
                     <div class="col-1 px-1">
                         <input @change="solveAmountTotal(index, index1)" v-model="item1.qty" type="text" class="form-control" placeholder="Qty" onkeypress="validate()">
                     </div>
                     <div class="col px-1">
-                        <input v-model="item1.pricePerCubic" type="text" class="form-control" placeholder="Price per m³" onkeypress="validate()">
-                    </div>
-                    <div class="col px-1">
-                        <input @change="solveAmountTotal(index, index1)" v-model="item1.amount" type="text" class="form-control" placeholder="Amount" onkeypress="validate()">
+                        <input @change="solveAmountTotal(index, index1)" v-model="item1.pricePerCubic" type="text" class="form-control" placeholder="Price per m³" onkeypress="validate()">
                     </div>
                     <div class="col px-1">
                         <input :value="formatPrice(item1.amountTotal)" type="text" class="form-control" placeholder="Total Amount" onkeypress="validate()" readonly>
@@ -219,7 +210,6 @@
                     thickness: null,
                     vol: null,
                     qty: null,
-                    amount: null,
                     amountTotal: null,
                     adjusted: [{
                         code: null,
@@ -264,9 +254,16 @@
 
             solveAmountTotal(index, index1){
                 var qty = this.order.items[index].adjusted[index1].qty
-                var amount = this.order.items[index].adjusted[index1].amount
+                var pricePerCubic= this.order.items[index].adjusted[index1].pricePerCubic
+                var vol = this.order.items[index].adjusted[index1].vol
 
-                this.order.items[index].adjusted[index1].amountTotal = qty*amount
+                this.order.items[index].adjusted[index1].amountTotal = (qty*vol).toFixed(4)*pricePerCubic
+            },
+            roundto5(number){
+                return Number(number).toFixed(5)
+            },
+            roundto2(number){
+                return Number(number).toFixed(2)
             },
             addAdjustments(index){
                 this.order.items[index].adjusted.push({
@@ -279,7 +276,7 @@
                     thickness: this.order.items[index].thickness,
                     vol: this.order.items[index].vol,
                     qty: null,
-                    pricePerCubic: null,
+                    pricePerCubic: this.order.items[index].pricePerCubic,
                     amount: this.order.items[index].amount,
                     amountTotal: this.order.items[index].amountTotal,
                 })
@@ -295,86 +292,89 @@
             },
 
             checkForm(id){
-                success = []
-                loop = 0
-                for(var item of this.order.items){
-                    for(var item1 of item.adjusted){
-                        if(
-                            item1.code &&
-                            item1.name &&
-                            item1.classification &&
-                            item1.type &&
-                            item1.length &&
-                            item1.width &&
-                            item1.thickness &&
-                            item1.vol &&
-                            item1.qty &&
-                            item1.amount &&
-                            item1.amountTotal
-                        ){
-                            success.push(1)
-                        } else {
-                            success.push(0)
-                            break
-                        }
-                    }
-
-                    if(success.includes(0)){
-                        break  
-                    }
-                    loop++
-                }
-
-                if(!success.includes(0)){
-                    this.submit(id)
-                    return
-                }
-
-                this.errors = []
-                this.order.items.forEach((item,index)=>{
-                    item.adjusted.forEach((item1,index1)=>{
-                        if(!item1.code){
-                            this.errors.push('Barcode Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                        if(!item1.name){
-                            this.errors.push('Name Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                        if(!item1.classification){
-                            this.errors.push('Classification Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                        if(!item1.type){
-                            this.errors.push('Type Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                        if(!item1.length){
-                            this.errors.push('Length Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                        if(!item1.width){
-                            this.errors.push('Width Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                        if(!item1.thickness){
-                            this.errors.push('Thickness Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                        if(!item1.vol){
-                            this.errors.push('Vol Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                        if(!item1.qty){
-                            this.errors.push('Qty Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                        if(!item1.amount){
-                            this.errors.push('Amount Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                        if(!item1.amountTotal){
-                            this.errors.push('Amount Total Required at index: ' + String(index+1) + "-" + String(index1+1))
-                        }
-                    })
-                })
-
-                Swal.fire({
-                    title: "Unfilled Inputs",
-                    html: this.errors.join('<br>'),
-                    icon: 'warning'
-                })
+                this.submit(id)
             },
+            //checkForm2(id){
+            //    success = []
+            //    loop = 0
+            //    for(var item of this.order.items){
+            //        for(var item1 of item.adjusted){
+            //            if(
+            //                item1.code &&
+            //                item1.name &&
+            //                item1.classification &&
+            //                item1.type &&
+            //                item1.length &&
+            //                item1.width &&
+            //                item1.thickness &&
+            //                item1.vol &&
+            //                item1.qty &&
+            //                item1.amount &&
+            //                item1.amountTotal
+            //            ){
+            //                success.push(1)
+            //            } else {
+            //                success.push(0)
+            //                break
+            //            }
+            //        }
+//
+            //        if(success.includes(0)){
+            //            break  
+            //        }
+            //        loop++
+            //    }
+//
+            //    if(!success.includes(0)){
+            //        this.submit(id)
+            //        return
+            //    }
+//
+            //    this.errors = []
+            //    this.order.items.forEach((item,index)=>{
+            //        item.adjusted.forEach((item1,index1)=>{
+            //            if(!item1.code){
+            //                this.errors.push('Barcode Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //            if(!item1.name){
+            //                this.errors.push('Name Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //            if(!item1.classification){
+            //                this.errors.push('Classification Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //            if(!item1.type){
+            //                this.errors.push('Type Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //            if(!item1.length){
+            //                this.errors.push('Length Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //            if(!item1.width){
+            //                this.errors.push('Width Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //            if(!item1.thickness){
+            //                this.errors.push('Thickness Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //            if(!item1.vol){
+            //                this.errors.push('Vol Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //            if(!item1.qty){
+            //                this.errors.push('Qty Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //            if(!item1.amount){
+            //                this.errors.push('Amount Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //            if(!item1.amountTotal){
+            //                this.errors.push('Amount Total Required at index: ' + String(index+1) + "-" + String(index1+1))
+            //            }
+            //        })
+            //    })
+//
+            //    Swal.fire({
+            //        title: "Unfilled Inputs",
+            //        html: this.errors.join('<br>'),
+            //        icon: 'warning'
+            //    })
+            //},
             
             formatPrice(val){
                 val = Number(val).toFixed(2)
@@ -396,9 +396,9 @@
                             this.order.items[index].length = item.length
                             this.order.items[index].width = item.width
                             this.order.items[index].thickness = item.thicc
-                            this.order.items[index].vol = item.vol
+                            this.order.items[index].vol = (Number(item.length/1000) * Number(item.width/1000) * Number(item.thicc/1000))
                             this.order.items[index].qty = item.qty
-                            this.order.items[index].amount = item.amount
+                            this.order.items[index].pricePerCubic = item.pricePerCubic
                             this.order.items[index].amountTotal = item.totalCost
                             this.order.items[index].adjusted = [{
                                 code: item.code,
@@ -408,10 +408,9 @@
                                 length: item.length,
                                 width: item.width,
                                 thickness: item.thicc,
-                                vol: item.vol,
-                                qty: null,
-                                pricePerCubic: null,
-                                amount: item.amount,
+                                vol: Number(item.length/1000) * Number(item.width/1000) * Number(item.thicc/1000),
+                                qty: item.qty,
+                                pricePerCubic: item.pricePerCubic,
                                 amountTotal: item.totalCost,
                             }]
                         } else {
@@ -421,9 +420,9 @@
                                 length: item.length,
                                 width: item.width,
                                 thickness: item.thicc,
-                                vol: item.vol,
+                                vol: Number(item.length/1000) * Number(item.width/1000) * Number(item.thicc/1000),
                                 qty: item.qty,
-                                amount: item.amount,
+                                pricePerCubic: item.pricePerCubic,
                                 amountTotal: item.totalCost,
                                 adjusted: [{
                                     code: item.code,
@@ -433,10 +432,9 @@
                                     length: item.length,
                                     width: item.width,
                                     thickness: item.thicc,
-                                    vol: item.vol,
-                                    qty: null,
-                                    pricePerCubic: null,
-                                    amount: item.amount,
+                                    vol: Number(item.length/1000) * Number(item.width/1000) * Number(item.thicc/1000),
+                                    qty: item.qty,
+                                    pricePerCubic: item.pricePerCubic,
                                     amountTotal: item.totalCost,
                                 }]
                             })

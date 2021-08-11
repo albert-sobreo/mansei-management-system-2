@@ -28,6 +28,7 @@ class AddMerchInventoryAPI(APIView):
         a = MerchandiseInventory()
 
         a.code = request.data['code']
+        a.name = request.data['name']
         a.classification = request.data['classification']
         a.type = request.data['type']
         a.length = Decimal(request.data['length'])

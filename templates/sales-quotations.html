@@ -24,6 +24,142 @@
             <span class="font-size-18 font-bold mr-1">Quotations</span>
         </div>
 
+
+
+        <!-- ADD CUSTOMER MODAL -->
+        <div class="modal fade" id="addCustomerModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add Customer</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" v-model="addCustomerModal.name" class="form-control" placeholder="Enter Customer Name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Shipping Address</label>
+                                    <input type="text" v-model="addCustomerModal.shippingAddress" class="form-control" placeholder="Enter Shipping Address">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Office Address</label>
+                                    <input type="text" v-model="addCustomerModal.officeAddress" class="form-control" placeholder="Enter Office Address">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 pr-2">
+                                <div class="form-group">
+                                    <label>Landline</label>
+                                    <input type="tel" v-model="addCustomerModal.landline" class="form-control" placeholder="Enter Landline">
+                                </div>
+                            </div>
+                            <div class="col-6 pl-2">
+                                <div class="form-group">
+                                    <label>Mobile No.</label>
+                                    <input type="tel" v-model="addCustomerModal.mobile" class="form-control" placeholder="Enter Mobile No.">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" v-model="addCustomerModal.email" class="form-control" placeholder="Enter Email">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Contact Person</label>
+                                    <input type="text" v-model="addCustomerModal.contactPerson" class="form-control" placeholder="Enter Contact Person">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Bank</label>
+                                    <input type="text" v-model="addCustomerModal.bank" class="form-control" placeholder="Enter Bank">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Bank No. / Customer Account No.</label>
+                                    <input type="text" v-model="addCustomerModal.bankNo" class="form-control" placeholder="Enter Bank No.">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>TIN</label>
+                                    <input type="text" v-model="addCustomerModal.tin" class="form-control" placeholder="Enter TIN">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" v-model="addCustomerModal.crte" class="form-check-input">
+                                    <label class="form-check-label font-semibold">With CRTE</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Preferred Payment Method</label>
+                                    <select v-model="addCustomerModal.prefferedPayment" class="form-control py-0">
+                                        <option value="" selected disabled class="gray">Choose Preferred Payment Method</option>
+                                        <option value="Cash on Hand">Cash on Hand</option>
+                                        <option value="Cash in Bank">Cash in Bank</option>
+                                        <option value="Cheque">Cheque</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-primary mt-2 col" @click="submitAddCustomer()">Add Customer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         <!-- SALES -->
         <div>
             <!-- REFERENCE NO AND DATES -->
@@ -44,7 +180,7 @@
             <!-- VENDOR -->
             <div class="row mt-2 mb-4">
                 <div class="col col-3 pr-2">
-                    <label>Customer</label>
+                    <label>Customer</label><button data-toggle="modal" data-target="#addCustomerModal" title="Add Customer" class="btn btn-warning btn-sm b-radius-5 ml-1 p-0 font-size-14" style="height: 18px; width: 18px">+</button>
                     <select v-model="order.customer" class="form-control">
                         <option value="" selected disabled>Choose Customer</option>
                         <option v-for="customer in customers" :value="customer.id">[[customer.name]]</option>
@@ -326,6 +462,21 @@
                     "X-CSRFToken": getCookie('csrftoken')
                 }
             },
+            addCustomerModal:{
+                name: null,
+                type: 'Customer',
+                shippingAddress: null,
+                officeAddress: null,
+                landline: null,
+                mobile: null,
+                email: null,
+                contactPerson: null,
+                bank: null,
+                bankNo: null,
+                tin: null,
+                crte: false,
+                prefferedPayment: ''
+            },
             order:{
                 code: '{{new_code}}',
                 date: new Date().toISOString().split('T')[0],
@@ -507,6 +658,10 @@
         },
 
         methods:{
+            submitAddCustomer(){
+                axios.post('/save-party/', this.addCustomerModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
             watchers(){
                 this.order.otherFeesTotal = this.otherFeesTotal.reduce((a,b)=>Number(a)+Number(b), 0)
                 this.order.amountDue = this.amountDue.reduce((a,b)=>Number(a)+Number(b),0)

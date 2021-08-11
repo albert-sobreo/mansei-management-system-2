@@ -1,3 +1,4 @@
+from os import error
 from django import views
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import query
@@ -61,7 +62,7 @@ class ImportInwardInventory(View):
         ii.code = new_code
         ii.datetimeCreated = datetime.now()
         ii.dateInward = request.POST['dateInward']
-        ii.party = Party.objects.get(name='Juken Sangyo')
+        ii.party = Party.objects.get(name='Juken Sangyo (Philippines) Corp.')
         
         total = 0
         if request.user.is_authenticated:
@@ -69,27 +70,35 @@ class ImportInwardInventory(View):
         
         ii.save()
 
+        for keys in jsonDF:
+            print(keys, end=' ')
+
         for item in jsonDF:
             iiitemsMerch = IIItemsMerch()
 
             iiitemsMerch.inwardInventory = ii
 
-            iiitemsMerch.code = item['barcode']
-            iiitemsMerch.productMark = item['productMark']
-            iiitemsMerch.length = item['length']
-            iiitemsMerch.width = item['width']
-            iiitemsMerch.thicc = item['thickness']
-            iiitemsMerch.vol = item['vol']
-            iiitemsMerch.qty = item['qty']
+            iiitemsMerch.code = item.get('barcode')
+            iiitemsMerch.length = item.get('length')
+            iiitemsMerch.width = item.get('width')
+            iiitemsMerch.thicc = item.get('thickness')
+            iiitemsMerch.name = item.get('name')
+            iiitemsMerch.classfication = item.get('classification')
+            iiitemsMerch.type = item.get('type')
+            iiitemsMerch.vol = Decimal(iiitemsMerch.length/1000)*Decimal(iiitemsMerch.width/1000)*Decimal(iiitemsMerch.thicc/1000)
+            iiitemsMerch.qty = item.get('qty')
 
-            item['amount'] = str(item['amount']).replace('₱', '')
-            item['amount'] = item['amount'].replace(',', '')
-            iiitemsMerch.amount = item['amount']
+            print(item['pricePerCubic'])
+            item['pricePerCubic'] = str(item.get('pricePerCubic')).replace('₱', '')
+            item['pricePerCubic'] = item['pricePerCubic'].replace(',', '')
+            iiitemsMerch.pricePerCubic = item['pricePerCubic']
 
-            item['totalCost'] = str(item['totalCost']).replace('₱', '')
+            item['totalCost'] = str(item.get('totalCost')).replace('₱', '')
             item['totalCost'] = item['totalCost'].replace(',', '')
             iiitemsMerch.totalCost = item['totalCost']
             total += Decimal(iiitemsMerch.totalCost)
+
+            print(iiitemsMerch.length, iiitemsMerch.width, iiitemsMerch.thicc, iiitemsMerch.vol, iiitemsMerch.pricePerCubic, iiitemsMerch.totalCost)
 
             iiitemsMerch.save()
             request.user.branch.iiItemsMerch.add(iiitemsMerch)
@@ -120,7 +129,6 @@ class InwardAdjustmentSave(APIView):
                 adjusted.thicc = item1['thickness']
                 adjusted.vol = item1['vol']
                 adjusted.qty = item1['qty']
-                adjusted.amount = item1['amount']
                 adjusted.totalCost = item1['amountTotal']
                 adjusted.pricePerCubic = item1['pricePerCubic']
                 adjusted.save()

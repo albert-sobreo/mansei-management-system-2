@@ -2,6 +2,9 @@
 from ..models import *
 
 def jeAPI(request, journal, normally, accountChild, amount):
+    if not amount:
+        return
+        
     je = JournalEntries()
 
     je.journal = journal

@@ -301,6 +301,14 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col px-1">
+                                <div class="form-group">
+                                    <label>Item Name</label>
+                                    <input v-model="invModal.name" type="text" class="form-control" placeholder="Enter Name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-6 px-1">
                                 <div class="form-group">
                                     <label>Item Classification</label>
@@ -318,19 +326,19 @@
                             <div class="col-4 px-1">
                                 <div class="form-group">
                                     <label>Length</label>
-                                    <input v-model="invModal.length" type="number" class="form-control" placeholder="Enter Length">
+                                    <input v-model="invModal.length" type="text" onkeypress="validate()" class="form-control" placeholder="Enter Length">
                                 </div>
                             </div>
                             <div class="col-4 px-1">
                                 <div class="form-group">
                                     <label>Width</label>
-                                    <input v-model="invModal.width" type="number" class="form-control" placeholder="Enter Width">
+                                    <input v-model="invModal.width" type="text" onkeypress="validate()" class="form-control" placeholder="Enter Width">
                                 </div>
                             </div>
                             <div class="col-4 px-1">
                                 <div class="form-group">
                                     <label>Thickness</label>
-                                    <input v-model="invModal.thickness" type="number" class="form-control" placeholder="Enter Thickness">
+                                    <input v-model="invModal.thickness" type="text" onkeypress="validate()" class="form-control" placeholder="Enter Thickness">
                                 </div>
                             </div>
                         </div>
