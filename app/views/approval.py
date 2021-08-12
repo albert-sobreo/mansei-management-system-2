@@ -1312,7 +1312,7 @@ class TransferApproval(APIView):
         tr.approved = True
 
         for element in tr.tritems.all():
-            ow = WarehouseItems.objects.get(merchInventory=element.merchInventory, warehouse=element.warehouse)
+            ow = WarehouseItems.objects.get(merchInventory=element.merchInventory, warehouse=element.oldWarehouse)
             ow.addQty(-element.qtyTransfered)
             try:
                 nw = WarehouseItems.objects.get(merchInventory=element.merchInventory, warehouse=tr.newWarehouse)
@@ -1357,7 +1357,7 @@ class AdjustmentApproval(APIView):
         for element in ad.aditems.all():
             # element.merchInventory.qtyA -= element.qtyAdjusted
             # element.merchInventory.qtyT -= element.qtyAdjusted
-            wi = WarehouseItems.objects.get(merchInventory = element.merchInventory)
+            wi = WarehouseItems.objects.get(merchInventory = element.merchInventory, warehouse=element.oldWarehouse)
             wi.addQty(-element.qtyAdjusted)
             element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
             element.merchInventory.totalCost -= element.totalCost

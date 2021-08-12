@@ -950,6 +950,7 @@ class AdjustmentsItems(models.Model):
     remaining = models.IntegerField(null = True, blank = True)
     unitCost = models.DecimalField(max_digits = 20, decimal_places=5, null = True, blank = True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    oldWarehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, null = True, blank = True, related_name= "aditems")
 
 class AdjustmentsPhotos(models.Model):
     adjustments = models.ForeignKey(Deliveries, related_name="adjustmentsphotos", on_delete=models.PROTECT, null=True, blank=True)

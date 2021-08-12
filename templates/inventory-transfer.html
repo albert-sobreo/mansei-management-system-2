@@ -314,8 +314,8 @@
                 axios.get(`/api/nestedmerchinventory/${id}/`)
                 .then(res=>{
                     console.log(id2)
-                    console.log(res.data.warehouseitems.find(item=>item.warehouse.id=id2))
-                    warehouseitems = res.data.warehouseitems.find(item=>item.warehouse.id=id2)
+                    console.log(res.data.warehouseitems.find(item=>item.warehouse.id==id2))
+                    warehouseitems = res.data.warehouseitems.find(item=>item.warehouse.id==id2)
                     this.order.items[index].remaining = warehouseitems.qtyA
                 })
             },

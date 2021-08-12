@@ -26,6 +26,20 @@
         </div>
         <!-- END TITLE AND BUTTONS -->
 
+        <div class="modal fade" id="trModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <button class="col btn btn-primary" @click="approveTR(modal.id)">Approve</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
             <thead class="thead-dark">
                 <th>Transfer Code</th>
@@ -36,7 +50,7 @@
             <tbody>
                 {% for transfer in transfers %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#">{{transfer.code}}</td>
+                    <td class="link" data-toggle="modal" data-target="#trModal" @click="viewTransfer({{transfer.pk}})">{{transfer.code}}</td>
                     <td>{{transfer.datetimeCreated}}</td>
                     <td>{{transfer.newWarehouse}}</td>
                     <td>₱[[formatPrice('{{transfer.totalCost}}')]]</td>
@@ -44,6 +58,7 @@
                 {% endfor %}
             </tbody>
         </table>
+        <pre>[[$data]]</pre>
     </div>
 </div>
 
@@ -117,6 +132,16 @@
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: '#app',
+        data:{
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            modal: {
+                id: null,
+            }
+        },
         methods: {
             formatPrice(val){
                 val = Number(val).toFixed(2)
@@ -126,6 +151,20 @@
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
             },
+
+            viewTransfer(id){
+                axios.get(`/api/transfer/${id}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    this.modal=res.data
+                })
+            },
+
+            approveTR(id){
+                $("#poModal").modal('hide')
+                axios.put(`/tr-approval/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+            }
         }
     })
 </script>

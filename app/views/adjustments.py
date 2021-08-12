@@ -76,6 +76,7 @@ class SaveAdjustments(APIView):
             aditem.remaining = item['remaining']
             aditem.unitCost = item['purchasingPrice']
             aditem.totalCost = item['totalLost']
+            aditem.oldWarehouse = Warehouse.objects.get(pk=item['oldWarehouse'])
             
             aditem.save()
             request.user.branch.adjustmentItems.add(aditem)

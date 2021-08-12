@@ -37,6 +37,7 @@ class AddMerchInventoryAPI(APIView):
         a.purchasingPrice = request.data['purchasingPrice']
         a.sellingPrice = request.data['sellingPrice']
         a.pricePerCubic = request.data['pricePerCubic']
+        a.inventoryDate = request.data['inventoryDate']
         a.qtyT = 0
         a.qtyR = 0
         a.qtyA = 0
@@ -137,6 +138,7 @@ class EditInventory(APIView):
         merch.type = edit['type']
         merch.pricePerCubic = edit['pricePerCubic']
         merch.um = edit['um']
+        merch.inventoryDate = edit['inventoryDate']
 
         merch.save()
 

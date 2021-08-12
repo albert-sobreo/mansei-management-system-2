@@ -43,9 +43,12 @@
         <!-- ITEMS AND DETAILS -->
          <div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
           <div class="row">
-              <div class="col-6 px-1">
+              <div class="col-3 px-1">
                   <label for="code" class="m-0">Item-Code - Item name</label>
               </div>
+              <div class="col-3 px-1">
+                <label for="warehouse" class="m-0">Warehouse</label>
+            </div>
               <div class="col-1 px-1">
                   <label for="remaining" class="m-0">Remaining</label>
               </div>
@@ -62,7 +65,7 @@
           </div>
           <!-- V-FOR ITEMS -->
           <div class="row" v-for="(item, index) in order.items">
-              <div class="col-6 px-1">
+              <div class="col-3 px-1">
                   <select @change="getRemaining(item.code, index)" v-model="item.code" class="form-control">
                       <option value="" selected disabled>Choose Item</option>
                       {% for item in request.user.branch.merchInventory.all %}
@@ -70,6 +73,15 @@
                       {% endfor %}
                   </select>
               </div>
+
+              <div class="col-3 px-1">
+                <!-- V-IF ELSE FOR DIFFERENT INVENTORY LIST -->
+                <select v-model="item.oldWarehouse" @change="getRemaining2(item.code, item.oldWarehouse, index)" class="form-control">
+                    <option value="" selected disabled>Choose Old Warehouse</option>
+                    <option v-for="warehouse in item.warehouseList" :value="warehouse.id">[[warehouse.name]]</option>
+                </select>
+                <!-- END -->
+            </div>
 
               <div class="col-1 px-1">
                   <input v-model="item.remaining" type="number" class="form-control" readonly>
@@ -190,6 +202,7 @@
                     qty: null,
                     purchasingPrice: null,
                     totalLost: null,
+                    oldWarehouse: ''
                 }],
                 type: '',
                 totalLost: null,
@@ -207,6 +220,15 @@
             }
         },
         methods: {
+            getRemaining2(id, id2, index){
+                axios.get(`/api/nestedmerchinventory/${id}/`)
+                .then(res=>{
+                    console.log(id2)
+                    console.log(res.data.warehouseitems.find(item=>item.warehouse.id==id2))
+                    warehouseitems = res.data.warehouseitems.find(item=>item.warehouse.id==id2)
+                    this.order.items[index].remaining = warehouseitems.qtyA
+                })
+            },
             checkForm(){
                 var success1 = false
                 if(
@@ -274,11 +296,17 @@
                 return val
             },
             getRemaining(id, index){
-                axios.get(`/api/merchinventory/${id}/`)
+                axios.get(`/api/nestedmerchinventory/${id}/`)
                 .then(res=>{
                     console.log(res.data)
-                    this.order.items[index].remaining = res.data.qtyA
                     this.order.items[index].purchasingPrice = res.data.purchasingPrice
+                    this.order.items[index].warehouseList = []
+                    res.data.warehouseitems.forEach((item)=>{
+                        this.order.items[index].warehouseList.push({
+                            id: item.warehouse.id,
+                            name: item.warehouse.name
+                        })
+                    })
                 })
             },
             getLineCost(index){

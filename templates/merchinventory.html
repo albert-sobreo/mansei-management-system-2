@@ -154,6 +154,31 @@
                                 <span class="font-size-14 font-bold">₱[[formatPrice(modal.totalCost)]]</span>
                             </div>
                         </div>
+
+                        <!-- MIDDLE CARD 2 -->
+                        <div class="order-card row my-2">
+                            <div class="col-3 my-3">
+                                <label for="" class="gray">Total m³</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[roundto4(modal.qtyT * modal.vol)]] m³</span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label for="" class="gray">Reserved m³</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[roundto4(modal.qtyR * modal.vol)]] m³</span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label for="" class="gray">Available m³</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[roundto4(modal.qtyA * modal.vol)]] m³</span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label for="" class="gray">Sold m³</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[roundto4(modal.qtyS * modal.vol)]] m³</span>
+                            </div>
+                        </div>
+
                         <!-- BOTTOM CARD -->
                         <div class="order-card row my-2">
                             <!-- LVL 1 -->
@@ -242,6 +267,12 @@
                                     <label>Selling Price</label>
                                     <input v-model="editModal.sellingPrice" type="number" step="0.01" class="form-control" placeholder="Enter Selling Price">
                                 </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col px-1">
+                                <label for="">Date of Inventory</label>
+                                <input type="date" class="form-control" v-model="editModal.inventoryDate">
                             </div>
                         </div>
                         <div class="row">
@@ -362,6 +393,14 @@
                         </div>
                         <div class="row">
                             <div class="col px-1">
+                                <div class="form-group">
+                                    <label for="">Date of Inventory</label>
+                                    <input v-model="invModal.inventoryDate" type="date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col px-1">
                                 <button @click="submit()" class="btn btn-primary col">Save Item</button>
                             </div>
                         </div>
@@ -408,7 +447,8 @@
                 qtyS: 0,
                 um: 'Per Piece',
                 warehouse: [],
-                totalCost: 0
+                totalCost: 0,
+                inventoryDate: null,
             },
             modal: {
                 code: null,
@@ -428,9 +468,11 @@
                 qtyS: 0,
                 um: 'Per Piece',
                 warehouseitems: [],
-                totalCost: 0
+                totalCost: 0, 
+                inventoryDate: null,
             },
             editModal: {
+                inventoryDate: null,
                 id: null,
                 code: null,
                 name: null,
@@ -447,6 +489,9 @@
         },
 
         methods: {
+            roundto4(number){
+                return Number(number).toFixed(4)
+            },
             convertSize(value){
                 if (this.sizeUM){
                     return value*0.00328084
