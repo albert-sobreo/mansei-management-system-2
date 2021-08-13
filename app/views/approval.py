@@ -1355,7 +1355,7 @@ class AdjustmentApproval(APIView):
         ad.approved = True
 
         for element in ad.aditems.all():
-            # element.merchInventory.qtyA -= element.qtyAdjusted
+            # element.merchInventory.qtyA -= element.qtyAdjusted                                       
             # element.merchInventory.qtyT -= element.qtyAdjusted
             wi = WarehouseItems.objects.get(merchInventory = element.merchInventory, warehouse=element.oldWarehouse)
             wi.addQty(-element.qtyAdjusted)
