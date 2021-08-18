@@ -1,5 +1,6 @@
 {% extends "base-template.html" %}
 {% block title %}Ledger{% endblock %}
+{% load filter_child %}
 
 {% block body %}
 
@@ -17,8 +18,11 @@
             <span class="font-size-18 font-bold mr-1">Ledger</span>
         </div>
 
+        <input v-model="startDate" type="date" class="form-control mx-1 d-inline-block" style="width: 200px;">
+        <input @change="filterLedger()" v-model="endDate" type="date" class="form-control mx-1 d-inline-block" style="width: 200px;">
+
         <!-- TABLE -->
-        {% for child in request.user.branch.accountChild.all %}
+        {% for child in children %}
         {% if not child.me %}
         <div class="mb-5">
             <div class="font-size-18 font-bold">
@@ -34,7 +38,7 @@
                     <th>Balance</th>
                 </thead>
                 <tbody>
-                    {% for je in child.journalentries.all %}
+                    {% for je in child.journalentries.all|filter_child:date%}
                     <tr>
                         <td>{{je.journal.journalDate}}</td>
                         <td>{{je.journal.code}}</td>
@@ -52,7 +56,7 @@
 
                     {% if child.accountchild.all %}
                     {% for x in child.accountchild.all %}
-                    {% for je in x.journalentries.all %}
+                    {% for je in x.journalentries.all|filter_child:date %}
                     <tr>
                         <td>{{je.journal.journalDate}}</td>
                         <td>{{je.journal.code}}</td>
@@ -181,6 +185,8 @@
                     "X-CSRFToken": getCookie('csrftoken')
                 }
             },
+            startDate: null,
+            endDate: null,
             bal: 0.0,
             currentRoot: '',
             ledgers: [],
@@ -188,6 +194,9 @@
         },
 
         methods: {
+            filterLedger(){
+                location.href=`/ledger/?startDate=${this.startDate}&endDate=${this.endDate}`
+            },
             formatPrice(value) {
                 if (this.roundToggle){
                     return value

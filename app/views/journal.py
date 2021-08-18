@@ -29,7 +29,6 @@ class JournalView(View):
         try:
             startDate = request.GET['startDate']
             endDate = request.GET['endDate']
-            print(startDate, endDate)
         
         except:
             startDate = now.today().replace(day=1)
@@ -55,17 +54,12 @@ class JournalView(View):
             listed_date = str(now.today()).split('-')
             new_code = 'J-{}-{}-0001'.format(listed_date[0], listed_date[1])
 
-        try:
-            context = {
-                'new_code': new_code,
-                'journals': request.user.branch.journal.filter(journalDate__range=[startDate, endDate]).order_by('pk').reverse()
-            }
-        except Exception as e:
-            print(e)
-            context = {
-                'new_code': new_code,
-                'journals': request.user.branch.journal.filter(journalDate__range=[startDate, endDate]).order_by('pk').reverse()
-            }
+
+
+        context = {
+            'new_code': new_code,
+            'journals': request.user.branch.journal.filter(journalDate__range=[startDate, endDate]).order_by('pk').reverse()
+        }
 
 
         

@@ -11,7 +11,25 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from rest_framework import viewsets
 from ..models import *
+from datetime import date as now
+from datetime import datetime
+from datetime import timedelta
 
 class LedgerView(View):
     def get(self, request):
-        return render(request, 'ledger.html')
+        try:
+            startDate = request.GET['startDate']
+            endDate = request.GET['endDate']
+        
+        except:
+            startDate = now.today().replace(day=1)
+            nextMonth = now.today().replace(month=startDate.month+1, day=1)
+            endDate = nextMonth - timedelta(days=1)
+
+        context = {
+            'children': request.user.branch.accountChild.all(),
+            'startDate': startDate,
+            'endDate': endDate,
+            'date': str(startDate)+ ',' +str(endDate)
+        }
+        return render(request, 'ledger.html', context)
