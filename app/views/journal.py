@@ -18,12 +18,23 @@ from ..models import *
 import json
 from datetime import date as now
 from datetime import datetime
+from datetime import timedelta
 from .journalAPI import jeAPI
 
 class JournalView(View):
     def get(self, request):
 
         user = request.user
+
+        try:
+            startDate = request.GET['startDate']
+            endDate = request.GET['endDate']
+            print(startDate, endDate)
+        
+        except:
+            startDate = now.today().replace(day=1)
+            nextMonth = now.today().replace(month=startDate.month+1, day=1)
+            endDate = nextMonth - timedelta(days=1)
 
         try:
             j = user.branch.journal.filter(code__regex=r'J-')
@@ -44,10 +55,20 @@ class JournalView(View):
             listed_date = str(now.today()).split('-')
             new_code = 'J-{}-{}-0001'.format(listed_date[0], listed_date[1])
 
-        context = {
-            'new_code': new_code,
-            'journals': request.user.branch.journal.all().order_by('pk').reverse()
-        }
+        try:
+            context = {
+                'new_code': new_code,
+                'journals': request.user.branch.journal.filter(journalDate__range=[startDate, endDate]).order_by('pk').reverse()
+            }
+        except Exception as e:
+            print(e)
+            context = {
+                'new_code': new_code,
+                'journals': request.user.branch.journal.filter(journalDate__range=[startDate, endDate]).order_by('pk').reverse()
+            }
+
+
+        
         return render(request, 'journal.html', context)
 
 class SaveJournal(APIView):

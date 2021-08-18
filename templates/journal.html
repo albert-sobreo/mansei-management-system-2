@@ -16,6 +16,9 @@
             <span class="font-size-18 font-bold mr-1">Journal</span>
             <button type="button" class="btn btn-primary mx-1" data-toggle="modal" data-target="#addJournalEntry">Add Journal Entry</button>
             <button type="button" class="btn btn-secondary mx-1" @click="roundingToggler()">Round Numbers</button>
+            <input v-model="startDate" type="date" name="startDate" class="form-control mx-1" style="width:200px">
+            <input @change="filterJournal()" v-model="endDate" type="date" name="endDate" class="form-control mx-1" style="width:200px">
+            <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/journal/'">Reset Date</button>
         </div>
 
         <!-- TABLE -->
@@ -234,6 +237,9 @@
             },
             today: new Date().toISOString().split('T')[0],
 
+            startDate: null,
+            endDate: null,
+
             addJournalModal: {
                 date: new Date().toISOString().split('T')[0],
                 datetimeCreated: new Date().toISOString(),
@@ -297,6 +303,12 @@
             }
         },
         methods:{
+            filterJournal(){
+                var date = new Date();
+                var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+                var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+                location.href=`/journal/?startDate=${this.startDate}&endDate=${this.endDate}`
+            },
             addLineDebit(){
                 this.addJournalModal.debit.push({
                     accountChild: '',
@@ -397,6 +409,12 @@
                 this.toggle = !this.toggle
             }
         },
+        mounted(){
+            let params = new URLSearchParams(location.search);
+            
+            this.startDate = params.get('startDate')
+            this.endDate = params.get('endDate')
+        }
     })
 </script>
 
