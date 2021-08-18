@@ -2,8 +2,9 @@ from os import error
 from django import views
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import query
+from django.http import response, HttpResponse
 from django.http.response import JsonResponse
-from django.shortcuts import redirect, render, HttpResponse
+from django.shortcuts import redirect, render
 from django.views import View
 from ..forms import *
 from rest_framework.views import APIView

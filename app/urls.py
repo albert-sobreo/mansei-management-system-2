@@ -226,5 +226,5 @@ urlpatterns = [
     path('delivery-void/<int:pk>/', login_required(views.DeliveriesVoid.as_view())),
     path('otherinventory/', login_required(views.OtherInventoryAPI.as_view())),
     path('otherinventoryview/', login_required(views.OtherInventoryView.as_view())),
-    path('getaccountexpenses/', login_required(views.GetAccountExpensesAPI.as_view()))
+    path('getaccountexpenses/', login_required(views.GetAccountExpensesAPI.as_view())),
 ]

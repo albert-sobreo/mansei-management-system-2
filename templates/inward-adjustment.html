@@ -393,6 +393,9 @@
                         if(index==0){
                             this.order.items[index].id = item.id
                             this.order.items[index].code = item.code
+                            this.order.items[index].name = item.name
+                            this.order.items[index].classification = item.classification
+                            this.order.items[index].type = item.type
                             this.order.items[index].length = item.length
                             this.order.items[index].width = item.width
                             this.order.items[index].thickness = item.thicc
@@ -402,9 +405,9 @@
                             this.order.items[index].amountTotal = item.totalCost
                             this.order.items[index].adjusted = [{
                                 code: item.code,
-                                name: null,
-                                classification: null,
-                                type: null,
+                                name: item.name,
+                                classification: item.classification,
+                                type: item.type,
                                 length: item.length,
                                 width: item.width,
                                 thickness: item.thicc,
@@ -417,6 +420,9 @@
                             this.order.items.push({
                                 id: item.id,
                                 code: item.code,
+                                name: item.name,
+                                classification: item.classification,
+                                type: item.type,
                                 length: item.length,
                                 width: item.width,
                                 thickness: item.thicc,
@@ -426,9 +432,9 @@
                                 amountTotal: item.totalCost,
                                 adjusted: [{
                                     code: item.code,
-                                    name: null,
-                                    classification: null,
-                                    type: null,
+                                    name: item.name,
+                                    classification: item.classification,
+                                    type: item.type,
                                     length: item.length,
                                     width: item.width,
                                     thickness: item.thicc,

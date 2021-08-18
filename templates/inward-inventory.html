@@ -419,6 +419,14 @@
                     action: function(){
                         $("#import").modal('show')
                     }
+                },
+                {
+                    text: `<i class="fas fa-file-download"></i>`,
+                    className: 'btn btn-table text-success',
+                    titleAttr: 'Download Excel Template',
+                    action: function(){
+                        location.href="/static/files/inward-template.xlsx"
+                    }
                 }
                 ],
                 dom: {
