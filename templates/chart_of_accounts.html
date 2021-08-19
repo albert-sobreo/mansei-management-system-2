@@ -89,7 +89,7 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <a href="#">Edit Child Account</a>
+                            <a href="#" data-toggle="modal" data-target="#editAccountModal" @click="copyChildAccount(viewChildModal.id)">Edit Child Account</a>
                         </div>
                     </div>
                 </div>
@@ -189,6 +189,105 @@
                     <div class="row mt-4">
                         <div class="col">
                             <button class="btn btn-primary mt-2" @click="submitAccount()">Add Account</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT ACCOUNT MODAL -->
+    <div class="modal fade" id="editAccountModal">
+        <div class="modal-dialog">
+            <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <span class="modal-title">Edit Account</span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="sub-group">Choose Account Sub-group</label>
+                                <select v-model="editChild.accountSubGroup" name="sub-group" class="form-control py-0">
+                                    <option value="" selected disabled class="gray">Choose Account Sub-group</option>
+                                    {% for group in request.user.branch.accountGroup.all %}
+                                    <optgroup label="{{group.name}}">
+                                        {% for subgroup in group.accountsubgroup.all %}
+                                        <option value="{{subgroup.pk}}">{{subgroup.name}}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col col-5 pr-2 form-group">
+                            <label for="code">Code</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">[[editChild.groupCode]]</span>
+                                </div>
+                                <input v-model="editChild.code" type="text" class="form-control box-shadow-off" name="code" placeholder="Enter Code" style="margin-top: 0px;">
+                            </div>
+                        </div>
+                        <div class="col col-7 pl-2">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input v-model="editChild.name" type="text" class="form-control" name="name" placeholder="Enter Name">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col col-12">
+                            <div class="form-group">
+                                <label for="description">description</label>
+                                <input v-model="editChild.description" type="text" name="description" class="form-control" placeholder="Enter Description">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-check mb-2">
+                                <input v-model="editChild.contra" type="checkbox" class="form-check-input" name="contra">
+                                <label class="form-check-label font-semibold" for="contra">Contra Account</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row py-3 b-radius-10 order-card">
+                        <div class="col col-12">
+                            <div class="form-check">
+                                <input v-model="editChild.linkToAccount" type="checkbox" class="form-check-input" name="linkToAccount">
+                                <label for="linkToAccount" class="form-check-label font-semibold">Link to an Account</label>
+                            </div>
+                        </div>
+
+                        <div class="col col-12" id="linkToAccountContainer" style="display: none;">
+                            <div class="form-group mt-2">
+                                <label for="specificAccount">Specific Account</label>
+                                <select v-model="editChild.me" name="specificAccount" class="form-control py-0" >
+                                    <option value="" selected disabled class="gray">Choose Account</option>
+                                    {% for subgroup in request.user.branch.subGroup.all %}
+                                    <optgroup label="{{subgroup.name}}">
+                                        {% for child in subgroup.accountchild.all %}
+                                        <option value="{{child.pk}}">{{child.name}}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col">
+                            <button class="btn btn-primary mt-2" @click="submitEditAccount(editChild.id)">Save Changes</button>
                         </div>
                     </div>
                 </div>
@@ -306,7 +405,14 @@
                 name: null,
             },
             editChild: {
-                
+                accountSubGroup: '',
+                code: null,
+                name: null,
+                description: null,
+                contra: false,
+                linkToAccount: false,
+                me: null,
+                groupCode: ''
             },
             accounts: [],
             subGroup: [],
@@ -348,6 +454,18 @@
             },
         },
         methods:{
+            copyChildAccount(id){
+                axios.get(`/api/child/${id}/`)
+                .then(res=>{
+                    this.editChild = res.data
+                })
+            },
+            submitEditAccount(id){
+                axios.put(`/edit-account-child/${id}/`, this.editChild, this.config)
+                .then(res=>{
+                    res.data==0?location.reload():0
+                })
+            },
             loadData(){
                 axios.get('/api/group/').then(res=>this.group=res.data)
                 axios.get('/api/sub-group').then(res=>this.subGroup=res.data)

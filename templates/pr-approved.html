@@ -99,7 +99,7 @@
                                     <tr v-for="item in prModal.pritemsmerch">
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.remaining]]</td>
-                                        <td>[[item.qty]]</td>
+                                        <td>[[item.qty]] [[unit[item.unit] ]]</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -221,6 +221,11 @@
                     "X-CSRFToken": getCookie('csrftoken')
                 }
             },
+            units: [
+                'PC',
+                'KG',
+                'L'
+            ],
             prModal: {
                 voided: null,
                 id: null,

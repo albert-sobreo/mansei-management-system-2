@@ -78,7 +78,7 @@ class EditSubGroup(APIView):
 
 class EditChildGroup(APIView):
     def put(self, request, pk, format = None):
-        childAccount = AccountChild.object.get(pk=pk)
+        childAccount = AccountChild.objects.get(pk=pk)
         edit = request.data
 
         childAccount.code = edit['code']

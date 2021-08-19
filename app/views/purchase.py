@@ -118,6 +118,7 @@ class SavePurchaseOrder(APIView):
                 poitemsmerch.qty = item['quantity']
                 poitemsmerch.purchasingPrice = Decimal(item['vatable'])
                 poitemsmerch.totalPrice = Decimal(item['totalCost'])
+                poitemsmerch.unit = item['unitCtr']
 
                 poitemsmerch.save()
                 request.user.branch.poitemsMerch.add(poitemsmerch)
@@ -142,6 +143,7 @@ class SavePurchaseOrder(APIView):
                 poitemsother.qty = item['quantity']
                 poitemsother.purchasingPrice = Decimal(item['vatable'])
                 poitemsother.totalPrice = Decimal(item['totalCost'])
+                poitemsother.unit = item['unitCtr']
 
                 poitemsother.save()
                 request.user.branch.poItemsOther.add(poitemsother)

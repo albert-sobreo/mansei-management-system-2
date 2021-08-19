@@ -18,6 +18,12 @@ normally = [
     ('Credit', 'Credit'),
 ]
 
+units = [
+    (0, 'PC'),
+    (1, 'KG'),
+    (2, 'L'),
+]
+
 # Create your models here.
 class User(AbstractUser):
     authLevel = models.CharField(max_length=50, null = True, blank = True)
@@ -329,6 +335,7 @@ class PRItemsMerch(models.Model):
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="pritemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
+    unit = models.IntegerField(choices=units, null=True, blank=True)
 
     class Meta:
         verbose_name = 'PR Items Merch'
@@ -343,6 +350,7 @@ class PRItemsOther(models.Model):
     otherInventory = models.ForeignKey(OtherInventory, related_name="pritemsother", on_delete=models.PROTECT, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
+    unit = models.IntegerField(choices=units, null=True, blank=True)
 
     class Meta:
         verbose_name = "PR Items Other"
@@ -399,6 +407,7 @@ class POItemsMerch(models.Model):
     totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
     delivered = models.BooleanField(null = True, default=False)
     qtyReceived = models.IntegerField(default=0)
+    unit = models.IntegerField(choices=units, null=True, blank=True)
 
     class Meta:
         verbose_name = 'PO Items Merch'
@@ -417,6 +426,7 @@ class POItemsOther(models.Model):
     totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
     delivered = models.BooleanField(null = True, default=False)
     qtyReceived = models.IntegerField(default=0)
+    unit = models.IntegerField(choices=units, null=True, blank=True)
 
 class POatc(models.Model):
     purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poatc",on_delete=models.PROTECT, null=True, blank=True)
@@ -469,6 +479,7 @@ class RRItemsMerch(models.Model):
     totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
     delivered = models.BooleanField(null = True, default=False)
     poitemsmerch = models.ForeignKey(POItemsMerch, related_name='rritemsmerch', on_delete=models.PROTECT, null=True, blank=True)
+    unit = models.IntegerField(choices=units, null=True, blank=True)
 
     class Meta:
         verbose_name = 'RR Items Merch'
@@ -487,6 +498,7 @@ class RRItemsOther(models.Model):
     totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
     delivered = models.BooleanField(null = True, default=False)
     poitemsother = models.ForeignKey(POItemsOther, related_name='rritemsother', on_delete=models.PROTECT, null=True, blank=True)
+    unit = models.IntegerField(choices=units, null=True, blank=True)
 
 class RRatc(models.Model):
     receivingReport = models.ForeignKey(ReceivingReport, related_name="rratc",on_delete=models.PROTECT, null=True, blank=True)

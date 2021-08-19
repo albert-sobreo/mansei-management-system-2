@@ -88,7 +88,7 @@
 				<div class="col-1 px-1">
 					<label for="remaining" class="m-0">Remaining</label>
 				</div>
-				<div class="col-1 px-1">
+				<div class="col px-1">
 					<label for="order-quantity" class="m-0">Received Qty</label>
 				</div>
 				<div class="col-2 px-1">
@@ -133,8 +133,13 @@
 				<div class="col-1 px-1">
 					<input v-model="item.remaining" type="number" class="form-control" readonly>
 				</div>
-				<div class="col-1 px-1">
-					<input v-model="item.quantity" @change="onForTotalCost(index)" type="number" class="form-control" min="0">
+				<div class="col px-1">
+					<div class="input-group">
+						<input v-model="item.quantity" @change="onForTotalCost(index)" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+						<div @click="cycleUnit(index)" class="input-group-append bg-primary-2" style="cursor: pointer;" title="Click me to change unit">
+							<span class="input-group-text text-white noselect">[[units[item.unitCtr] ]]</span>
+						</div>
+					</div>
 				</div>
 				<div class="col-2 px-1">
 					<div class="input-group">
@@ -301,6 +306,13 @@
                     "X-CSRFToken": getCookie('csrftoken')
                 }
 			},
+
+			units: [
+                'PC',
+                'KG',
+                'L'
+            ],
+
             inventoryTypes: [
                 'Merchandise',
                 'Manufacturing',
@@ -323,7 +335,8 @@
                     remaining: null,
                     quantity: null,
                     vatable: 0.00,
-                    totalCost: null
+                    totalCost: null,
+					unitCtr: 0,
                 }],
                 atc: [{
                     code: '47',
@@ -404,6 +417,13 @@
         },
 
 		methods:{
+			cycleUnit(index){
+                len = this.units.length
+                this.purchaseOrder.items[index].unitCtr++
+                if (this.purchaseOrder.items[index].unitCtr >= len){
+                    this.purchaseOrder.items[index].unitCtr = 0
+                }
+            },
 			watchers(){
                 //this.purchaseOrder.withholdingTax = this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)
                 var amountDue = this.purchaseOrder.amountDue
@@ -584,7 +604,8 @@
                     remaining: null,
                     quantity: null,
                     vatable: 0.00,
-                    totalCost: null
+                    totalCost: null,
+					unitCtr: 0
                 })
             },
 

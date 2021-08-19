@@ -106,7 +106,12 @@
 						<input v-model="item.remaining" type="number" class="form-control" readonly>
 					</div>
 					<div class="col-2 px-1">
-						<input v-model="item.qty" type="number" class="form-control" min="0">
+						<div class="input-group">
+							<input v-model="item.qty" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                            <div @click="cycleUnit(index)" class="input-group-append bg-primary-2" style="cursor: pointer;" title="Click me to change unit">
+                                <span class="input-group-text text-white noselect">[[units[item.unitCtr] ]]</span>
+                            </div>
+                        </div>
 					</div>
 						<i @click="remove(index)" class="fas fa-minus-circle stop text-shadow-small pl-3" style="line-height: 30px;"></i>
 				</div>
@@ -184,6 +189,13 @@
         	    'Merchandise',
         	    'Manufacturing',
         	],
+
+            units: [
+                'PC',
+                'KG',
+                'L'
+            ],
+
 			expenseTypes: [],
 			purchaseRequest:{
 				code: '{{new_code}}',
@@ -198,6 +210,7 @@
 					type: '',
 					remaining: null,
 					qty: null,
+                    unitCtr: 0,
 				}]
 			},
 			vendorquotes: [{
@@ -218,6 +231,13 @@
 			merchandiseInventory: [],
 		},
 		methods: {
+			cycleUnit(index){
+                len = this.units.length
+                this.purchaseRequest.items[index].unitCtr++
+                if (this.purchaseRequest.items[index].unitCtr >= len){
+                    this.purchaseRequest.items[index].unitCtr = 0
+                }
+            },
 			loadData(){
 				axios.get('/api/merchinventory/')
 				.then(res=>this.merchandiseInventory=res.data)
@@ -278,10 +298,12 @@
 			},
 			addLine(){
 				this.purchaseRequest.items.push({
-					type: null,
+					type: '',
 					item: null,
 					onHand: null,
 					qty: null,
+					unitCtr: 0,
+					
 				})
 				this.vendorquotes.push({
 					item: null,

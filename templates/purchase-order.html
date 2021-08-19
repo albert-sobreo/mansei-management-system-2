@@ -226,11 +226,11 @@
                     <div class="col-1 px-1">
                         <label for="remaining" class="m-0">Remaining</label>
                     </div>
-                    <div class="col-1 px-1">
+                    <div class="col px-1">
                         <label for="order-quantity" class="m-0">Order Qty</label>
                     </div>
                     <div class="col-2 px-1">
-                        <label for="order-quantity" class="m-0">Purchasing Price <span class="font-size-10 gray">per qty</span></label>
+                        <label for="order-quantity" class="m-0">Purchasing Price</label>
                     </div>
                     <div class="col-2 px-1">
                         <label for="Total Cost" class="m-0">Total Cost</label>
@@ -271,8 +271,13 @@
                     <div class="col-1 px-1">
                         <input v-model="item.remaining" type="number" class="form-control" readonly>
                     </div>
-                    <div class="col-1 px-1">
-                        <input v-model="item.quantity" @change="onForTotalCost(index)" type="number" class="form-control" min="0">
+                    <div class="col px-1">
+                        <div class="input-group">
+                            <input v-model="item.quantity" @change="onForTotalCost(index)" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                            <div @click="cycleUnit(index)" class="input-group-append bg-primary-2" style="cursor: pointer;" title="Click me to change unit">
+                                <span class="input-group-text text-white noselect">[[units[item.unitCtr] ]]</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-2 px-1">
                         <div class="input-group">
@@ -485,7 +490,6 @@
             <button>Import</button>
         </form>
     </div>
-    <pre>[[ $data ]]</pre>
 </div>
 
 {% endblock %}
@@ -506,6 +510,12 @@
             inventoryTypes: [
                 'Merchandise',
                 'Manufacturing',
+            ],
+
+            units: [
+                'PC',
+                'KG',
+                'L'
             ],
 
             addVendorModal:{
@@ -543,7 +553,8 @@
                     quantity: null,
                     vatable: 0.00,
                     inputVAT: 0,
-                    totalCost: null
+                    totalCost: null,
+                    unitCtr: 0,
                 }],
                 atc: [{
                     code: '47',
@@ -648,6 +659,13 @@
         },
 
         methods:{
+            cycleUnit(index){
+                len = this.units.length
+                this.purchaseOrder.items[index].unitCtr++
+                if (this.purchaseOrder.items[index].unitCtr >= len){
+                    this.purchaseOrder.items[index].unitCtr = 0
+                }
+            },
             submitAddVendor(){
                 axios.post('/save-party/', this.addVendorModal, this.config)
                 .then(res=>res.data==0?location.reload():'')
@@ -823,7 +841,8 @@
                     quantity: null,
                     vatable: 0.00,
                     inputVAT: 0,
-                    totalCost: null
+                    totalCost: null,
+                    unitCtr: 0,
                 })
             },
 

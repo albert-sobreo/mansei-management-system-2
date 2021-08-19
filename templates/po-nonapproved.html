@@ -170,14 +170,14 @@
                                     <tr v-for="item in poModal.poitemsmerch">
                                         <td>Merchandise</td>
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
-                                        <td>[[item.qty]]</td>
+                                        <td>[[item.qty]] [[units[item.unit] ]]</td>
                                         <td>₱[[formatPrice(item.purchasingPrice)]]</td>
                                         <td>₱[[formatPrice(item.totalPrice)]]</td>
                                     </tr>
                                     <tr v-for="item in poModal.poitemsother">
                                         <td>[[item.type]]</td>
                                         <td>[[item.otherInventory.name]]</td>
-                                        <td>[[item.qty]]</td>
+                                        <td>[[item.qty]] [[units[item.unit] ]]</td>
                                         <td>₱[[formatPrice(item.purchasingPrice)]]</td>
                                         <td>₱[[formatPrice(item.totalPrice)]]</td>
                                     </tr>
@@ -273,6 +273,12 @@
                     "X-CSRFToken": getCookie('csrftoken')
                 }
             },
+
+            units: [
+                'PC',
+                'KG',
+                'L'
+            ],
 
             poModal: {
                 code: null,
