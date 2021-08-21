@@ -282,25 +282,26 @@ class DTRProcess(APIView):
         
         id = request.data['idNum']
         employee = User.objects.get(idUser = id)
-        #try:   
-        if employee.dtr.all().latest('pk').dateTimeOut == None:
-            self.timeOut(id)
-            serializer = UserWithDTRSZ(employee)
-            x = serializer.data
-            x['dtr'] = serializer.data['dtr'][-1]
-            return Response(x)
-        else:
+        try:   
+            if employee.dtr.all().latest('pk').dateTimeOut == None:
+                self.timeOut(id)
+                serializer = UserWithDTRSZ(employee)
+                x = serializer.data
+                x['dtr'] = serializer.data['dtr'][-1]
+                return Response(x)
+            else:
+                self.timeIn(id)
+                serializer = UserWithDTRSZ(employee)
+                x = serializer.data
+                x['dtr'] = serializer.data['dtr'][-1]
+                return Response(x)
+        except Exception as e:
+            print(e)
             self.timeIn(id)
             serializer = UserWithDTRSZ(employee)
             x = serializer.data
+            print(x)
             x['dtr'] = serializer.data['dtr'][-1]
             return Response(x)
-        # except Exception as e:
-        #     print(e)
-        #     print('b0ss2')
-        #     self.timeIn(id)
-        #     serializer = UserWithDTRSZ(employee)
-        #     x = serializer.data
-        #     return Response(x)
         
         
