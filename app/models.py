@@ -25,6 +25,14 @@ units = [
 ]
 
 # Create your models here.
+class Schedule(models.Model):
+    timeIn = models.TimeField()
+    timeOut = models.TimeField()
+        
+    def __str__(self):
+        return str(self.timeIn) + " - " + str(self.timeOut)
+
+
 class User(AbstractUser):
     authLevel = models.CharField(max_length=50, null = True, blank = True)
     position = models.CharField(max_length=20, null = True, blank = True)
@@ -41,6 +49,7 @@ class User(AbstractUser):
     dateResigned = models.DateField(null = True, blank = True)
     department = models.CharField(max_length=50, null = True, blank = True)
     mobile = models.CharField(max_length=15, null = True, blank = True)
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True, blank=True)
     branch = models.ForeignKey('Branch', on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
@@ -49,6 +58,35 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+dayOff = [
+    (0, 'SUN'),
+    (1, 'MON'),
+    (2, 'TUE'),
+    (3, 'WED'),
+    (4, 'THU'),
+    (5, 'FRI'),
+    (6, 'SAT')
+]
+
+class DayOff(models.Model):
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True, blank=True)
+    day = models.IntegerField(choices=dayOff, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.day)
+
+class DTR(models.Model):
+    dateTimeIn = models.DateTimeField( null = True, blank = True)
+    dateTimeOut = models.DateTimeField( null = True, blank = True)
+    date = models.DateField( null = True, blank = True)
+    user = models.ForeignKey(User, related_name = "dtr", on_delete=models.PROTECT, null = True, blank = True)
+
+    rh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    ot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    ut = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+
 
 class Register(models.Model):
     username = models.CharField(max_length=50, null=True, blank=True)
@@ -1077,6 +1115,11 @@ class Branch(models.Model):
     adjustments = models.ManyToManyField(Adjustments, blank = True)
     adjustmentItems = models.ManyToManyField(AdjustmentsItems, blank = True)
     adjustmentPhotos = models.ManyToManyField(AdjustmentsPhotos, blank = True)
+
+    #### DTR ####
+    dayOff = models.ManyToManyField(DayOff, blank=True)
+    dtr = models.ManyToManyField(DTR, blank=True)
+    
 
     def __str__(self):
         return self.name

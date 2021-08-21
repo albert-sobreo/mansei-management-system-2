@@ -227,4 +227,9 @@ urlpatterns = [
     path('otherinventory/', login_required(views.OtherInventoryAPI.as_view())),
     path('otherinventoryview/', login_required(views.OtherInventoryView.as_view())),
     path('getaccountexpenses/', login_required(views.GetAccountExpensesAPI.as_view())),
+
+    path('ems-dtr/', views.DTRView.as_view()),
+    path('ems-list/', views.DTRList.as_view()),
+    path('ems-dtr-process/', views.DTRProcess.as_view()),
+    path('ems-user-w-dtr/', views.FetchUserDTR.as_view()),
 ]
