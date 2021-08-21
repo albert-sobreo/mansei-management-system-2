@@ -1,0 +1,150 @@
+{% extends 'base-template.html' %}
+{% block title %}DTR List{% endblock %}
+
+{% block body %}
+
+<div id="app">
+    <div class="nav border py-2 px-4 mb-4">
+        <a href="/ems-dtr/"> Go to DTR</a>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <select @change = "getDTR(selectedUser)" v-model="selectedUser" class="form-control col mx-1">
+                <option value="" disabled selected>Select User</option>
+                {% for user in User %}
+                <option value="{{user.id}}">{{user.first_name}} {{user.last_name}}</option>
+                {% endfor %}
+            </select>
+            <input @change = "getDTR(selectedUser)" v-model="startDate" type="date" class="form-control col mx-1">
+            <input @change = "getDTR(selectedUser)" v-model="endDate" type="date" class="form-control col mx-1">
+        </div>
+
+        <div class="my-3">
+            <table class="table">
+                <thead>
+                    <th>Date</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                    <th>BH</th>
+                    <th>OT</th>
+                    <th>UT</th>
+                </thead>
+                <tbody>
+                    <tr v-for="u in user.dtr.slice().reverse()">
+                        <td>[[formatDate(u.date)]]</td>
+                        <td>[[formatTime(u.dateTimeIn)]]</td>
+                        <td>[[formatTime(u.dateTimeOut)]]</td>
+                        <td>[[u.rh]]H</td>
+                        <td>[[u.ot]]H</td>
+                        <td>[[u.ut]]H</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <pre>[[$data]]</pre>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            selectedUser: '',
+            startDate: '',
+            endDate: '',
+            user: {
+                id: null,
+                first_name: null,
+                last_name: null,
+
+                dtr: [{
+                    dateTimeIn: null,
+                    dateTimeOut: null,
+                    date: null,
+
+                    rh: null,
+                    ot: null,
+                    ut: null,
+    
+                }]
+            }
+        },
+
+        methods:{
+            getDTR(id){
+                axios.get(`/ems-user-w-dtr/`, {
+                    params: {
+                        id: id,
+                        startDate: this.startDate,
+                        endDate: this.endDate
+                    }
+                  })
+                .then(res=>{
+                    if(res.data!=1){
+                        this.user.dtr = res.data
+                    }
+                })
+            },
+
+            formatTime(value){
+                if(value===null){
+                    return null
+                }
+
+                value = new Date(value)
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${day} - ${month}. ${date}, ${year}`
+
+                return formatted
+            },
+        }
+    })
+</script>
+
+{% endblock %}

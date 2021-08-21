@@ -1,0 +1,211 @@
+{% extends 'base-template.html'%}
+{% block title %}DTR{% endblock %}
+
+{% block body %}
+
+<div id="app" class="vw100">
+    <div class="m-0 p-0 d-md-flex d-xs-flex flex-nowrap justify-content-center align-items-center flex-column">
+        <!-- COMPANY NAME -->
+        <a href="/ems-list/">go to list</a>
+        <div id="companyName" class="font-extrabold font-size-56 res-none">
+            <span>Mansei</span><span class="text-blue-green">DTR</span>
+        </div>
+
+        <!-- DATE AND TIME -->
+        <div id="dateTime" class="d-md-flex d-xs-flex flex-nowrap flex-row font-regular oswald">
+            <div id="date" class="mr-5 d-md-flex d-xs-flex flex-nowrap flex-row align-items-center">
+                <div id="dateDate" class="d-md-flex d-xs-flex flex-nowrap font-size-48">13</div>
+                <div id="dateMonthDay" class="d-md-flex d-xs-flex flex-nowrap flex-column">
+                    <div id="dateMonth" class="d-md-flex d-xs-flex flex-nowrap font-size-15"><div>MAR</div></div>
+                    <div id="dateDay" class="d-md-flex d-xs-flex flex-nowrap font-size-15"><div>TUE</div></div>
+                </div>
+            </div>
+
+            <div id="time" class="ml-5 d-md-flex d-xs-flex flex-nowrap flex-row align-items-center">
+                <div id="timeTime" class="d-md-flex d-xs-flex flex-nowrap font-size-48">07:58</div>
+                <div id="timeSecMer" class="d-md-flex d-xs-flex flex-nowrap flex-column">
+                    <div id="timeSec" class="font-size-15">11</div>
+                    <div id="timeMer" class="font-size-15">AM</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR SCANNER -->
+        <div id="qrScanner" class="b-radius-15 d-md-flex d-xs-flex flex-nowrap justify-content-center align-items-center qr-scanner">
+            <span class="font-bold font-size-16">Live QR Feed Here</span>
+        </div>
+
+        <span id="errMessage" class="mt-2 font-semibold text-danger d-none">Probable cause: User does not exist</span>
+
+        <!-- ID NUMBER -->
+        <div id="idInput">
+            <div class="form-group my-4 col">
+                <label for="">ID Number</label>
+                <input id="input" v-model="input.idNum" type="text" class="form-control col vw95" placeholder="Enter your ID number and press enter">
+                <button @click="submit()" class="btn btn-primary my-2 col vw95">Enter</button>
+            </div>
+        </div>
+
+        <div id="dtrCreds" class="b-radius-15 dtr-creds py-3 px-4">
+            <div class="d-flex justify-content-between mb-4">
+                <span class="font-size-24 font-extrabold align-self-end line-height-100">[[dtrData.first_name]] [[dtrData.last_name]]</span>&nbsp;
+                <span class="font-size-24 gray font-extrabold align-self-end line-height-100 oswald">[[dtrData.idUser]]</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div class="flex-column">
+                    <div class="font-bold gray">Time In</div>
+                    <div class="font-size-20 font-bold">[[formatTime(dtrData.dtr.dateTimeIn)]]</div>
+                </div>
+                <div class="flex-column">
+                    <div class="font-bold gray">Time Out</div>
+                    <div class="font-size-20 font-bold">[[formatTime(dtrData.dtr.dateTimeOut)]]</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <pre>[[$data]]</pre>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+
+        data: {
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+
+            input: {
+                idNum: null
+            },
+
+            dtrData: {
+                first_name: null,
+                last_name: null,
+                idUser: null,
+                dtr: {
+                    date: null,
+                    dateTimeIn: null,
+                    dateTimeOut: null,
+                }
+            }
+        },
+
+        methods: {
+            submit(){
+                if(this.input.idNum === null || this.input.idNum == 0){
+                    document.getElementById('input').classList.add('form-control-invalid', 'is-invalid')
+                    setTimeout(()=>{document.getElementById('input').classList.remove('form-control-invalid', 'is-invalid')}, 2000)
+                    return
+                }
+                axios.post('/ems-dtr-process/', this.input, this.config)
+                .then(res=>{
+                    console.log(res.data)
+                    this.dtrData = res.data
+                    this.input.idNum = null
+
+                    setTimeout(()=>{
+                        this.dtrData = {
+                            first_name: null,
+                            last_name: null,
+                            idUser: null,
+                            dtr: {
+                                date: null,
+                                dateTimeIn: null,
+                                dateTimeOut: null,
+                            }
+                        }
+
+                        this.input = {
+                            idNum: null
+                        }
+                    }, 5000)
+                })
+                .catch(err=>{
+                    document.getElementById('errMessage').classList.remove('d-none')
+                    document.getElementById('input').classList.add('form-control-invalid', 'is-invalid')
+                    setTimeout(()=>{
+                        document.getElementById('errMessage').classList.add('d-none')
+                        document.getElementById('input').classList.remove('form-control-invalid', 'is-invalid')
+                    }, 2000)
+                })
+            },
+            formatTime(value){
+                if(value===null){
+                    return null
+                }
+
+                value = new Date(value)
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+        }
+
+    })
+</script>
+
+<script>
+    window.document.onload = DateTime()
+    function DateTime(){
+        const months = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec'
+        ]
+
+        const days = [
+            'Sun',
+            'Mon',
+            'Tue',
+            'Wed',
+            'Thu',
+            'Fri',
+            'Sat'
+        ]
+
+        value = new Date()
+        year = value.getFullYear()
+        month = months[value.getMonth()]
+        date = (value.getDate()<10?'0':'') + value.getDate()
+        hour = (value.getHours() + 24) % 12 || 12; 
+        minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+        day = days[value.getDay()]
+        sec = (value.getSeconds()<10?'0':'') + value.getSeconds()
+        meridian = value.getHours() >= 12 ? 'pm' : 'am'
+
+        formatted = `${month}. ${date}, ${year} - ${hour}:${minute}:${sec} ${meridian}`
+
+        document.getElementById('dateDate').innerHTML = date
+        document.getElementById('dateMonth').innerHTML = month.toUpperCase()
+        document.getElementById('dateDay').innerHTML = day.toUpperCase()
+
+        document.getElementById('timeTime').innerHTML = `${hour}:${minute}`
+        document.getElementById('timeSec').innerHTML = sec
+        document.getElementById('timeMer').innerHTML = meridian.toUpperCase()
+
+        setTimeout(DateTime, 1000)
+
+    }
+</script>
+
+{% endblock %}
