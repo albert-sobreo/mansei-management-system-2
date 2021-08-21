@@ -353,3 +353,12 @@ class BranchDefaultChildAccountAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = BranchDefaultChildAccountSZ
     queryset = BranchDefaultChildAccount.objects.all()
+
+
+
+
+
+########## USER WITH DTR ##########
+class UserWithDTRAPI(viewsets.ModelViewSet):
+    serializer_class = UserWithDTRSZ
+    queryset = User.objects.all()
