@@ -1,17 +1,9 @@
 from rest_framework.views import APIView
 from ..models import *
-from django import views
-from django.core.exceptions import NON_FIELD_ERRORS
-from django.db.models import query
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
 from ..forms import *
-from django.contrib import messages
-from django.contrib.auth import authenticate, login as auth_login, logout
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import never_cache
-from rest_framework import viewsets
 import sweetify
 from decimal import Decimal
 from datetime import datetime
@@ -1366,4 +1358,59 @@ class AdjustmentApproval(APIView):
         ad.save()
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+
+
+
+
+########## BANK RECONCILIATION ##########
+class BankReconNonApproved(View):
+    def get(self, request, format=None):
+        context = {
+            
+        }
+
+        return render(request, 'bank-recon-non-approved.html', context)
+
+class BankReconApproved(View):
+    def get(self, request, format=None):
+        context = {
+            
+        }
+
+        return render(request, 'bank-recon-approved.html', context)
+
+class BankReconApprovalAPI(APIView):
+    def put(self, request, pk, format=None):
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+        cheque = Cheques.objects.get(pk=pk)
         
+        cheque.approved = True
+        cheque.datetimeApproved = datetime.now()
+        cheque.approvedBy = request.user
+        cheque.save()
+
+        j = Journal()
+        j.datetimeCreated = cheque.datetimeApproved
+        j.createdBy = cheque.ApprovedBy
+        j.journalDate = datetime.now()
+        j.save()
+
+        cheque.receivePayment.journal = j
+        cheque.receivePayment.save()
+        request.user.branch.journal.add(j)
+
+        ################# CREDIT SIDE #################
+        jeAPI(request, j, 'Credit', cheque.receivePayment.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (cheque.receivePayment.amountPaid + cheque.receivePayment.wep))
+
+        ################# DEBIT SIDE #################
+        if cheque.receivePayment.wep != 0.0:
+            jeAPI(request, j, 'Debit', dChildAccount.cwit, cheque.receivePayment.wep)
+
+
+        jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=cheque.accountChild), cheque.receivePayment.amountPaid)
+
+        cheque.receivePayment.salesContract.runningBalance -= (cheque.receivePayment.amountPaid + cheque.receivePayment.wep)
+        if cheque.receivePayment.salesContract.runningBalance == 0:
+            cheque.receivePayment.salesContract.fullyPaid = True
+        cheque.receivePayment.salesContract.save()

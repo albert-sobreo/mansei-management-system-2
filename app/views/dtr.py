@@ -1,17 +1,13 @@
 from rest_framework.views import APIView
 import datetime
-from datetime import date as now
 from django.http.response import JsonResponse
 from django.views import View
 from ..models import *
-import sweetify
 from django.shortcuts import redirect, render, HttpResponse
 from ..serializers import *
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from decimal import Decimal
 from django.core import serializers
-
 import datetime
 
 class DTRList(View):

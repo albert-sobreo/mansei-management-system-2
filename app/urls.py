@@ -232,4 +232,7 @@ urlpatterns = [
     path('ems-list/', views.DTRList.as_view()),
     path('ems-dtr-process/', views.DTRProcess.as_view()),
     path('ems-user-w-dtr/', views.FetchUserDTR.as_view()),
+    path('bank-recon/', login_required(views.BankReconView.as_view())),
+    path('br-nonapproved/', login_required(views.BankReconNonApproved.as_view())),
+    path('br-approved/', login_required(views.BankReconApproved.as_view()))
 ]

@@ -862,7 +862,6 @@ class ReceivePayment(models.Model):
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="rpCreatedBy")
     paymentMethod = models.CharField(max_length = 50, null = True)
     paymentPeriod = models.CharField(max_length = 50, null = True)
-    chequeNo = models.CharField(max_length=20, null = True, blank = True)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default= 0.0)
     voided = models.BooleanField(default = False)
@@ -1005,6 +1004,15 @@ class AdjustmentsItems(models.Model):
 class AdjustmentsPhotos(models.Model):
     adjustments = models.ForeignKey(Deliveries, related_name="adjustmentsphotos", on_delete=models.PROTECT, null=True, blank=True)
     picture = models.ImageField(null=True, blank=True, upload_to="adjustment_photos")
+
+class Cheques(models.Model):
+    chequeNo = models.CharField(max_length=255, null=True, blank=True)
+    receivePayment = models.ForeignKey(ReceivePayment, on_delete=models.CASCADE, null = True, blank = True, related_name="cheques")
+    accountChild = models.ForeignKey(AccountChild, on_delete=models.PROTECT, null = True, blank = True, related_name="cheques")
+    approved = models.BooleanField(null = True, default=False, blank = True)
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="cheApprovedBy")
+    datetimeApproved = models.DateTimeField(null = True, blank = True)
+    dueDate = models.DateField(null = True, blank = False)
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
