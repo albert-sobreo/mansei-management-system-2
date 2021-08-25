@@ -197,11 +197,11 @@
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="gray">Cash Payment Due</label><br>
-                                        <span class="font-size-14 font-bold">₱[[create.sc.runningBalance]]</span>
+                                        <span class="font-size-14 font-bold">₱[[roundNumber2(create.sc.runningBalance)]]</span>
                                     </div>
                                     <div class="col-4">
                                         <label class="gray">To be Withheld</label><br>
-                                        <span class="font-size-14 font-bold">₱[[create.sc.wep]]</span>
+                                        <span class="font-size-14 font-bold">₱[[roundNumber2(create.sc.wep)]]</span>
                                     </div>
                                     <div class="col-4">
                                         <label class='gray'>Vendor</label><br>
@@ -226,6 +226,7 @@
                                             {% for item in request.user.branch.branchProfile.branchDefaultChildAccount.cashInBank.all%}
                                             <option value="{{item.name}}">{{item.name}}</option>
                                             {% endfor %}
+                                            <option value="Cheque">Cheque</option>
                                         </select>
                                     </div>
                                 </div>
@@ -237,7 +238,7 @@
                                     <input v-model=create.paymentPeriod value="Partial Payment" name="radios" type="radio" class="form-check-input">
                                     <label class="form-check-label">Partial Payment</label>
                                 </div>
-                                <div class="col-6 pr-2">
+                                <div class="col-4 pr-2">
                                     <div class="form-group">
                                         <label for="">Amount Withheld</label>
                                         <div class="input-group">
@@ -248,7 +249,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-6 pl-2">
+                                <div class="col-4 px-2">
                                     <div class="form-group">
                                         <label for="">Cheque No.</label>
                                         <div class="input-group">
@@ -257,6 +258,12 @@
                                             </div>
                                             <input v-model="create.chequeNo" type="text" class="form-control box-shadow-off" style="margin-top: 0px" placeholder="Leave blank if applicable">
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 pl-2">
+                                    <div class="form-group">
+                                        <label for="">Cheque Due Date</label>
+                                        <input v-model="create.dueDate" type="date" class="form-control">
                                     </div>
                                 </div>
                                 <div class="col-12">
@@ -355,6 +362,7 @@
                 paymentMethod: '',
                 paymentPeriod: null,
                 chequeNo: null,
+                dueDate: null,
                 amountPaid: 0,
                 description: null,
                 wep: 0
@@ -522,8 +530,8 @@
             buttons: {
                 buttons: [
                 {
-                    text: '<i class="fas fa-plus"></i>',
-                    className: 'btn btn-warning btn-table',
+                    text: 'Create Receive Payments',
+                    className: 'btn btn-warning',
                     titleAttr: 'Add Inventory',
                     action: function(){
                         $("#addPV").modal('show')
