@@ -510,6 +510,9 @@ class PVApprovalAPI(APIView):
             voucher.cheque.approvedBy = request.user
             voucher.cheque.save()
 
+        elif voucher.paymentMethod == "Memorandum":
+            pass
+
         ################# EXPENSE PAYMENT #################
         if voucher.purchaseOrder.poitemsother.all():
             j = Journal()

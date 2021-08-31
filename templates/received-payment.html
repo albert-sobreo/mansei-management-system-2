@@ -249,8 +249,11 @@
                                 <div class="col-12 d-none" id="memorandum">
                                     <div class="form-group">
                                         <label>Transaction to Credit/Debit</label>
-                                        <select class="form-control">
-                                            <option value="">Transaction # - <span class="gray">Cash Payment Due: </span> P10,000</option>
+                                        <select class="form-control" v-model="create.transactionID">
+                                            <option value="">Choose Transaction</option>
+                                            {% for item in po reversed %}
+                                            <option value="{{item.pk}}">{{item.code}} - <span class="gray">Cash Payment Due: </span>₱[[formatPrice({{item.runningBalance}})]]</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
@@ -388,6 +391,7 @@
                     taxRate: null,
                     dueDate: null,
                 },
+                transactionID: '',
                 paymentMethod: '',
                 paymentPeriod: null,
                 chequeNo: null,

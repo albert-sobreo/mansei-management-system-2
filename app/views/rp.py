@@ -37,6 +37,7 @@ class ReceivedPaymentView(View):
         context = {
             'new_code': new_code,
             'sc': request.user.branch.salesContract.filter(approved=True, fullyPaid=False),
+            'po': request.user.branch.purchaseOrder.filter(approved=True, fullyPaid=False).exclude(runningBalance=Decimal(0)),
         }
         return render(request, 'received-payment.html', context)
 
@@ -118,7 +119,6 @@ class RPVoid(APIView):
         rp.datetimeVoided = datetime.now()
         rp.voidedBy = request.user
 
-        
         j = Journal()
         j.code = rp.code
         j.datetimeCreated = rp.datetimeCreated

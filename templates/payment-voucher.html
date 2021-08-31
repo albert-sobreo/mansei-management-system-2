@@ -215,7 +215,7 @@
                                         <label for="">Select II</label>
                                         <select @change="getII(create.iiCode)" v-model="create.iiCode" class="form-control">
                                             <option value="" disabled selected>Select II</option>
-                                            {% for item in request.user.branch.inwardInventory.all reversed %}
+                                            {% for item in ii reversed %}
                                             <option value="{{item.pk}}">{{item.code}}</option>
                                             {% endfor %}
                                         </select>
@@ -292,8 +292,11 @@
                                 <div class="col-12 d-none" id="memorandum">
                                     <div class="form-group">
                                         <label>Transaction to Credit/Debit</label>
-                                        <select class="form-control">
-                                            <option value="">Transaction # - <span class="gray">Cash Payment Due: </span> P10,000</option>
+                                        <select class="form-control" v-model="create.transactionID">
+                                            <option value="">Choose Transaction</option>
+                                            {% for item in sc reversed %}
+                                            <option value="{{item.pk}}">{{item.code}} - <span class="gray">Cash Payment Due: </span>₱[[formatPrice({{item.runningBalance}})]]</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
@@ -434,6 +437,7 @@
                     taxRate: null,
                     dueDate: null,
                 },
+                transactionID: '',
                 paymentMethod: '',
                 paymentPeriod: null,
                 chequeNo: null,

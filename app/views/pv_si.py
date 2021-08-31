@@ -1,3 +1,4 @@
+from django.contrib.auth.forms import PasswordChangeForm
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
@@ -8,6 +9,7 @@ from ..models import *
 import sweetify
 from datetime import date as now
 from datetime import datetime
+from decimal import Decimal
 
 class PaymentVoucherView(View):
     def get(self, request, format=None):
@@ -33,8 +35,9 @@ class PaymentVoucherView(View):
 
         context = {
             'new_code': new_code,
-            'po': request.user.branch.purchaseOrder.filter(approved=True, fullyPaid=False),
-            'ii': request.user.branch.inwardInventory.filter(approved=True, fullyPaid=False)
+            'po': request.user.branch.purchaseOrder.filter(approved=True, fullyPaid=False).exclude(runningBalance=Decimal(0)),
+            'ii': request.user.branch.inwardInventory.filter(approved=True, fullyPaid=False),
+            'sc': request.user.branch.salesContract.filter(approved=True, fullyPaid=False)
         }
 
         return render(request, 'payment-voucher.html', context)
@@ -59,6 +62,10 @@ class SavePaymentVoucher(APIView):
             pv.createdBy = request.user
         pv.paymentMethod = paymentVoucher['paymentMethod']
         pv.paymentPeriod = paymentVoucher['paymentPeriod']
+
+        if pv.paymentMethod == "Memorandum":
+            pv.transaction = paymentVoucher['transactionID']
+        
         pv.amountPaid = paymentVoucher['amountPaid']
         pv.wep = paymentVoucher['wep']
         
@@ -75,6 +82,7 @@ class SavePaymentVoucher(APIView):
 
             pv.cheque = cheque
             pv.save()
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
