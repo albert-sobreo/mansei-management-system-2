@@ -64,7 +64,7 @@ class SavePaymentVoucher(APIView):
         pv.paymentPeriod = paymentVoucher['paymentPeriod']
 
         if pv.paymentMethod == "Memorandum":
-            pv.transaction = paymentVoucher['transactionID']
+            pv.transaction = SalesContract.objects.get(pk=paymentVoucher['transactionID'])
         
         pv.amountPaid = paymentVoucher['amountPaid']
         pv.wep = paymentVoucher['wep']

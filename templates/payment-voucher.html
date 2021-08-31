@@ -292,10 +292,10 @@
                                 <div class="col-12 d-none" id="memorandum">
                                     <div class="form-group">
                                         <label>Transaction to Credit/Debit</label>
-                                        <select class="form-control" v-model="create.transactionID">
+                                        <select @change="fetchSCBalance()" class="form-control" v-model="create.transactionID">
                                             <option value="">Choose Transaction</option>
                                             {% for item in sc reversed %}
-                                            <option value="{{item.pk}}">{{item.code}} - <span class="gray">Cash Payment Due: </span>₱[[formatPrice({{item.runningBalance}})]]</option>
+                                            <option value="{{item.pk}}">{{item.code}} - <span class="gray">Cash Payment Due: </span>₱[[formatPrice("{{item.runningBalance}}")]]</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -347,7 +347,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">₱</span>
                                             </div>
-                                            <input v-model="create.amountPaid" type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Paid">
+                                            <input id="amountPaid" v-model="create.amountPaid" type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Paid">
                                         </div>
                                     </div>
                                 </div>
@@ -474,6 +474,10 @@
         },
         
         methods: {
+            fetchSCBalance(){
+                axios.get(`/api/sales-contract/${this.create.transactionID}/`)
+                .then(res=>this.create.amountPaid=res.data.runningBalance)
+            },
             toggleMemorandum(){
                 if(this.create.paymentMethod==='Memorandum'){
                     document.getElementById('memorandum').classList.remove('d-none')

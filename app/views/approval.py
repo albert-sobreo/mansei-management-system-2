@@ -510,8 +510,7 @@ class PVApprovalAPI(APIView):
             voucher.cheque.approvedBy = request.user
             voucher.cheque.save()
 
-        elif voucher.paymentMethod == "Memorandum":
-            pass
+        
 
         ################# EXPENSE PAYMENT #################
         if voucher.purchaseOrder.poitemsother.all():
@@ -524,16 +523,27 @@ class PVApprovalAPI(APIView):
             request.user.branch.journal.add(j)
 
             if voucher.purchaseOrder.needsRR == False:
-                ################# DEBIT SIDE #################
-                jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.amountPaid)
+                # ################# DEBIT SIDE #################
+                # jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.amountPaid)
 
-                ################# CREDIT SIDE #################
+                
                 if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                     jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, voucher.amountPaid)
+                    jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.amountPaid)
                 elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
                     jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
+                    jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.amountPaid)
                 elif voucher.paymentMethod == "Cheque":
                     jeAPI(request, j, 'Credit', voucher.cheque.accountChild, voucher.amountPaid)
+                    jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.amountPaid)
+                elif voucher.paymentMethod == "Memorandum":
+                    voucher.transaction
+                    if voucher.purchaseOrder.runningBalance <= voucher.transaction.runningBalance:
+                        jeAPI(request, j, 'Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.purchaseOrder.runningBalance)
+                        jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.purchaseOrder.runningBalance)
+                    else:
+                        jeAPI(request, j, 'Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.transaction.runningBalance)
+                        jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.transaction.runningBalance)
 
             else:
                 ################# DEBIT SIDE #################
@@ -575,9 +585,8 @@ class PVApprovalAPI(APIView):
                         jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
                     elif voucher.paymentMethod == "Cheque":
                         jeAPI(request, j, 'Credit', voucher.cheque.accountChild, voucher.amountPaid)
-
+                    
                 elif voucher.paymentPeriod == 'Partial Payment':
-                    print('b0ss plis')
                     if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                         jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, voucher.amountPaid)
 
@@ -591,6 +600,13 @@ class PVApprovalAPI(APIView):
                         jeAPI(request, j, 'Credit', voucher.cheque.accountChild, voucher.amountPaid)
 
                         jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+                if voucher.paymentMethod == "Memorandum":
+                    if voucher.purchaseOrder.runningBalance <= voucher.amountPaid:
+                        jeAPI(request, j, 'Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.purchaseOrder.runningBalance)
+                    else:
+                        jeAPI(request, j, 'Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.amountPaid)
+                        jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+        
         else:
         ################# MERCHANDISE PAYMENT #################
             ################# INWARD INVENTORY JOURNAL #################
@@ -615,7 +631,6 @@ class PVApprovalAPI(APIView):
                         jeAPI(request, j, 'Credit', voucher.cheque.accountChild, voucher.amountPaid)
 
                 elif voucher.paymentPeriod == 'Partial Payment':
-                    print('b0ss plis')
                     if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                         jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, voucher.amountPaid)
 
@@ -624,11 +639,18 @@ class PVApprovalAPI(APIView):
                     elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
                         jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
 
-                        jeAPI(request, j, 'Credit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance))
+                        jeAPI(request, j, 'Credit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance - voucher.amountPaid))
                     elif voucher.paymentMethod == "Cheque":
                         jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
 
-                        jeAPI(request, j, 'Credit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance))
+                        jeAPI(request, j, 'Credit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance - voucher.amountPaid))
+                    
+                if voucher.paymentMethod == "Memorandum":
+                    if voucher.inwardInventory.runningBalance <= voucher.transaction.runningBalance:
+                        jeAPI(request, j, 'Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.inwardInventory.runningBalance)
+                    else:
+                        jeAPI(request, j, 'Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.amountPaid)
+                        jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance - voucher.amountPaid))
 
                 if voucher.inwardinventory.runningBalance == voucher.inwardinventory.amountTotal:
                     voucher.inwardinventory.first = True
@@ -701,11 +723,31 @@ class PVApprovalAPI(APIView):
                         jeAPI(request, j, 'Credit', voucher.cheque.accountChild, voucher.amountPaid)
 
                         jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+                if voucher.paymentMethod == "Memorandum":
+                    if voucher.purchaseOrder.runningBalance <= voucher.amountPaid:
+                        jeAPI(request, j, 'Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.purchaseOrder.runningBalance)
+                    else:
+                        jeAPI(request, j, 'Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.amountPaid)
+                        jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
 
-        voucher.purchaseOrder.runningBalance -= voucher.amountPaid
-        if voucher.purchaseOrder.runningBalance == 0:
-            voucher.purchaseOrder.fullyPaid == True
+        if voucher.paymentMethod == "Memorandum":
+            if voucher.purchaseOrder.runningBalance <= voucher.transaction.runningBalance:
+                voucher.transaction.runningBalance -= voucher.purchaseOrder.runningBalance
+                voucher.purchaseOrder.runningBalance = Decimal(0.0)
+                voucher.purchaseOrder.fullyPaid == True
+            else:
+                voucher.purchaseOrder.runningBalance -= voucher.transaction.runningBalance
+                voucher.transaction.runningBalance = Decimal(0.0)
+                voucher.transaction.fullyPaid == True
+            voucher.transaction.save()
+        else:
+            voucher.purchaseOrder.runningBalance -= voucher.amountPaid
+            if voucher.purchaseOrder.runningBalance == 0:
+                voucher.purchaseOrder.fullyPaid == True
         voucher.purchaseOrder.save()
+        
+
+
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
