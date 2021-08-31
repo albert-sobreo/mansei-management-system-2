@@ -64,6 +64,17 @@ class SavePaymentVoucher(APIView):
         
         pv.save()
         request.user.branch.paymentVoucher.add(pv)
+
+        if pv.paymentMethod == "Cheque":
+            cheque = Cheques()
+            cheque.chequeNo = paymentVoucher['chequeNo']
+            cheque.accountChild = AccountChild.objects.get(pk=paymentVoucher['bank'])
+            cheque.dueDate = paymentVoucher['dueDate']
+            cheque.save()
+            request.user.branch.cheque.add(cheque)
+
+            pv.cheque = cheque
+            pv.save()
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 

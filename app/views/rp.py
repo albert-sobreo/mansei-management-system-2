@@ -97,9 +97,14 @@ class SaveReceivePayment(APIView):
         else:
             cheque = Cheques()
             cheque.chequeNo = receivePayment['chequeNo']
-            cheque.receivePayment = rp
             cheque.accountChild = AccountChild.objects.get(pk=receivePayment['bank'])
+            print(receivePayment['bank'])
             cheque.dueDate = receivePayment['dueDate']
+            cheque.save()
+            request.user.branch.cheque.add(cheque)
+
+            rp.cheque = cheque
+            rp.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -113,36 +118,36 @@ class RPVoid(APIView):
         rp.datetimeVoided = datetime.now()
         rp.voidedBy = request.user
 
-        if rp.paymentMethod != "Cheque":
-            j = Journal()
+        
+        j = Journal()
+        j.code = rp.code
+        j.datetimeCreated = rp.datetimeCreated
+        j.createdBy = rp.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        rp.journal = j
+        rp.save()
+        request.user.branch.journal.add(j)
+        ################# DEBIT SIDE #################
+        jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+        ################# CREDIT SIDE #################
+        if rp.wep!= 0.0:
+            jeAPI(request, j, 'Credit', dChildAccount.cwit, rp.wep)
+        if rp.paymentMethod == dChildAccount.cashOnHand.name:
+            jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, rp.amountPaid)
+        elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
+            jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
+        elif rp.paymentMethod == "Cheque":
+            jeAPI(request, j, 'Credit', rp.cheque.accountChild, rp.amountPaid)
+        
+        rp.salesContract.runningBalance += (rp.amountPaid + rp.wep)
+        if rp.salesContract.runningBalance == 0:
+            rp.salesContract.fullyPaid = True
+        rp.salesContract.save()
 
-            j.code = rp.code
-            j.datetimeCreated = rp.datetimeCreated
-            j.createdBy = rp.createdBy
-            j.journalDate = datetime.now()
-            j.save()
-            rp.journal = j
-            rp.save()
-            request.user.branch.journal.add(j)
-
-            ################# DEBIT SIDE #################
-            jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
-
-            ################# CREDIT SIDE #################
-            if rp.wep!= 0.0:
-                jeAPI(request, j, 'Credit', dChildAccount.cwit, rp.wep)
-
-            if rp.paymentMethod == dChildAccount.cashOnHand.name:
-                jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, rp.amountPaid)
-            elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
-                jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
-            
-            rp.salesContract.runningBalance += (rp.amountPaid + rp.wep)
-            if rp.salesContract.runningBalance == 0:
-                rp.salesContract.fullyPaid = True
-            rp.salesContract.save()
-        else:
-            rp.cheques.receivePayment = None
+        if rp.paymentMethod == "Cheque":
+            rp.cheque.receivePayment = None
+            rp.cheque.receivePayment.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

@@ -31,14 +31,18 @@
                 <th>Transaction</th>
                 <th>Amount</th>
                 <th>Customer/Vendor</th>
+                <th>Actions</th>
             </thead>
             <tbody>
+                {% for cheque in cheques %}
                 <tr>
-                    <th>b0ss</th>
-                    <th>b0ss</th>
-                    <th>b0ss</th>
-                    <th>b0ss</th>
+                    <td>{{cheque.chequeNo}}</td>
+                    <td>{{cheque.receivePayment.code}}</td>
+                    <td>{{cheque.receivePayment.amountPaid}}</td>
+                    <td>{{cheque.receivePayment.salesContract.party.name}}</td>
+                    <td><button @click="approveBR({{cheque.pk}})">Approve</button></td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -54,7 +58,18 @@
         el: "#app",
 
         data: {
-            
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            }
+        },
+
+        methods: {
+            approveBR(id){
+                axios.put(`/br-approval/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+            }
         }
     })
 </script>

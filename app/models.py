@@ -342,6 +342,13 @@ class WarehouseItems(models.Model):
         self.merchInventory.save()
         self.save()
 
+class Cheques(models.Model):
+    chequeNo = models.CharField(max_length=255, null=True, blank=True)
+    accountChild = models.ForeignKey(AccountChild, on_delete=models.PROTECT, null = True, blank = True, related_name="cheques")
+    approved = models.BooleanField(null = True, default=False, blank = True)
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="cheApprovedBy")
+    datetimeApproved = models.DateTimeField(null = True, blank = True)
+    dueDate = models.DateField(null = True, blank = False)
 
 class PurchaseRequest(models.Model):
     code = models.CharField(max_length=50)
@@ -601,7 +608,7 @@ class PaymentVoucher(models.Model):
     paymentDate = models.DateField(null = True)
     purchaseOrder = models.ForeignKey(PurchaseOrder, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
     receivingReport = models.ForeignKey(ReceivingReport, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
-    inwardInventory = models.ForeignKey(InwardInventory, related_name= "inwardinventory", on_delete=models.PROTECT, null = True, blank = True)
+    inwardInventory = models.ForeignKey(InwardInventory, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank = True)
     journal = models.ForeignKey(Journal, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
     remarks = models.TextField(null = True)
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vCreatedBy")
@@ -616,6 +623,7 @@ class PaymentVoucher(models.Model):
     voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "pvVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
     first = models.BooleanField(null = True, default = False)
+    cheque = models.ForeignKey(Cheques, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank = True )
 
 class Quotations(models.Model):
     code = models.CharField(max_length=50)
@@ -865,6 +873,7 @@ class ReceivePayment(models.Model):
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default= 0.0)
     voided = models.BooleanField(default = False)
+    cheque = models.ForeignKey(Cheques, related_name= "receivepayment", on_delete=models.PROTECT, null = True, blank = True )
 
 class Driver(models.Model):
     driverID = models.CharField(max_length=50, default='0')
@@ -1005,14 +1014,7 @@ class AdjustmentsPhotos(models.Model):
     adjustments = models.ForeignKey(Deliveries, related_name="adjustmentsphotos", on_delete=models.PROTECT, null=True, blank=True)
     picture = models.ImageField(null=True, blank=True, upload_to="adjustment_photos")
 
-class Cheques(models.Model):
-    chequeNo = models.CharField(max_length=255, null=True, blank=True)
-    receivePayment = models.ForeignKey(ReceivePayment, on_delete=models.CASCADE, null = True, blank = True, related_name="cheques")
-    accountChild = models.ForeignKey(AccountChild, on_delete=models.PROTECT, null = True, blank = True, related_name="cheques")
-    approved = models.BooleanField(null = True, default=False, blank = True)
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="cheApprovedBy")
-    datetimeApproved = models.DateTimeField(null = True, blank = True)
-    dueDate = models.DateField(null = True, blank = False)
+
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
@@ -1127,6 +1129,9 @@ class Branch(models.Model):
     #### DTR ####
     dayOff = models.ManyToManyField(DayOff, blank=True)
     dtr = models.ManyToManyField(DTR, blank=True)
+
+    #### CHEQUE ####
+    cheque = models.ManyToManyField(Cheques, blank=True)
     
 
     def __str__(self):

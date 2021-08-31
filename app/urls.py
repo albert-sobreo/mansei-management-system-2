@@ -234,5 +234,6 @@ urlpatterns = [
     path('ems-user-w-dtr/', views.FetchUserDTR.as_view()),
     path('bank-recon/', login_required(views.BankReconView.as_view())),
     path('br-nonapproved/', login_required(views.BankReconNonApproved.as_view())),
-    path('br-approved/', login_required(views.BankReconApproved.as_view()))
+    path('br-approved/', login_required(views.BankReconApproved.as_view())),
+    path('br-approval/<int:pk>/', login_required(views.BankReconApprovalAPI.as_view()))
 ]

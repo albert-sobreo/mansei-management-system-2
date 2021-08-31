@@ -33,12 +33,14 @@
                 <th>Customer/Vendor</th>
             </thead>
             <tbody>
+                {% for cheque in cheques %}
                 <tr>
-                    <th>b0ss</th>
-                    <th>b0ss</th>
-                    <th>b0ss</th>
-                    <th>b0ss</th>
+                    <td>{{cheque.chequeNo}}</td>
+                    <td>{{cheque.receivePayment.code}}</td>
+                    <td>{{cheque.receivePayment.amountPaid}}</td>
+                    <td>{{cheque.receivePayment.salesContract.party.name}}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

@@ -138,6 +138,10 @@
                                 <label class="gray">Remarks</label><br>
                                 <span class="font-size-14 font-bold">[[orderModal.remarks]]</span>
                             </div>
+                            <div class="col-3 my-3">
+                                <label class="gray">Running Balance</label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(orderModal.runningBalance)]]</span>
+                            </div>
                         </div>
 
                         <!-- QQ ITEMS -->
@@ -285,6 +289,7 @@
                 remarks: null,
                 discountPeso: null,
                 discountPercent: null,
+                runningBalance: null,
 
                 atcCode: null,
                 amountWithheld: null,

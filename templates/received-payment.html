@@ -220,13 +220,20 @@
                                 <div class="col-6 pr-2">
                                     <div class="form-group">
                                         <label for="">Payment Method</label>
-                                        <select v-model="create.paymentMethod" name="" id="" class="form-control">
+                                        <select @change="toggleMemorandum()" v-model="create.paymentMethod" name="" id="" class="form-control">
                                             <option value="" selected disabled>Choose Payment Method</option>
-                                            <option value="{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}}">{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}}</option>
-                                            {% for item in request.user.branch.branchProfile.branchDefaultChildAccount.cashInBank.all%}
-                                            <option value="{{item.name}}">{{item.name}}</option>
-                                            {% endfor %}
-                                            <option value="Cheque">Cheque</option>
+                                            <optgroup label="Cash">
+                                                <option value="{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}}">{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}}</option>
+                                                {% for item in request.user.branch.branchProfile.branchDefaultChildAccount.cashInBank.all%}
+                                                <option value="{{item.name}}">{{item.name}}</option>
+                                                {% endfor %}
+                                            </optgroup>
+                                            <optgroup label="Cheque">
+                                                <option value="Cheque">Cheque</option>
+                                            </optgroup>
+                                            <optgroup label="Non-Cash">
+                                                <option value="Memorandum">Memorandum</option>
+                                            </optgroup>
                                         </select>
                                     </div>
                                 </div>
@@ -238,7 +245,17 @@
                                     <input v-model=create.paymentPeriod value="Partial Payment" name="radios" type="radio" class="form-check-input">
                                     <label class="form-check-label">Partial Payment</label>
                                 </div>
-                                <div class="col-4 pr-2">
+
+                                <div class="col-12 d-none" id="memorandum">
+                                    <div class="form-group">
+                                        <label>Transaction to Credit/Debit</label>
+                                        <select class="form-control">
+                                            <option value="">Transaction # - <span class="gray">Cash Payment Due: </span> P10,000</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-3 pr-2 py-2">
                                     <div class="form-group">
                                         <label for="">Amount Withheld</label>
                                         <div class="input-group">
@@ -249,7 +266,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-4 px-2">
+                                <div class="col-3 pl-2 order-card py-2 b-tl-radius-10 b-bl-radius-10">
                                     <div class="form-group">
                                         <label for="">Cheque No.</label>
                                         <div class="input-group">
@@ -260,7 +277,18 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-4 pl-2">
+                                <div class="col-3 px-2 order-card py-2">
+                                    <div class="form-group">
+                                        <label for="">Receiving Bank</label>
+                                        <select v-model="create.bank" class="form-control">
+                                            <option value="">Choose Bank</option>
+                                            {% for item in request.user.branch.branchProfile.branchDefaultChildAccount.cashInBank.all%}
+                                            <option value="{{item.pk}}">{{item.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-3 pl-2 py-2 order-card b-tr-radius-10 b-br-radius-10">
                                     <div class="form-group">
                                         <label for="">Cheque Due Date</label>
                                         <input v-model="create.dueDate" type="date" class="form-control">
@@ -345,6 +373,7 @@
                 date: new Date().toISOString().split('T')[0],
                 retroactive: null,
                 scCode: '',
+                bank: '',
                 sc: {
                     code: null,
                     runningBalance: null,
@@ -369,7 +398,7 @@
             },
             voucherToggle: false,
             roundToggle: false,
-            errors: []
+            errors: [],
         },
 
         computed:{
@@ -395,6 +424,13 @@
         },
         
         methods: {
+            toggleMemorandum(){
+                if(this.create.paymentMethod==='Memorandum'){
+                    document.getElementById('memorandum').classList.remove('d-none')
+                } else {
+                    document.getElementById('memorandum').classList.add('d-none')
+                }
+            },
             formatDateTime(value){
                 const months = [
                     'Jan',
