@@ -67,35 +67,10 @@ class SaveReceivePayment(APIView):
         rp.save()
         request.user.branch.receivePayment.add(rp)
 
-        if rp.paymentMethod != "Cheque":
-            j = Journal()
+        if rp.paymentMethod == "Memorandum":
+                    rp.transaction = PurchaseOrder.objects.get(pk=receivePayment['transactionID'])
 
-            j.code = rp.code
-            j.datetimeCreated = rp.datetimeCreated
-            j.createdBy = rp.createdBy
-            j.journalDate = datetime.now()
-            j.save()
-            rp.journal = j
-            rp.save()
-            request.user.branch.journal.add(j)
-
-            ################# CREDIT SIDE #################
-            jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
-
-            ################# DEBIT SIDE #################
-            if rp.wep!= 0.0:
-                jeAPI(request, j, 'Debit', dChildAccount.cwit, rp.wep)
-
-            if rp.paymentMethod == dChildAccount.cashOnHand.name:
-                jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, rp.amountPaid)
-            elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
-                jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
-            
-            rp.salesContract.runningBalance -= (rp.amountPaid + rp.wep)
-            if rp.salesContract.runningBalance == 0:
-                rp.salesContract.fullyPaid = True
-            rp.salesContract.save()
-        else:
+        if rp.paymentMethod == "Cheque":
             cheque = Cheques()
             cheque.chequeNo = receivePayment['chequeNo']
             cheque.accountChild = AccountChild.objects.get(pk=receivePayment['bank'])
@@ -106,6 +81,41 @@ class SaveReceivePayment(APIView):
 
             rp.cheque = cheque
             rp.save()
+
+            sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+            return JsonResponse(0, safe=False)
+
+        j = Journal()
+        j.code = rp.code
+        j.datetimeCreated = rp.datetimeCreated
+        j.createdBy = rp.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        rp.journal = j
+        rp.save()
+        request.user.branch.journal.add(j)
+        ################# CREDIT SIDE #################
+        # jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+        ################# DEBIT SIDE #################
+        if rp.wep!= 0.0:
+            jeAPI(request, j, 'Debit', dChildAccount.cwit, rp.wep)
+        if rp.paymentMethod == dChildAccount.cashOnHand.name:
+            jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+            jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, rp.amountPaid)
+        elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
+            jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+            jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
+        elif rp.paymentMethod == "Memorandum":
+            if rp.salesContract.runningBalance <= rp.transaction.runningBalance:
+                jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.salesContract.runningBalance)
+                jeAPI(request, j, 'Credit', rp.transaction.party.accountChild.get(name__regex=r"[Pp]ayable"), rp.salesContract.runningBalance)
+            else:
+                jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.transaction.runningBalance)
+                jeAPI(request, j, 'Credit', rp.transaction.party.accountChild.get(name__regex=r"[Pp]ayable"), rp.transaction.runningBalance)
+        rp.salesContract.runningBalance -= (rp.amountPaid + rp.wep)
+        if rp.salesContract.runningBalance == 0:
+            rp.salesContract.fullyPaid = True
+        rp.salesContract.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
