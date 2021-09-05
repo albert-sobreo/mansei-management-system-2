@@ -37,7 +37,8 @@ class PaymentVoucherView(View):
             'new_code': new_code,
             'po': request.user.branch.purchaseOrder.filter(approved=True, fullyPaid=False).exclude(runningBalance=Decimal(0)),
             'ii': request.user.branch.inwardInventory.filter(approved=True, fullyPaid=False),
-            'sc': request.user.branch.salesContract.filter(approved=True, fullyPaid=False)
+            'sc': request.user.branch.salesContract.filter(approved=True, fullyPaid=False),
+            "vendors": request.user.branch.party.filter(type="Vendor")
         }
 
         return render(request, 'payment-voucher.html', context)
@@ -46,42 +47,79 @@ class SavePaymentVoucher(APIView):
     def post(self, request, format = None):
         paymentVoucher = request.data
 
-        pv = PaymentVoucher()
-        pv.code = paymentVoucher['code']
-        if paymentVoucher['poCode']:
-            pv.purchaseOrder = PurchaseOrder.objects.get(pk=paymentVoucher['po']['code'])
-        if paymentVoucher['iiCode']:
-            pv.inwardInventory = InwardInventory.objects.get(pk=paymentVoucher['po']['code'])
-        pv.datetimeCreated = datetime.now()
-        pv.remarks = paymentVoucher['description']
-        if paymentVoucher['retroactive']:
-            pv.paymentDate = paymentVoucher['retroactive']
-        else:
-            pv.paymentDate = paymentVoucher['date']
-        if request.user.is_authenticated:
-            pv.createdBy = request.user
-        pv.paymentMethod = paymentVoucher['paymentMethod']
-        pv.paymentPeriod = paymentVoucher['paymentPeriod']
+        if paymentVoucher['pvType'] == "Default":
+            pv = PaymentVoucher()
+            pv.code = paymentVoucher['code']
+            if paymentVoucher['poCode']:
+                pv.purchaseOrder = PurchaseOrder.objects.get(pk=paymentVoucher['po']['code'])
+            if paymentVoucher['iiCode']:
+                pv.inwardInventory = InwardInventory.objects.get(pk=paymentVoucher['po']['code'])
+            pv.datetimeCreated = datetime.now()
+            pv.remarks = paymentVoucher['description']
+            if paymentVoucher['retroactive']:
+                pv.paymentDate = paymentVoucher['retroactive']
+            else:
+                pv.paymentDate = paymentVoucher['date']
+            if request.user.is_authenticated:
+                pv.createdBy = request.user
+            pv.paymentMethod = paymentVoucher['paymentMethod']
+            pv.paymentPeriod = paymentVoucher['paymentPeriod']
 
-        if pv.paymentMethod == "Memorandum":
-            pv.transaction = SalesContract.objects.get(pk=paymentVoucher['transactionID'])
-        
-        pv.amountPaid = paymentVoucher['amountPaid']
-        pv.wep = paymentVoucher['wep']
-        
-        pv.save()
-        request.user.branch.paymentVoucher.add(pv)
+            if pv.paymentMethod == "Memorandum":
+                pv.transaction = SalesContract.objects.get(pk=paymentVoucher['transactionID'])
 
-        if pv.paymentMethod == "Cheque":
-            cheque = Cheques()
-            cheque.chequeNo = paymentVoucher['chequeNo']
-            cheque.accountChild = AccountChild.objects.get(pk=paymentVoucher['bank'])
-            cheque.dueDate = paymentVoucher['dueDate']
-            cheque.save()
-            request.user.branch.cheque.add(cheque)
+            pv.amountPaid = paymentVoucher['amountPaid']
+            pv.wep = paymentVoucher['wep']
 
-            pv.cheque = cheque
             pv.save()
+            request.user.branch.paymentVoucher.add(pv)
+
+            if pv.paymentMethod == "Cheque":
+                cheque = Cheques()
+                cheque.chequeNo = paymentVoucher['chequeNo']
+                cheque.accountChild = AccountChild.objects.get(pk=paymentVoucher['bank'])
+                cheque.dueDate = paymentVoucher['dueDate']
+                cheque.save()
+                request.user.branch.cheque.add(cheque)
+
+                pv.cheque = cheque
+                pv.save()
+
+        elif paymentVoucher['pvType'] == 'Custom':
+            pv = PaymentVoucher()
+            pv.code = paymentVoucher['code']
+            pv.datetimeCreated = datetime.now()
+            if request.user.is_authenticated:
+                pv.createdBy = request.user
+
+            if paymentVoucher['retroactive']:
+                pv.paymentDate = paymentVoucher['retroactive']
+            else:
+                pv.paymentDate = paymentVoucher['date']
+
+            pv.party = Party.objects.get(pk=paymentVoucher['party'])
+
+            pv.save()
+            request.user.branch.paymentVoucher.add(pv)
+            
+            for item in paymentVoucher['debit']:
+                cpve = CustomPVEntries()
+                cpve.paymentVoucher = pv
+                cpve.normally = item['normally']
+                cpve.accountChild = AccountChild.objects.get(pk=item['accountChild'])
+                cpve.amount = item['amount']
+                cpve.save()
+                request.user.branch.customePVEntries.add(cpve)
+
+            for item in paymentVoucher['credit']:
+                cpve = CustomPVEntries()
+                cpve.paymentVoucher = pv
+                cpve.normally = item['normally']
+                cpve.accountChild = AccountChild.objects.get(pk=item['accountChild'])
+                cpve.amount = item['amount']
+                cpve.save()
+                request.user.branch.customePVEntries.add(cpve)
+
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

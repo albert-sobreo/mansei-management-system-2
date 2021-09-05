@@ -760,28 +760,35 @@ class SalesContract(models.Model):
         return self.code
 
 class PaymentVoucher(models.Model):
-    code = models.CharField(max_length = 50, null = True)
-    datetimeCreated = models.DateTimeField(null = True)
-    paymentDate = models.DateField(null = True)
-    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
-    transaction = models.ForeignKey(SalesContract, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True )
-    receivingReport = models.ForeignKey(ReceivingReport, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
+    code = models.CharField(max_length = 50, null = True, blank=True)
+    datetimeCreated = models.DateTimeField(null = True, blank=True)
+    paymentDate = models.DateField(null = True, blank=True)
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank=True)
+    transaction = models.ForeignKey(SalesContract, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank=True )
+    receivingReport = models.ForeignKey(ReceivingReport, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank=True)
     inwardInventory = models.ForeignKey(InwardInventory, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank = True)
-    journal = models.ForeignKey(Journal, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True)
-    remarks = models.TextField(null = True)
+    journal = models.ForeignKey(Journal, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank=True)
+    remarks = models.TextField(null = True, blank=True)
     createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vCreatedBy")
     approved = models.BooleanField(default = 'False', null = True, blank = True)
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vApprovedBy")
-    datetimeApproved = models.DateTimeField(null = True)
-    paymentMethod = models.CharField(max_length = 50, null = True)
+    datetimeApproved = models.DateTimeField(null = True, blank=True)
+    paymentMethod = models.CharField(max_length = 50, null = True, blank=True)
     paymentPeriod = models.CharField(max_length = 50, null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default = 0.0)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     voided = models.BooleanField(null = True, default = False)
     voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "pvVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
-    first = models.BooleanField(null = True, default = False)
+    first = models.BooleanField(null = True, default = False, blank=True)
     cheque = models.ForeignKey(Cheques, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank = True )
+    party = models.ForeignKey(Party, on_delete=models.CASCADE, null=True, blank=True)
+
+class CustomPVEntries(models.Model):
+    paymentVoucher = models.ForeignKey(PaymentVoucher, related_name="custompventries", on_delete=models.PROTECT, null=True, blank=True)
+    normally = models.CharField(max_length=50, choices=normally)
+    accountChild = models.ForeignKey(AccountChild, related_name="custompventries", on_delete=models.PROTECT, null=True, blank=True)
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,default= 0)
 
 class TempSalesContract(models.Model):
     code = models.CharField(max_length=50)
@@ -876,6 +883,13 @@ class ReceivePayment(models.Model):
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default= 0.0)
     voided = models.BooleanField(default = False)
     cheque = models.ForeignKey(Cheques, related_name= "receivepayment", on_delete=models.PROTECT, null = True, blank = True )
+    party = models.ForeignKey(Party, on_delete=models.CASCADE, null=True, blank=True)
+
+class CustomRPEntries(models.Model):
+    receivePayment = models.ForeignKey(ReceivePayment, related_name="customrpentries", on_delete=models.PROTECT, null=True, blank=True)
+    normally = models.CharField(max_length=50, choices=normally)
+    accountChild = models.ForeignKey(AccountChild, related_name="customrpentries", on_delete=models.PROTECT, null=True, blank=True)
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,default= 0)
 
 class Driver(models.Model):
     driverID = models.CharField(max_length=50, default='0')
@@ -1118,8 +1132,10 @@ class Branch(models.Model):
 
     #### PAYMENT VOUCHER & SALES INVOICE ####
     paymentVoucher = models.ManyToManyField(PaymentVoucher, blank = True)
+    customPVEntries = models.ManyToManyField(CustomPVEntries, blank=True)
     salesInvoice = models.ManyToManyField(SalesInvoice, blank = True)
     receivePayment = models.ManyToManyField(ReceivePayment, blank = True)
+    customRPEntries = models.ManyToManyField(CustomRPEntries, blank=True)
 
     #### TRANSFER AND ADJUSTMENTS ####
     transfer = models.ManyToManyField(Transfer, blank = True)

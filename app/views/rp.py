@@ -38,6 +38,7 @@ class ReceivedPaymentView(View):
             'new_code': new_code,
             'sc': request.user.branch.salesContract.filter(approved=True, fullyPaid=False),
             'po': request.user.branch.purchaseOrder.filter(approved=True, fullyPaid=False).exclude(runningBalance=Decimal(0)),
+            'customers': request.user.branch.party.filter(type="Customer")
         }
         return render(request, 'received-payment.html', context)
 
@@ -46,76 +47,121 @@ class SaveReceivePayment(APIView):
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         receivePayment = request.data
 
-        rp = ReceivePayment()
-        rp.code = receivePayment['code']
-        rp.datetimeCreated = datetime.now()
-        rp.remarks = receivePayment['description']
-        if receivePayment['retroactive']:
-            rp.paymentDate = receivePayment['retroactive']
-        else:
-            rp.paymentDate = receivePayment['date']
-        if request.user.is_authenticated:
-            rp.createdBy = request.user
-        rp.salesContract = SalesContract.objects.get(pk=receivePayment['sc']['code'])
-        rp.paymentMethod = receivePayment['paymentMethod']
-        rp.paymentPeriod = receivePayment['paymentPeriod']
-        
-        rp.wep = Decimal(receivePayment['wep'])
-        rp.amountPaid = Decimal(receivePayment['amountPaid']) - rp.wep
-        rp.salesContract.wep += rp.wep
-        rp.salesContract.save()
-        rp.save()
-        request.user.branch.receivePayment.add(rp)
 
-        if rp.paymentMethod == "Memorandum":
-                    rp.transaction = PurchaseOrder.objects.get(pk=receivePayment['transactionID'])
+        ##### RECEIVED PAYMENT DEFAULT #####
+        if receivePayment['rpType'] == 'Default':
 
-        if rp.paymentMethod == "Cheque":
-            cheque = Cheques()
-            cheque.chequeNo = receivePayment['chequeNo']
-            cheque.accountChild = AccountChild.objects.get(pk=receivePayment['bank'])
-            print(receivePayment['bank'])
-            cheque.dueDate = receivePayment['dueDate']
-            cheque.save()
-            request.user.branch.cheque.add(cheque)
+            rp = ReceivePayment()
+            rp.code = receivePayment['code']
+            rp.datetimeCreated = datetime.now()
+            rp.remarks = receivePayment['description']
+            if receivePayment['retroactive']:
+                rp.paymentDate = receivePayment['retroactive']
+            else:
+                rp.paymentDate = receivePayment['date']
+            if request.user.is_authenticated:
+                rp.createdBy = request.user
+            rp.salesContract = SalesContract.objects.get(pk=receivePayment['sc']['code'])
+            rp.paymentMethod = receivePayment['paymentMethod']
+            rp.paymentPeriod = receivePayment['paymentPeriod']
 
-            rp.cheque = cheque
+            rp.wep = Decimal(receivePayment['wep'])
+            rp.amountPaid = Decimal(receivePayment['amountPaid']) - rp.wep
+            rp.salesContract.wep += rp.wep
+            rp.salesContract.save()
+            rp.save()
+            request.user.branch.receivePayment.add(rp)
+
+            if rp.paymentMethod == "Memorandum":
+                        rp.transaction = PurchaseOrder.objects.get(pk=receivePayment['transactionID'])
+
+            if rp.paymentMethod == "Cheque":
+                cheque = Cheques()
+                cheque.chequeNo = receivePayment['chequeNo']
+                cheque.accountChild = AccountChild.objects.get(pk=receivePayment['bank'])
+                print(receivePayment['bank'])
+                cheque.dueDate = receivePayment['dueDate']
+                cheque.save()
+                request.user.branch.cheque.add(cheque)
+
+                rp.cheque = cheque
+                rp.save()
+
+                sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+                return JsonResponse(0, safe=False)
+
+            j = Journal()
+            j.code = rp.code
+            j.datetimeCreated = rp.datetimeCreated
+            j.createdBy = rp.createdBy
+            j.journalDate = datetime.now()
+            j.save()
+            rp.journal = j
+            rp.save()
+            request.user.branch.journal.add(j)
+            ################# CREDIT SIDE #################
+            # jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+            ################# DEBIT SIDE #################
+            if rp.wep!= 0.0:
+                jeAPI(request, j, 'Debit', dChildAccount.cwit, rp.wep)
+            if rp.paymentMethod == dChildAccount.cashOnHand.name:
+                jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+                jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, rp.amountPaid)
+            elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
+                jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+                jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
+            elif rp.paymentMethod == "Memorandum":
+                if rp.salesContract.runningBalance <= rp.transaction.runningBalance:
+                    jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.salesContract.runningBalance)
+                    jeAPI(request, j, 'Credit', rp.transaction.party.accountChild.get(name__regex=r"[Pp]ayable"), rp.salesContract.runningBalance)
+                else:
+                    jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.transaction.runningBalance)
+                    jeAPI(request, j, 'Credit', rp.transaction.party.accountChild.get(name__regex=r"[Pp]ayable"), rp.transaction.runningBalance)
+            rp.salesContract.runningBalance -= (rp.amountPaid + rp.wep)
+            if rp.salesContract.runningBalance == 0:
+                rp.salesContract.fullyPaid = True
+            rp.salesContract.save()
+
+        ##### END OF RECEIVED PAYMENT DEFAULT #####
+        elif receivePayment['rpType'] == 'Custom':
+            rp = ReceivePayment()
+            rp.code = receivePayment['code']
+            rp.datetimeCreated = datetime.now()
+            rp.remarks = receivePayment['remarks']
+            if receivePayment['retroactive']:
+                rp.paymentDate = receivePayment['retroactive']
+            else:
+                rp.paymentDate = receivePayment['date']
+
+            if request.user.is_authenticated:
+                rp.createdBy = request.user
+
+            rp.party = Party.objects.get(pk=receivePayment['party'])
+
             rp.save()
 
-            sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
-            return JsonResponse(0, safe=False)
+            for item in receivePayment['debit']:
+                crpe = CustomRPEntries()
+                crpe.receivePayment = rp
+                crpe.normally = item['normally']
+                crpe.accountChild = AccountChild.objects.get(pk=item['accountChild'])
+                crpe.amount = item['amount']
+                crpe.save()
+                
+                request.user.branch.customRPEntries.add(crpe)
 
-        j = Journal()
-        j.code = rp.code
-        j.datetimeCreated = rp.datetimeCreated
-        j.createdBy = rp.createdBy
-        j.journalDate = datetime.now()
-        j.save()
-        rp.journal = j
-        rp.save()
-        request.user.branch.journal.add(j)
-        ################# CREDIT SIDE #################
-        # jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
-        ################# DEBIT SIDE #################
-        if rp.wep!= 0.0:
-            jeAPI(request, j, 'Debit', dChildAccount.cwit, rp.wep)
-        if rp.paymentMethod == dChildAccount.cashOnHand.name:
-            jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
-            jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, rp.amountPaid)
-        elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
-            jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
-            jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
-        elif rp.paymentMethod == "Memorandum":
-            if rp.salesContract.runningBalance <= rp.transaction.runningBalance:
-                jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.salesContract.runningBalance)
-                jeAPI(request, j, 'Credit', rp.transaction.party.accountChild.get(name__regex=r"[Pp]ayable"), rp.salesContract.runningBalance)
-            else:
-                jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.transaction.runningBalance)
-                jeAPI(request, j, 'Credit', rp.transaction.party.accountChild.get(name__regex=r"[Pp]ayable"), rp.transaction.runningBalance)
-        rp.salesContract.runningBalance -= (rp.amountPaid + rp.wep)
-        if rp.salesContract.runningBalance == 0:
-            rp.salesContract.fullyPaid = True
-        rp.salesContract.save()
+            for item in receivePayment['credit']:
+                crpe = CustomRPEntries()
+                crpe.receivePayment = rp
+                crpe.normally = item['normally']
+                crpe.accountChild = AccountChild.objects.get(pk=item['accountChild'])
+                crpe.amount = item['amount']
+                crpe.save()
+                
+                request.user.branch.customRPEntries.add(crpe)
+
+            ##### CUSTOME RP NEEDS JOURNAL ENTRIES #####
+
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
