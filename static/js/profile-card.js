@@ -6,6 +6,7 @@ Vue.component('profile-card', {
         'position',
         'auth_level',
         'photo',
+        'branch'
     ],
 
     template: /*javascript*/`
@@ -20,11 +21,14 @@ Vue.component('profile-card', {
             <div class="profile-my-position">
                 <span>[[this.position]]</span>
             </div>
+            <div>
+                <span>[[this.branch]]</span>
+            </div>
         </div>
         <div class="mt-2 flex flex-row profile-card-container logout py-2 px-4 b-radius-5 justify-content-center align-items-center " onclick="location.href='#'">
             My Profile
         </div>
-        <div class="mt-2 flex flex-row profile-card-container logout py-2 px-4 b-radius-5 justify-content-center align-items-center " onclick="location.href='/branch-profile/'">
+        <div class="mt-2 flex flex-row profile-card-container logout py-2 px-4 b-radius-5 justify-content-center align-items-center " onclick="location.href='/branches/'">
             Branch Profile
         </div>
         <div class="mt-2 flex flex-row profile-card-container logout py-2 px-4 b-radius-5 justify-content-center align-items-center " onclick="location.href='/logout/'">

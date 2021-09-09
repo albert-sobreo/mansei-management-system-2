@@ -1,0 +1,40 @@
+{% extends "base-template.html" %}
+{% block title %}Branches{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-plain photo="/media/{{request.user.image}}"></navbar-plain>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links imps-nav">
+                <a href="/branches/" class="active-imps mx-2">Branches</a>
+                <a href="/branch-profile/" class="mx-2">Accounting</a>
+                <a href="#" class="mx-2">Others</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Branches</span>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiter: ['[[', ']]'],
+        el: '#app'
+    })
+</script>
+
+{% endblock %}

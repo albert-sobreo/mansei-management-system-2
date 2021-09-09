@@ -34,8 +34,7 @@
                 <th>Width</th>
                 <th>Thickness</th>
                 <th>Selling Price</th>
-                <th>Qty. (T)</th>
-                <th>Qty. (S)</th>
+                <!-- <th>Qty. (T)</th> -->
                 <th>Qty. (R)</th>
                 <th>Qty. (A)</th>
                 <!-- <th>U/M</th> -->
@@ -59,8 +58,7 @@
                         <span class="inch">[[roundNumber2(convertSize({{item.thickness}}))]] [[iof]]</span>
                     </td>
                     <td class="align-middle">P[[roundNumber2({{item.sellingPrice}})]]</td>
-                    <td class="align-middle">{{item.qtyT}}</td>
-                    <td class="align-middle">{{item.qtyS}}</td>
+                    <!-- <td class="align-middle">{{item.qtyT}}</td> -->
                     <td class="align-middle">{{item.qtyR}}</td>
                     <td class="align-middle">{{item.qtyA}}</td>
                     <!-- <td class="align-middle">{{item.um}}</td> -->
@@ -629,6 +627,14 @@
                     titleAttr: 'Import',
                     action: function(){
                         $("#import").modal('show')
+                    }
+                },
+                {
+                    text: `<i class="fas fa-file-download"></i>`,
+                    className: 'btn btn-table text-success',
+                    titleAttr: 'Download Excel Template',
+                    action: function(){
+                        location.href="/static/files/Merch-Inventory-Template.xlsx"
                     }
                 }
                 ],

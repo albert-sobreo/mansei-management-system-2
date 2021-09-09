@@ -84,3 +84,6 @@ class SaveDefaultAccounts(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+class BranchesView(View):
+    def get(self, request, format=None):
+        return render(request, 'branches.html')
