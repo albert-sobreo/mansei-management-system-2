@@ -8,6 +8,7 @@ import sweetify
 from decimal import Decimal
 import pandas as pd
 import json
+from datetime import datetime
 
 class MerchInventoryView(View):
     def get(self, request, format=None):
@@ -56,6 +57,7 @@ class AddMerchInventoryAPI(APIView):
 class ImportMerchandiseInventory(View):
     def post(self, request, format=None):
         df = pd.read_excel(request.FILES['excel'])
+        print(df['Inventory-Date'].tolist())
         jsonDF = json.loads(df.to_json(orient='records'))
         
         for item in jsonDF:
@@ -90,7 +92,7 @@ class ImportMerchandiseInventory(View):
             merch.um = item['U/M']
             merch.description = item['Description']
             merch.totalCost = item['Total-Cost']
-            merch.inventoryDate = item['Inventory-Date']
+            merch.inventoryDate = datetime.fromtimestamp((item['Inventory-Date'])/1000)
 
             merch.save()
             
