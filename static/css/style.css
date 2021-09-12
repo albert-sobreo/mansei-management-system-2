@@ -1019,3 +1019,7 @@ select.form-control{
 .transistion{
     transition: 1s ease-in-out;
 }
+
+.ppe-orange-text{
+    color: #FF7557;
+}

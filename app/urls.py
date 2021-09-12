@@ -238,5 +238,7 @@ urlpatterns = [
     path('br-approval/<int:pk>/', login_required(views.BankReconApprovalAPI.as_view())),
     path('branches/', login_required(views.BranchesView.as_view())),
     path('create-branch-in-dashboard/', login_required(views.CreateBranchInDashboard.as_view())),
-    path('connect-branch-in-dashboard/', login_required(views.ConnectBranchInDashboard.as_view()))
+
+    path('connect-branch-in-dashboard/', login_required(views.ConnectBranchInDashboard.as_view())),
+    path('ppe/', login_required(views.PPEView.as_view())),
 ]

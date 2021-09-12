@@ -1,0 +1,310 @@
+{% extends "base-template.html" %}
+{% block title %}PPE{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-gas active="nav-ppe" photo="/media/{{request.user.image}}"></navbar-gas>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Plant Property and Equipment</span>
+        </div>
+
+        <!-- TABLE -->
+        <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead class="thead-dark">
+                <th>PPE Code</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Purchase Date</th>
+                <th>Purchase Price</th>
+                <th>Accum. Depr.</th>
+                <th>Book Value</th>
+                <th>Useful Life</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="link" data-toggle="modal" data-target="#ppeModal">b0ss</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="modal fade" id="ppeModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <div class="order-card row my-2">
+                            <!-- LVL 1 -->
+                            <div class="col-3 mt-3">
+                                <label for="" class="gray">PPE Code</label>
+                                <br>
+                                <span class="font-size-14 font-bold"></span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label for="" class="gray">Name</label>
+                                <br>
+                                <span class="font-size-14 font-bold"></span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label for="" class="gray">Type</label>
+                                <br>
+                                <span class="font-size-14 font-bold"></span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label for="" class="gray">Purchase Date</label>
+                                <br>
+                                <span class="font-size-14 font-bold"></span>
+                            </div>
+
+                            <!-- LVL 2 -->
+                            <div class="col-3 my-3">
+                                <label for="" class="gray">Useful Life</label>
+                                <br>
+                                <span class="font-size-14 font-bold"></span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label for="" class="gray">Purchase Price</label>
+                                <br>
+                                <span class="font-size-14 font-bold"></span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label for="" class="gray">Accum. Depr.</label>
+                                <br>
+                                <span class="font-size-14 font-bold"></span>
+                            </div>
+                            <div class="col-3 my-3">
+                                <label for="" class="gray">Bank Value</label>
+                                <br>
+                                <span class="font-size-14 font-bold"></span>
+                            </div>
+                        </div>
+
+                        <!-- HISTORY OF DEPRECIATION -->
+                        <div class="row mt-4">
+                            <div class="col">
+                                <span class="font-extrabold font-size-20 ppe-orange-text">History of Depreciation</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <table class="table table-sm table-striped table-borderless">
+                                <thead>
+                                    <th>
+                                        <span class="font-bold gray">Date</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Depreciation</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Accumulated</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Bank Value</span>
+                                    </th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>hello</td>
+                                        <td>Hello</td>
+                                        <td>HEllo</td>
+                                        <td>HELLo</td>
+                                    </tr>
+                                    <tr>
+                                        <td>hello</td>
+                                        <td>Hello</td>
+                                        <td>HEllo</td>
+                                        <td>HELLo</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- HISTORY OF REPAIR AND MAINTENANCE -->
+                        <div class="row mt-4">
+                            <div class="col">
+                                <span class="font-extrabold font-size-20 ppe-orange-text">
+                                    History of Repair and Maintenance
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <table class="table table-sm table-striped table-borderless">
+                                <thead>
+                                    <th>
+                                        <span class="font-bold gray">Date</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Reference No.</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Description</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Amount</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Capitalized</span>
+                                    </th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Hello</td>
+                                        <td>Hello</td>
+                                        <td>Hello</td>
+                                        <td>Hello</td>
+                                        <td>Hello</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config: {
+				headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+			},
+
+            modal: {
+                code: null,
+                name: null,
+                type: null,
+                purchaseDate: null,
+                accumDepr: null,
+                bookValue: null,
+                usefulLife: null,
+                
+                ppehistoryofdepr: [{
+                    date: null,
+                    deprAmount: null,
+                    accumDeprAmount: null,
+                    bookValue: null,
+                }],
+
+                repairandmaintenance: [{
+                    date: null,
+                    description: null,
+                    amount: null,
+                }]
+            },
+
+            create: {
+                code: null,
+                name: null,
+                type: null,
+                purchaseDate: null,
+                accumDepr: null,
+                bookValue: null,
+                usefulLife: null 
+            }
+        },
+
+        methods: {
+
+        },
+    })
+</script>
+
+<script>
+    $(document).ready(function() {
+        $.fn.dataTable.moment( 'MMMM D, YYYY' );
+        $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
+        $('#table').DataTable({
+            language: { search: '', searchPlaceholder: 'Search'},
+            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            "order": [[ 0, "desc" ]],
+            "pageLength": 25,
+            buttons: {
+                buttons: [
+                {
+                    text: 'Add PPE',
+                    className: 'btn btn-warning',
+                    titleAttr: 'Add PPE',
+                    action: function(){
+                        $("#addPPE").modal('show')
+                    }
+                },
+                
+                {
+                    text: '<i class="fas fa-file-excel"></i>',
+                    className: 'btn text-success btn-table',
+                    titleAttr: 'Export Excel',
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fas fa-file-csv"></i>',
+                    className: 'btn text-warning btn-table',
+                    titleAttr: 'Export CSV',
+                    extend: 'csv'
+                },
+                {
+                    text: '<i class="fas fa-print"></i>',
+                    className: 'btn btn-table',
+                    titleAttr: 'Print',
+                    extend: 'print'
+                },
+                {
+                    text: "RAW",
+                    className: 'btn btn-table font-size-10',
+                    titleAttr: 'View Raw Numbers',
+                    action: function(){
+                        app.roundToggler()
+                    }
+                }
+                ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
+                }
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            },
+        
+        });
+    });
+    $('option').mousedown(function(e) {
+        e.preventDefault();
+        $(this).prop('selected', !$(this).prop('selected'));
+        return false;
+    });
+</script>
+
+{% endblock %}

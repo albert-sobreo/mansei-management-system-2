@@ -60,7 +60,7 @@ Vue.component('navbar-gas', {
             <a href="/vendors/" class="mx-3" id="nav-vendors">Vendors</a>
             <a href="/bank-recon/" class="mx-3" id="nav-bank-recon">Bank Reconciliation</a>
             <a href="/chart-of-accounts/" class="mx-3" id="nav-accounts">Chart of Accounts</a>
-            <a href="#" class="mx-3" id="nav-ppe">PPE</a>
+            <a href="/ppe/" class="mx-3" id="nav-ppe">PPE</a>
             <div class="btn-group mx-3">
                 <a href="#" data-toggle="dropdown" id="nav-approvals">Approvals</a>
                 <div class="dropdown-menu b-radius-5 py-0">

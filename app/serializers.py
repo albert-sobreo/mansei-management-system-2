@@ -682,3 +682,31 @@ class UserWithDTRSZ(serializers.ModelSerializer):
             'dtr'
         ]
         depth = 1
+
+
+
+
+
+########## PPE ##########
+class PPESZ(serializers.ModelSerializer):
+    class Meta:
+        model = PPE
+        fields = '__all__'
+
+class PPEHistoryOfDeprSZ(serializers.ModelSerializer):
+    class Meta:
+        model = PPEHistoryOfDepr
+        fields = "__all__"
+
+class RepairAndMaintenanceSZ(serializers.ModelSerializer):
+    class Meta:
+        model = RepairAndMaintenance
+        fields = "__all__"
+
+class PPENestedSZ(serializers.ModelSerializer):
+    ppehistoryofdepr = PPEHistoryOfDeprSZ(read_only=True, many=True)
+    repairandmaintenance = RepairAndMaintenanceSZ(read_only=True, many=True)
+    class Meta:
+        model = PPE
+        fields = "__all__"
+        depth = 1

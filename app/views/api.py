@@ -249,7 +249,6 @@ class PurchaseRequestNestedAPI(viewsets.ModelViewSet):
 
 
 ########## RECEIVING REPORT ##########
-
 class ReceivingReportNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ReceivingReportNestedSZ
@@ -261,7 +260,6 @@ class ReceivingReportNestedAPI(viewsets.ModelViewSet):
 
 
 ########## INWARD INVENTORY ##########
-
 class InwardInventoryNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = InwardInventoryNestedSZ
@@ -278,7 +276,6 @@ class InwardInventoryAPI(viewsets.ModelViewSet):
 
 
 ########## PAYMENT VOUCHER ##########
-
 class PaymentVoucherAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = VoucherSZ
@@ -308,7 +305,6 @@ class SalesInvoiceAPI(viewsets.ModelViewSet):
 
 
 ########## QUOTATIONS ##########
-
 class QuotationsAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = QuotationsSZ
@@ -336,6 +332,9 @@ class AdjustmentAPI(viewsets.ModelViewSet):
     queryset = Adjustments.objects.all()
 
 
+
+
+
 ########### BranchDefaultChildAccount ##########
 class BranchDefaultChildAccountAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -350,3 +349,13 @@ class BranchDefaultChildAccountAPI(viewsets.ModelViewSet):
 class UserWithDTRAPI(viewsets.ModelViewSet):
     serializer_class = UserWithDTRSZ
     queryset = User.objects.all()
+
+
+
+
+
+########## PPE ##########
+class PPENestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PPENestedSZ
+    queryset = PPE.objects.all()

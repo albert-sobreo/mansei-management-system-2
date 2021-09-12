@@ -1030,7 +1030,27 @@ class AdjustmentsPhotos(models.Model):
     adjustments = models.ForeignKey(Deliveries, related_name="adjustmentsphotos", on_delete=models.PROTECT, null=True, blank=True)
     picture = models.ImageField(null=True, blank=True, upload_to="adjustment_photos")
 
+class PPE(models.Model):
+    code = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(max_length=512, null=True, blank=True)
+    type = models.CharField(max_length=128, null=True, blank=True)
+    purchaseDate = models.DateField(null=True, blank=True)
+    accumDepr = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    bookValue = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    usefulLife = models.IntegerField(null=True, blank=True)
 
+class PPEHistoryOfDepr(models.Model):
+    ppe = models.ForeignKey(PPE, on_delete=models.CASCADE, related_name="ppehistoryofdepr", null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
+    deprAmount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    accumDeprAmount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    bookValue = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+
+class RepairAndMaintenance(models.Model):
+    ppe = models.ForeignKey(PPE, on_delete=models.CASCADE, related_name="repairandmaintenance", null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
