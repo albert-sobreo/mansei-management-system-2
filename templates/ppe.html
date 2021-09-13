@@ -125,6 +125,33 @@
             </div>
         </div>
 
+        <!-- IMPORT MODAL -->
+        <div class="modal fade" id="import">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Import PPE Items</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="/import-ppe/" enctype="multipart/form-data" method="POST">{% csrf_token %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="">Select Excel File</label><br>
+                                    <input name="excel" type="file" accept=".xls,.xlsx,.csv"><br>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary col">Import</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="modal fade" id="ppeModal">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content b-radius-15">
@@ -135,44 +162,44 @@
                             <div class="col-3 mt-3">
                                 <label for="" class="gray">PPE Code</label>
                                 <br>
-                                <span class="font-size-14 font-bold"></span>
+                                <span class="font-size-14 font-bold">[[modal.code]]</span>
                             </div>
                             <div class="col-3 mt-3">
                                 <label for="" class="gray">Name</label>
                                 <br>
-                                <span class="font-size-14 font-bold"></span>
+                                <span class="font-size-14 font-bold">[[modal.name]]</span>
                             </div>
                             <div class="col-3 mt-3">
                                 <label for="" class="gray">Type</label>
                                 <br>
-                                <span class="font-size-14 font-bold"></span>
+                                <span class="font-size-14 font-bold">[[modal.type]]</span>
                             </div>
                             <div class="col-3 mt-3">
                                 <label for="" class="gray">Purchase Date</label>
                                 <br>
-                                <span class="font-size-14 font-bold"></span>
+                                <span class="font-size-14 font-bold">[[formatDate(modal.purchaseDate)]]</span>
                             </div>
 
                             <!-- LVL 2 -->
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Useful Life</label>
                                 <br>
-                                <span class="font-size-14 font-bold"></span>
+                                <span class="font-size-14 font-bold">[[modal.usefulLife]] Years</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Purchase Price</label>
                                 <br>
-                                <span class="font-size-14 font-bold"></span>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(modal.purchasePrice)]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Accum. Depr.</label>
                                 <br>
-                                <span class="font-size-14 font-bold"></span>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(modal.accumDepr)]]</span>
                             </div>
                             <div class="col-3 my-3">
-                                <label for="" class="gray">Bank Value</label>
+                                <label for="" class="gray">Book Value</label>
                                 <br>
-                                <span class="font-size-14 font-bold"></span>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(modal.bookValue)]]</span>
                             </div>
                         </div>
 
@@ -285,6 +312,7 @@
                 name: null,
                 type: null,
                 purchaseDate: null,
+                purchasePrice: null,
                 accumDepr: null,
                 bookValue: null,
                 usefulLife: null,
@@ -321,11 +349,41 @@
                 .then(res=>{
                     this.modal = res.data
                 })
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: err.message,
+                        icon: 'error',
+                        showCancelButton: true,
+                        confirmButtonText: "Reload Page",
+                        cancelButtonText: "Dismiss"
+                    })
+                    .then((result) => {
+                        if(result.isConfirmed){
+                            location.reload()
+                        }
+                    })
+                })
             },
 
             addPPE(){
                 axios.post('/addppe/', this.create, this.config)
                 .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: err.message,
+                        icon: 'error',
+                        showCancelButton: true,
+                        confirmButtonText: "Reload Page",
+                        cancelButtonText: "Dismiss"
+                    })
+                    .then((result) => {
+                        if(result.isConfirmed){
+                            location.reload()
+                        }
+                    })
+                })
             },
 
             formatPrice(val){
@@ -335,6 +393,81 @@
                 var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
+            },
+
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${day} - ${month}. ${date}, ${year}`
+
+                return formatted
+            },
+
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
             },
         },
     })
@@ -381,11 +514,19 @@
                     extend: 'print'
                 },
                 {
-                    text: "RAW",
-                    className: 'btn btn-table font-size-10',
-                    titleAttr: 'View Raw Numbers',
+                    text: `<i class="fas fa-file-import"></i>`,
+                    className: 'btn btn-table',
+                    titleAttr: 'Import',
                     action: function(){
-                        app.roundToggler()
+                        $("#import").modal('show')
+                    }
+                },
+                {
+                    text: `<i class="fas fa-file-download"></i>`,
+                    className: 'btn btn-table text-success',
+                    titleAttr: 'Download Excel Template',
+                    action: function(){
+                        location.href="/static/files/PPE-Import-Template.xlsx"
                     }
                 }
                 ],

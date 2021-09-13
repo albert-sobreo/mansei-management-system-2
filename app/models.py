@@ -1041,6 +1041,9 @@ class PPE(models.Model):
     usefulLife = models.IntegerField(null=True, blank=True)
     purchasePrice = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
 
+    def __str__(self):
+        return str(self.code) + " " + self.name + " " + self.type
+
 class PPEHistoryOfDepr(models.Model):
     ppe = models.ForeignKey(PPE, on_delete=models.CASCADE, related_name="ppehistoryofdepr", null=True, blank=True)
     date = models.DateField(null=True, blank=True)

@@ -1,4 +1,3 @@
-from django.contrib.auth.forms import PasswordChangeForm
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
@@ -12,6 +11,7 @@ from datetime import datetime
 from decimal import Decimal
 import json
 import pandas as pd
+
 
 class PPEView(View):
     def get(self, request):
@@ -44,6 +44,10 @@ class ImportPPE(View):
         for item in jsonDF:
             equipment = PPE()
 
+            if PPE.objects.filter(code=item['Code']):
+                print('it exists')
+                continue
+
             equipment.code = item['Code']
             equipment.name = item['Name']
             equipment.type = item['Type']
@@ -57,13 +61,17 @@ class ImportPPE(View):
             item['Purchase-Price'] = item['Purchase-Price'].replace(',', '')
             equipment.purchasePrice = item['Purchase-Price']
 
+            item['Accum-Depr'] = str(item['Accum-Depr']).replace('₱', '')
+            item['Accum-Depr'] = item['Accum-Depr'].replace(',', '')
+            equipment.accumDepr = item['Accum-Depr']
+
             equipment.usefulLife = item['Useful-Life']
 
             equipment.save()
             request.user.branch.ppe.add(equipment)
 
-            sweetify.sweetalert(request, icon="success", title="Success!", persistent="Dismiss")
-            return redirect('/merchinventory/')
+        sweetify.sweetalert(request, icon="success", title="Success!", persistent="Dismiss")
+        return redirect('/ppe/')
 
 class EditPPE(APIView):
     def put(self, request, pk, format = None):
