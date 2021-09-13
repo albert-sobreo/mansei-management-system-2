@@ -95,6 +95,9 @@ router.register(r"adjustments", views.AdjustmentAPI, 'adjustments')
 ########## BRANCH DEFAULT CHILD ACCOUNT ##########
 router.register(r"branch-default-child-account", views.BranchDefaultChildAccountAPI, 'branch-default-child-account')
 
+########## PPE ##########
+router.register(r"ppe", views.PPENestedAPI, "ppe")
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -241,4 +244,7 @@ urlpatterns = [
 
     path('connect-branch-in-dashboard/', login_required(views.ConnectBranchInDashboard.as_view())),
     path('ppe/', login_required(views.PPEView.as_view())),
+    path('addppe/', login_required(views.AddPPE.as_view())),
+    path('import-ppe/', login_required(views.ImportPPE.as_view())),
+    path('edit-ppe/<int:pk>/', login_required(views.EditPPE.as_view())),
 ]

@@ -1,3 +1,4 @@
+import decimal
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import (
@@ -1038,6 +1039,7 @@ class PPE(models.Model):
     accumDepr = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     bookValue = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     usefulLife = models.IntegerField(null=True, blank=True)
+    purchasePrice = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
 
 class PPEHistoryOfDepr(models.Model):
     ppe = models.ForeignKey(PPE, on_delete=models.CASCADE, related_name="ppehistoryofdepr", null=True, blank=True)
@@ -1051,6 +1053,7 @@ class RepairAndMaintenance(models.Model):
     date = models.DateField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    capitalized = models.BooleanField(default=False)
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
@@ -1170,6 +1173,11 @@ class Branch(models.Model):
 
     #### CHEQUE ####
     cheque = models.ManyToManyField(Cheques, blank=True)
+
+    #### PPE ####
+    ppe = models.ManyToManyField(PPE, blank=True)
+    ppeHistoryOfDepr = models.ManyToManyField(PPEHistoryOfDepr, blank=True)
+    repairAndMaintenance = models.ManyToManyField(RepairAndMaintenance, blank=True)
     
 
     def __str__(self):

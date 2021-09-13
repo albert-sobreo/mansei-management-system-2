@@ -29,18 +29,101 @@
                 <th>Useful Life</th>
             </thead>
             <tbody>
+                {% for ppe in request.user.branch.ppe.all %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#ppeModal">b0ss</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td @click="fetchPPE({{ppe.pk}})" class="link" data-toggle="modal" data-target="#ppeModal">{{ppe.code}}</td>
+                    <td>{{ppe.name}}</td>
+                    <td>{{ppe.type}}</td>
+                    <td>{{ppe.purchaseDate}}</td>
+                    <td>₱[[formatPrice('{{ppe.purchasePrice}}')]]</td>
+                    <td>₱[[formatPrice('{{ppe.accumDepr}}')]]</td>
+                    <td>₱[[formatPrice('{{ppe.bookValue}}')]]</td>
+                    <td>{{ppe.usefulLife}} Years</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
+
+        <div class="modal fade" id="addPPE">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add PPE</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col pr-1">
+                                <div class="form-group">
+                                    <label for="">PPE Code</label>
+                                    <input type="text" v-model="create.code" class="form-control" placeholder="Enter Code">
+                                </div>
+                            </div>
+                            <div class="col px-1">
+                                <div class="form-group">
+                                    <label for="">Name</label>
+                                    <input type="text" v-model="create.name" class="form-control" placeholder="Enter Name">
+                                </div>
+                            </div>
+                            <div class="col pl-1">
+                                <div class="form-group">
+                                    <label for="">Type</label>
+                                    <input type="text" v-model="create.type" class="form-control" placeholder="Enter Type">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col pr-1">
+                                <div class="form-group">
+                                    <label for="">Purchase Date</label>
+                                    <input type="date" v-model="create.purchaseDate" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col pl-1">
+                                <div class="form-group">
+                                    <label for="">Purchasing Price</label>
+                                    <input type="text" v-model="create.purchasePrice" class="form-control" placeholder="Enter Purchasing Price" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col pr-1">
+                                <div class="form-group">
+                                    <label for="">Accum. Depreciation</label>
+                                    <input type="text" v-model="create.accumDepr" class="form-control" placeholder="Enter Accum. Depr" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col pl-1">
+                                <div class="form-group">
+                                    <label for="">Book Value</label>
+                                    <input type="text" v-model="create.bookValue" class="form-control" placeholder="Enter Book Value" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="">Useful Life</label>
+                                    <input type="text" v-model="create.usefulLife" class="form-control" placeholder="Enter Years">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-primary col" @click="addPPE()">Add PPE</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="modal fade" id="ppeModal">
             <div class="modal-dialog modal-lg">
@@ -225,6 +308,7 @@
                 name: null,
                 type: null,
                 purchaseDate: null,
+                purchasePrice: null,
                 accumDepr: null,
                 bookValue: null,
                 usefulLife: null 
@@ -232,7 +316,26 @@
         },
 
         methods: {
+            fetchPPE(id){
+                axios.get(`/api/ppe/${id}/`)
+                .then(res=>{
+                    this.modal = res.data
+                })
+            },
 
+            addPPE(){
+                axios.post('/addppe/', this.create, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
         },
     })
 </script>
