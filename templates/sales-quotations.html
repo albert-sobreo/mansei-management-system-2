@@ -213,6 +213,9 @@
                     <div class="col px-1">
                         <label for="warehouse" class="m-0">Item-Code - Item name</label>
                     </div>
+                    <div class="col px-1">
+                        <label for="" class="m-0">Warehouse</label>
+                    </div>
                     <div class="col-1 px-1">
                         <label for="remaining" class="m-0">Remaining</label>
                     </div>
@@ -239,6 +242,12 @@
                         <select @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control">
                             <option value="" selected disabled>Choose Merchandise Inventory</option>
                             <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]]</option>
+                        </select>
+                    </div>
+                    <div class="cl px-1">
+                        <select @change="getMerchRemaining2(item.code, item.warehouse, index)" class="form-control" v-model="item.warehouse">
+                            <option value="">Choose Warehouse</option>
+                            <option v-for="warehouse in item.warehouseList" :value="warehouse.id">[[warehouse.name]]</option>
                         </select>
                     </div>
                     <div class="col-1 px-1">
@@ -488,12 +497,14 @@
                 items: [{
                     type: '',
                     code: '',
+                    warehouse: '',
                     remaining: null,
                     quantity: 0,
                     cbm: 'm3',
                     vol: null,
                     pricePerCubic: 0.00,
-                    totalCost: null
+                    totalCost: null,
+                    warehouseList: [],
                 }],
                 atc: [{
                     code: '47',
@@ -840,12 +851,27 @@
             },
 
             getMerchRemaining(id, index){
-                item = this.merchandiseInventory.find(x=>x.id==id)
-                this.order.items[index].remaining = item.qtyA
-                this.order.items[index].pricePerCubic = Number(item.pricePerCubic).toFixed(2)
-                this.order.items[index].vol = item.vol
 
-                this.onForTotalCost(index)
+                axios.get(`/api/nestedmerchinventory/${id}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    this.order.items[index].pricePerCubic = res.data.pricePerCubic
+                    this.order.items[index].warehouseList = []
+                    res.data.warehouseitems.forEach((item)=>{
+                        this.order.items[index].warehouseList.push({
+                            id: item.warehouse.id,
+                            name: item.warehouse.name
+                        })
+                    })
+                })
+            },
+
+            getMerchRemaining2(id, id2, index){
+                axios.get(`/api/nestedmerchinventory/${id}/`)
+                .then(res=>{
+                    warehouseitems = res.data.warehouseitems.find(item=>item.warehouse.id==id2)
+                    this.order.items[index].remaining = warehouse.qtyA
+                })
             },
 
             onForTotalCost(index){

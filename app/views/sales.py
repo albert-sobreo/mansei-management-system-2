@@ -37,6 +37,7 @@ class SalesContractView(View):
 
         context = {
             'new_code': new_code,
+            "salesOrder": request.user.branch.salesOrder.all().filter(approved=True,soed=False)
         }
         return render(request, 'sales-contract.html', context)
 
@@ -71,6 +72,11 @@ class SaveSalesContract(APIView):
         sc.bank = salesContract['bank']
         sc.remarks = salesContract['remarks']
         sc.wep = Decimal(salesContract['withholdingTax'])
+
+        if salesContract['salesOrder']:
+            sc.salesOrder = SalesOrder.objects.get(pk=salesContract['salesOrder'])
+            sc.salesOrder.soed = True
+            sc.salesOrder.save()
 
         if request.user.is_authenticated:
             sc.createdBy = request.user
@@ -203,6 +209,7 @@ class SaveQuotations(APIView):
             qqitemsmerch.quotations = qq
             qqitemsmerch.pricePerCubic = item['pricePerCubic']
             qqitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
+            qqitemsmerch.warehouse = Warehouse.objects.get(pk=item['warehouse'])
             qqitemsmerch.remaining = item['remaining']
             qqitemsmerch.qty = item['quantity']
             qqitemsmerch.totalCost = Decimal(item['totalCost'])
@@ -257,8 +264,11 @@ class SalesOrderView(View):
             listed_date = str(now.today()).split('-')
             new_code = 'SO-{}-{}-0001'.format(listed_date[0], listed_date[1])
 
+        print(SalesOrder.objects.none())
+
         context = {
             'new_code': new_code,
+            "quotations": request.user.branch.quotations.all().filter(approved=True, qqd=False)
         }
         return render(request, 'sales-order.html', context)
 
@@ -281,6 +291,11 @@ class SaveSalesOrder(APIView):
             so.dateSold = salesOrder['date']
 
         so.party = Party.objects.get(pk=salesOrder['customer'])
+
+        if salesOrder['quotation']:
+            so.quotations = Quotations.objects.get(pk=salesOrder['quotation'])
+            so.quotations.qqd = True
+            so.quotations.save()
 
         so.amountDue = Decimal(salesOrder['amountDue'])
         so.amountTotal = Decimal(salesOrder['amountTotal'])

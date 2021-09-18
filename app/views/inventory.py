@@ -80,14 +80,15 @@ class ImportMerchandiseInventory(View):
             item['Selling-Price'] = str(item['Selling-Price']).replace('₱', '')
             item['Selling-Price'] = item['Selling-Price'].replace(',', '')
             merch.sellingPrice = item['Selling-Price']
-            merch.vol = item['Volume']
+
+            merch.vol = (merch.width / 1000) * (merch.length / 1000) * (merch.thickness / 1000)
 
             item['Price-Per-Cubic'] = str(item['Price-Per-Cubic']).replace('₱', '')
             item['Price-Per-Cubic'] = item['Price-Per-Cubic'].replace(',', '')
             merch.pricePerCubic = item['Price-Per-Cubic']
-            merch.qtyT = item['QtyT']
-            merch.qtyR = item['QtyR']
-            merch.qtyA = item['QtyA']
+            merch.qtyT = int(item['QtyT'])
+            merch.qtyR = int(item['QtyR'])
+            merch.qtyA = merch.qtyT - merch.qtyR
             merch.um = item['U/M']
             merch.description = item['Description']
             merch.totalCost = item['Total-Cost']

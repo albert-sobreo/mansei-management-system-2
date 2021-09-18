@@ -1030,7 +1030,7 @@ class SOApprovalAPI(APIView):
         salesOrder.save()
 
         for element in salesOrder.soitemsmerch.all():
-            wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
+            wi = WarehouseItems.objects.filter(merchInventory=element.merchInventory)[0]
             wi.resQty(element.qty)
             # element.merchInventory.qtyT -= element.qty
             # element.merchInventory.qtyR += element.qty
@@ -1086,11 +1086,15 @@ class SCApprovalAPI(APIView):
 
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
-        for element in sale.scitemsmerch.all():
-            if element.merchInventory.qtyA <= 0:
-                print('b0ss')
-                sweetify.sweetalert(request, icon='error', title='Error', text="{} has {} items. You are selling {} items.".format((element.merchInventory.name + ' ' + element.merchInventory.classification + ' ' + element.merchInventory.type), element.merchInventory.qtyA, element.qty), persistent='Dismiss')
-                return JsonResponse(0, safe=False)
+        
+        if not sale.salesOrder:
+            for element in sale.scitemsmerch.all():
+                if element.merchInventory.qtyA <= element.qty:
+                    sweetify.sweetalert(request, icon='error', title='Error', text="{} has {} items. You are selling {} items.".format((element.merchInventory.name + ' ' + element.merchInventory.classification + ' ' + element.merchInventory.type), element.merchInventory.qtyA, element.qty), persistent='Dismiss')
+                    return JsonResponse(0, safe=False)
+                else:
+                    wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
+                    wi.resQty(-element.qty)
 
         sale.datetimeApproved = datetime.now()
         sale.approved = True

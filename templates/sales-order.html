@@ -179,7 +179,7 @@
                     <label><span>Quotations</span></label>
                     <select @change="getQQ(order.quotation)" v-model="order.quotation" class="form-control">
                         <option value="" selected disabled>Choose a Quotation</option>
-                        {% for item in request.user.branch.quotations.all %}
+                        {% for item in quotations %}
                         <option value="{{item.pk}}">{{item.code}}</option>
                         {% endfor %}
                     </select>
@@ -505,7 +505,7 @@
                 customer: '',
                 taxType: '',
                 taxRate: '',
-                quotation: '',
+                quotation: null,
                 items: [{
                     type: '',
                     code: '',

@@ -256,7 +256,7 @@ class MerchandiseInventory(models.Model):
     thickness =  models.DecimalField(max_digits=20, decimal_places=5)
     purchasingPrice =  models.DecimalField(max_digits=20, decimal_places=5)
     sellingPrice =  models.DecimalField(max_digits=20, decimal_places=5)
-    vol = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    vol = models.DecimalField(max_digits=20, decimal_places=4, null=True, blank=True)
     pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     qtyT = models.IntegerField()
     qtyR = models.IntegerField()
@@ -621,6 +621,7 @@ class Quotations(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(default=False)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    qqd = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Quotation"
@@ -633,6 +634,7 @@ class Quotations(models.Model):
 class QQItemsMerch(models.Model):
     quotations = models.ForeignKey(Quotations, related_name="qqitemsmerch",on_delete=models.PROTECT, null=True, blank=True)
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="qqitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    warehouse = models.ForeignKey(Warehouse, related_name="qqitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
     cbm = models.CharField(max_length=10, null = True)
@@ -682,6 +684,7 @@ class SalesOrder(models.Model):
     voided = models.BooleanField(null = True, default = False)
     voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "soVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
+    soed = models.BooleanField(null = True, default = False)
 
     class Meta:
         verbose_name = "Sales Order"
