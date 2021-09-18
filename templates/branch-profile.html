@@ -32,6 +32,15 @@
 
         <form action="#" method="POST">{% csrf_token %}
             <div class="form-group">
+                <label for="">Default Warehouse</label>
+                <select v-model="daccount.defaultWarehouse" class="form-control">
+                    <option value="">None</option>
+                    {% for warehouse in request.user.branch.warehouse.all %}
+                    <option value="{{warehouse.pk}}">{{warehouse.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="">Cash on Hand</label>
                 <select v-model="daccount.cashOnHand" class="form-control">
                     <option value="">None</option>

@@ -1066,6 +1066,7 @@ class RepairAndMaintenance(models.Model):
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
+    defaultWarehouse = models.ForeignKey(Warehouse, related_name = 'branchdefaultwarehouse', on_delete=models.PROTECT, blank = True, null = True)
     cashOnHand = models.ForeignKey(AccountChild, related_name='branchcashonhand', on_delete=models.PROTECT, blank=True, null=True)
     cashInBank = models.ManyToManyField(AccountChild, related_name='branchcashinbank', blank=True)
     pettyCash = models.ForeignKey(AccountChild, related_name='branchpettycash', on_delete=models.PROTECT, blank=True, null=True)

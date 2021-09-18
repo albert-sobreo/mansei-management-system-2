@@ -17,61 +17,80 @@ class SaveDefaultAccounts(APIView):
         print(items['pettyCash'])
         bdacct = BranchDefaultChildAccount.objects.get(pk=items['id'])
         try:
+            bdacct.defaultWarehouse = Warehouse.objects.get(pk=items['defaultWarehouse'])
+        except Exception as e:
+            print(e)
+            bdacct.defaultWarehouse = None
+        try:
             bdacct.cashOnHand = AccountChild.objects.get(pk=items['cashOnHand'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.cashOnHand = None
         try:
             bdacct.pettyCash = AccountChild.objects.get(pk=items['pettyCash'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.pettyCash = None
         try:
             bdacct.merchInventory = AccountChild.objects.get(pk=items['merchInventory'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.merchInventory = None
         try:
             bdacct.manuInventory = AccountChild.objects.get(pk=items['manuInventory'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.manuInventory = None
         try:
             bdacct.ppeProperty = AccountChild.objects.get(pk=items['manuInventory'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.ppeProperty = None
         try:
             bdacct.ppePlant = AccountChild.objects.get(pk=items['ppePlant'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.ppePlant = None
         try:
             bdacct.ppeEquipment = AccountChild.objects.get(pk=items['ppeEquipment'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.ppeEquipment = None
         try:
             bdacct.inputVat = AccountChild.objects.get(pk=items['inputVat'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.inputVat = None
         try:
             bdacct.outputVat = AccountChild.objects.get(pk=items['outputVat'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.outputVat = None
         try:
             bdacct.ewp = AccountChild.objects.get(pk=items['ewp'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.ewp = None
         try:
             bdacct.sales = AccountChild.objects.get(pk=items['sales'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.sales = None
         try:
             bdacct.costOfSales = AccountChild.objects.get(pk=items['costOfSales'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.costOfSales = None
         try:
             bdacct.otherIncome = AccountChild.objects.get(pk=items['otherIncome'])
-        except: 
-            pass
+        except Exception as e: 
+            print(e)
+            bdacct.otherIncome = None
         try:
             bdacct.cwit = AccountChild.objects.get(pk=items['cwit'])
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            bdacct.cwit = None
 
         for item in items['cashInBank']:
             bdacct.cashInBank.add(AccountChild.objects.get(pk=item))
