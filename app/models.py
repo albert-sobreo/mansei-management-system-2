@@ -305,14 +305,22 @@ class WarehouseItems(models.Model):
         self.qtyR = qtyR
         self.qtyA = qtyA
         self.qtyS = 0
+        return 1
+
+    def save(self):
+        self.merchInventory.save()
+        self.save()
     
     def addQty(self, qty):
         self.qtyA += qty
         self.qtyT += qty
         self.merchInventory.qtyA += qty
         self.merchInventory.qtyT += qty
-        self.merchInventory.save()
-        self.save()
+
+        if self.qtyA < 0 or self.qtyT < 0 or self.merchInventory.qtyA < 0 or self.merchInventory.qtyT < 0:
+            return 0
+
+        return 1
 
     def resQty(self, qty):
         self.qtyR += qty
@@ -320,8 +328,11 @@ class WarehouseItems(models.Model):
 
         self.merchInventory.qtyR += qty
         self.merchInventory.qtyA -= qty
-        self.merchInventory.save()
-        self.save()
+
+        if self.qtyR < 0 or self.qtyA < 0 or self.merchInventory.qtyR < 0 or self.merchInventory.qtyA < 0:
+            return 0
+
+        return 1
 
     def salesWSO(self, qty):
         self.qtyR -= qty
@@ -330,8 +341,10 @@ class WarehouseItems(models.Model):
         self.merchInventory.qtyR -= qty
         self.merchInventory.qtyS += qty
 
-        self.merchInventory.save()
-        self.save()
+        if self.qtyR < 0 or self.qtyS < 0 or self.merchInventory.qtyR < 0 or self.merchInventory.qtyS < 0:
+            return 0
+
+        return 1
 
     def salesWOSO(self, qty):
         self.qtyA -= qty
@@ -340,8 +353,10 @@ class WarehouseItems(models.Model):
         self.merchInventory.qtyA -= qty
         self.merchInventory.qtyS += qty
 
-        self.merchInventory.save()
-        self.save()
+        if self.qtyA < 0 or self.qtyS < 0 or self.merchInventory.qtyA < 0 or self.merchInventory.qtyS < 0:
+            return 0
+
+        return 1
 
 class Cheques(models.Model):
     chequeNo = models.CharField(max_length=255, null=True, blank=True)
@@ -1088,6 +1103,7 @@ class BranchDefaultChildAccount(models.Model):
 class BranchProfile(models.Model):
     branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.PROTECT, null=True, blank=True)
 
+# request.user.branch.accountChild.add()
 class Branch(models.Model):
     name = models.CharField(max_length=255)
     branchProfile = models.ForeignKey(BranchProfile, related_name='branch', on_delete=models.PROTECT, null=True, blank=True)

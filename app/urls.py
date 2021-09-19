@@ -26,6 +26,7 @@ router.register(r"vendor-transaction", views.VendorTransactionAPI, 'vendor-trans
 
 ########## WAREHOUSE ##########
 router.register(r"warehouse", views.WarehouseAPI, 'warehouse')
+router.register(r"warehouse-nested", views.WarehouseNestedAPI, 'warehouse-nested')
 
 ########## MERCH INVENTORY ##########
 router.register(r"merchinventory", views.MerchandiseInventoryAPI, 'merchinvetory')

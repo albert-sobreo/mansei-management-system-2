@@ -26,12 +26,68 @@
             <tbody>
                 {% for warehouse in request.user.branch.warehouse.all%}
                 <tr>
-                    <td>{{warehouse.name}}</td>
+                    <td @click="fetchWarehouse({{warehouse.pk}})" class="link" data-toggle="modal" data-target="#modal">{{warehouse.name}}</td>
                     <td>{{warehouse.address}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- VIEW WAREHOUSE MODAL -->
+        <div class="modal fade" id="modal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <div class="row my-2">
+                            <!-- LVL1 -->
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">Name</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.name]]</span>
+                            </div>
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">Address</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.address]]</span>
+                            </div>
+                        </div>
+
+                        <!-- WAREHOUSE ITEMS -->
+                        <div class="row mt-4">
+                            <div class="col">
+                                <span class="font-bold">Warehouse Items</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <table class="table table-sm table-striped table-borderless">
+                                <thead>
+                                    <th><span class="font-bold gray">Code</span></th>
+                                    <th><span class="font-bold gray">Name</span></th>
+                                    <th><span class="font-bold gray">Class - Type</span></th>
+                                    <th><span class="font-bold gray">TxWxL</span></th>
+                                    <th><span class="font-bold gray">QtyT</span></th>
+                                    <th><span class="font-bold gray">QtyR</span></th>
+                                    <th><span class="font-bold gray">QtyA</span></th>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in modal.warehouseitems">
+                                        <td>[[item.merchInventory.code]]</td>
+                                        <td>[[item.merchInventory.name]]</td>
+                                        <td>[[item.merchInventory.classification]] - [[item.merchInventory.type]]</td>
+                                        <td>[[roundNumber0(item.merchInventory.thickness)]]mm x [[roundNumber0(item.merchInventory.width)]]mm x [[roundNumber0(item.merchInventory.length)]]mm</td>
+                                        <td>[[item.qtyT]]</td>
+                                        <td>[[item.qtyR]]</td>
+                                        <td>[[item.qtyA]]</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- ADD WAREHOUSE MODAL -->
         <div class="modal fade" id="addWarehouse">
@@ -167,13 +223,42 @@
             addWarehouse: {
                 name: null,
                 address: null,
+            },
+
+            modal: {
+                address: null,
+                name: null,
+                warehouseitems: [{
+                    qtyA: 0,
+                    qtyR: 0,
+                    qtyT: 0,
+                    merchInventory: {
+                        code: null,
+                        classification: null,
+                        type: null,
+                        name: null,
+                        length: null,
+                        width: null,
+                        thickness: null,
+                    }
+                }]
             }
         },
         methods:{
             submit(){
                 axios.post('/addwarehouse/', this.addWarehouse, this.config)
                 .then(res=>res.data==0?location.reload():'')
-            }
+            },
+            fetchWarehouse(id){
+                axios.get(`/api/warehouse-nested/${id}`)
+                .then(res => {
+                    this.modal = res.data
+                })
+            },
+            roundNumber0(value){
+                let val = (value/1).toFixed(0)
+                return val
+            },
         }
     })
 </script>

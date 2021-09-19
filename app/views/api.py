@@ -1,5 +1,7 @@
+from django.db.models import query
 from django.http.response import Http404, JsonResponse
 from rest_framework import viewsets
+from rest_framework import permissions
 from ..serializers import *
 from rest_framework.views import APIView
 from ..models import *
@@ -82,6 +84,11 @@ class VendorTransactionAPI(viewsets.ModelViewSet):
 class WarehouseAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = WarehouseSZ
+    queryset = Warehouse.objects.all()
+
+class WarehouseNestedAPI(viewsets.ModelViewSet):
+    permissions = [IsAuthenticated]
+    serializer_class = WarehouseNestedSZ
     queryset = Warehouse.objects.all()
 
 

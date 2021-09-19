@@ -93,6 +93,18 @@ class PartyNestedTransactionSZ(serializers.ModelSerializer):
 
 
 
+
+########## MERCH INVENTORY ##########
+class MerchandiseInventorySZ(serializers.ModelSerializer):
+    class Meta:
+        model = MerchandiseInventory
+        fields = '__all__'
+
+
+
+
+
+
 ########## WAREHOUSE ##########
 class WarehouseSZ(serializers.ModelSerializer):
     class Meta: 
@@ -105,16 +117,26 @@ class WarehouseItemsSZ(serializers.ModelSerializer):
         model=WarehouseItems
         fields='__all__'
 
+class WarehouseItemsInventorySZ(serializers.ModelSerializer):
+    merchInventory = MerchandiseInventorySZ(serializers.ModelSerializer)
+    class Meta:
+        model = WarehouseItems
+        fields = "__all__"
+
+class WarehouseNestedSZ(serializers.ModelSerializer):
+    warehouseitems = WarehouseItemsInventorySZ(read_only=True, many=True)
+    class Meta:
+        model = Warehouse
+        fields = "__all__"
+        depth = 1
+
 
 
 
 
 
 ########## MERCH INVENTORY ##########
-class MerchandiseInventorySZ(serializers.ModelSerializer):
-    class Meta:
-        model = MerchandiseInventory
-        fields = '__all__'
+
 
 class MerchandiseInventoryNestedSZ(serializers.ModelSerializer):
     warehouseitems = WarehouseItemsSZ(read_only=True, many=True)

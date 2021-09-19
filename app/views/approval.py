@@ -205,6 +205,7 @@ class RRApprovalAPI(APIView):
                 # element.merchInventory.qtyT = element.merchInventory.qtyA + element.merchInventory.qtyR
                 wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
                 wi.addQty(element.qty)
+                wi.save()
                 element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
                 # print(element.merchInventory.qtyT, element.merchInventory.qtyA, element.merchInventory.pk)
                 merchAmountDue += Decimal(element.totalPrice)
@@ -295,6 +296,7 @@ class RRVoid(APIView):
             element.poitemsmerch.save()
             wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
             wi.addQty(-element.qty)
+            wi.save()
             element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
 
             merchAmountDue += Decimal(element.totalPrice)
@@ -390,7 +392,8 @@ class IIApprovalAPI(APIView):
 
                 wi = WarehouseItems.objects.get(merchInventory=merch)
                 wi.addQty(element.qty)
-
+                wi.save()
+                
                 merch = MerchandiseInventory.objects.get(code=element.code)
                 merch.totalCost += element.totalCost
                 merch.purchasingPrice = (Decimal(merch.totalCost / merch.qtyT))
@@ -451,6 +454,7 @@ class IIVoid(APIView):
             merch = MerchandiseInventory.objects.get(code = element.code)
             wi = WarehouseItems.objects.get(merchInventory = merch)
             wi.addQty(-element.qty)
+            wi.save()
 
             merch = MerchandiseInventory.objects.get(code=element.code)
             merch.totalCost -= element.totalCost
@@ -1031,7 +1035,11 @@ class SOApprovalAPI(APIView):
 
         for element in salesOrder.soitemsmerch.all():
             wi = WarehouseItems.objects.filter(merchInventory=element.merchInventory)[0]
-            wi.resQty(element.qty)
+            if wi.resQty(element.qty):
+                wi.save()
+            else:
+                sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                return JsonResponse(0, safe=False)
             # element.merchInventory.qtyT -= element.qty
             # element.merchInventory.qtyR += element.qty
             # element.merchInventory.qtyA = element.merchInventory.qtyT - element.merchInventory.qtyR
@@ -1051,7 +1059,11 @@ class SOVoid(APIView):
 
         for element in salesOrder.soitemsmerch.all():
             wi = WarehouseItems.objects.get(merchInventory = element.merchInventory)
-            wi.resQty(-element.qty)
+            if wi.resQty(element.qty):
+                wi.save()
+            else:
+                sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                return JsonResponse(0, safe=False)
             # element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
 
         salesOrder.save()
@@ -1089,12 +1101,12 @@ class SCApprovalAPI(APIView):
         
         if not sale.salesOrder:
             for element in sale.scitemsmerch.all():
-                if element.merchInventory.qtyA <= element.qty:
-                    sweetify.sweetalert(request, icon='error', title='Error', text="{} has {} items. You are selling {} items.".format((element.merchInventory.name + ' ' + element.merchInventory.classification + ' ' + element.merchInventory.type), element.merchInventory.qtyA, element.qty), persistent='Dismiss')
-                    return JsonResponse(0, safe=False)
+                wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
+                if wi.resQty(element.qty):
+                    wi.save()
                 else:
-                    wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
-                    wi.resQty(-element.qty)
+                    sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                    return JsonResponse(0, safe=False)
 
         sale.datetimeApproved = datetime.now()
         sale.approved = True
@@ -1301,9 +1313,17 @@ class DeliveriesApprovalAPI(APIView):
 
                     wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
                     if sc.salesOrder:
-                        wi.salesWSO(element.qty)
+                        if wi.salesWSO(element.qty):
+                            wi.save()
+                        else:
+                            sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                            return JsonResponse(0, safe=False)
                     else:
-                        wi.salesWOSO(element.qty)
+                        if wi.salesWOSO(element.qty):
+                            wi.save()
+                        else:
+                            sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                            return JsonResponse(0, safe=False)
                     element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
                     element.merchInventory.totalCost -= element.totalCost                
                     # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
@@ -1352,9 +1372,14 @@ class DeliveriesVoid(APIView):
 
                     wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
                     if sc.salesOrder:
-                        wi.salesWSO(-element.qty)
+                        if wi.salesWSO(-element.qty):
+                            wi.save()
+                        else:
+                            sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                            return JsonResponse(0, safe=False)
                     else:
                         wi.addQty(element.qty)
+                        wi.save()
                     element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
                     element.merchInventory.totalCost += element.totalCost                
                     # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
@@ -1404,17 +1429,23 @@ class TransferApproval(APIView):
 
         for element in tr.tritems.all():
             ow = WarehouseItems.objects.get(merchInventory=element.merchInventory, warehouse=element.oldWarehouse)
-            ow.addQty(-element.qtyTransfered)
+            if ow.addQty(-element.qtyTransfered):
+                ow.save()
+            else:
+                sweetify.sweetalert(request, icon='error', title='<0!', persistent='Dismiss')
+                return JsonResponse(0, safe=False)
             try:
                 nw = WarehouseItems.objects.get(merchInventory=element.merchInventory, warehouse=tr.newWarehouse)
                 nw.addQty(element.qtyTransfered)
+                nw.save()
             except:
                 nw = WarehouseItems()
                 nw.merchInventory = element.merchInventory
                 nw.warehouse = tr.newWarehouse
-                nw.initQty(nw.merchInventory.qtyT, nw.merchInventory.qtyR, nw.merchInventory.qtyA)
+                nw.initQty(0, 0, 0)
                 nw.save()
                 nw.addQty(element.qtyTransfered)
+                nw.save()
             # element.merchInventory.warehouse = tr.newWarehouse
             # element.merchInventory.save()
 
@@ -1449,7 +1480,8 @@ class AdjustmentApproval(APIView):
             # element.merchInventory.qtyA -= element.qtyAdjusted                                       
             # element.merchInventory.qtyT -= element.qtyAdjusted
             wi = WarehouseItems.objects.get(merchInventory = element.merchInventory, warehouse=element.oldWarehouse)
-            wi.addQty(-element.qtyAdjusted)
+            if wi.addQty(-element.qtyAdjusted):
+                wi.save()
             element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
             element.merchInventory.totalCost -= element.totalCost
             element.merchInventory.save()
