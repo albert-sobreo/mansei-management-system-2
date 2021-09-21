@@ -1,0 +1,82 @@
+{% extends 'base-template.html' %}
+{% block title %}Reset Accounts{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+<!-- NAVIGATION BAR -->
+<navbar-plain photo="/media/{{request.user.image}}"></navbar-plain>
+<app-card></app-card>
+<profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+ <!-- MAIN BODY -->
+ <div class="container">
+     <!-- TITLE AND BUTTONS -->
+     <div class="d-flex align-items-center mb-3">
+        <span class="font-size-18 font-bold mr-1">Reset Chart of Accounts</span>
+        <span class="font-size-14 text-danger font-bold ml-1">Warning: This action cannot be undone!</span>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="b-radius-15 box-shadow-medium w-50 h-50 p-4">
+            <div>
+                <span class="font-size-18 font-bold">Reset all of Chart of Accounts</span>
+            </div>
+            <div class="my-4">
+                <span>All amount of accounts, including child, sub-group, and group will be reset to P0.00</span>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button @click="resetAccounts()" class="col btn btn-danger">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+ </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+        data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+        },
+
+        methods: {
+            resetAccounts(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: "warning",
+                    html: "This action cannot be undone",
+                    confirmButtonText: 'I am sure.',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancel'
+                })
+                .then((result)=>{
+                    if(result.isConfirmed){
+                        axios.post('/reset-account-process/', {proceed: true}, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                        .catch(err=>{
+                            Swal.fire({
+                                title:"Something went wrong.",
+                                icon: 'error',
+                                html: err.message
+                            })
+                        })
+                    }
+                })
+            }
+        }
+    })
+</script>
+
+{% endblock %}
