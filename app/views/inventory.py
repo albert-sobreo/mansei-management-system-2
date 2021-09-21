@@ -143,3 +143,14 @@ class EditInventory(APIView):
 class OtherInventoryView(View):
     def get(self, request, format=None):
         return render(request, 'otherinventory.html')
+
+
+class DeleteMerchInventory(APIView):
+    def delete(self, request, pk):
+        inv = MerchandiseInventory.objects.get(pk=pk)
+        for item in inv.warehouseitems.all():
+            item.delete()
+        inv.delete()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)

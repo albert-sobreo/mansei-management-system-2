@@ -117,7 +117,7 @@ class SaveReceivingReport(APIView):
                     otherInv.name = item['other']
                     otherInv.qty = 0
                     otherInv.purchasingPrice = Decimal(0.0)
-                    otherInv.accountChild = AccountChild.objects.get(name=item['type'])
+                    otherInv.accountChild = AccountChild.objects.get(pk=item['type'])
                     otherInv.save()
                     request.user.branch.otherInventory.add(otherInv)
                     rritemsother.otherInventory = otherInv

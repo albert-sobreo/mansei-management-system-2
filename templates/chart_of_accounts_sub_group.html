@@ -1,0 +1,74 @@
+{% extends "base-template.html" %}
+{% block title %}Chart of Accounts | Sub-Groups{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-gas active="nav-accounts" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- NAV 2 -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links imps-gas">
+                <a href="/chart-of-accounts/" class="mx-2">Child Accounts</a>
+                <a href="/chart-of-accounts-subgroup/" class="active-gas mx-2">Sub-Group Accounts</a>
+                <a href="/chart-of-accounts-group/" class="mx-2">Group Accounts</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold">Chart of Accounts - Sub-Groups</span>
+        </div>
+
+        <!-- TABLES -->
+        <table class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-5">
+            <thead class="thead-dark">
+                <th>Sub-Group Code</th>
+                <th>Sub-Group Name</th>
+                <th>Account Group</th>
+                <th>Amount</th>
+            </thead>
+            <tbody>
+                {% for sub in request.user.branch.subGroup.all %}
+                <tr>
+                    <td class="link" data-toggle="modal" data-target="#modal">{{sub.code}}</td>
+                    <td>{{sub.name}}</td>
+                    <td>{{sub.accountGroup.name}}</td>
+                    <td>₱[[formatPrice('{{sub.amount}}')]]</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+        data: {
+
+        },
+        methods: {
+            formatPrice(value) {
+                if (this.toggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(2).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+        }
+    })
+</script>
+
+{% endblock %}

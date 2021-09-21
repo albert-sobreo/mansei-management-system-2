@@ -82,7 +82,7 @@
 								<option v-for="type in inventoryTypes" :value="type">[[type]]</option>
 							</optgroup>
 							<optgroup label="Expenses">
-								<option v-for="expense in expenseTypes" :value="expense">[[expense]]</option>
+								<option v-for="expense in expenseTypes" :value="expense[0]">[[ expense[1] ]]</option>
 							</optgroup>
 						</select>
 					</div>
@@ -251,8 +251,7 @@
 
 				axios.get('/getaccountexpenses/')
 				.then(res=>{
-					y = res.data.map(x=>x.name)
-					this.expenseTypes = y
+					this.expenseTypes = res.data
 				})
 			},
 			testData(pk, index, itemType){

@@ -208,7 +208,16 @@
                                 </div>
                             </template>
                         </div>
-                        <a @click="edit()" href="#" data-toggle="modal" data-target="#editModal">Edit this item</a>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <a @click="edit()" href="#" data-toggle="modal" data-target="#editModal">Edit this item</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button @click="deleteMerch(modal.id)" class="btn btn-danger col">Delete this item</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -554,6 +563,31 @@
             submitEdit(id){
                 axios.put(`/editmerchinventory/${id}/`, this.editModal, this.config)
                 .then(res=>res.data==0?location.reload():'')
+            },
+            deleteMerch(id){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: 'warning',
+                    html: "Deleting this item cannot be undone.",
+                    showCancelButton: true,
+                    confirmButtonText: "I am sure",
+                    cancelButtonText: "Cancel"
+                })
+                .then((result)=>{
+                    if(result.isConfirmed){
+                        axios.delete(`/delete-merch-inventory/${id}/`, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                        .catch(err=>{
+                            Swal.fire({
+                                title: "Something went wrong.",
+                                icon: 'error',
+                                html: "This item is linked to other parts of the system."
+                            })
+                        })
+                    }
+                })
+                
+
             }
         },
         mounted(){

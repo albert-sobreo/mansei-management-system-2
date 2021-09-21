@@ -70,6 +70,7 @@ class SavePurchaseRequest(APIView):
                 pritemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
                 pritemsmerch.remaining = item['remaining']
                 pritemsmerch.qty = item['qty']
+                pritemsmerch.unit = item['unitCtr']
             
                 pritemsmerch.save()
                 request.user.branch.pritemsMerch.add(pritemsmerch)
@@ -85,7 +86,7 @@ class SavePurchaseRequest(APIView):
                     otherInv.name = item['other']
                     otherInv.qty = 0
                     otherInv.purchasingPrice = Decimal(0.0)
-                    otherInv.accountChild = AccountChild.objects.get(name=item['type'])
+                    otherInv.accountChild = AccountChild.objects.get(pk=item['type'])
                     otherInv.save()
                     request.user.branch.otherInventory.add(otherInv)
 
@@ -93,6 +94,7 @@ class SavePurchaseRequest(APIView):
 
                 pritemsother.remaining = item['remaining']
                 pritemsother.qty = item['qty']
+                pritemsother.unit = item['unitCtr']
 
                 pritemsother.save()
                 request.user.branch.prItemsOther.add(pritemsother)

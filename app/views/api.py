@@ -41,7 +41,13 @@ class AccountSubGroupAPI(viewsets.ModelViewSet):
 
 class GetAccountExpensesAPI(APIView):
     def get(self, request, format=None):
-        return JsonResponse(list(AccountChild.objects.filter(name__regex=r'[Ee]xpense').values('name')), safe=False)
+        lst = []
+        expGroup = request.user.branch.accountGroup.filter(name__regex=r'[Ee]xpense')
+        for exp in expGroup:
+            for sub in exp.accountsubgroup.all():
+                for child in sub.accountchild.all():
+                    lst.append([child.pk, child.name])
+        return JsonResponse(lst, safe=False)
 
 
 

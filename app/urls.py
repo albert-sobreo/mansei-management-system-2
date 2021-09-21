@@ -250,4 +250,8 @@ urlpatterns = [
     path('edit-ppe/<int:pk>/', login_required(views.EditPPE.as_view())),
     path('ppe-lapsing-schedule/', login_required(views.LapsingView.as_view())),
     path('ppe-update-depr/', login_required(views.UpdateDepr.as_view())),
+    path('delete-merch-inventory/<int:pk>/', login_required(views.DeleteMerchInventory.as_view())),
+    path('chart-of-accounts-subgroup/', login_required(views.SubGroupView.as_view())),
+    path('chart-of-accounts-group/', login_required(views.GroupView.as_view())),
+    path('edit-group/<int:pk>/', login_required(views.EditGroup.as_view()))
 ]

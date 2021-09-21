@@ -246,7 +246,7 @@
 								<option v-for="type in inventoryTypes" :value="type">[[type]]</option>
 							</optgroup>
 							<optgroup label="Expenses">
-								<option v-for="expense in expenseTypes" :value="expense">[[expense]]</option>
+								<option v-for="expense in expenseTypes" :value="expense[0]">[[ expense[1] ]]</option>
 							</optgroup>
                         </select>
                     </div>
@@ -490,6 +490,7 @@
             <button>Import</button>
         </form>
     </div>
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -711,8 +712,7 @@
 
                 axios.get('/getaccountexpenses/')
 				.then(res=>{
-					y = res.data.map(x=>x.name)
-					this.expenseTypes = y
+					this.expenseTypes = res.data
 				})
 
                 axios.get('/api/atc/')
@@ -911,7 +911,8 @@
                         quantity: null,
                         vatable: 0.00,
                         inputVAT: 0,
-                        totalCost: null
+                        totalCost: null,
+                        unitCtr: 0
                     }]
                     pr.pritemsmerch.forEach((item, index)=>{
                         console.log(item.merchInventory.id)
@@ -921,6 +922,7 @@
 							this.purchaseOrder.items[0].code = invObject.id
 							this.purchaseOrder.items[0].quantity = item.qty
                             this.purchaseOrder.items[0].remaining = invObject.qtyA
+                            this.purchaseOrder.items[0].unitCtr = item.unit
                         } else {
                             this.purchaseOrder.items.push({
 								type: 'Merchandise',
@@ -929,6 +931,7 @@
                                 remaining: invObject.qtyA,
                                 vatable: 0,
                                 totalCost: null,
+                                unitCtr: item.unit,
                             })
                         }
                     })
@@ -940,12 +943,15 @@
                             this.purchaseOrder.items[0].other = item.otherInventory.name
                             this.purchaseOrder.items[0].quantity = item.qty
                             this.purchaseOrder.items[0].remaining = item.otherInventory.qty
+                            this.purchaseOrder.items[0].unitCtr = item.unit
+                            console.log(item.otherInventory.unit)
                         } else {
                             this.purchaseOrder.items.push({
                                 type: item.type,
                                 other: item.otherInventory.name,
                                 quantity: item.qty,
-                                remaining: item.otherInventory.qty
+                                remaining: item.otherInventory.qty,
+                                unitCtr: item.unit
                             })
                         }
                     })

@@ -82,5 +82,24 @@ class EditChildGroup(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!',  persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+class SubGroupView(View):
+    def get(self, request):
+        return render(request, 'chart_of_accounts_sub_group.html')
 
+class GroupView(View):
+    def get(self, request):
+        return render(request, 'chart_of_accounts_group.html')
+
+class EditGroup(APIView):
+    def put(self, request, pk):
+        g = request.data
+        group = AccountGroup.objects.get(pk=pk)
+
+        group.code = g['code']
+        group.permanence = g['permanence']
+        group.normally = g['normally']
+        group.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!',  persistent='Dismiss')
+        return JsonResponse(0, safe=False)
 

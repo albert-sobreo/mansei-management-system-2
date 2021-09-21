@@ -115,7 +115,7 @@ class POApprovalAPI(APIView):
                         expenseType[element.type] = element.totalPrice
 
                 for key, val in expenseType.items():
-                    jeAPI(request, j, "Debit", AccountChild.objects.get(name = key), (val/(1+(purchase.taxRate/100))))
+                    jeAPI(request, j, "Debit", AccountChild.objects.get(pk = key), (val/(1+(purchase.taxRate/100))))
 
                 if purchase.taxPeso != 0:
                     jeAPI(request, j, "Debit", dChildAccount.inputVat, purchase.taxPeso)
@@ -259,7 +259,7 @@ class RRApprovalAPI(APIView):
 
                 for key, val in expenseAmountDue.items():
                     if val:
-                        jeAPI(request, j, 'Debit', AccountChild.objects.get(name=key), (val/(1+(receive.taxRate/100))))
+                        jeAPI(request, j, 'Debit', AccountChild.objects.get(pk=key), (val/(1+(receive.taxRate/100))))
             
                 jeAPI(request, j, 'Debit', dChildAccount.inputVat, (receive.taxPeso))
     
@@ -271,7 +271,7 @@ class RRApprovalAPI(APIView):
 
                 for key, val in expenseAmountDue.items():
                     if val:
-                        jeAPI(request, j, 'Debit', AccountChild.objects.get(name=key), (val/(1+(receive.taxRate/100))))
+                        jeAPI(request, j, 'Debit', AccountChild.objects.get(pk=key), (val/(1+(receive.taxRate/100))))
 
                 jeAPI(request, j, 'Credit', dChildAccount.prepaidExpense, (receive.amountDue - receive.taxPeso))
 

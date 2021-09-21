@@ -108,7 +108,7 @@
 							<option disabled v-for="type in inventoryTypes" :value="type">[[type]]</option>
 						</optgroup>
 						<optgroup label="Expenses">
-							<option disabled v-for="expense in expenseTypes" :value="expense">[[expense]]</option>
+							<option disabled v-for="expense in expenseTypes" :value="expense[0]">[[expense[1] ]]</option>
 						</optgroup>
 					</select>
 				</div>
@@ -455,8 +455,7 @@
 
 				axios.get('/getaccountexpenses/')
 				.then(res=>{
-					y = res.data.map(x=>x.name)
-					this.expenseTypes = y
+					this.expenseTypes = res.data
 				})
 
                 axios.get('/api/merchinventory/')
@@ -676,6 +675,7 @@
 							this.purchaseOrder.items[0].quantity = item.qty - item.qtyReceived
 							this.purchaseOrder.items[0].vatable = item.purchasingPrice
 							this.purchaseOrder.items[0].totalCost = item.totalPrice
+							this.purchaseOrder.items[0].unitCtr = item.unit
 						} else {
 							this.purchaseOrder.items.push({
 								poID: item.id,
@@ -684,7 +684,8 @@
                     			remaining: item.remaining,
                     			quantity: item.qty - item.qtyReceived,
                     			vatable: item.purchasingPrice,
-                    			totalCost: item.totalPrice
+                    			totalCost: item.totalPrice,
+								unitCtr: item.unit
 							})
 						}
 					})
@@ -698,6 +699,7 @@
 							this.purchaseOrder.items[0].quantity = item.qty - item.qtyReceived
 							this.purchaseOrder.items[0].vatable = item.purchasingPrice
 							this.purchaseOrder.items[0].totalCost = item.totalPrice
+							this.purchaseOrder.items[0].unitCtr = item.unit
 						} else {
 							this.purchaseOrder.items.push({
 								poID: item.id,
@@ -706,7 +708,8 @@
                     			remaining: item.remaining,
                     			quantity: item.qty - item.qtyReceived,
                     			vatable: item.purchasingPrice,
-                    			totalCost: item.totalPrice
+                    			totalCost: item.totalPrice,
+								unitCtr: item.unit
 							})
 						}
 					})
