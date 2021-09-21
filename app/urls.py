@@ -256,5 +256,6 @@ urlpatterns = [
     
     path('edit-group/<int:pk>/', login_required(views.EditGroup.as_view())),
     path('reset-accounts/', login_required(views.ResetChartOfAccounts.as_view())),
-    path('reset-account-process/', login_required(views.ResetChartOfAccountsProcess.as_view()))
+    path('reset-account-process/', login_required(views.ResetChartOfAccountsProcess.as_view())),
+    path('upload-test/', login_required(views.UploadView.as_view()))
 ]

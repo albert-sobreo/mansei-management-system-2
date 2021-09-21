@@ -1079,6 +1079,9 @@ class RepairAndMaintenance(models.Model):
     amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     capitalized = models.BooleanField(default=False)
 
+class TestUploadFile(models.Model):
+    file = models.ImageField(upload_to='test/')
+
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
     defaultWarehouse = models.ForeignKey(Warehouse, related_name = 'branchdefaultwarehouse', on_delete=models.PROTECT, blank = True, null = True)

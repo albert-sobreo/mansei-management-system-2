@@ -1,0 +1,58 @@
+{% extends "base-template.html" %}
+{% block title %}Test Upload File{% endblock %}
+
+{% block body %}
+
+<div id="app">
+    <div class="container">
+        <div class="form-group">
+            <label for="">Upload a file</label>
+            <input ref="file" type="file" @change="handleFile()">
+        </div>
+        <button @click="upload()">Submit</button>
+    </div>
+    <pre>[[$data]]</pre>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+        data: {
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    "content-type": "multipart/form-data"
+                }
+            },
+            file: null,
+        },
+
+        methods: {
+            handleFile(){
+                this.file = this.$refs.file.files[0]
+                console.log(this.file)
+            },
+            upload(){
+                var formData = new FormData()
+                formData.append("file", this.file)
+
+                axios.post('/upload-test/', formData, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            }
+        }
+    })
+</script>
+
+{% endblock %}

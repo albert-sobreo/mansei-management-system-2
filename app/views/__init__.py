@@ -25,3 +25,4 @@ from .dtr import *
 from .bank_recon import *
 from .ppe import *
 from .reset import *
+from .uploadfiletest import *

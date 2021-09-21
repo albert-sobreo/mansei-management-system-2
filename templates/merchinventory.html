@@ -432,7 +432,8 @@
         data:{
             config: {
                 headers: {
-                    "X-CSRFToken": getCookie('csrftoken')
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    "content-type": "multipart/form-data"
                 }
             },
 
