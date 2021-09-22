@@ -307,7 +307,7 @@ class WarehouseItems(models.Model):
         self.qtyS = 0
         return 1
 
-    def save(self):
+    def save2(self):
         self.merchInventory.save()
         self.save()
     

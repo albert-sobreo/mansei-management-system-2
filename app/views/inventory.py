@@ -46,7 +46,7 @@ class AddMerchInventoryAPI(APIView):
         wi.merchInventory = a
         wi.warehouse = w
         wi.initQty(a.qtyT, a.qtyR, a.qtyA)
-        wi.save()
+        wi.save2()
 
         request.user.branch.warehouseItems.add(wi)
         request.user.branch.merchInventory.add(a)
