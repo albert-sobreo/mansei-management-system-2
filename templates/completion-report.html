@@ -1,0 +1,228 @@
+{% extends 'base-template.html' %}
+{% block title %}Completion Report{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-purchase" photo="/media/{{request.user.image}}"></navbar-gas>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- NAV 2 -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="#" class="active-gas mx-2">Create</a>
+                <a href="#" class="mx-2">CR List</a>
+            </div>
+        </div>
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Completion Report</span>
+        </div>
+
+        <div class="d-flex justify-content-center my-2">
+            <div class="w-50 py-4">
+                <div class="mx-3 mb-3">
+                    <div class="row">
+                        <div class="col pr-1">
+                            <div class="form-group">
+                                <label for="">Reference No.</label>
+                                <input v-model="cr.code" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="form-group">
+                                <label for="">Report Date</label>
+                                <input v-model="cr.reportDate" type="date" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAIN CR BODY -->
+                <div class="b-tr-radius-15 b-tl-radius-15 p-3 box-shadow-medium">
+                    <!-- SELECT ASSET -->
+                    <div class="row">
+                        <div class="col pr-1">
+                            <label for="">Asset (PPE)</label>
+                            <select v-model="cr.ppe" class="form-control">
+                                <option value="" selected disabled>Choose Asset</option>
+                            </select>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Malfunction Date</label>
+                            <input v-model="cr.malfuncDate" type="date" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- ASSET CONTAINER -->
+                    <div class="row my-2 py-2 order-card">
+                        <div class="col">
+                            <span class="font-bold gray">Name</span><br>
+                            <span class="font-bold font-size-14">Hello</span>
+                        </div>
+                        <div class="col">
+                            <span class="font-bold gray">Type</span>
+                            <br>
+                            <span class="font-bold font-size-14">Vehicle</span>
+                        </div>
+                        <div class="col">
+                            <span class="font-bold gray">Useful Life</span>
+                            <br>
+                            <span class="font-bold font-size-14">30 Years</span>
+                        </div>
+                    </div>
+
+                    <!-- DAMAGE DESCRIPTION -->
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">
+                                    Damage Description
+                                    &nbsp;
+                                    <label class="link" for="damagePhoto" title="Attach a Photo">+ <i class="fas fa-image"></i></label><br>
+                                    <input ref="damageFile" @change="damagePhotoHandler()" id="damagePhoto" type="file" style="display: none;">
+                                </label>
+                                <textarea v-model="cr.damageDescription" cols="30" rows="2" class="form-control" placeholder="Enter Damage Description Here"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PHOTO -->
+                    <div class="row my-1 py-3 order-card">
+                        <div class="col">
+                            <img v-if="damagePhotoUrl" :src="damagePhotoUrl" alt="wrong type" width="100%" class="b-radius-10 box-shadow-small">
+                        </div>
+                    </div>
+
+                    <!-- RECOMMENDATION -->
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">Recommendation</label>
+                                <textarea v-model="cr.recommendation" cols="30" rows="2" class="form-control" placeholder="Enter Recommended Repair and Maintenance Here"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SPARE PARTS -->
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">Spare Parts Purchased</label>
+                                <select v-model="cr.spareParts" class="form-control">
+                                    <option value="" selected disabled>Choose Receiving Report</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REPAIR PARTY CONTRACTED -->
+                    <div class="row">
+                        <div class="col-8 mb-1 pr-1">
+                            <label for="">Repair Party Contracted</label>
+                            <select class="form-control mb-2" v-for="(item, index) in cr.crvendors" v-model="item.vendor">
+                                <option value="" selected disabled>Choose a Vendor</option>
+                                <option v-for="vendor in vendors" :value="vendor.id">[[vendor.name]]</option>
+                            </select>
+                        </div>
+                        <div class="col-4 mb-1 pl-1">
+                            <label for="">Payment Amount</label>
+                            <div class="input-group mb-2" v-for="(item, index) in cr.crvendors">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input v-model="item.paymentAmount" type="text" onkeypress="validate()" class="form-control box-shadow-off" placeholder="Enter Amount">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button @click="pushVendor()" class="btn btn-warning mt-1">+ Add More Vendor</button>
+                            <button @click="popVendor()" class="btn btn-danger mt-1">- Remove a Vendor</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="border btn-bottom">
+                    Save
+                </div>
+            </div>
+        </div>
+    </div>
+    <pre>[[$data]]</pre>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+        data: {
+            config: {
+				headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+			},
+
+            damagePhotoUrl: null,
+
+            cr: {
+                code: null,
+                reportDate: null,
+                ppe: '',
+                malfuncDate: null,
+                damageDescription: null,
+                spareParts: '',
+                damagePhoto: null,
+                recommendation: null,
+                crvendors: [{
+                    vendor: '',
+                    paymentAmount: null,
+                }]
+            },
+            vendors: []
+        },
+
+        methods: {
+            loadData(){
+                axios.get('/api/vendor/')
+                .then(res=>this.vendors=res.data)
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: 'vendor failed to fetch',
+                        icon: 'error'
+                    })
+                })
+            },
+
+            popVendor(){
+                this.cr.crvendors.pop()
+            },
+
+            pushVendor(){
+                this.cr.crvendors.push({
+                    vendor: '',
+                    paymentAmount: null,
+                })
+            },
+
+            damagePhotoHandler(){
+                this.cr.damagePhoto = this.$refs.damageFile.files[0]
+                this.damagePhotoUrl = URL.createObjectURL(this.cr.damagePhoto);
+                console.log(this.cr.damagePhoto)
+            }
+        },
+        mounted(){
+            this.loadData()
+        }
+    })
+</script>
+
+{% endblock %}

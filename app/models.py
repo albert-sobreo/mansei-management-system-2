@@ -1081,7 +1081,33 @@ class RepairAndMaintenance(models.Model):
 
 class TestUploadFile(models.Model):
     file = models.ImageField(upload_to='test/')
-#hello
+
+class CompletionReport(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    reportDate = models.DateField(null=True, blank=True)
+    ppe = models.ForeignKey(PPE, on_delete=models.PROTECT, null=True, blank=True)
+    malfuncDate = models.DateField(null=True, blank=True)
+    damageDescription = models.TextField(null=True, blank=True)
+    spareParts = models.ForeignKey(ReceivingReport, on_delete=models.PROTECT, null=True, blank=True)
+    damagePhoto = models.ImageField(null=True, blank=True, upload_to="cr/damage/")
+    recommendation = models.TextField(null=True, blank=True)
+    status = models.CharField(max_length=20, null=True, blank=True)
+    reason = models.TextField(null=True, blank=True)
+    successPhoto = models.ImageField(null=True, blank=True, upload_to="cr/success/")
+
+    def __str__(self):
+        return self.code
+
+class CRVendors(models.Model):
+    cr = models.ForeignKey(CompletionReport, on_delete=models.PROTECT, related_name='crvendors')
+    vendor = models.ForeignKey(Party, on_delete=models.PROTECT, related_name='crvendors')
+    paymentAmount = models.DecimalField(max_digits=20, decimal_places=5, default=decimal.Decimal(0))
+
+    def __str__(self):
+        return self.cr.code + " " + self.vendor.name
+
+
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
     defaultWarehouse = models.ForeignKey(Warehouse, related_name = 'branchdefaultwarehouse', on_delete=models.PROTECT, blank = True, null = True)
