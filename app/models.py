@@ -1081,7 +1081,7 @@ class RepairAndMaintenance(models.Model):
 
 class TestUploadFile(models.Model):
     file = models.ImageField(upload_to='test/')
-
+#hello
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
     defaultWarehouse = models.ForeignKey(Warehouse, related_name = 'branchdefaultwarehouse', on_delete=models.PROTECT, blank = True, null = True)
