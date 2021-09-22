@@ -663,6 +663,15 @@ label{
     color: #40a5ee;
 }
 
+.link-danger{
+    cursor: pointer;
+    color: rgb(240, 68, 68);
+}
+
+.link-danger:hover{
+    color: rgb(255, 104, 104);
+}
+
 .gray, .grey{
     color: #A6A6A6;
 }

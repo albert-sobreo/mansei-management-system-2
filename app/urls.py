@@ -98,6 +98,7 @@ router.register(r"branch-default-child-account", views.BranchDefaultChildAccount
 
 ########## PPE ##########
 router.register(r"ppe", views.PPENestedAPI, "ppe")
+router.register(r"ppe-real", views.PPEAPI, 'ppe-real')
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -259,4 +260,5 @@ urlpatterns = [
     path('reset-account-process/', login_required(views.ResetChartOfAccountsProcess.as_view())),
     path('upload-test/', login_required(views.UploadView.as_view())),
     path('completion-report/', login_required(views.CompletionReportView.as_view())),
+    path('cr-list/', login_required(views.CRList.as_view()))
 ]

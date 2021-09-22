@@ -14,8 +14,8 @@
         <!-- NAV 2 -->
         <div class="d-flex font-semibold mb-2 justify-content-center">
             <div class="justify-content-center c-nav-links gas-nav">
-                <a href="#" class="active-gas mx-2">Create</a>
-                <a href="#" class="mx-2">CR List</a>
+                <a href="/completion-report/" class="active-gas mx-2">Create</a>
+                <a href="/cr-list/" class="mx-2">CR List</a>
             </div>
         </div>
         <!-- TITLE AND BUTTONS -->
@@ -29,13 +29,13 @@
                     <div class="row">
                         <div class="col pr-1">
                             <div class="form-group">
-                                <label for="">Reference No.</label>
+                                <label class="font-size-16 gray" for="">Reference No.</label>
                                 <input v-model="cr.code" type="text" class="form-control">
                             </div>
                         </div>
                         <div class="col pl-1">
                             <div class="form-group">
-                                <label for="">Report Date</label>
+                                <label class="font-size-16 gray" for="">Report Date</label>
                                 <input v-model="cr.reportDate" type="date" class="form-control">
                             </div>
                         </div>
@@ -47,32 +47,35 @@
                     <!-- SELECT ASSET -->
                     <div class="row">
                         <div class="col pr-1">
-                            <label for="">Asset (PPE)</label>
-                            <select v-model="cr.ppe" class="form-control">
+                            <label class="font-size-16 gray" for="">Asset (PPE)</label>
+                            <select @change="fetchPPE(cr.ppe)" v-model="cr.ppe" class="form-control">
                                 <option value="" selected disabled>Choose Asset</option>
+                                {% for ppe in request.user.branch.ppe.all %}
+                                <option value="{{ppe.pk}}">{{ppe.name}}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="col pl-1">
-                            <label for="">Malfunction Date</label>
+                            <label class="font-size-16 gray" for="">Malfunction Date</label>
                             <input v-model="cr.malfuncDate" type="date" class="form-control">
                         </div>
                     </div>
 
                     <!-- ASSET CONTAINER -->
-                    <div class="row my-2 py-2 order-card">
+                    <div class="row my-2 py-2 order-card" v-if="ppe.name">
                         <div class="col">
-                            <span class="font-bold gray">Name</span><br>
-                            <span class="font-bold font-size-14">Hello</span>
+                            <span class="font-bold gray">Asset Name</span><br>
+                            <span class="font-bold font-size-14">[[ppe.name]]</span>
                         </div>
                         <div class="col">
-                            <span class="font-bold gray">Type</span>
+                            <span class="font-bold gray">Asset Type</span>
                             <br>
-                            <span class="font-bold font-size-14">Vehicle</span>
+                            <span class="font-bold font-size-14">[[ppe.type]]</span>
                         </div>
                         <div class="col">
-                            <span class="font-bold gray">Useful Life</span>
+                            <span class="font-bold gray">Asset Useful Life</span>
                             <br>
-                            <span class="font-bold font-size-14">30 Years</span>
+                            <span class="font-bold font-size-14">[[ppe.usefulLife]] Years</span>
                         </div>
                     </div>
 
@@ -80,11 +83,12 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
-                                <label for="">
+                                <label class="font-size-16 gray" for="">
                                     Damage Description
                                     &nbsp;
-                                    <label class="link" for="damagePhoto" title="Attach a Photo">+ <i class="fas fa-image"></i></label><br>
+                                    <label class="link" for="damagePhoto" title="Attach a Photo">+ <i class="fas fa-image"></i></label>
                                     <input ref="damageFile" @change="damagePhotoHandler()" id="damagePhoto" type="file" style="display: none;">
+                                    <label @click="removeDamagePhoto()" v-if="damagePhotoUrl" class="link-danger" title="Remove Photo">- <i class="fas fa-image"></i></label>
                                 </label>
                                 <textarea v-model="cr.damageDescription" cols="30" rows="2" class="form-control" placeholder="Enter Damage Description Here"></textarea>
                             </div>
@@ -92,7 +96,7 @@
                     </div>
 
                     <!-- PHOTO -->
-                    <div class="row my-1 py-3 order-card">
+                    <div class="row my-1 py-3 order-card" v-if="damagePhotoUrl">
                         <div class="col">
                             <img v-if="damagePhotoUrl" :src="damagePhotoUrl" alt="wrong type" width="100%" class="b-radius-10 box-shadow-small">
                         </div>
@@ -102,7 +106,7 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
-                                <label for="">Recommendation</label>
+                                <label class="font-size-16 gray" for="">Recommendation</label>
                                 <textarea v-model="cr.recommendation" cols="30" rows="2" class="form-control" placeholder="Enter Recommended Repair and Maintenance Here"></textarea>
                             </div>
                         </div>
@@ -112,25 +116,69 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
-                                <label for="">Spare Parts Purchased</label>
-                                <select v-model="cr.spareParts" class="form-control">
+                                <label class="font-size-16 gray" for="">Spare Parts Purchased</label>
+                                <select @change="viewRR(cr.spareParts)" v-model="cr.spareParts" class="form-control">
                                     <option value="" selected disabled>Choose Receiving Report</option>
+                                    {% for rr in request.user.branch.receivingReport.all %}
+                                    <option value="{{rr.pk}}">{{rr.code}}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
                     </div>
 
+                    <!-- RR DETAILS -->
+                    <div class="row mt-2 py-2 order-card" v-if="rr.code">
+                        <div class="col">
+                            <span class="font-bold gray">RR Code</span>
+                            <br>
+                            <span class="font-bold font-size-14">[[rr.code]]</span>
+                        </div>
+                        <div class="col">
+                            <span class="font-bold gray">Amount</span>
+                            <br>
+                            <span class="font-bold font-size-14">₱[[formatPrice(rr.amountTotal)]]</span>
+                        </div>
+                        <div class="col">
+                            <span class="font-bold gray">Vendor</span>
+                            <br>
+                            <span class="font-bold font-size-14">[[rr.party.name]]</span>
+                        </div>
+                    </div>
+
+                    <div class="row pt-2 mb-2 pb-2 order-card" v-if="rr.code">
+                        <table class="table-sm table-striped table-borderless col mx-2">
+                            <thead>
+                                <th class="gray">Account Type</th>
+                                <th class="gray">Item</th>
+                                <th class="gray">Qty</th>
+                            </thead>
+                            <tbody>
+                                <tr v-if="rr.rritemsmerch" v-for="item in rr.rritemsmerch">
+                                    <td class="font-medium">[[item.type]]</td>
+                                    <td class="font-medium">[[item.merchInventory.name]] [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
+                                    <td class="font-medium">[[item.qty]] [[ units[item.unit] ]]</td>
+                                </tr>
+                                <tr v-if="rr.rritemsother" v-for="item in rr.rritemsother">
+                                    <td class="font-medium">[[item.type]]</td>
+                                    <td class="font-medium">[[item.otherInventory.name]]</td>
+                                    <td class="font-medium">[[item.qty]] [[ units[item.unit] ]]</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                     <!-- REPAIR PARTY CONTRACTED -->
                     <div class="row">
                         <div class="col-8 mb-1 pr-1">
-                            <label for="">Repair Party Contracted</label>
+                            <label class="font-size-16 gray" for="">Repair Party Contracted</label>
                             <select class="form-control mb-2" v-for="(item, index) in cr.crvendors" v-model="item.vendor">
                                 <option value="" selected disabled>Choose a Vendor</option>
                                 <option v-for="vendor in vendors" :value="vendor.id">[[vendor.name]]</option>
                             </select>
                         </div>
                         <div class="col-4 mb-1 pl-1">
-                            <label for="">Payment Amount</label>
+                            <label class="font-size-16 gray" for="">Payment Amount</label>
                             <div class="input-group mb-2" v-for="(item, index) in cr.crvendors">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">₱</span>
@@ -146,13 +194,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="border btn-bottom">
+                <div @click="checkForm()" class="border btn-bottom">
                     Save
                 </div>
             </div>
         </div>
     </div>
-    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -166,14 +213,21 @@
         data: {
             config: {
 				headers: {
-                    "X-CSRFToken": getCookie('csrftoken')
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    "content-type": "multipart/form-data"
                 }
 			},
 
             damagePhotoUrl: null,
 
+            units: [
+                'PC',
+                'KG',
+                'L'
+            ],
+
             cr: {
-                code: null,
+                code: '{{new_code}}',
                 reportDate: null,
                 ppe: '',
                 malfuncDate: null,
@@ -186,7 +240,26 @@
                     paymentAmount: null,
                 }]
             },
-            vendors: []
+
+            rr: {
+                code: null,
+                amountTotal: 0,
+                party: {
+                    name: null,
+                },
+
+                rritemsmerch: [],
+                rritemsother: []
+            },
+
+            ppe: {
+                name: null,
+                type: null,
+                usefulLife: null,
+            },
+
+            vendors: [],
+            errors: []
         },
 
         methods: {
@@ -199,6 +272,33 @@
                         html: 'vendor failed to fetch',
                         icon: 'error'
                     })
+                })
+            },
+
+            viewRR(code){
+                console.log(code)
+                axios.get(`/api/receiving-report/${code}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    this.rr=res.data
+                })
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            fetchPPE(id){
+                axios.get(`/api/ppe-real/${id}/`)
+                .then(res=>{
+                    this.ppe.name = res.data.name
+                    this.ppe.type = res.data.type
+                    this.ppe.usefulLife = res.data.usefulLife
                 })
             },
 
@@ -217,6 +317,96 @@
                 this.cr.damagePhoto = this.$refs.damageFile.files[0]
                 this.damagePhotoUrl = URL.createObjectURL(this.cr.damagePhoto);
                 console.log(this.cr.damagePhoto)
+            },
+
+            checkForm(){
+                var success = false
+                if(
+                    this.cr.code &&
+                    this.cr.reportDate &&
+                    this.cr.ppe &&
+                    this.cr.malfuncDate &&
+                    this.cr.damageDescription &&
+                    this.cr.spareParts &&
+                    this.cr.recommendation
+                )
+                {
+                    for(var item of this.cr.crvendors){
+                        if(
+                            item.vendor &&
+                            item.paymentAmount
+                        )
+                        {
+                            success = true
+                        } else {
+                            success = false
+                            break
+                        }
+                    }
+                    if(success){
+                        this.submit()
+                        return
+                    }
+                }
+
+                this.errors = []
+                success = true
+                if(!this.cr.code){
+                    this.errors.push('Code required')
+                }
+                if(!this.cr.reportDate){
+                    this.errors.push('Report Date Required')
+                }
+                if(!this.cr.malfuncDate){
+                    this.errors.push('Malfunction Date Required')
+                }
+                if(!this.cr.damageDescription){
+                    this.errors.push('Damage Description Required')
+                }
+                if(!this.cr.spareParts){
+                    this.errors.push('Spare Parts Required')
+                }
+                if(!this.cr.recommendation){
+                    this.errors.push('Recommendation Required')
+                }
+                this.cr.crvendors.forEach((item,index)=>{
+                    if(!item.vendor){
+                        this.errors.push('Vendor required at index: ' + String(index+1))
+                    }
+                    if(!item.paymentAmount){
+                        this.errors.push("Payment Amount required at index: " + String(index+1))
+                    }
+                })
+
+                Swal.fire({
+                    title: "Unfilled Inputs",
+                    html: this.errors.join('<br>'),
+                    icon: "warning"
+                })
+            },
+
+            removeDamagePhoto(){
+                this.damagePhotoUrl = null
+                this.cr.damagePhoto = null
+                document.getElementById('damagePhoto').value=null
+            },
+            
+            submit(){
+                var formdata = new FormData()
+                formdata.append("damagePhoto", this.cr.damagePhoto)
+
+                var postDATA = JSON.stringify(this.cr)
+                formdata.append("postDATA", postDATA)
+
+                axios.post('/completion-report/', formdata, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
             }
         },
         mounted(){

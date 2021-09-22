@@ -372,3 +372,8 @@ class PPENestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PPENestedSZ
     queryset = PPE.objects.all()
+
+class PPEAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PPESZ
+    queryset = PPE.objects.all()

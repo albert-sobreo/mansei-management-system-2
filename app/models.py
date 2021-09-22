@@ -1085,17 +1085,20 @@ class TestUploadFile(models.Model):
 class CompletionReport(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
+    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='completionreportcreatedby')
     reportDate = models.DateField(null=True, blank=True)
-    ppe = models.ForeignKey(PPE, on_delete=models.PROTECT, null=True, blank=True)
+    ppe = models.ForeignKey(PPE, on_delete=models.PROTECT, null=True, blank=True, related_name='completionreport')
     malfuncDate = models.DateField(null=True, blank=True)
     damageDescription = models.TextField(null=True, blank=True)
-    spareParts = models.ForeignKey(ReceivingReport, on_delete=models.PROTECT, null=True, blank=True)
+    spareParts = models.ForeignKey(ReceivingReport, on_delete=models.PROTECT, null=True, blank=True, related_name='completionreport')
     damagePhoto = models.ImageField(null=True, blank=True, upload_to="cr/damage/")
     recommendation = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=20, null=True, blank=True)
     reason = models.TextField(null=True, blank=True)
     successPhoto = models.ImageField(null=True, blank=True, upload_to="cr/success/")
-
+    approved = models.BooleanField(default=False)
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='completionreportapprovedby')
+    
     def __str__(self):
         return self.code
 
@@ -1233,6 +1236,10 @@ class Branch(models.Model):
     ppe = models.ManyToManyField(PPE, blank=True)
     ppeHistoryOfDepr = models.ManyToManyField(PPEHistoryOfDepr, blank=True)
     repairAndMaintenance = models.ManyToManyField(RepairAndMaintenance, blank=True)
+
+    #### COMPLETION REPORT ####
+    completionReport = models.ManyToManyField(CompletionReport, blank=True)
+    crVendors = models.ManyToManyField(CRVendors, blank=True)
     
 
     def __str__(self):
