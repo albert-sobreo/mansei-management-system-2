@@ -7,6 +7,14 @@ class UserSZ(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+class UserNameOnlySZ(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name'
+        ]
+
 
 
 
@@ -582,6 +590,14 @@ class ReceivingReportNestedSZ(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+class ReceivingReportNestedSZ2(serializers.ModelSerializer):
+    rritemsmerch = RRItemsMerchNestedSZ(read_only=True, many=True)
+    rritemsother = RRItemsOtherNestedSZ(read_only=True, many=True)
+
+    class Meta:
+        model = ReceivingReport
+        fields = "__all__"
+
 ########## VOUCHER ##########
 class VoucherSZ(serializers.ModelSerializer):
     purchaseOrder = PurchaseOrderNestedSZ(read_only=True)
@@ -730,5 +746,32 @@ class PPENestedSZ(serializers.ModelSerializer):
     repairandmaintenance = RepairAndMaintenanceSZ(read_only=True, many=True)
     class Meta:
         model = PPE
+        fields = "__all__"
+        depth = 1
+
+
+
+
+
+########## CR ##########
+class CRSZ(serializers.ModelSerializer):
+    class Meta:
+        model = CompletionReport
+        fields = "__all__"
+
+class CRVendorsSZ(serializers.ModelSerializer):
+    vendor = PartySZ(read_only=True)
+    class Meta:
+        model = CRVendors
+        fields = "__all__"
+
+class CRNestedSZ(serializers.ModelSerializer):
+    createdBy = UserNameOnlySZ(read_only=True)
+    ppe = PPESZ(read_only=True)
+    spareParts = ReceivingReportNestedSZ2(read_only=True)
+    approvedBy = UserNameOnlySZ(read_only=True)
+    crvendors = CRVendorsSZ(many=True, read_only=True)
+    class Meta:
+        model = CompletionReport
         fields = "__all__"
         depth = 1

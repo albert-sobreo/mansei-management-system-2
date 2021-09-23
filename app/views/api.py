@@ -377,3 +377,13 @@ class PPEAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PPESZ
     queryset = PPE.objects.all()
+
+
+
+
+
+########## CR ##########
+class CRNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CRNestedSZ
+    queryset = CompletionReport.objects.all()

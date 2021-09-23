@@ -100,6 +100,9 @@ router.register(r"branch-default-child-account", views.BranchDefaultChildAccount
 router.register(r"ppe", views.PPENestedAPI, "ppe")
 router.register(r"ppe-real", views.PPEAPI, 'ppe-real')
 
+########## CR ##########
+router.register(r"cr-nested", views.CRNestedAPI, 'cr-nested')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),

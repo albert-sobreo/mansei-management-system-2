@@ -37,7 +37,7 @@
             <tbody>
                 {% for cr in request.user.branch.completionReport.all %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#modal">{{cr.code}}</td>
+                    <td @click="fetchCR({{cr.pk}})" class="link" data-toggle="modal" data-target="#modal">{{cr.code}}</td>
                     <td>{{cr.reportDate}}</td>
                     <td>{{cr.ppe.name}}</td>
                     <td>{{cr.malfuncDate}}</td>
@@ -47,7 +47,191 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- UPDATE MODAL -->
+
+        <!-- VIEW CR MODAL -->
+        <div class="modal fade" id="modal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <div class="row my-2">
+                            <!-- LVL 1 -->
+                            <div class="col-4 mt-3">
+                                <label for="" class="gray">Reference No.</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.code]]</span>
+                            </div>
+                            <div class="col-4 mt-3">
+                                <label for="" class="gray">Report Date</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.reportDate]]</span>
+                            </div>
+                            <div class="col-4 mt-3">
+                                <label for="" class="gray">Created By</label>
+                                <br>
+                                <span class="font-size-14 font-bold" v-if="modal.createdBy!==null">[[modal.createdBy.first_name]] [[modal.createdBy.last_name]]</span>
+                            </div>
+                            <!-- LVL 2 -->
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">R&M Status</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.status]]</span>
+                            </div>
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">Approval Status</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.approved]]</span>
+                            </div>
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">Approved By</label>
+                                <br>
+                                <span class="font-size-14 font-bold" v-if="modal.approvedBy!==null">[[modal.approvedBy.first_name]] [[modal.approvedBy.last_name]]</span>
+                            </div>
+                        </div>
+                        <!-- MID CARD -->
+                        <div class="order-card row my-2">
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">PPE</label>
+                                <br>
+                                <span class="font-size-14 font-bold" v-if="modal.ppe">[[modal.ppe.name]]</span>
+                            </div>
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">Type</label>
+                                <br>
+                                <span class="font-size-14 font-bold" v-if="modal.ppe">[[modal.ppe.type]]</span>
+                            </div>
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">Malfunction Date</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.malfuncDate]]</span>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col-12 mt-3">
+                                <label for="" class="gray">Damage Description</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.damageDescription]]</span>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <span @click="toggleDamagePhoto()" class="link noselect" id="damagePhotoBtn">View Photo</span>
+                                <img style="display: none;" id="damagePhoto" :src="modal.damagePhoto" alt="" width="100%" class="b-radius-10 box-shadow-medium">
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col">
+                                <span class="font-bold gray">Contracted Repair Party</span>
+                            </div>
+                        </div>
+
+                        <div class="row order-card mb-2 pt-2">
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-4"><span class="font-bold gray">Name</span></div>
+                                    <div class="col-4"><span class="font-bold gray">Contact Number</span></div>
+                                    <div class="col-4"><span class="font-bold gray">Payment Amount</span></div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="row my-1" v-for="vendor in modal.crvendors">
+                                    <div class="col-4">
+                                        <span class="font-semibold">[[vendor.vendor.name]]</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="font-semibold" v-if="vendor.vendor.mobile">[[vendor.vendor.mobile]] [[vendor.vendor.landline]]</span>
+                                        <span class="font-semibold" v-else-if="vendor.vendor.landline">[[vendor.vendor.landline]]</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="font-semibold">₱[[formatPrice(vendor.paymentAmount)]]</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col">
+                                <span class="grey font-bold">Spare Parts Purchased</span>
+                            </div>
+                        </div>
+
+                        <div class="row order-card">
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">RR Code</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.spareParts.code]]</span>
+                            </div>
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">Total Amount</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(modal.spareParts.amountTotal)]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row order-card mb-2">
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-6"><span class="font-bold gray">Item</span></div>
+                                    <div class="col-6"><span class="font-bold gray">Qty</span></div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="row my-1" v-for="item in modal.spareParts.rritemsmerch">
+                                    <div class="col-6">
+                                        <span class="font-semibold">[[item.merchInventory.name]] [[item.merchInventory.classification]] [[item.merchInventory.type]] </span>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="font-semibold">[[item.qty]]</span>
+                                    </div>
+                                </div>
+                                <div class="row my-1" v-for="item in modal.spareParts.rritemsother">
+                                    <div class="col-6">
+                                        <span class="font-semibold">[[item.otherInventory.name]]</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="font-semibold">[[item.qty]]</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col-12 my-3">
+                                <label for="" class="gray">Recommendations</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.recommendation]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col-12 my-3">
+                                <label for="" class="gray">Reason</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.reason]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col-12 my-3">
+                                <label for="" class="gray">Success</label>
+                                <br>
+                                <span @click="toggleSuccessPhoto" class="link noselect" id="successPhotoBtn">View Photo</span>
+                                <img id="successPhoto" :src="modal.sucessPhoto" alt="" width="100%" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <button class="btn btn-primary col">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -59,11 +243,151 @@
         delimiters: ['[[', ']]'],
         el: "#app",
         data: {
+            config: {
+				headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    "content-type": "multipart/form-data"
+                }
+			},
 
+            modal: {
+                code: null,
+                datetimeCreated: null,
+                reportDate: null,
+                createdBy: {
+                    first_name: null,
+                    last_name: null
+                },
+                ppe: null,
+                malfuncDate: null,
+                damageDescription: null,
+                spareParts: {
+                    rritemsmerch: [],
+                    rritemsother: [],
+                },
+                damagePhoto: null,
+                recommendation: null,
+                status: null,
+                reason: null,
+                successPhoto: null,
+                approved: null,
+                approvedBy: {
+                    first_name: null,
+                    last_name: null
+                },
+                crvendors: null,
+            }
         },
 
         methods: {
+            toggleDamagePhoto(){
+                photo = document.getElementById('damagePhoto')
+                if(photo.style.display == 'none'){
+                    photo.style.display = 'block'
+                    document.getElementById('damagePhotoBtn').innerHTML = 'Hide Photo'
+                } else {
+                    photo.style.display = 'none'
+                    document.getElementById('damagePhotoBtn').innerHTML = 'View Photo'
+                }
+            },
 
+            toggleSuccessPhoto(){
+                photo = document.getElementById("successPhoto")
+                if(photo.style.display == 'none'){
+                    photo.style.display = 'block'
+                    document.getElementById('successPhotoBtn').innerHTML = 'Hide Photo'
+                } else {
+                    photo.style.display = 'none'
+                    document.getElementById('successPhotoBtn').innerHTML = 'View Photo'
+                }
+            },
+            fetchCR(id){
+                axios.get(`/api/cr-nested/${id}/`)
+                .then(res=>this.modal=res.data)
+            },
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${day} - ${month}. ${date}, ${year}`
+
+                return formatted
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
         }
     })
 </script>
