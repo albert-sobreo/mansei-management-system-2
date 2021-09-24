@@ -576,6 +576,11 @@ class RRItemsOtherNestedSZ(serializers.ModelSerializer):
         model = RRItemsOther
         fields = '__all__'
 
+class ReceivingReportSZ(serializers.ModelSerializer):
+    class Meta:
+        model = ReceivingReport
+        fields = '__all__'
+
 class ReceivingReportNestedSZ(serializers.ModelSerializer):
     party = PartySZ(read_only=True)
     createdBy = UserSZ(read_only=True)
@@ -759,18 +764,24 @@ class CRSZ(serializers.ModelSerializer):
         model = CompletionReport
         fields = "__all__"
 
-class CRVendorsSZ(serializers.ModelSerializer):
-    vendor = PartySZ(read_only=True)
+class CRPOSZ(serializers.ModelSerializer):
+    purchaseOrder = PurchaseOrderSZ(read_only=True)
     class Meta:
-        model = CRVendors
+        model = CRPO
         fields = "__all__"
+
+class CRSparePartsSZ(serializers.ModelSerializer):
+    receivingReport = ReceivingReportSZ(read_only=True)
+    class Meta:
+        model = CRSpareParts
+        field = "__all__"
 
 class CRNestedSZ(serializers.ModelSerializer):
     createdBy = UserNameOnlySZ(read_only=True)
     ppe = PPESZ(read_only=True)
     spareParts = ReceivingReportNestedSZ2(read_only=True)
     approvedBy = UserNameOnlySZ(read_only=True)
-    crvendors = CRVendorsSZ(many=True, read_only=True)
+    crpo = CRPOSZ(many=True, read_only=True)
     class Meta:
         model = CompletionReport
         fields = "__all__"

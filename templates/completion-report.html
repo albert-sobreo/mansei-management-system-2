@@ -140,7 +140,7 @@
                             <span class="font-bold font-size-14">₱[[formatPrice(rr.amountTotal)]]</span>
                         </div>
                         <div class="col">
-                            <span class="font-bold gray">Vendor</span>
+                            <span class="font-bold gray">PO</span>
                             <br>
                             <span class="font-bold font-size-14">[[rr.party.name]]</span>
                         </div>
@@ -172,25 +172,25 @@
                     <div class="row">
                         <div class="col-8 mb-1 pr-1">
                             <label class="font-size-16 gray" for="">Repair Party Contracted</label>
-                            <select class="form-control mb-2" v-for="(item, index) in cr.crvendors" v-model="item.vendor">
-                                <option value="" selected disabled>Choose a Vendor</option>
-                                <option v-for="vendor in vendors" :value="vendor.id">[[vendor.name]]</option>
+                            <select class="form-control mb-2" v-for="(item, index) in cr.crpo" v-model="item.purchaseOrder" @change="fetchPO(item.purchaseOrder, index)" >
+                                <option value="" selected disabled>Choose Purchase Order</option>
+                                <option v-for="po in pos" :value="po.id">[[po.code]] --- [[po.party.name]]</option>
                             </select>
                         </div>
                         <div class="col-4 mb-1 pl-1">
                             <label class="font-size-16 gray" for="">Payment Amount</label>
-                            <div class="input-group mb-2" v-for="(item, index) in cr.crvendors">
+                            <div class="input-group mb-2" v-for="(item, index) in cr.crpo">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">₱</span>
                                 </div>
-                                <input v-model="item.paymentAmount" type="text" onkeypress="validate()" class="form-control box-shadow-off" placeholder="Enter Amount">
+                                <input :value="formatPrice(item.amountTotal)" type="text" onkeypress="validate()" class="form-control box-shadow-off" placeholder="Enter Amount" readonly>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            <button @click="pushVendor()" class="btn btn-warning mt-1">+ Add More Vendor</button>
-                            <button @click="popVendor()" class="btn btn-danger mt-1">- Remove a Vendor</button>
+                            <button @click="pushPO()" class="btn btn-warning mt-1">+ Add More PO</button>
+                            <button @click="popPO()" class="btn btn-danger mt-1">- Remove PO</button>
                         </div>
                     </div>
                 </div>
@@ -235,9 +235,9 @@
                 spareParts: '',
                 damagePhoto: null,
                 recommendation: null,
-                crvendors: [{
-                    vendor: '',
-                    paymentAmount: null,
+                crpo: [{
+                    purchaseOrder: '',
+                    amountTotal: null,
                 }]
             },
 
@@ -258,21 +258,26 @@
                 usefulLife: null,
             },
 
-            vendors: [],
+            pos: [],
             errors: []
         },
 
         methods: {
             loadData(){
-                axios.get('/api/vendor/')
-                .then(res=>this.vendors=res.data)
+                axios.get(`/po-repair/`)
+                .then(res=>this.pos=res.data)
                 .catch(err=>{
                     Swal.fire({
                         title: "Something went wrong.",
-                        html: 'vendor failed to fetch',
+                        html: 'PO failed to fetch',
                         icon: 'error'
                     })
                 })
+            },
+
+            fetchPO(id, index){
+                axios.get(`/api/purchase-order/${id}`)
+                .then(res=>this.cr.crpo[index].amountTotal=res.data.amountTotal)
             },
 
             viewRR(code){
@@ -302,14 +307,14 @@
                 })
             },
 
-            popVendor(){
-                this.cr.crvendors.pop()
+            popPO(){
+                this.cr.crpo.pop()
             },
 
-            pushVendor(){
-                this.cr.crvendors.push({
-                    vendor: '',
-                    paymentAmount: null,
+            pushPO(){
+                this.cr.crpo.push({
+                    purchaseOrder: '',
+                    amountTotal: null
                 })
             },
 
@@ -331,10 +336,9 @@
                     this.cr.recommendation
                 )
                 {
-                    for(var item of this.cr.crvendors){
+                    for(var item of this.cr.crpo){
                         if(
-                            item.vendor &&
-                            item.paymentAmount
+                            item.purchaseOrder
                         )
                         {
                             success = true
@@ -369,12 +373,9 @@
                 if(!this.cr.recommendation){
                     this.errors.push('Recommendation Required')
                 }
-                this.cr.crvendors.forEach((item,index)=>{
-                    if(!item.vendor){
-                        this.errors.push('Vendor required at index: ' + String(index+1))
-                    }
-                    if(!item.paymentAmount){
-                        this.errors.push("Payment Amount required at index: " + String(index+1))
+                this.cr.crpo.forEach((item,index)=>{
+                    if(!item.crpo){
+                        this.errors.push('PO required at index: ' + String(index+1))
                     }
                 })
 

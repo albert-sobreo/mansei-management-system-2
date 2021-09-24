@@ -263,5 +263,6 @@ urlpatterns = [
     path('reset-account-process/', login_required(views.ResetChartOfAccountsProcess.as_view())),
     path('upload-test/', login_required(views.UploadView.as_view())),
     path('completion-report/', login_required(views.CompletionReportView.as_view())),
-    path('cr-list/', login_required(views.CRList.as_view()))
+    path('cr-list/', login_required(views.CRList.as_view())),
+    path('po-repair/', login_required(views.PurchaseOrderApprovedRepairAPI.as_view()))
 ]

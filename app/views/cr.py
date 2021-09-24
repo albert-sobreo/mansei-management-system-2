@@ -62,13 +62,19 @@ class CompletionReportView(View):
         cr.save()
         request.user.branch.completionReport.add(cr)
 
-        for vendor in crJson['crvendors']:
-            crvendor = CRVendors()
-            crvendor.cr = cr
-            crvendor.vendor = Party.objects.get(pk=vendor['vendor'])
-            crvendor.paymentAmount = Decimal(vendor['paymentAmount'])
-            crvendor.save()
-            request.user.branch.crVendors.add(crvendor)
+        for po in crJson['crpo']:
+            crpo = CRPO()
+            crpo.cr = cr
+            crpo.purchaseOrder = PurchaseOrder.objects.get(pk=po['purchaseOrder'])
+            crpo.save()
+            request.user.branch.crpo.add(crpo)
+
+        for rr in crJson['crSpareParts']:
+            crsp = CRSpareParts()
+            crsp.cr = cr
+            crsp.receivingReport = ReceivingReport.objects.get(pk=po['receivingReport'])
+            crsp.save()
+            request.user.branch.crSpareParts.add(crsp)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

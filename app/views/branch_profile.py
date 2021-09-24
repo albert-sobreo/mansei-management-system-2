@@ -9,13 +9,21 @@ import sweetify
 
 class BranchProfileView(View):
     def get(self, request, format=None):
-        return render(request, 'branch-profile.html')
+        context = {
+            'sg': request.user.branch.subGroup.all()
+        }
+        return render(request, 'branch-profile.html', context)
 
 class SaveDefaultAccounts(APIView):
     def put(self, request, format=None):
         items = request.data
         print(items['pettyCash'])
         bdacct = BranchDefaultChildAccount.objects.get(pk=items['id'])
+        try:
+            bdacct.rm = AccountChild.objects.get(pk=items['rm'])
+        except Exception as e:
+            print(e)
+            bdacct.rm = None
         try:
             bdacct.defaultWarehouse = Warehouse.objects.get(pk=items['defaultWarehouse'])
         except Exception as e:

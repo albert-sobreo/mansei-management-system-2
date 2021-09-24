@@ -6,6 +6,7 @@ from ..serializers import *
 from rest_framework.views import APIView
 from ..models import *
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.fields import CurrentUserDefault
 
 ########## CHART OF ACCOUNTS ##########
 class AccountGroupAPI(viewsets.ModelViewSet):
@@ -154,6 +155,13 @@ class PurchaseOrderApprovedAPI(viewsets.ModelViewSet):
     serializer_class = PurchaseOrderNestedSZ
     queryset = PurchaseOrder.objects.filter(approved=True)
 
+class PurchaseOrderApprovedRepairAPI(APIView):
+    def get(self, request, format=None):
+        lst = []
+        repairAccount = request.user.branch.branchProfile.branchDefaultChildAccount.rm
+        poRepairOnly = request.user.branch.purchaseOrder.filter(poitemsother__type = repairAccount.id)
+        serializer = PurchaseOrderNestedSZ(poRepairOnly, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
 
 

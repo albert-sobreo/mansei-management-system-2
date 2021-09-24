@@ -1098,21 +1098,30 @@ class CompletionReport(models.Model):
     successPhoto = models.ImageField(null=True, blank=True, upload_to="cr/success/")
     approved = models.BooleanField(default=False)
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='completionreportapprovedby')
-    
+    datetimeApproved = models.DateTimeField(null = True, blank=True)
+
+
     def __str__(self):
         return self.code
 
-class CRVendors(models.Model):
-    cr = models.ForeignKey(CompletionReport, on_delete=models.PROTECT, related_name='crvendors')
-    vendor = models.ForeignKey(Party, on_delete=models.PROTECT, related_name='crvendors')
-    paymentAmount = models.DecimalField(max_digits=20, decimal_places=5, default=decimal.Decimal(0))
+class CRSpareParts(models.Model):
+    cr = models.ForeignKey(CompletionReport, on_delete=models.PROTECT, related_name='crspareparts')
+    receivingReport = models.ForeignKey(ReceivingReport, on_delete=models.PROTECT, related_name='crspareparts')
 
     def __str__(self):
-        return self.cr.code + " " + self.vendor.name
+        return self.cr.code + " --- " + self.receivingReport.code
+
+class CRPO(models.Model):
+    cr = models.ForeignKey(CompletionReport, on_delete=models.PROTECT, related_name='crpo')
+    purchaseOrder = models.ForeignKey(PurchaseOrder, on_delete=models.PROTECT, related_name='crpo')
+
+    def __str__(self):
+        return self.cr.code + " --- " + self.purchaseOrder.code
 
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
+    rm = models.ForeignKey(AccountChild, related_name="branchdefaultrm", on_delete=models.PROTECT, null=True, blank=True)
     defaultWarehouse = models.ForeignKey(Warehouse, related_name = 'branchdefaultwarehouse', on_delete=models.PROTECT, blank = True, null = True)
     cashOnHand = models.ForeignKey(AccountChild, related_name='branchcashonhand', on_delete=models.PROTECT, blank=True, null=True)
     cashInBank = models.ManyToManyField(AccountChild, related_name='branchcashinbank', blank=True)
@@ -1239,7 +1248,8 @@ class Branch(models.Model):
 
     #### COMPLETION REPORT ####
     completionReport = models.ManyToManyField(CompletionReport, blank=True)
-    crVendors = models.ManyToManyField(CRVendors, blank=True)
+    crSpareParts = models.ManyToManyField(CRSpareParts, blank=True)
+    crpo = models.ManyToManyField(CRPO, blank=True)
     
 
     def __str__(self):

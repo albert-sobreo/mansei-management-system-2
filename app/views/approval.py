@@ -1547,3 +1547,33 @@ class BankReconApprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+
+########## PPE ##########
+class CRnonapproved(View):
+    def get(self, request, format=None):
+        context = {
+            'cr': request.user.branch.completionReport.filter(approved=False),
+        }
+        return render(request, 'cr-nonapproved.html', context)
+
+class CRapproved(View):
+    def get(self, request, format=None):
+        context = {
+            'cr': request.user.branch.completionReport.filter(approved=True),
+        }
+        return render(request, 'cr-approved.html', context)
+
+class CRApproval(View):
+    def put(self, request, pk, format = None):
+        
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
+        cr = CompletionReport.objects.get(pk=pk)
+
+        cr.approved = True
+        cr.approvedBy = request.user
+        cr.datetimeApproved = datetime.now()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
