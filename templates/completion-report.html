@@ -114,16 +114,28 @@
 
                     <!-- SPARE PARTS -->
                     <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-                                <label class="font-size-16 gray" for="">Spare Parts Purchased</label>
-                                <select @change="viewRR(cr.spareParts)" v-model="cr.spareParts" class="form-control">
-                                    <option value="" selected disabled>Choose Receiving Report</option>
-                                    {% for rr in request.user.branch.receivingReport.all %}
-                                    <option value="{{rr.pk}}">{{rr.code}}</option>
-                                    {% endfor %}
-                                </select>
+                        <div class="col-8 mb-1 pr-1">
+                            <label class="font-size-16 gray" for="">Spare Parts Purchased</label>
+                            <select class="form-control mb-2" v-for="(item, index) in cr.crspareparts" v-model="item.receivingReport" @change="fetchRR(item.receivingReport, index)">
+                                <option value="" selected disabled>Choose RR</option>
+                                <option v-for="rr in rrs" :value="rr.id">[[rr.code]] --- [[rr.party.name]]</option>
+                            </select>
+                        </div>
+                        <div class="col-4 mb-1 pl-1">
+                            <label class="font-size-16 gray" for="">Amount</label>
+                            <div class="input-group mb-2" v-for="(item, index) in cr.crspareparts">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input :value="formatPrice(item.amountTotal)" type="text" onkeypress="validate()" class="form-control box-shadow-off" placeholder="Enter Amount" readonly>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <button @click="pushRR()" class="btn btn-warning mt-1">+ Add More RR</button>
+                            <button @click="popRR()" class="btn btn-danger mt-1">- Remove RR</button>
                         </div>
                     </div>
 
@@ -193,13 +205,27 @@
                             <button @click="popPO()" class="btn btn-danger mt-1">- Remove PO</button>
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="offset-8 col-4 pl-1">
+                            <label class="font-size-16 gray">Total Cost</label>
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input :value="formatPrice(cr.totalCost)" type="text" onkeypress="validate()" class="form-control box-shadow-off" placeholder="Total Cost" readonly>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
                 <div @click="checkForm()" class="border btn-bottom">
                     Save
                 </div>
             </div>
         </div>
     </div>
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -232,13 +258,17 @@
                 ppe: '',
                 malfuncDate: null,
                 damageDescription: null,
-                spareParts: '',
                 damagePhoto: null,
                 recommendation: null,
                 crpo: [{
                     purchaseOrder: '',
                     amountTotal: null,
-                }]
+                }],
+                crspareparts: [{
+                    receivingReport: '',
+                    amountTotal: null,
+                }],
+                totalCost: null,
             },
 
             rr: {
@@ -259,7 +289,28 @@
             },
 
             pos: [],
+            rrs: [],
             errors: []
+        },
+
+        computed: {
+            rrTotalCost(){
+                return this.cr.crspareparts.map(item=>item.amountTotal)
+            },
+            poTotalCost(){
+                return this.cr.crpo.map(item=>item.amountTotal)
+            },
+            totalAmount(){
+                return [this.rrTotalCost, this.poTotalCost]
+            }
+        },
+
+        watch: {
+            totalAmount(){
+                rr = this.rrTotalCost.reduce((a,b)=>Number(a)+Number(b), 0)
+                po = this.poTotalCost.reduce((a,b)=>Number(a)+Number(b), 0)
+                this.cr.totalCost = Number(rr) + Number(po)
+            }
         },
 
         methods: {
@@ -273,6 +324,14 @@
                         icon: 'error'
                     })
                 })
+
+                axios.get('/api/receiving-report-approved/')
+                .then(res=>this.rrs=res.data)
+            },
+
+            fetchRR(id, index){
+                axios.get(`/api/receiving-report-approved/${id}/`)
+                .then(res=>this.cr.crspareparts[index].amountTotal=res.data.amountTotal)
             },
 
             fetchPO(id, index){
@@ -318,6 +377,17 @@
                 })
             },
 
+            popRR(){
+                this.cr.crspareparts.pop()
+            },
+
+            pushRR(){
+                this.cr.crspareparts.push({
+                    receivingReport: '',
+                    amountTotal: null
+                })
+            },
+
             damagePhotoHandler(){
                 this.cr.damagePhoto = this.$refs.damageFile.files[0]
                 this.damagePhotoUrl = URL.createObjectURL(this.cr.damagePhoto);
@@ -332,7 +402,6 @@
                     this.cr.ppe &&
                     this.cr.malfuncDate &&
                     this.cr.damageDescription &&
-                    this.cr.spareParts &&
                     this.cr.recommendation
                 )
                 {
@@ -366,9 +435,6 @@
                 }
                 if(!this.cr.damageDescription){
                     this.errors.push('Damage Description Required')
-                }
-                if(!this.cr.spareParts){
-                    this.errors.push('Spare Parts Required')
                 }
                 if(!this.cr.recommendation){
                     this.errors.push('Recommendation Required')

@@ -55,9 +55,9 @@ class CompletionReportView(View):
         cr.ppe = PPE.objects.get(pk=crJson['ppe'])
         cr.malfuncDate = crJson['malfuncDate']
         cr.damageDescription = crJson['damageDescription']
-        cr.spareParts = ReceivingReport.objects.get(pk=crJson['spareParts'])
         cr.damagePhoto = request.FILES['damagePhoto']
         cr.recommendation = crJson['recommendation']
+        cr.totalCost = crJson['totalCost']
         
         cr.save()
         request.user.branch.completionReport.add(cr)
@@ -69,10 +69,10 @@ class CompletionReportView(View):
             crpo.save()
             request.user.branch.crpo.add(crpo)
 
-        for rr in crJson['crSpareParts']:
+        for rr in crJson['crspareparts']:
             crsp = CRSpareParts()
             crsp.cr = cr
-            crsp.receivingReport = ReceivingReport.objects.get(pk=po['receivingReport'])
+            crsp.receivingReport = ReceivingReport.objects.get(pk=rr['receivingReport'])
             crsp.save()
             request.user.branch.crSpareParts.add(crsp)
 
@@ -82,3 +82,54 @@ class CompletionReportView(View):
 class CRList(View):
     def get(self, request):
         return render(request, 'cr-list.html')
+
+class CRSuccessUpdate(APIView):
+    def put(self, request, pk, format = None):
+
+        cr = CompletionReport.objects.get(pk=pk)
+        cr.successPhoto = request.FILES['successPhoto']
+        cr.status = 'Success'
+        cr.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+class CRIncompleteUpdate(APIView):
+    def put(self, request, pk, format = None):
+        
+        crJson = request.data
+
+        cr = CompletionReport.objects.get(pk=pk)
+        cr.status = 'Incomplete'
+        cr.reason = crJson['reason']
+        cr.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+class CRTransactionUpdate(APIView):
+    def put(self, request, pk, format = None):
+        
+        crJson = request.data
+
+        cr = CompletionReport.objects.get(pk=pk)
+        
+        for po in crJson['crpo']:
+            crpo = CRPO()
+            crpo.cr = cr
+            crpo.purchaseOrder = PurchaseOrder.objects.get(pk=po['purchaseOrder'])
+            crpo.save()
+            request.user.branch.crpo.add(crpo)
+
+        for rr in crJson['crspareparts']:
+            crsp = CRSpareParts()
+            crsp.cr = cr
+            crsp.receivingReport = ReceivingReport.objects.get(pk=rr['receivingReport'])
+            crsp.save()
+            request.user.branch.crSpareParts.add(crsp)
+
+        cr.totalCost += Decimal(crJson['totalCost'])
+        cr.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)

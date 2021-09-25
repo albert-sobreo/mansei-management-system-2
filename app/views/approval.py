@@ -1553,14 +1553,14 @@ class BankReconApprovalAPI(APIView):
 class CRnonapproved(View):
     def get(self, request, format=None):
         context = {
-            'cr': request.user.branch.completionReport.filter(approved=False),
+            'crs': request.user.branch.completionReport.filter(approved=False),
         }
         return render(request, 'cr-nonapproved.html', context)
 
 class CRapproved(View):
     def get(self, request, format=None):
         context = {
-            'cr': request.user.branch.completionReport.filter(approved=True),
+            'crs': request.user.branch.completionReport.filter(approved=True),
         }
         return render(request, 'cr-approved.html', context)
 
@@ -1574,6 +1574,8 @@ class CRApproval(View):
         cr.approved = True
         cr.approvedBy = request.user
         cr.datetimeApproved = datetime.now()
+        cr.status = 'Pending'
+        cr.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

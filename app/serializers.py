@@ -84,6 +84,12 @@ class PurchaseOrderSZ(serializers.ModelSerializer):
         model = PurchaseOrder
         fields = '__all__'
 
+class PurchaseOrderCRSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    class Meta:
+        model = PurchaseOrder
+        fields = "__all__"
+
 class SalesContractSZ(serializers.ModelSerializer):
     class Meta:
         model = SalesContract
@@ -581,6 +587,12 @@ class ReceivingReportSZ(serializers.ModelSerializer):
         model = ReceivingReport
         fields = '__all__'
 
+class ReceivingReportCRSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    class Meta:
+        model = ReceivingReport
+        fields = "__all__"
+
 class ReceivingReportNestedSZ(serializers.ModelSerializer):
     party = PartySZ(read_only=True)
     createdBy = UserSZ(read_only=True)
@@ -726,6 +738,23 @@ class UserWithDTRSZ(serializers.ModelSerializer):
         ]
         depth = 1
 
+########## CR ##########
+class CRSZ(serializers.ModelSerializer):
+    class Meta:
+        model = CompletionReport
+        fields = "__all__"
+
+class CRPOSZ(serializers.ModelSerializer):
+    purchaseOrder = PurchaseOrderCRSZ(read_only=True)
+    class Meta:
+        model = CRPO
+        fields = "__all__"
+
+class CRSparePartsSZ(serializers.ModelSerializer):
+    receivingReport = ReceivingReportCRSZ(read_only=True)
+    class Meta:
+        model = CRSpareParts
+        fields = "__all__"
 
 
 
@@ -741,48 +770,25 @@ class PPEHistoryOfDeprSZ(serializers.ModelSerializer):
         model = PPEHistoryOfDepr
         fields = "__all__"
 
-class RepairAndMaintenanceSZ(serializers.ModelSerializer):
-    class Meta:
-        model = RepairAndMaintenance
-        fields = "__all__"
 
 class PPENestedSZ(serializers.ModelSerializer):
     ppehistoryofdepr = PPEHistoryOfDeprSZ(read_only=True, many=True)
-    repairandmaintenance = RepairAndMaintenanceSZ(read_only=True, many=True)
+    completionreport = CRSZ(read_only=True, many=True)
     class Meta:
         model = PPE
         fields = "__all__"
         depth = 1
 
-
-
-
-
-########## CR ##########
-class CRSZ(serializers.ModelSerializer):
-    class Meta:
-        model = CompletionReport
-        fields = "__all__"
-
-class CRPOSZ(serializers.ModelSerializer):
-    purchaseOrder = PurchaseOrderSZ(read_only=True)
-    class Meta:
-        model = CRPO
-        fields = "__all__"
-
-class CRSparePartsSZ(serializers.ModelSerializer):
-    receivingReport = ReceivingReportSZ(read_only=True)
-    class Meta:
-        model = CRSpareParts
-        field = "__all__"
-
 class CRNestedSZ(serializers.ModelSerializer):
     createdBy = UserNameOnlySZ(read_only=True)
     ppe = PPESZ(read_only=True)
-    spareParts = ReceivingReportNestedSZ2(read_only=True)
     approvedBy = UserNameOnlySZ(read_only=True)
     crpo = CRPOSZ(many=True, read_only=True)
+    crspareparts = CRSparePartsSZ(many=True, read_only=True)
     class Meta:
         model = CompletionReport
         fields = "__all__"
         depth = 1
+
+
+

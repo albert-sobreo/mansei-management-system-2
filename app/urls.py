@@ -66,6 +66,7 @@ router.register(r"purchase-request-nested", views.PurchaseRequestNestedAPI, 'pur
 
 ########## PURCHASE REQUEST ##########
 router.register(r"receiving-report", views.ReceivingReportNestedAPI, 'receiving-report')
+router.register(r'receiving-report-approved', views.ReceivingReportNestedApprovedAPI, 'receiving-report-approved')
 
 ########### QUOTATIONS ###########
 router.register(r"quotations", views.QuotationsAPI, 'quotations')
@@ -264,5 +265,12 @@ urlpatterns = [
     path('upload-test/', login_required(views.UploadView.as_view())),
     path('completion-report/', login_required(views.CompletionReportView.as_view())),
     path('cr-list/', login_required(views.CRList.as_view())),
-    path('po-repair/', login_required(views.PurchaseOrderApprovedRepairAPI.as_view()))
+    path('po-repair/', login_required(views.PurchaseOrderApprovedRepairAPI.as_view())),
+    path('cr-nonapproved/', login_required(views.CRnonapproved.as_view())),
+    path('cr-approved/', login_required(views.CRapproved.as_view())),
+    path('cr-approval/<int:pk>/', login_required(views.CRApproval.as_view())),
+    
+    path('cr-success/<int:pk>/', login_required(views.CRSuccessUpdate.as_view())),
+    path('cr-incomplete/<int:pk>/', login_required(views.CRIncompleteUpdate.as_view())),
+    path('cr-transaction/<int:pk>/', login_required(views.CRTransactionUpdate.as_view())),
 ]

@@ -1070,14 +1070,7 @@ class PPEHistoryOfDepr(models.Model):
     date = models.DateField(null=True, blank=True)
     deprAmount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     accumDeprAmount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
-    bookValue = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
-
-class RepairAndMaintenance(models.Model):
-    ppe = models.ForeignKey(PPE, on_delete=models.CASCADE, related_name="repairandmaintenance", null=True, blank=True)
-    date = models.DateField(null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
-    capitalized = models.BooleanField(default=False)
+    bookValue = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)    
 
 class TestUploadFile(models.Model):
     file = models.ImageField(upload_to='test/')
@@ -1099,7 +1092,8 @@ class CompletionReport(models.Model):
     approved = models.BooleanField(default=False)
     approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='completionreportapprovedby')
     datetimeApproved = models.DateTimeField(null = True, blank=True)
-
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    capitalized = models.BooleanField(default=False)
 
     def __str__(self):
         return self.code
@@ -1244,7 +1238,6 @@ class Branch(models.Model):
     #### PPE ####
     ppe = models.ManyToManyField(PPE, blank=True)
     ppeHistoryOfDepr = models.ManyToManyField(PPEHistoryOfDepr, blank=True)
-    repairAndMaintenance = models.ManyToManyField(RepairAndMaintenance, blank=True)
 
     #### COMPLETION REPORT ####
     completionReport = models.ManyToManyField(CompletionReport, blank=True)

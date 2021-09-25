@@ -166,6 +166,8 @@ class PurchaseOrderApprovedRepairAPI(APIView):
 
 
 
+
+
 ########## SALES CONTRACT ##########
 class SalesContractAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -274,6 +276,11 @@ class ReceivingReportNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ReceivingReportNestedSZ
     queryset = ReceivingReport.objects.all()
+
+class ReceivingReportNestedApprovedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReceivingReportNestedSZ
+    queryset = ReceivingReport.objects.filter(approved=True).order_by("-pk")
 
 
 
