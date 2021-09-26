@@ -136,4 +136,15 @@ class CRTransactionUpdate(APIView):
 
 class CRCapitalize(APIView):
     def put(self, request, pk):
-        pass
+        cr = CompletionReport.objects.get(pk=pk)
+        cr.ppe.bookValue += cr.totalCost
+        NUMERATOR = cr.ppe.bookValue * cr.ppe.deprCycle
+        DENOMINATOR = int(cr.ppe.usefulLife * 12) - int(cr.ppe.accumDepr // cr.ppe.deprRate)
+        cr.ppe.deprRate = Decimal(NUMERATOR)/Decimal(DENOMINATOR)
+        cr.capitalized = True
+        cr.ppe.save()
+        cr.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+

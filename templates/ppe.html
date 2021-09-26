@@ -208,6 +208,13 @@
                                 <br>
                                 <span class="font-size-14 font-bold">₱[[formatPrice(modal.bookValue)]]</span>
                             </div>
+
+                            <!-- LVL 3 -->
+                            <div class="col-12 my-3">
+                                <label for="" class="gray">Depreciation Rate</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(modal.deprRate)]]</span>
+                            </div>
                         </div>
 
                         <!-- HISTORY OF DEPRECIATION -->
@@ -282,7 +289,7 @@
                                         <td>[[item.damageDescription]]</td>
                                         <td>₱[[formatPrice(item.totalCost)]]</td>
                                         <td>[[item.capitalized]]</td>
-                                        <td><button class="btn btn-sm btn-warning" @click="checkCapitalize(item.id)">Capitalize</button></td>
+                                        <td><button class="btn btn-sm btn-warning" @click="checkCapitalize(item.id)" v-if="!item.capitalized">Capitalize</button></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -322,6 +329,7 @@
                 accumDepr: null,
                 bookValue: null,
                 usefulLife: null,
+                deprRate: null,
                 
                 ppehistoryofdepr: [{
                     date: null,
@@ -374,7 +382,7 @@
 
             capitalize(id){
                 axios.put(`/cr-capitalize/${id}/`, '', this.config)
-                .then(res=>res.data?location.reload():'')
+                .then(res=>res.data==0?location.reload():'')
                 .catch(err=>{
                     Swal.fire({
                         title: "Something went wrong.",

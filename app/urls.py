@@ -273,4 +273,5 @@ urlpatterns = [
     path('cr-success/<int:pk>/', login_required(views.CRSuccessUpdate.as_view())),
     path('cr-incomplete/<int:pk>/', login_required(views.CRIncompleteUpdate.as_view())),
     path('cr-transaction/<int:pk>/', login_required(views.CRTransactionUpdate.as_view())),
+    path('cr-capitalize/<int:pk>/', login_required(views.CRCapitalize.as_view())),
 ]
