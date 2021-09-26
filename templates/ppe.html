@@ -230,21 +230,15 @@
                                         <span class="font-bold gray">Accumulated</span>
                                     </th>
                                     <th>
-                                        <span class="font-bold gray">Bank Value</span>
+                                        <span class="font-bold gray">Book Value</span>
                                     </th>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>##</td>
-                                        <td>##</td>
-                                        <td>##</td>
-                                        <td>##</td>
-                                    </tr>
-                                    <tr>
-                                        <td>##</td>
-                                        <td>##</td>
-                                        <td>##</td>
-                                        <td>##</td>
+                                    <tr v-for="item in modal.ppehistoryofdepr">
+                                        <td>[[item.date]]</td>
+                                        <td>₱[[formatPrice(item.deprAmount)]]</td>
+                                        <td>₱[[formatPrice(item.accumDeprAmount)]]</td>
+                                        <td>₱[[formatPrice(item.bookValue)]]</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -263,13 +257,13 @@
                             <table class="table table-sm table-striped table-borderless">
                                 <thead>
                                     <th>
-                                        <span class="font-bold gray">Date</span>
-                                    </th>
-                                    <th>
                                         <span class="font-bold gray">Reference No.</span>
                                     </th>
                                     <th>
-                                        <span class="font-bold gray">Description</span>
+                                        <span class="font-bold gray">Date</span>
+                                    </th>
+                                    <th>
+                                        <span class="font-bold gray">Damage Description</span>
                                     </th>
                                     <th>
                                         <span class="font-bold gray">Amount</span>
@@ -277,14 +271,18 @@
                                     <th>
                                         <span class="font-bold gray">Capitalized</span>
                                     </th>
+                                    <th>
+                                        <span class="font-bold gray">Actions</span>
+                                    </th>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>##</td>
-                                        <td>##</td>
-                                        <td>##</td>
-                                        <td>##</td>
-                                        <td>##</td>
+                                    <tr v-for="item in modal.completionreport">
+                                        <td class="link">[[item.code]]</td>
+                                        <td>[[item.reportDate]]</td>
+                                        <td>[[item.damageDescription]]</td>
+                                        <td>₱[[formatPrice(item.totalCost)]]</td>
+                                        <td>[[item.capitalized]]</td>
+                                        <td><button class="btn btn-sm btn-warning" @click="checkCapitalize(item.id)">Capitalize</button></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -296,6 +294,7 @@
 
         </div>
     </div>
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -370,6 +369,32 @@
                             location.reload()
                         }
                     })
+                })
+            },
+
+            capitalize(id){
+                axios.put(`/cr-capitalize/${id}/`)
+                .then(res=>res.data?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: "error",
+                        html: err.message,
+                    })
+                })
+            },
+
+            checkCapitalize(crID){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: 'warning',
+                    html: 'Capitalizing this Completion Report adds its amount to its PPE book value.',
+                    showCancelButton: true,
+                    confirmButtonText: "I am sure."
+                }).then(result=>{
+                    if(result.isConfirmed){
+                        this.capitalize(crID)
+                    }
                 })
             },
 

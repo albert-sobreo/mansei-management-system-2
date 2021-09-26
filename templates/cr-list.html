@@ -132,6 +132,9 @@
 
                         <div class="row order-card mb-2 pt-2">
                             <div class="col-12">
+                                <span class="link noselect" @click="toggleShowPO1()">Show Details</span>
+                            </div>
+                            <div class="col-12">
                                 <div class="row">
                                     <div class="col-6"><span class="font-bold gray">Code</span></div>
                                     <div class="col-6"><span class="font-bold gray">Total Amount</span></div>
@@ -145,6 +148,19 @@
                                     <div class="col-6">
                                         <span class="font-semibold">₱[[formatPrice(po.purchaseOrder.amountTotal)]]</span>
                                     </div>
+                                    <div class="col-12">
+                                        <div class="row" :class="{'cool-active':showPO1}">
+                                            <div class="col cool-animation">
+                                                <span class="gray font-medium">[[po.purchaseOrder.party.name]]</span>
+                                            </div>
+                                            <div class="col cool-animation">
+                                                <span class="gray font-medium">[[po.purchaseOrder.party.email]]</span>
+                                            </div>
+                                            <div class="col cool-animation">
+                                                <span class="gray font-medium">[[po.purchaseOrder.party.mobile]]</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -156,6 +172,9 @@
                         </div>
 
                         <div class="row order-card">
+                            <div class="col-12 pt-2">
+                                <span class="link noselect" @click="toggleShowRR1">Show Details</span>
+                            </div>
                             <div class="col-12">
                                 <div class="row">
                                     <div class="col-6"><span class="font-bold gray">Code</span></div>
@@ -169,6 +188,31 @@
                                     </div>
                                     <div class="col-6">
                                         <span class="font-semibold">₱[[formatPrice(po.receivingReport.amountTotal)]]</span>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="row" :class="{'cool-active':showRR1}">
+                                            <template v-for="item in po.receivingReport.rritemsother">
+                                                <div class="col cool-animation">
+                                                    <span class="gray font-medium">[[item.otherInventory.name]]</span>
+                                                </div>
+                                                <div class="col cool-animation">
+                                                    <span class="gray font-medium">[[item.qty]]</span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <div class="row" :class="{'cool-active':showRR1}">
+                                            <template v-for="item in po.receivingReport.rritemsmerch">
+                                                <div class="col cool-animation">
+                                                    <span class="gray font-medium">[[item.merchInventory.code]]</span>
+                                                </div>
+                                                <div class="col cool-animation">
+                                                    <span class="gray font-medium">[[item.merchInventory.name]] -- [[item.merchInventory.classification]] --  [[item.merchInventory.type]]</span>
+                                                </div>
+                                                <div class="col cool-animation">
+                                                    <span class="gray font-medium">[[item.qty]]</span>
+                                                </div>
+                                            </template>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -237,7 +281,7 @@
 
                         <div class="row my-2">
                             <div class="col">
-                                <button @click="fetchCR2()" data-toggle="modal" data-target="#updateModal" class="btn btn-primary col">Update</button>
+                                <button @click="fetchCR2()" data-dismiss="modal" data-toggle="modal" data-target="#updateModal" class="btn btn-primary col">Update</button>
                             </div>
                         </div>
                     </div>
@@ -305,6 +349,9 @@
 
                         <div class="row order-card my-3">
                             <div class="col-12 my-2">
+                                <div class="link noselect" @click="toggleShowRR2()">View Details</div>
+                            </div>
+                            <div class="col-12">
                                 <span class="font-bold gray">Spare Parts Purchased</span>
                             </div>
                             <div class="col-4 mt-2">
@@ -327,6 +374,24 @@
                                     </div>
                                     <div class="col-4">
                                         <span class="font-semibold">₱[[(formatPrice(item.receivingReport.amountTotal))]]</span>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="row order-card-darker" :class="{'cool-active':showRR2}">
+                                            <div class="col-6 cool-animation">
+                                                <span class="gray font-bold">Item</span>
+                                            </div>
+                                            <div class="col-6 cool-animation">
+                                                <span class="gray font-bold">Qty</span>
+                                            </div>
+                                            <template v-for="i in item.receivingReport.rritemsother">
+                                                <div class="col-6 cool-animation">
+                                                    <span class="font-medium gray">[[i.otherInventory.name]]</span>
+                                                </div>
+                                                <div class="col-6 cool-animation">
+                                                    <span class="font-medium gray">[[i.qty]]</span>
+                                                </div>
+                                            </template>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -465,6 +530,11 @@
                 }
             },
 
+            showPO1: false,
+            showRR1: false,
+
+            showRR2: false,
+
 
             pos: [],
             rrs: [],
@@ -550,6 +620,18 @@
 
                 axios.get('/api/receiving-report-approved/')
                 .then(res=>this.rrs=res.data)
+            },
+
+            toggleShowPO1(){
+                this.showPO1 = !this.showPO1
+            },
+
+            toggleShowRR1(){
+                this.showRR1 = !this.showRR1
+            },
+
+            toggleShowRR2(){
+                this.showRR2 = !this.showRR2
             },
 
             popPO(){

@@ -84,11 +84,7 @@ class PurchaseOrderSZ(serializers.ModelSerializer):
         model = PurchaseOrder
         fields = '__all__'
 
-class PurchaseOrderCRSZ(serializers.ModelSerializer):
-    party = PartySZ(read_only=True)
-    class Meta:
-        model = PurchaseOrder
-        fields = "__all__"
+
 
 class SalesContractSZ(serializers.ModelSerializer):
     class Meta:
@@ -215,6 +211,13 @@ class PurchaseOrderNestedSZ(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+class PurchaseOrderCRSZ(serializers.ModelSerializer):
+    party = PartySZ(read_only=True)
+    poitemsother = POItemsOtherNestedSZ(many=True, read_only=True)
+    poitemsmerch = POItemsMerchNestedSZ(many=True, read_only=True)
+    class Meta:
+        model = PurchaseOrder
+        fields = "__all__"
 
 
 
@@ -589,6 +592,8 @@ class ReceivingReportSZ(serializers.ModelSerializer):
 
 class ReceivingReportCRSZ(serializers.ModelSerializer):
     party = PartySZ(read_only=True)
+    rritemsother = RRItemsOtherNestedSZ(many=True, read_only=True)
+    rritemsmerch = RRItemsMerchNestedSZ(read_only=True, many=True)
     class Meta:
         model = ReceivingReport
         fields = "__all__"
