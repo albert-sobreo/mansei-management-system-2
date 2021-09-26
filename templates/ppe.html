@@ -373,7 +373,7 @@
             },
 
             capitalize(id){
-                axios.put(`/cr-capitalize/${id}/`)
+                axios.put(`/cr-capitalize/${id}/`, '', this.config)
                 .then(res=>res.data?location.reload():'')
                 .catch(err=>{
                     Swal.fire({

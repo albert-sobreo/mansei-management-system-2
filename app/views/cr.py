@@ -133,3 +133,7 @@ class CRTransactionUpdate(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class CRCapitalize(APIView):
+    def put(self, request, pk):
+        pass
