@@ -1,0 +1,198 @@
+{% extends 'base-template.html' %}
+{% block title %} EMS | My Timesheet {% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-ems active="nav-timesheet" photo="/static/media/{{request.user.image}}"></navbar-ems>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- NAV 2 -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links ems-nav">
+                <a href="/ems-my-timesheet/" class="active-ems mx-2">My Timesheet</a>
+                <a href="/ems-employee-timesheet/" class="mx-2">Employee Timesheet</a>
+                <a href="/ems-timesheet-tabular/" class="mx-2">Tabular</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">My Timesheet</span>
+        </div>
+
+        <!-- PERIOD -->
+        <div class="d-flex align-items-center justify-content-end">
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="" class="mx-1">Period</label>
+                    <select class="form-control mx-1">
+                        <option value="" selected disabled>Select Year</option>
+                        <option v-for="year in yearList" :value="year">[[year]]</option>
+                    </select>
+                    <select class="form-control mx-1">
+                        <option value="" selected disabled>Select Period</option>
+                    </select>
+                    <select class="form-control mx-1">
+                        <option value="" selected disabled>Date Range</option>
+                    </select>
+                    <button class="mx-1 btn btn-warning btn-sm">
+                        Set
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIMESHEET -->
+
+        <div class="row my-4     b-radius-15 box-shadow-medium">
+            <div class="col-12 m-3">
+                <span class="font-bold font-size-20">March 31, 2021</span>
+            </div>
+            <div class="col-12 px-3 mb-3">
+                <div class="row px-3">
+                    <div class="col">
+                        <label for="" class="gray font-bold">Time-In</label><br>
+                        <span class="font-bold font-size-16">7:55 AM</span>
+                    </div>
+                    <div class="col">
+                        <label for="" class="gray font-bold">Time-Out</label><br>
+                        <span class="font-bold font-size-16">5:00 PM</span>
+                    </div>
+                    <div class="col">
+                        <label for="" class="gray font-bold">Total Hours</label><br>
+                        <span class="font-bold font-size-16">8H</span>
+                    </div>
+                    <div class="col">
+                        <label for="" class="gray font-bold">OT Hours</label><br>
+                        <span class="font-bold font-size-16">0H</span>
+                    </div>
+                    <div class="col">
+                        <label for="" class="gray font-bold">ND Hours</label><br>
+                        <span class="font-bold font-size-16">0H</span>
+                    </div>
+                    <div class="col">
+                        <label for="" class="gray font-bold">Basic Pay</label><br>
+                        <span class="font-bold font-size-16">₱980.00</span>
+                    </div>
+                    <div class="col">
+                        <label for="" class="gray font-bold">Day Category</label><br>
+                        <div class="d-flex flex-column">
+                            <span class="font-bold font-size-16 mb-2">Regular Holiday</span>
+                            <span class="font-bold font-size-16 mb-2">Rest Day</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 px-3 mb-3 order-card">
+                <div class="row px-3 mt-3">
+                    <div class="col">
+                        <span class="font-bold font-size-14">Edit Hours</span>
+                    </div>
+                </div>
+                <div class="row px-3 mb-2">
+                    <div class="col my-3">
+                        <label for="" class="gray">BH</label><br>
+                        <div class="placeholder" data-placeholder="H">
+                            <input type="text" class="form-control-special" onkeypress="validate()">
+                        </div>
+                    </div>
+                    <div class="col my-3">
+                        <label for="" class="gray">OT</label><br>
+                        <div class="placeholder" data-placeholder="H">
+                            <input type="text" class="form-control-special" onkeypress="validate()">
+                        </div>
+                    </div>
+                    <div class="col my-3">
+                        <label for="" class="gray">ND</label><br>
+                        <div class="placeholder" data-placeholder="H">
+                            <input type="text" class="form-control-special" onkeypress="validate()">
+                        </div>
+                    </div>
+                    <div class="col my-3">
+                        <label for="" class="gray">SUN</label><br>
+                        <div class="placeholder" data-placeholder="H">
+                            <input type="text" class="form-control-special" onkeypress="validate()">
+                        </div>
+                    </div>
+                    <div class="col my-3">
+                        <label for="" class="gray">SUN OT</label><br>
+                        <div class="placeholder" data-placeholder="H">
+                            <input type="text" class="form-control-special" onkeypress="validate()">
+                        </div>
+                    </div>
+                    <div class="col my-3">
+                        <label for="" class="gray">RH</label><br>
+                        <div class="placeholder" data-placeholder="H">
+                            <input type="text" class="form-control-special" onkeypress="validate()">
+                        </div>
+                    </div>
+                    <div class="col my-3">
+                        <label for="" class="gray">RH OT</label><br>
+                        <div class="placeholder" data-placeholder="H">
+                            <input type="text" class="form-control-special" onkeypress="validate()">
+                        </div>
+                    </div>
+                    <div class="col my-3">
+                        <label for="" class="gray">SH</label><br>
+                        <div class="placeholder" data-placeholder="H">
+                            <input type="text" class="form-control-special" onkeypress="validate()">
+                        </div>
+                    </div>
+                    <div class="col my-3">
+                        <label for="" class="gray">SH OT</label><br>
+                        <div class="placeholder" data-placeholder="H">
+                            <input type="text" class="form-control-special" onkeypress="validate()">
+                        </div>
+                    </div>
+                    <div class="col my-3">
+                        <label for="" class="gray">BH</label><br>
+                        <div class="placeholder" data-placeholder="H">
+                            <input type="text" class="form-control-special" onkeypress="validate()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            yearList: []
+        },
+
+        methods: {
+            onload(){
+                axios.get('/year-api/')
+                .then(res=>this.yearList=res.data)
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: "error",
+                        html: err.message
+                    })
+                })
+            }
+        },
+        mounted(){
+            this.onload()
+        }
+    })
+</script>
+
+{% endblock %}

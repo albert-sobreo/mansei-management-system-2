@@ -38,9 +38,12 @@ Vue.component('navbar-ems', {
 
         <!-- TABS CONTAINER -->
         <div class="ems-nav justify-content-center font-semibold navbar">
-            <a href="#" class="mx-3" id="nav-dtr">DTR</a>
-            <a href="#" class="mx-3" id="nav-timesheet">Timesheet</a>
-            <a href="#" class="mx-3" id="nav-payslip">Payslip</a>
+            <a href="/ems-my-dtr/" class="mx-3" id="nav-dtr">DTR</a>
+            <a href="/ems-my-timesheet/" class="mx-3" id="nav-timesheet">Timesheet</a>
+            <a href="/ems-my-payslip/" class="mx-3" id="nav-payslip">Payslip</a>
+            <a href="#" class="mx-3" id="nav-payroll">Payroll</a>
+            <a href="#" class="mx-3" id="nav-employees">Employees</a>
+            <a href="#" class="mx-3" id="nav-holidays">Holidays</a>
             <a href="#" class="mx-3" id="nav-requests">Requests</a>
         </div>
 

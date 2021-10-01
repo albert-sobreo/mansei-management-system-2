@@ -1,0 +1,21 @@
+{% extends 'base-template.html' %}
+{% block title %} <!-- ADD TITLE HERE --> {% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app"
+    })
+</script>
+
+{% endblock %}

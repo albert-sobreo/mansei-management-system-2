@@ -21,7 +21,7 @@ Vue.component('app-card', {
         <div onclick="location.href='/journal/'" class="flex flex-column app-card-links gas border align-items-center justify-content-center my-3 py-3 px-4 b-radius-10">
             <img :src="this.const.gasLogo" alt="">
         </div>
-        <div onclick="location.href='#'" class="flex flex-column app-card-links ems border align-items-center justify-content-center mt-3 py-3 px-4 b-radius-10">
+        <div onclick="location.href='/ems-my-dtr/'" class="flex flex-column app-card-links ems border align-items-center justify-content-center mt-3 py-3 px-4 b-radius-10">
             <img :src="this.const.emsLogo" alt="">
         </div>
     </div>

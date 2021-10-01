@@ -27,3 +27,7 @@ from .ppe import *
 from .reset import *
 from .uploadfiletest import *
 from .cr import *
+from .ems_dtr import *
+from .ems_timesheet import *
+from .return_years import *
+from .ems_payslip import *

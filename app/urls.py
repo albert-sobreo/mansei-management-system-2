@@ -274,4 +274,12 @@ urlpatterns = [
     path('cr-incomplete/<int:pk>/', login_required(views.CRIncompleteUpdate.as_view())),
     path('cr-transaction/<int:pk>/', login_required(views.CRTransactionUpdate.as_view())),
     path('cr-capitalize/<int:pk>/', login_required(views.CRCapitalize.as_view())),
+    path('ems-my-dtr/', login_required(views. EMS_MyDTRView.as_view())),
+    path('ems-employee-dtr/', login_required(views.EMS_EmployeeDTRView.as_view())),
+    path('ems-my-timesheet/', login_required(views.EMS_MyTimesheetView.as_view())),
+    path('year-api/', login_required(views.ReturnYearsView.as_view())),
+    path('ems-employee-timesheet/', login_required(views.EMS_EmployeeTimesheetView.as_view())),
+    path('ems-timesheet-tabular/', login_required(views.EMS_TimesheetTabularView.as_view())),
+    path('ems-my-payslip/', login_required(views.EMS_MyPayslipView.as_view())),
+    path('ems-employee-payslip/', login_required(views.EMS_EmployeePayslipView.as_view()))
 ]
