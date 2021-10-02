@@ -230,6 +230,10 @@ body{
     box-shadow: 0px 4px 15px rgba(0,0,0,0.15);
 }
 
+.box-shadow-large{
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.25);
+}
+
 .font-thin{
     font-weight: 100 !important;
 }
@@ -687,6 +691,11 @@ label{
     color: white !important;
 }
 
+.d-item-ems:hover{
+    background-color: var(--ems-green-text);
+    color: white !important;
+}
+
 .reject{
     color: #ff0000;
 }
@@ -697,7 +706,7 @@ label{
 
 .link{
     cursor: pointer;
-    color: #218adf;
+    color: #46a5f3;
 }
 
 .link:hover{
@@ -1096,4 +1105,8 @@ select.form-control{
 
 .net-pay{
     background-color: #CCF3FF !important;
+}
+
+.earnings-text{
+    color: #70C32F;
 }

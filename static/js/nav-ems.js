@@ -41,10 +41,18 @@ Vue.component('navbar-ems', {
             <a href="/ems-my-dtr/" class="mx-3" id="nav-dtr">DTR</a>
             <a href="/ems-my-timesheet/" class="mx-3" id="nav-timesheet">Timesheet</a>
             <a href="/ems-my-payslip/" class="mx-3" id="nav-payslip">Payslip</a>
-            <a href="#" class="mx-3" id="nav-payroll">Payroll</a>
-            <a href="#" class="mx-3" id="nav-employees">Employees</a>
-            <a href="#" class="mx-3" id="nav-holidays">Holidays</a>
-            <a href="#" class="mx-3" id="nav-requests">Requests</a>
+            <a href="/ems-payroll/" class="mx-3" id="nav-payroll">Payroll</a>
+            <a href="/ems-employees/" class="mx-3" id="nav-employees">Employees</a>
+            <a href="/ems-holidays/" class="mx-3" id="nav-holidays">Holidays</a>
+            <a href="/ems-overtime-request/" class="mx-3" id="nav-requests">Requests</a>
+            <div class="btn-group mx-3">
+                <a href="#" data-toggle="dropdown" id="nav-approvals">Approvals</a>
+                <div class="dropdown-menu b-radius-5 py-0">
+                    <a href="/ems-overtime-pending/" class="dropdown-item d-item-ems font-size-12 font-semibold">Overtime</a>
+                    <a href="/ems-undertime-pending/" class="dropdown-item d-item-ems font-size-12 font-semibold">Undertime</a>
+                    <a href="/ems-leave-pending/" class="dropdown-item d-item-ems font-size-12 font-semibold">Leave</a>
+                </div>
+            </div>
         </div>
 
         <!-- NAV CONTROLS -->

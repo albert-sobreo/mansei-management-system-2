@@ -31,3 +31,8 @@ from .ems_dtr import *
 from .ems_timesheet import *
 from .return_years import *
 from .ems_payslip import *
+from .ems_payroll import *
+from .ems_holidays import *
+from .ems_employees import *
+from .ems_requests import *
+from .ems_approvals import *

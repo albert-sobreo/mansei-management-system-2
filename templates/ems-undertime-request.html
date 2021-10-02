@@ -1,92 +1,101 @@
 {% extends 'base-template.html' %}
-{% block title %}EMS | Employee DTR{% endblock %}
+{% block title %} EMS | Undertime Requests {% endblock %}
 
 {% block body %}
 
 <div id="app" v-cloak>
     <!-- NAV BAR -->
-    <navbar-ems active="nav-dtr" photo="/static/media/{{request.user.image}}"></navbar-ems>
+    <navbar-ems active="nav-requests" photo="/static/media/{{request.user.image}}"></navbar-ems>
     <app-card></app-card>
     <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
 
-    <!-- MAIN BODy -->
+    <!-- MAIN BODY -->
     <div class="container">
         <!-- NAV 2 -->
         <div class="d-flex font-semibold mb-2 justify-content-center">
             <div class="justify-content-center c-nav-links ems-nav">
-                <a href="/ems-my-dtr/" class="mx-2">My DTR</a>
-                <a href="/ems-employee-dtr/" class="active-ems mx-2">Employee DTR</a>
+                <a href="/ems-overtime-request/" class="mx-2">Overtime</a>
+                <a href="/ems-undertime-request/" class="active-ems mx-2">Undertime</a>
+                <a href="/ems-leave-request/" class="mx-2">Leave</a>
             </div>
         </div>
 
-        <!-- TITLE AND BUTTONS -->
+        <!-- TITLE -->
         <div class="d-flex align-items-center mb-3">
-            <span class="font-size-18 font-bold mr-1">Employee DTR</span>
+            <span class="font-size-18 font-bold mr-1">Undertime Requests</span>
         </div>
 
         <!-- TABLE -->
         <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
             <thead>
-                <th>Employee</th>
-                <th>Status Today</th>
+                <th class="gray">Date</th>
+                <th class="gray">Time-Out</th>
+                <th class="gray">Status</th>
             </thead>
             <tbody>
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#modal">Mar Roxas</td>
-                    <td>Absent</td>
+                    <td>Mar. 31, 2020</td>
+                    <td>3:00 PM</td>
+                    <td class="pending">Pending</td>
+                </tr>
+                <tr>
+                    <td>Mar. 31, 2020</td>
+                    <td>4:00 PM</td>
+                    <td class="approved">Approved</td>
+                </tr>
+                <tr>
+                    <td>Mar. 31, 2020</td>
+                    <td>3:30 PM</td>
+                    <td class="text-danger">Declined</td>
                 </tr>
             </tbody>
         </table>
 
         <!-- MODAL -->
-        <div class="modal fade" id="modal">
+        <div class="modal fade" id="requestModal">
             <div class="modal-dialog">
                 <div class="modal-content b-radius-15">
                     <div class="modal-body">
-                        <!-- TOP CARD -->
-                        <div class="row my-2">
-                            <!-- LVL 1 -->
-                            <div class="col-6 my-3">
-                                <label for="" class="gray">Employee Name</label>
-                                <br>
-                                <span class="font-size-14 font-bold">Mar Roxas</span>
-                            </div>
-                            <div class="col-6 my-3">
-                                <label for="" class="gray">Status</label>
-                                <br>
-                                <span class="font-size-14 font-bold">Absent</span>
-                            </div>
+                        <div class="mb-4">
+                            <span class="modal-title">Request Undertime</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
 
-                        <!-- DTR CARDS -->
-                        <div class="row my-2">
-                            <div class="col">
-                                <span class="font-bold gray">DTR</span>
-                            </div>
-                        </div>
-
-                        <!-- DTR TABLE -->
                         <div class="row">
-                            <table class="table table-sm table-striped table-borderless">
-                                <thead>
-                                    <th><span class="font-bold gray">Date</span></th>
-                                    <th><span class="font-bold gray">Time-In</span></th>
-                                    <th><span class="font-bold gray">Time-Out</span></th>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>b0ss</td>
-                                        <td>b0ss</td>
-                                        <td>b0ss</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="col-8 pr-1">
+                                <div class="form-group">
+                                    <label for="">Date</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-4 pl-1">
+                                <div class="form-group">
+                                    <label for="">Time-Out</label>
+                                    <input type="time" onkeypress="validate()" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="">Reason</label>
+                                    <input type="text" placeholder="Enter Reason for Undertime" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col">
+                                <button class="col btn btn-primary">Request</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
 
     </div>
 </div>
@@ -114,6 +123,14 @@
 
             buttons: {
                 buttons: [
+                {
+                    text: 'Make Request',
+                    className: 'btn btn-warning',
+                    titleAttr: 'Make Request',
+                    action: function(){
+                        $("#requestModal").modal('show')
+                    }
+                },
                 {
                     text: '<i class="fas fa-file-excel"></i>',
                     className: 'btn text-success btn-table',

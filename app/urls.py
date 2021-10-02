@@ -280,6 +280,20 @@ urlpatterns = [
     path('year-api/', login_required(views.ReturnYearsView.as_view())),
     path('ems-employee-timesheet/', login_required(views.EMS_EmployeeTimesheetView.as_view())),
     path('ems-timesheet-tabular/', login_required(views.EMS_TimesheetTabularView.as_view())),
+
     path('ems-my-payslip/', login_required(views.EMS_MyPayslipView.as_view())),
-    path('ems-employee-payslip/', login_required(views.EMS_EmployeePayslipView.as_view()))
+    path('ems-employee-payslip/', login_required(views.EMS_EmployeePayslipView.as_view())),
+    path('ems-payroll/', login_required(views.EMS_PayrollView.as_view())),
+    path('ems-holidays/', login_required(views.EMS_HolidaysView.as_view())),
+    path('ems-employees/', login_required(views.EMS_EmployeesView.as_view())),
+    path('ems-raise-history/', login_required(views.EMS_RaiseHistoryView.as_view())),
+    path('ems-overtime-request/', login_required(views.EMS_OvertimeRequestsView.as_view())),
+    path('ems-undertime-request/', login_required(views.EMS_UndertimeRequestsView.as_view())),
+    path('ems-leave-request/', login_required(views.EMS_LeaveRequestsView.as_view())),
+    path('ems-overtime-pending/', login_required(views.EMS_OvertimePendingView.as_view())),
+    path('ems-overtime-approved/', login_required(views.EMS_OvertimeApprovedView.as_view())),
+    path('ems-undertime-pending/', login_required(views.EMS_UndertimePendingView.as_view())),
+    path('ems-undertime-approved/', login_required(views.EMS_UndertimeApprovedView.as_view())),
+    path('ems-leave-pending/', login_required(views.EMS_LeavePendingView.as_view())),
+    path('ems-leave-approved/', login_required(views.EMS_LeaveApprovedView.as_view()))
 ]

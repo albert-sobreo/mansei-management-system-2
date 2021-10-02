@@ -1,0 +1,494 @@
+{% extends 'base-template.html' %}
+{% block title %} EMS | Employees {% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-ems active="nav-employees" photo="/static/media/{{request.user.image}}"></navbar-ems>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- NAV 2 -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links ems-nav">
+                <a href="/ems-employees/" class="active-ems mx-2">Employees</a>
+                <a href="/ems-raise-history/" class="mx-2">Raise</a>
+                <a href="/ems-employee-evaluation/" class="mx-2">Evaluation</a>
+            </div>
+        </div>
+
+        <!-- TITLE -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Employee Details</span>
+        </div>
+
+        <!-- TABLE -->
+        <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead>
+                <th>Employee</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>Position</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="link" data-toggle="modal" data-target="#modal">Clark Kent</td>
+                    <td>smpale@gmail.com</td>
+                    <td>+639741258378</td>
+                    <td>Accountant</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- VIEW MODAL -->
+        <div class="modal fade" id="modal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <div class="row my-2">
+                            <div class="col-9">
+                                <div class="row">
+                                    <div class="col-6 my-1">
+                                        <label for="" class="gray">ID No.</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold">00331137</span>
+                                    </div>
+                                    <div class="col-6 my-1">
+                                        <label for="" class="gray">Employee Name</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold">Clark Kent</span>
+                                    </div>
+                                    <div class="col-6 my-1">
+                                        <label for="" class="gray">Position</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold">Accountant</span>
+                                    </div>
+                                    <div class="col-6 my-1">
+                                        <label for="" class="gray">Date of Employment</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold">April 18, 2017</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <img src="/static/media/profile-pictures/person.png/" class="border b-radius-5" alt="" height="100%" width="100%">
+                            </div>
+                        </div>
+
+                        <!-- MID CARD -->
+                        <div class="row my-3">
+                            <div class="col-12">
+                                <label for="" class="gray">Basic Information</label>
+                            </div>
+                            <div class="col">
+                                <div class="d-flex flex-wrap mb-3">
+                                    <div class="modal-info-container"><i class="fas fa-map-marker-alt mr-2 icon-gray"></i><span class="font-semibold">344 Clinton Street, Apartment 3D</span></div>
+                                    <div class="modal-info-container"><i class="fas fa-mobile mr-2 icon-gray"></i><span class="font-semibold">09872411245</span></div>
+                                    <div class="modal-info-container"><i class="fas fa-envelope mr-2 icon-gray"></i><span class="font-semibold">totallynotsuperman@gmail.com</span></div>
+                                    <div class="modal-info-container"><img src="/static/media/icons/drop.svg" alt="" class="mr-2"><span class="font-semibold">O+</span></div>
+                                    <div class="modal-info-container"><img src="/static/media/icons/tin.svg" alt="" class="mr-2"><span class="font-semibold">775-465-323-000</span></div>
+                                    <div class="modal-info-container"><img src="/static/media/icons/peso.svg" alt="" class="mr-2"><span class="font-semibold">₱850.00</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MID CARD 2 -->
+                        <div class="row my-3 order-card py-2">
+                            <div class="col-12">
+                                <label for="" class="gray">Leave</label>
+                            </div>
+                            <div class="col font-medium">
+                                <div class="row">
+                                    <div class="col">Paid Leave Remaining</div>
+                                    <div class="col">5 Days</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">Sick Leave Remaining</div>
+                                    <div class="col">2 Days</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MID CARD 3 -->
+                        <div class="row my-3 py-2">
+                            <div class="col-12">
+                                <label for="" class="gray">Government Contribution No.</label>
+                            </div>
+                            <div class="col font-medium">
+                                <div class="row">
+                                    <div class="col">SSS</div>
+                                    <div class="col">02-2396485-4</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">PhilHealth</div>
+                                    <div class="col">07-0257681278</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">Pag-Ibig</div>
+                                    <div class="col">1212-3736-6607</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MID CARD 4 -->
+                        <div class="row my-3 order-card py-2">
+                            <div class="col-12">
+                                <label for="" class="gray">Raise History</label>
+                            </div>
+                            <div class="col font-medium">
+                                <div class="row">
+                                    <div class="col">April 25, 2021</div>
+                                    <div class="col">₱740/Day</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">April 25, 2019</div>
+                                    <div class="col">₱850.00/Day</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-3 mr-1">
+                                <a type="button" class="link" data-toggle="modal" data-target="#promotionModal">Give Promotion</a>
+                            </div>
+                            <div class="col-3 ml-1">
+                                <a type="button" class="link" data-toggle="modal" data-target="#raiseModal">Give Raise</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GIVE PROMOTION -->
+        <div class="modal fade" id="promotionModal">
+            <div class="modal-dialog">
+                <div class="modal-content box-shadow-large b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Give Promotion</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">ID No.</label>
+                                <br>
+                                <span class="font-size-14 font-bold">00331137</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Employee</label>
+                                <br>
+                                <span class="font-size-14 font-bold">Clark Kent</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Position</label>
+                                <br>
+                                <span class="font-size-14 font-bold">Accountant</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Current Daily Rate</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱580.00</span>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 order-card py-3">
+                            <div class="col-8 pr-1">
+                                <div class="form-group">
+                                    <label for="">New Position</label>
+                                    <select name="" id="" class="form-control">
+                                        <option value="" selected disabled>Select New Position</option>
+                                        <option value="">HR Admin</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-4 pl-1">
+                                <div class="form-group">
+                                    <label for="">Rate <span class="font-size-10 gray font-bold">(per day)</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input type="text" class="form-control box-shadow-off" placeholder="Enter Amount" onkeypress="validate()">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <button class="btn btn-warning col">Give Promotion</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GIVE RAISE -->
+        <div class="modal fade" id="raiseModal">
+            <div class="modal-dialog">
+                <div class="modal-content box-shadow-large b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Give Raise</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">ID No.</label>
+                                <br>
+                                <span class="font-size-14 font-bold">00331137</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Employee</label>
+                                <br>
+                                <span class="font-size-14 font-bold">Clark Kent</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Position</label>
+                                <br>
+                                <span class="font-size-14 font-bold">Accountant</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Current Daily Rate</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱580.00</span>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 order-card py-3">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="">Rate <span class="font-size-10 gray font-bold">(per day)</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">₱</span>
+                                        </div>
+                                        <input type="text" class="form-control box-shadow-off" placeholder="Enter Raise" onkeypress="validate()">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <button class="btn btn-warning col">Give Raise</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD EMPLOYEE MODAL -->
+        <div class="modal fade" id="addModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add New Employee</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col-6 pr-2">
+                                <label for="">ID Number</label>
+                                <input placeholder="Enter ID Number" type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col-6 pr-2">
+                                <label for="">First Name</label>
+                                <input placeholder="Enter First Name" type="text" class="form-control">
+                            </div>
+                            <div class="col-6 pl-2">
+                                <label for="">Last Name</label>
+                                <input placeholder="Enter Last Name" type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mt-2 order-card pt-3">
+                            <div class="col">
+                                <label for="">Position</label>
+                                <select name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Postion</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2 order-card pb-3">
+                            <div class="col">
+                                <label for="">Account Authorization Level</label>
+                                <select name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Auth Level</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2 pt-3">
+                            <div class="col">
+                                <label for="">Mobile No.</label>
+                                <input placeholder="Enter Mobile No." type="text" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label for="">Email</label>
+                                <input placeholder="Enter Email" type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2 pb-3">
+                            <div class="col">
+                                <label for="">Blood Type</label>
+                                <select class="form-control">
+                                    <option value="" selected disabled>Select Blood Type</option>
+                                    <option value="Unknown">Unknown</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label for="">Daily Rate</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input type="text" class="form-control box-shadow-off" placeholder="Enter Daily Rate" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2 order-card pt-3">
+                            <div class="col">
+                                <label for="">TIN Number</label>
+                                <input placeholder="Enter TIN Number" type="text" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label for="">SSS Number</label>
+                                <input placeholder="Enter SSS Number" type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2 order-card pb-3">
+                            <div class="col">
+                                <label for="">PHIC No.</label>
+                                <input placeholder="Enter PHIC No." type="text" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label for="">Pag-Ibig No.</label>
+                                <input placeholder="Enter Pag-Ibig No." type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <!-- BUTTONS -->
+                        <div class="row mt-3">
+                            <div class="col">
+                                <button class="col btn btn-primary">Add Employee</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app"
+    })
+</script>
+
+<script>
+    $(document).ready(function() {
+        $.fn.dataTable.moment( 'MMMM D, YYYY' );
+        $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
+        $('#table').DataTable({
+            language: { search: '', searchPlaceholder: 'Search'},
+            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+
+            buttons: {
+                buttons: [
+                {
+                    text: 'Add Employee',
+                    className: 'btn btn-warning',
+                    titleAttr: 'Add Employee',
+                    action: function(){
+                        $("#addModal").modal('show')
+                    }
+                },
+                {
+                    text: '<i class="fas fa-file-excel"></i>',
+                    className: 'btn text-success btn-table',
+                    titleAttr: 'Export Excel',
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fas fa-file-csv"></i>',
+                    className: 'btn text-warning btn-table',
+                    titleAttr: 'Export CSV',
+                    extend: 'csv'
+                },
+                {
+                    text: '<i class="fas fa-print"></i>',
+                    className: 'btn btn-table',
+                    titleAttr: 'Print',
+                    extend: 'print'
+                },
+                {
+                    text: `<i class="fas fa-file-import"></i>`,
+                    className: 'btn btn-table',
+                    titleAttr: 'Import',
+                    action: function(){
+                        $("#import").modal('show')
+                    }
+                },
+                {
+                    text: `<i class="fas fa-file-download"></i>`,
+                    className: 'btn btn-table text-success',
+                    titleAttr: 'Download Excel Template',
+                    action: function(){
+                        location.href="#"
+                    }
+                }
+                ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
+                }
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            },
+        
+        });
+    });
+    $('option').mousedown(function(e) {
+        e.preventDefault();
+        $(this).prop('selected', !$(this).prop('selected'));
+        return false;
+    });
+</script>
+
+{% endblock %}
