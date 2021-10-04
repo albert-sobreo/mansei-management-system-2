@@ -295,5 +295,6 @@ urlpatterns = [
     path('ems-undertime-pending/', login_required(views.EMS_UndertimePendingView.as_view())),
     path('ems-undertime-approved/', login_required(views.EMS_UndertimeApprovedView.as_view())),
     path('ems-leave-pending/', login_required(views.EMS_LeavePendingView.as_view())),
-    path('ems-leave-approved/', login_required(views.EMS_LeaveApprovedView.as_view()))
+    path('ems-leave-approved/', login_required(views.EMS_LeaveApprovedView.as_view())),
+    path('ems-import-holidays/', login_required(views.EMS_ImportHolidays.as_view()))
 ]

@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import (
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.aggregates import Min
 from django.db.models.deletion import PROTECT
+from django.db.models.fields.related import OneToOneField
 
 #CHOICES
 parties = [
@@ -1112,6 +1113,67 @@ class CRPO(models.Model):
     def __str__(self):
         return self.cr.code + " --- " + self.purchaseOrder.code
 
+class Holiday(models.Model):
+    date = models.DateField()
+    year = models.CharField(max_length=6)
+    description = models.TextField()
+    type = models.CharField(max_length=100)
+
+    def __str__(self):
+        return str(self.date) + " " + self.description
+
+class Timesheet(models.Model):
+    dtr = OneToOneField(DTR, on_delete=models.PROTECT)
+    bh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    ot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    ut = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    nd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    ndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    sun = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    sunot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    sh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    normalDay = models.BooleanField(default=True)
+
+class TimesheetDayCategory(models.Model):
+     timesheet = models.ForeignKey(Timesheet, on_delete=models.PROTECT)
+     holiday = models.ForeignKey(Holiday, on_delete=models.PROTECT)
+
+class OTRequest(models.Model):
+    requestedBy = models.ForeignKey(User, on_delete=models.PROTECT, related_name='otrequestrequestedby') 
+    hours = models.DecimalField(max_digits=4, decimal_places=2)
+    date = models.DateField()
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='otrequestapprovedby')
+    status = models.CharField(max_length=64, null=True, blank=True)
+    reason = models.TextField(null=True, blank=True)
+    datetimeCreated = models.DateTimeField(null=True, blank=True)
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+
+class UTRequest(models.Model):
+    requestedBy = models.ForeignKey(User, on_delete=models.PROTECT, related_name="utrequestrequestedby")
+    timeOut = models.TimeField()
+    date = models.DateField()
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='utrequestapprovedby')
+    status = models.CharField(max_length=64, null=True, blank=True)
+    datetimeCreated = models.DateTimeField(null=True, blank=True)
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    reason = models.TextField(null=True, blank=True)
+
+class LeaveRequest(models.Model):
+    requestedBy = models.ForeignKey(User, on_delete=models.PROTECT, related_name='leaverequestrequestedby')
+    dateStart = models.DateField()
+    dateEnd = models.DateField()
+    reason = models.TextField(null=True, blank=True)
+    leaveType = models.CharField(max_length=64, null=True, blank=True)
+    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name="leaverequestapprovedby")
+    datetimeCreated = models.DateTimeField(null=True, blank=True)
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=64, null=True, blank=True)
+
+
+
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
@@ -1243,6 +1305,14 @@ class Branch(models.Model):
     completionReport = models.ManyToManyField(CompletionReport, blank=True)
     crSpareParts = models.ManyToManyField(CRSpareParts, blank=True)
     crpo = models.ManyToManyField(CRPO, blank=True)
+
+    #### DTR 2 ####
+    holiday = models.ManyToManyField(Holiday, blank=True)
+    timesheet = models.ManyToManyField(Timesheet, blank=True)
+    timesheetDayCategory = models.ManyToManyField(TimesheetDayCategory, blank=True)
+    otRequest = models.ManyToManyField(OTRequest, blank=True)
+    utRequest = models.ManyToManyField(UTRequest, blank=True)
+    leaveRequest = models.ManyToManyField(LeaveRequest, blank=True)
     
 
     def __str__(self):

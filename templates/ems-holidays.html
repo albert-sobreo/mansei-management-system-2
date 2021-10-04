@@ -25,7 +25,7 @@
                 <button class="btn btn-success mx-1" data-toggle="modal" data-target="#importModal">Import Holidays</button>
             </div>
             <div>
-                <select name="" id="" class="form-control ml-1">
+                <select v-model="year" @change="filterHolidays()" name="" id="" class="form-control ml-1">
                     <option value="" selected disabled>Select Year</option>
                     <option v-for="year in yearList" :value="year">[[year]]</option>
                 </select>
@@ -41,16 +41,89 @@
             </thead>
 
             <tbody>
+                {% for h in holidays %}
                 <tr>
-                    <td>January 1, 2021</td>
-                    <td>New Year</td>
+                    <td>{{h.date}}</td>
+                    <td>{{h.description}}</td>
+                    {% if h.type == 'rh' %}
                     <td>Regular Holiday</td>
+                    {% elif h.type == 'sh' %}
+                    <td>Special Non-working Holiday</td>
+                    {% else %}
+                    <td>Unknown</td>
+                    {% endif %}
                 </tr>
+                {% endfor %}
+
             </tbody>
         </table>
 
-        <!-- ADD MODAL -->
+        <!-- ADD MODAL 2 -->
         <div class="modal fade" id="addModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body p-4">
+                        <div class="">
+                            <span class="modal-title">Add Holiday</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-3">
+                            <div class="col">
+                                <button @click="pushHoliday()" class="btn btn-warning mt-1">+ Add more holiday</button>
+                                <button @click="popHoliday()" class="btn btn-danger mt-1">- Remove a holiday</button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col pr-1">
+                                <label for="">#</label>
+                            </div>
+                            <div class="col-3 px-1">
+                                <label for="">Date</label>
+                            </div>
+                            <div class="col-4 px-1">
+                                <label for="">Description</label>
+                            </div>
+                            <div class="col-4 pl-1">
+                                <label for="">Type</label>
+                            </div>
+                        </div>
+
+                        <div class="row my-1" v-for="(item, index) in addModal">
+                            <div class="col pr-1 align-self-center">  
+                                <span class="font-bold">[[index+1]]</span>
+                            </div>
+                            <div class="col-3 px-1">
+                                <input v-model="item.date" type="date" class="form-control">
+                            </div>
+                            <div class="col-4 px-1">
+                                <input placeholder="Enter Holiday Description"  v-model="item.description" type="text" class="form-control">
+                            </div>
+                            <div class="col-4 pl-1">
+                                <select v-model="item.type" name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Holiday Type</option>
+                                    <option value="sh">Special Non-working Holiday</option>
+                                    <option value="rh">Regular Holiday</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col">
+                                <button @click="submitHoliday()" class="btn btn-primary col">Save</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD MODAL -->
+        <div class="modal fade" >
             <div class="modal-dialog">
                 <div class="modal-content b-radius-15">
                     <div class="modal-body p-4">
@@ -65,7 +138,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label for="">Date</label>
-                                    <input type="date" class="form-control">
+                                    <input v-model="modal.date" type="date" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -74,7 +147,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label for="">Description</label>
-                                    <input placeholder="Enter Holiday Description" type="text" class="form-control">
+                                    <input v-model="modal.description" placeholder="Enter Holiday Description" type="text" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -82,11 +155,11 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">Description</label>
-                                    <select name="" id="" class="form-control">
-                                        <option value="" selected dir="">Select Holiday Type</option>
-                                        <option value="">Special Non-working Holiday</option>
-                                        <option value="">Regular Holiday</option>
+                                    <label for="">Holiday Type</label>
+                                    <select v-model="modal.type" name="" id="" class="form-control">
+                                        <option value="" selected disabled>Select Holiday Type</option>
+                                        <option value="sh">Special Non-working Holiday</option>
+                                        <option value="rh">Regular Holiday</option>
                                     </select>
                                 </div>
                             </div>
@@ -94,7 +167,7 @@
 
                         <div class="row">
                             <div class="col">
-                                <button class="btn btn-primary col">Save</button>
+                                <button @click="submitHoliday()" class="btn btn-primary col">Save</button>
                             </div>
                         </div>
                     </div>
@@ -107,32 +180,35 @@
             <div class="modal-dialog">
                 <div class="modal-content b-radius-15">
                     <div class="modal-body p-4">
-                        <div class="mb-4">
-                            <span class="modal-title">Import Holiday</span>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
+                        <form action="/ems-import-holidays/" enctype="multipart/form-data" method="POST">{% csrf_token %}
+                            <div class="mb-4">
+                                <span class="modal-title">Import Holiday</span>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
 
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-group">
-                                    <label for="">Select an Excel File</label>
-                                    <input type="file" class="form-control-file">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="">Select an Excel File</label>
+                                        <input type="file" name="excel" class="form-control-file">
+                                    </div>
+                                </div>
+                            </div> 
+
+                            <div class="row">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary col">Import</button>
                                 </div>
                             </div>
-                        </div> 
-
-                        <div class="row">
-                            <div class="col">
-                                <button class="btn btn-primary col">Import</button>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -145,7 +221,24 @@
         el: "#app",
         
         data: {
-            yearList: []
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            year: '',
+            yearList: [],
+            modal: {
+                date: null,
+                description: null,
+                type: '',
+            },
+
+            addModal: [{
+                date: null,
+                description: null,
+                type: '',
+            }]
         },
 
         methods: {
@@ -159,10 +252,43 @@
                         html: err.message
                     })
                 })
+            },
+            
+            submitHoliday(){
+                axios.post('/ems-holidays/', this.addModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            filterHolidays(){
+                location.href=`/ems-holidays/?year=${this.year}`
+            },
+
+            pushHoliday(){
+                this.addModal.push({
+                    date: null,
+                    description: null,
+                    type: '',
+                })
+            },
+
+            popHoliday(){
+                this.addModal.pop()
             }
         },
         mounted(){
             this.onload()
+
+            let params = new URLSearchParams(location.search);
+            
+            x = params.get('year')
+            this.year = x?x:''
         }
     })
 </script>
