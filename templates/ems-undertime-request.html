@@ -33,21 +33,21 @@
                 <th class="gray">Status</th>
             </thead>
             <tbody>
+                {% for ut in request.user.branch.utRequest.all %}
                 <tr>
-                    <td>Mar. 31, 2020</td>
-                    <td>3:00 PM</td>
-                    <td class="pending">Pending</td>
-                </tr>
-                <tr>
-                    <td>Mar. 31, 2020</td>
-                    <td>4:00 PM</td>
+                    <td>{{ut.date}}</td>
+                    <td>{{ut.timeOut}}</td>
+                    {% if ut.status == 'Pending' %}
+                    <td class="pending">{{ut.status}}</td>
+                    {% elif ut.status == 'Approved' %}
                     <td class="approved">Approved</td>
-                </tr>
-                <tr>
-                    <td>Mar. 31, 2020</td>
-                    <td>3:30 PM</td>
+                    {% elif ut.status == 'Declined' %}
                     <td class="text-danger">Declined</td>
+                    {% else %}
+                    <td class="text-info">Unknown</td>
+                    {% endif %}
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 
@@ -67,13 +67,13 @@
                             <div class="col-8 pr-1">
                                 <div class="form-group">
                                     <label for="">Date</label>
-                                    <input type="date" class="form-control">
+                                    <input v-model="modal.date" type="date" class="form-control">
                                 </div>
                             </div>
                             <div class="col-4 pl-1">
                                 <div class="form-group">
                                     <label for="">Time-Out</label>
-                                    <input type="time" onkeypress="validate()" class="form-control">
+                                    <input v-model="modal.timeOut" type="time" onkeypress="validate()" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -82,14 +82,14 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label for="">Reason</label>
-                                    <input type="text" placeholder="Enter Reason for Undertime" class="form-control">
+                                    <input v-model="modal.reason" type="text" placeholder="Enter Reason for Undertime" class="form-control">
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mt-2">
                             <div class="col">
-                                <button class="col btn btn-primary">Request</button>
+                                <button @click="submit()" class="col btn btn-primary">Request</button>
                             </div>
                         </div>
                     </div>
@@ -107,7 +107,35 @@
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
-        el: "#app"
+        el: "#app",
+
+        data: {
+            config: {
+                headers:{
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+
+            modal: {
+                date: null,
+                timeOut: null,
+                reason: null,
+            }
+        },
+
+        methods: {
+            submit(){
+                axios.post('/ems-undertime-request/', this.modal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message,
+                    })
+                })
+            }
+        }
     })
 </script>
 

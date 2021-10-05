@@ -797,3 +797,24 @@ class CRNestedSZ(serializers.ModelSerializer):
 
 
 
+
+class OTRequestSZ(serializers.ModelSerializer):
+    requestedBy = UserNameOnlySZ(read_only=True)
+    approvedBy = UserNameOnlySZ(read_only=True)
+    class Meta:
+        model = OTRequest
+        fields = "__all__"
+
+class UTRequestSZ(serializers.ModelSerializer):
+    requestedBy = UserNameOnlySZ(read_only=True)
+    approvedBy = UserNameOnlySZ(read_only=True)
+    class Meta:
+        model = UTRequest
+        fields = "__all__"
+
+class LeaveRequestSZ(serializers.ModelSerializer):
+    requestedBy = UserNameOnlySZ(read_only=True)
+    approvedBy = UserNameOnlySZ(read_only=True)
+    class Meta:
+        model = LeaveRequest
+        fields = '__all__'

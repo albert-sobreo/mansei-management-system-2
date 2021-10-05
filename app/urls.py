@@ -104,6 +104,12 @@ router.register(r"ppe-real", views.PPEAPI, 'ppe-real')
 ########## CR ##########
 router.register(r"cr-nested", views.CRNestedAPI, 'cr-nested')
 
+########## OT ##########
+router.register(r'ot-request', views.OTRequestAPI, 'ot-request')
+
+########## UT ##########
+router.register(r'ut-request', views.UTRequestAPI, 'ut-request')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -291,10 +297,18 @@ urlpatterns = [
     path('ems-undertime-request/', login_required(views.EMS_UndertimeRequestsView.as_view())),
     path('ems-leave-request/', login_required(views.EMS_LeaveRequestsView.as_view())),
     path('ems-overtime-pending/', login_required(views.EMS_OvertimePendingView.as_view())),
+    
     path('ems-overtime-approved/', login_required(views.EMS_OvertimeApprovedView.as_view())),
+    path('ems-overtime-approval/<int:pk>/', login_required(views.EMS_OvertimeApproval.as_view())),
+    path('ems-overtime-disapproval/<int:pk>/', login_required(views.EMS_OvertimeDisapproval.as_view())),
     path('ems-undertime-pending/', login_required(views.EMS_UndertimePendingView.as_view())),
     path('ems-undertime-approved/', login_required(views.EMS_UndertimeApprovedView.as_view())),
+    path('ems-undertime-approval/<int:pk>/', login_required(views.EMS_UndertimeApproval.as_view())),
+    path('ems-undertime-disapproval/<int:pk>/', login_required(views.EMS_UndertimeDisapproval.as_view())),
     path('ems-leave-pending/', login_required(views.EMS_LeavePendingView.as_view())),
     path('ems-leave-approved/', login_required(views.EMS_LeaveApprovedView.as_view())),
+    path('ems-leave-approval/<int:pk>/', login_required(views.EMS_LeaveApproval.as_view())),
+    
+    path('ems-leave-disapproval/<int:pk>/', login_required(views.EMS_LeaveDisapproval.as_view())),
     path('ems-import-holidays/', login_required(views.EMS_ImportHolidays.as_view()))
 ]

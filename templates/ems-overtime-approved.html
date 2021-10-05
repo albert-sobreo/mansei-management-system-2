@@ -32,11 +32,13 @@
                 <th>No. of Hours</th>
             </thead>
             <tbody>
+                {% for ot in ots %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#modal">Clark Kent</td>
-                    <td>Jan. 1, 2021</td>
-                    <td>2 Hours</td>
+                    <td class="link" data-toggle="modal" data-target="#modal" @click="fetchOT({{ot.pk}})">{{ot.requestedBy.first_name}} {{ot.requestedBy.last_name}}</td>
+                    <td>{{ot.date}}</td>
+                    <td>{{ot.hours}} Hours</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 

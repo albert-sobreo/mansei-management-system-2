@@ -33,21 +33,21 @@
                 <th class="gray">Status</th>
             </thead>
             <tbody>
+                {% for ot in request.user.branch.otRequest.all %}
                 <tr>
-                    <td>Mar. 31, 2020</td>
-                    <td>3 Hours</td>
-                    <td class="pending">Pending</td>
-                </tr>
-                <tr>
-                    <td>Mar. 31, 2020</td>
-                    <td>3 Hours</td>
+                    <td>{{ot.date}}</td>
+                    <td>{{ot.hours}} Hours</td>
+                    {% if ot.status == 'Pending' %}
+                    <td class="pending">{{ot.status}}</td>
+                    {% elif ot.status == 'Approved' %}
                     <td class="approved">Approved</td>
-                </tr>
-                <tr>
-                    <td>Mar. 31, 2020</td>
-                    <td>3 Hours</td>
+                    {% elif ot.status == 'Declined' %}
                     <td class="text-danger">Declined</td>
+                    {% else %}
+                    <td class="text-info">Unknown</td>
+                    {% endif %}
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 
@@ -67,13 +67,13 @@
                             <div class="col-8 pr-1">
                                 <div class="form-group">
                                     <label for="">Date</label>
-                                    <input type="date" class="form-control">
+                                    <input v-model="modal.date" type="date" class="form-control">
                                 </div>
                             </div>
                             <div class="col-4 pl-1">
                                 <div class="form-group">
                                     <label for="">No. of Hours</label>
-                                    <input placeholder="No. of Hours" type="text" onkeypress="validate()" class="form-control">
+                                    <input v-model="modal.hours" placeholder="No. of Hours" type="text" onkeypress="validate()" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -82,14 +82,14 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label for="">Reason</label>
-                                    <input type="text" placeholder="Enter Reason for Overtime" class="form-control">
+                                    <input v-model="modal.reason" type="text" placeholder="Enter Reason for Overtime" class="form-control">
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mt-2">
                             <div class="col">
-                                <button class="col btn btn-primary">Request</button>
+                                <button @click="submit()" class="col btn btn-primary">Request</button>
                             </div>
                         </div>
                     </div>
@@ -98,6 +98,7 @@
         </div>
 
     </div>
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -107,7 +108,35 @@
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
-        el: "#app"
+        el: "#app",
+
+        data: {
+            config: {
+                headers:{
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+
+            modal: {
+                date: null,
+                hours: null,
+                reason: null,
+            }
+        },
+
+        methods: {
+            submit(){
+                axios.post('/ems-overtime-request/', this.modal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message,
+                    })
+                })
+            }
+        }
     })
 </script>
 

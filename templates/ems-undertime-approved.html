@@ -32,11 +32,13 @@
                 <th>Time-Out</th>
             </thead>
             <tbody>
+                {% for ut in uts %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#modal">Clark Kent</td>
-                    <td>Jan. 1, 2021</td>
-                    <td>3:00 PM</td>
+                    <td @click="fetchUT({{ut.pk}})" class="link" data-toggle="modal" data-target="#modal">{{ut.requestedBy.first_name}} {{ut.requestedBy.last_name}}</td>
+                    <td>{{ut.date}}</td>
+                    <td>{{ut.timeOut}}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 

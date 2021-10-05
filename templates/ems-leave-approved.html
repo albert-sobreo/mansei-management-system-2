@@ -32,11 +32,14 @@
                 <th>Leave Type</th>
             </thead>
             <tbody>
+                {% for leave in leaves %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#modal">Clark Kent</td>
-                    <td>Jan. 1, 2021</td>
-                    <td>Sick Leave</td>
+                    <td @click="fetchLeave({{leave.pk}})" class="link" data-toggle="modal" data-target="#modal">{{leave.requestedBy.first_name}} {{leave.requestedBy.last_name}}</td>
+                    <td>{{leave.dateStart}}</td>
+                    <td>{{leave.dateEnd}}</td>
+                    <td>{{leave.leaveType}}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 

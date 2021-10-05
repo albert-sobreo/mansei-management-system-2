@@ -32,16 +32,41 @@
                 <th>No. of Hours</th>
             </thead>
             <tbody>
+                {% for ot in ots %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#modal">Clark Kent</td>
-                    <td>Jan. 1, 2021</td>
-                    <td>2 Hours</td>
+                    <td class="link" data-toggle="modal" data-target="#modal" @click="fetchOT({{ot.pk}})">{{ot.requestedBy.first_name}} {{ot.requestedBy.last_name}}</td>
+                    <td>{{ot.date}}</td>
+                    <td>{{ot.hours}} Hours</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 
         <!-- MODAL -->
-
+        <div class="modal fade" id="modal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <div class="row my-2">
+                            <div class="col my-3">
+                                <label for="" class="gray">Requested By</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.requestedBy.first_name]] [[modal.requestedBy.last_name]]</span>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col pr-1">
+                                <button @click="approve(modal.id)" class="btn btn-primary col">Approve</button>
+                            </div>
+                            <div class="col pl-1">
+                                <button @click="decline(modal.id)" class="btn btn-danger col">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -52,7 +77,41 @@
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
-        el: "#app"
+        el: "#app",
+
+        data: {
+            config: {
+                headers:{
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+
+            modal: {
+                id: null,
+                requestedBy: {
+                    first_name: null,
+                    last_name: null
+                },
+            }
+        },
+
+        methods: {
+            fetchOT(id){
+                axios.get(`/api/ot-request/${id}/`)
+                .then(res=>this.modal=res.data)
+            },
+            approve(id){
+                axios.put(`/ems-overtime-approval/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: "error",
+                        html: err.message
+                    })
+                })
+            }
+        }
     })
 </script>
 
