@@ -25,6 +25,7 @@
             <span class="font-size-18 font-bold mr-1">Chart of Accounts</span>
             <button type="button" class="btn btn-primary mx-1" data-toggle="modal" data-target="#addAccountModal">Add Account</button>
             <button type="button" class="btn btn-primary mx-1" data-toggle="modal" data-target="#addSubGroupModal">Add Sub-group</button>
+            <button type="button" class="btn btn-success mx-1" data-toggle="modal" data-target="#importModal">Import Chart of Accounts</button>
             <button type="button" class="btn btn-secondary mx-1" @click="roundingToggler()">Round Numbers</button>
         </div>
 
@@ -100,6 +101,38 @@
                     <div class="row">
                         <div class="col">
                             <a href="#" data-toggle="modal" data-target="#editAccountModal" @click="copyChildAccount(viewChildModal.id)">Edit Child Account</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="importModal">
+        <div class="modal-dialog">
+            <div class="modal-content b-radius-15">
+                <div class="modal-body">
+                    <div class="mb-1">
+                        <span class="modal-title">Add Account</span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <a href="/static/files/Chart_of_accounts-template.xlsx">Download Excel Template</a>
+                            <form action="/import-chart-of-accounts/" enctype="multipart/form-data" method="POST">{% csrf_token %}
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="">Select Excel File</label><br>
+                                        <input type="file" name="excel" accept=".xls,.xlsx,.csv">
+                                    </div>
+                                    <div class="col-12 mt-4">
+                                        <button type="submit" class="btn btn-primary col">Import</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

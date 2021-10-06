@@ -289,7 +289,7 @@
                                         <td>[[item.damageDescription]]</td>
                                         <td>₱[[formatPrice(item.totalCost)]]</td>
                                         <td>[[item.capitalized]]</td>
-                                        <td><button class="btn btn-sm btn-warning" @click="checkCapitalize(item.id)" v-if="!item.capitalized">Capitalize</button></td>
+                                        <td><button class="btn btn-sm btn-warning" @click="checkCapitalize(item.id)" v-if="!item.capitalized && item.approved">Capitalize</button></td>
                                     </tr>
                                 </tbody>
                             </table>

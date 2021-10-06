@@ -5,10 +5,74 @@ from rest_framework.views import APIView
 from ..forms import *
 from ..models import *
 import sweetify
+import pandas as pd
+import json
+from decimal import Decimal
 
 class ChartOfAccountsView(View):
     def get(self, request):
         return render(request, 'chart_of_accounts.html')
+
+class ImportChartOfAccounts(View):
+    def post(self, request):
+        df = pd.read_excel(request.FILES['excel'])
+        print(df.to_string())
+        jsonDF = json.loads(df.to_json(orient='records'))
+
+        existing = []
+
+        for item in jsonDF:
+            accGrp = item['Account-Group']
+            accSub = item['Account-Sub-Group']
+            accChi = item['Account-Child-Group']
+            code = item['Code']
+
+            try:
+                code = code.split('-')
+            except:
+                code = ['##', '##', '####']
+
+            branch = request.user.branch
+
+            if branch.accountGroup.filter(name=accGrp):
+                print(accGrp + ' already exists')
+                accGrp = branch.accountGroup.get(name=accGrp)
+
+            else:
+                sweetify.sweetalert(request, icon='error', title='Account Group does not exists.', persistent='Dismiss')
+                return JsonResponse(0, safe=False)
+            
+            if branch.subGroup.filter(name=accSub):
+                print(accSub+ ' already exists')
+                accSub = branch.subGroup.get(name=accSub)
+            else:
+                aSub = AccountSubGroup()
+                aSub.code = code[1]
+                aSub.name = accSub
+                aSub.accountGroup = accGrp
+                aSub.description = '',
+                aSub.amount = Decimal(0)
+                aSub.save()
+                branch.subGroup.add(aSub)
+                accSub = aSub
+
+            if branch.accountChild.filter(name=accChi):
+                print(accChi + ' already exists')
+
+            else:
+                aChi = AccountChild()
+                aChi.code = code[2]
+                aChi.name = accChi
+                aChi.accountSubGroup = accSub
+                aChi.amount = Decimal(0)
+                aChi.description = ''
+                aChi.save()
+                branch.accountChild.add(aChi)
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return redirect('/chart-of-accounts/')
+
+
 
 class SaveAccountChild(APIView):
     def post(self, request, format=None):

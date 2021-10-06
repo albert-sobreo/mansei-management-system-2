@@ -181,7 +181,7 @@
                 <div class="modal-content b-radius-15">
                     <div class="modal-body p-4">
                         <form action="/ems-import-holidays/" enctype="multipart/form-data" method="POST">{% csrf_token %}
-                            <div class="mb-4">
+                            <div class="mb-1">
                                 <span class="modal-title">Import Holiday</span>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
@@ -190,6 +190,8 @@
 
                             <div class="row">
                                 <div class="col">
+
+                                <a href="/static/files/Holiday_Import_Template.xlsx">Download Excel Template</a>
                                     <div class="form-group">
                                         <label for="">Select an Excel File</label>
                                         <input type="file" name="excel" class="form-control-file">

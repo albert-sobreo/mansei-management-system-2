@@ -310,5 +310,6 @@ urlpatterns = [
     path('ems-leave-approval/<int:pk>/', login_required(views.EMS_LeaveApproval.as_view())),
     
     path('ems-leave-disapproval/<int:pk>/', login_required(views.EMS_LeaveDisapproval.as_view())),
-    path('ems-import-holidays/', login_required(views.EMS_ImportHolidays.as_view()))
+    path('ems-import-holidays/', login_required(views.EMS_ImportHolidays.as_view())),
+    path('import-chart-of-accounts/', login_required(views.ImportChartOfAccounts.as_view()))
 ]
