@@ -387,29 +387,75 @@ class DTRProcess(APIView):
 
         # ARRIVAL ON-TIME ONLY
         elif arrival['onTime'] and departure['offTime']:
-            durationDTR = dtr.dateTimeOut - scheduleTimeIn
-            durationDTR = deductBreak(durationDTR)
+            # PSEUCODE FOR DAY SHIFT
+            otMark = getOTMark(scheduleTimeIn)
+            otDuration = datetime.timedelta(0)
+            bhDuration = datetime.timedelta(0)
 
-            bh += Decimal(durationDTR.seconds/3600)
+            bhDuration = abs(otMark - scheduleTimeIn)
+            bhDuration = deductBreak(bhDuration)
+            bhDuration = deductBreakNight(bhDuration)
 
-            # EARLY DEPARTURE
-            if departure['earlyDeparture']:
-                ut += Decimal(timeOutDiff.seconds/3600)
+            if dtr.dateTimeOut < otMark:
+                diff = abs(otMark - dtr.dateTimeOut)
+                bhDuration -= diff
 
-            # LATE DEPARTURE
-            elif departure['lateDeparture']:
-                ot += Decimal(timeOutDiff.seconds/3600)
+            # BH IS SOLVED
+            # NEXT UT
+            utDuration = timeInDiff
 
-            bh -=  ot
+            if datetime.time(13) <= scheduleTimeIn.time() <= datetime.time(17) or datetime.time(23) <= scheduleTimeIn.time():
+                utDuration -= datetime.timedelta(hours=1)
+
+            # AT EARLY DEPARTURE
+            if otMark > dtr.dateTimeOut:
+                utDuration += abs(otMark - dtr.dateTimeOut)
+            # AT LATE DEPARTURE
+            if otMark < dtr.dateTimeOut:
+                otDuration = abs(dtr.dateTimeOut - otMark)
+
+            nd += getND(scheduleTimeIn, dtr.dateTimeOut)
+            ndot += getNDOT(scheduleTimeIn, dtr.dateTimeOut, scheduleTimeIn, scheduleTimeOut)
+
+            bh += Decimal(bhDuration.seconds/3600)
+            ot += Decimal(otDuration.seconds/3600)
+            ut += Decimal(utDuration.seconds/3600)
 
         # DEPARTURE ON-TIME ONLY
         elif arrival['offTime'] and departure['onTime']:
-            durationDTR = scheduleTimeOut - dtr.dateTimeIn
-            durationDTR = deductBreak(durationDTR)
+            # PSEUCODE FOR DAY SHIFT
+            otMark = getOTMark(scheduleTimeIn)
+            otDuration = datetime.timedelta(0)
+            bhDuration = datetime.timedelta(0)
 
-            bh += Decimal(durationDTR.seconds/3600)
+            bhDuration = abs(otMark - dtr.dateTimeIn)
+            bhDuration = deductBreak(bhDuration)
+            bhDuration = deductBreakNight(bhDuration)
 
-            ut += Decimal(timeInDiff.seconds/3600)
+            if scheduleTimeOut < otMark:
+                diff = abs(otMark - scheduleTimeOut)
+                bhDuration -= diff
+
+            # BH IS SOLVED
+            # NEXT UT
+            utDuration = timeInDiff
+
+            if datetime.time(13) <= dtr.dateTimeIn.time() <= datetime.time(17) or datetime.time(23) <= dtr.dateTimeIn.time():
+                utDuration -= datetime.timedelta(hours=1)
+
+            # # AT EARLY DEPARTURE
+            # if otMark > scheduleTimeOut:
+            #     utDuration += abs(otMark - scheduleTimeOut)
+            # # AT LATE DEPARTURE
+            # if otMark < scheduleTimeOut:
+            #     otDuration = abs(scheduleTimeOut - otMark)
+
+            nd += getND(dtr.dateTimeIn, scheduleTimeOut)
+            ndot += getNDOT(dtr.dateTimeIn, scheduleTimeOut, dtr.dateTimeIn, scheduleTimeOut)
+
+            bh += Decimal(bhDuration.seconds/3600)
+            ot += Decimal(otDuration.seconds/3600)
+            ut += Decimal(utDuration.seconds/3600)
         
         # IF NONE OF ABOVE APPLIES
         else:

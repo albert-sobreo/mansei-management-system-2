@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from ..models import MerchandiseInventory, Warehouse, WarehouseItems
+from ..models import *
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
@@ -18,11 +18,12 @@ class AddMerchInventoryAPI(APIView):
     def post(self, request, format = None):
         print(request.data)
         
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         a = MerchandiseInventory()
 
         a.code = request.data['code']
-        a.name = request.data['name']
-        a.classification = request.data['classification']
+        a.name = (request.data['name']).upper()
+        a.classification = (request.data['classification']).upper()
         a.type = request.data['type']
         a.length = Decimal(request.data['length'])
         a.width = Decimal(request.data['width'])
@@ -37,6 +38,69 @@ class AddMerchInventoryAPI(APIView):
         a.um = "Per Piece"
         a.vol = (a.width / 1000) * (a.length / 1000) * (a.thickness / 1000)
         a.totalCost = 0.0
+        # PUT CHART OF ACCOUNT CODE HERE
+        # ACCOUNT INVENTORY
+
+        inv = "{} - {} {}".format(dChildAccount.merchInventory, a.name, a.classification)
+        sales = '{} - {} {}'.format(dChildAccount.sales, a.name, a.classification)
+        cos = '{} - {} {}'.format(dChildAccount.costOfSales, a.name, a.classification)
+
+        if AccountChild.objects.filter(name=inv):
+            objects = {
+                'inv': AccountChild.objects.get(name=inv),
+                'sales': AccountChild.objects.get(name=sales),
+                'cos': AccountChild.objects.get(name=cos),
+            }
+            a.childAccountInventory = objects['inv']
+            a.childAccountSales = objects['sales']
+            a.childAccountCostOfSales = objects['cos']
+
+        else:
+            try:
+                inventory = dChildAccount.merchInventory.accountSubGroup
+                invCode = inventory.accountchild.latest('pk')
+                invCurrentCode = int(invCode)
+                invCurrentCode += 1
+                invNewCode = str(invCurrentCode).zfill(4)
+            except Exception as e:
+                invNewCode = '0001'
+
+            try:
+                salesObj = dChildAccount.sales.accountSubGroup
+                salesCode = salesObj.accountchild.latest('pk')
+                salesCurrentCode = int(salesCode)
+                salesCurrentCode += 1
+                salesNewCode = str(salesCurrentCode).zfill(4)
+            except Exception as e:
+                salesNewCode = '0001'
+
+            try:
+                cosObj = dChildAccount.costOfSales.accountSubGroup
+                cosCode = cosObj.accountchild.latest('pk')
+                cosCurrentCode = int(cosCode)
+                cosCurrentCode += 1
+                cosNewCode = str(cosCurrentCode).zfill(4)
+            except Exception as e:
+                cosNewCode = '0001'
+
+            childInventory = AccountChild.objects.create(code = invNewCode, name = inv, accountSubGroup = dChildAccount.merchInventory.accountSubGroup, me = dChildAccount.merchInventory, amount = 0.0, description = "")
+            childSales = AccountChild.objects.create(code=salesNewCode, name=sales, accountSubGroup=dChildAccount.sales.accountSubGroup, me=dChildAccount.sales, amount=0, description='')
+            childCoS = AccountChild.objects.create(code=cosNewCode, name=cos, accountSubGroup=dChildAccount.costOfSales.accountSubGroup, me=dChildAccount.costOfSales, amount=0, description='')
+
+            
+
+            childInventory.save()
+            childSales.save()
+            childCoS.save()
+
+            a.childAccountInventory = childInventory
+            a.childAccountSales = childSales
+            a.childAccountCostOfSales = childCoS
+            
+            request.user.branch.accountChild.add(childInventory)
+            request.user.branch.accountChild.add(childSales)
+            request.user.branch.accountChild.add(childCoS)
+        # END
         a.save()
         
         w = Warehouse.objects.get(pk=request.data['warehouse'])
@@ -46,7 +110,7 @@ class AddMerchInventoryAPI(APIView):
         wi.merchInventory = a
         wi.warehouse = w
         wi.initQty(a.qtyT, a.qtyR, a.qtyA)
-        wi.save2()
+        wi.save()
 
         request.user.branch.warehouseItems.add(wi)
         request.user.branch.merchInventory.add(a)

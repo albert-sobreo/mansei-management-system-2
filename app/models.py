@@ -83,7 +83,7 @@ class DTR(models.Model):
     dateTimeIn = models.DateTimeField( null = True, blank = True)
     dateTimeOut = models.DateTimeField( null = True, blank = True)
     date = models.DateField( null = True, blank = True)
-    user = models.ForeignKey(User, related_name = "dtr", on_delete=models.PROTECT, null = True, blank = True)
+    user = models.ForeignKey(User, related_name = "dtr", on_delete=models.CASCADE, null = True, blank = True)
     bh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     ot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     ut = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
@@ -160,7 +160,7 @@ class AccountGroup(models.Model):
 class AccountSubGroup(models.Model):
     code = models.CharField(max_length=256)
     name = models.CharField(max_length=256)
-    accountGroup = models.ForeignKey(AccountGroup, related_name="accountsubgroup", on_delete=models.PROTECT, null=True, blank=True)
+    accountGroup = models.ForeignKey(AccountGroup, related_name="accountsubgroup", on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,  default= 0.0)
 
@@ -174,8 +174,8 @@ class AccountSubGroup(models.Model):
 class AccountChild(models.Model):
     code = models.CharField(max_length=256)
     name = models.CharField(max_length=256)
-    accountSubGroup = models.ForeignKey(AccountSubGroup,related_name="accountchild", on_delete=models.PROTECT, null=True, blank=True)
-    me = models.ForeignKey('self', related_name="accountchild", null=True,blank=True, on_delete=models.PROTECT)
+    accountSubGroup = models.ForeignKey(AccountSubGroup,related_name="accountchild", on_delete=models.CASCADE, null=True, blank=True)
+    me = models.ForeignKey('self', related_name="accountchild", null=True,blank=True, on_delete=models.CASCADE)
     contra = models.BooleanField(null = True, blank=True, default=False)
     amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,default= 0.0)
     description = models.TextField(null=True, blank=True)
@@ -218,8 +218,8 @@ class Journal(models.Model):
     datetimeCreated = models.DateTimeField()
     journalDate = models.DateField()
     remarks = models.TextField(null=True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, related_name= "journalCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "journalApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name= "journalCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "journalApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -230,9 +230,9 @@ class Journal(models.Model):
         return self.code
 
 class JournalEntries(models.Model):
-    journal = models.ForeignKey(Journal, related_name="journalentries", on_delete=models.PROTECT, null=True, blank=True)
+    journal = models.ForeignKey(Journal, related_name="journalentries", on_delete=models.CASCADE, null=True, blank=True)
     normally = models.CharField(max_length=50, choices=normally)
-    accountChild = models.ForeignKey(AccountChild, related_name="journalentries", on_delete=models.PROTECT, null=True, blank=True)
+    accountChild = models.ForeignKey(AccountChild, related_name="journalentries", on_delete=models.CASCADE, null=True, blank=True)
     amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,default= 0)
     balance = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,default= 0)
 
@@ -275,6 +275,9 @@ class MerchandiseInventory(models.Model):
     turnover = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, default=0.00,)
     inventoryDate = models.DateField(null=True, blank=True)
+    childAccountInventory = models.ForeignKey(AccountChild, on_delete=models.CASCADE, null=True, blank=True, related_name='merchinventorychildaccountinventory')
+    childAccountSales = models.ForeignKey(AccountChild, on_delete=models.CASCADE, null=True, blank=True, related_name='merchinventorychildaccountsales')
+    childAccountCostOfSales = models.ForeignKey(AccountChild, on_delete=models.CASCADE, null=True, blank=True, related_name='merchinventorychildaccountcostofsales')
 
     class Meta:
         verbose_name = "Merchandise Inventory"
@@ -287,7 +290,7 @@ class OtherInventory(models.Model):
     name = models.CharField(max_length=100)
     qty = models.IntegerField()
     purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5, default=0.00)
-    accountChild = models.ForeignKey(AccountChild, on_delete=models.PROTECT, blank=True, null=True)
+    accountChild = models.ForeignKey(AccountChild, on_delete=models.CASCADE, blank=True, null=True)
         
 
     class Meta:
@@ -298,8 +301,8 @@ class OtherInventory(models.Model):
         return self.name
     
 class WarehouseItems(models.Model):
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, related_name = 'warehouseitems')
-    merchInventory = models.ForeignKey(MerchandiseInventory, on_delete=models.PROTECT, related_name = 'warehouseitems')
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, related_name = 'warehouseitems')
+    merchInventory = models.ForeignKey(MerchandiseInventory, on_delete=models.CASCADE, related_name = 'warehouseitems')
     qtyT = models.IntegerField()
     qtyR = models.IntegerField()
     qtyA = models.IntegerField()
@@ -368,9 +371,9 @@ class WarehouseItems(models.Model):
 
 class Cheques(models.Model):
     chequeNo = models.CharField(max_length=255, null=True, blank=True)
-    accountChild = models.ForeignKey(AccountChild, on_delete=models.PROTECT, null = True, blank = True, related_name="cheques")
+    accountChild = models.ForeignKey(AccountChild, on_delete=models.CASCADE, null = True, blank = True, related_name="cheques")
     approved = models.BooleanField(null = True, default=False, blank = True)
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="cheApprovedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True , related_name="cheApprovedBy")
     datetimeApproved = models.DateTimeField(null = True, blank = True)
     dueDate = models.DateField(null = True, blank = False)
 
@@ -381,13 +384,13 @@ class PurchaseRequest(models.Model):
     dateNeeded = models.DateField(null=True, blank=True)
     department = models.CharField(max_length=50, null=True, blank=True)
     intendedFor = models.CharField(max_length=200, null=True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "prCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "prApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "prCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "prApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(default=False)
     poed = models.BooleanField(default = False)
     voided = models.BooleanField(null = True, default = False)
-    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "prVoidedBy")
+    voidedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True, related_name = "prVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
     
 
@@ -400,8 +403,8 @@ class PurchaseRequest(models.Model):
 
 
 class PRItemsMerch(models.Model):    
-    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="pritemsmerch",on_delete=models.PROTECT, null=True, blank=True)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="pritemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="pritemsmerch",on_delete=models.CASCADE, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="pritemsmerch", on_delete=models.CASCADE, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
     unit = models.IntegerField(choices=units, null=True, blank=True)
@@ -415,8 +418,8 @@ class PRItemsMerch(models.Model):
 
 class PRItemsOther(models.Model):
     type = models.CharField(max_length = 255, blank=True, null=True)
-    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="pritemsother",on_delete=models.PROTECT, null=True, blank=True)
-    otherInventory = models.ForeignKey(OtherInventory, related_name="pritemsother", on_delete=models.PROTECT, null=True, blank=True)
+    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="pritemsother",on_delete=models.CASCADE, null=True, blank=True)
+    otherInventory = models.ForeignKey(OtherInventory, related_name="pritemsother", on_delete=models.CASCADE, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
     unit = models.IntegerField(choices=units, null=True, blank=True)
@@ -432,8 +435,8 @@ class PurchaseOrder(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     datePurchased = models.DateField()
-    party = models.ForeignKey(Party, related_name="purchaseorder", on_delete=models.PROTECT)
-    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="purchaseorder",on_delete=models.PROTECT, null=True, blank=True)
+    party = models.ForeignKey(Party, related_name="purchaseorder", on_delete=models.CASCADE)
+    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="purchaseorder",on_delete=models.CASCADE, null=True, blank=True)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     amountDue = models.DecimalField(max_digits=20, decimal_places=5)
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
@@ -446,17 +449,17 @@ class PurchaseOrder(models.Model):
     dueDate = models.DateField(null = True, blank = True)
     bank = models.CharField(max_length=50, blank=True, null=True)
     remarks = models.TextField(null = True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "poCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "poApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "poCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "poApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default=False)
-    journal = models.ForeignKey(Journal, related_name="purchaseorder", on_delete=models.PROTECT, null=True, blank=True)
+    journal = models.ForeignKey(Journal, related_name="purchaseorder", on_delete=models.CASCADE, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, blank = True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     fullyReceived = models.BooleanField(default=False)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default = 0.0)
     voided = models.BooleanField(null = True, default= False)
-    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "poVoidedBy")
+    voidedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "poVoidedBy")
     datetimeVoided = models.DateTimeField(null=True, blank=True)
     needsRR = models.BooleanField(default = True)
 
@@ -468,8 +471,8 @@ class PurchaseOrder(models.Model):
         return self.code
 
 class POItemsMerch(models.Model):
-    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poitemsmerch",on_delete=models.PROTECT, null=True, blank=True)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="poitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poitemsmerch",on_delete=models.CASCADE, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="poitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
     purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
@@ -487,8 +490,8 @@ class POItemsMerch(models.Model):
 
 class POItemsOther(models.Model):
     type = models.CharField(max_length = 255, blank=True, null=True)
-    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poitemsother",on_delete=models.PROTECT, null=True, blank=True)
-    otherInventory = models.ForeignKey(OtherInventory, related_name="poitemsother", on_delete=models.PROTECT, null=True, blank=True)
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poitemsother",on_delete=models.CASCADE, null=True, blank=True)
+    otherInventory = models.ForeignKey(OtherInventory, related_name="poitemsother", on_delete=models.CASCADE, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
     purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
@@ -498,16 +501,16 @@ class POItemsOther(models.Model):
     unit = models.IntegerField(choices=units, null=True, blank=True)
 
 class POatc(models.Model):
-    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poatc",on_delete=models.PROTECT, null=True, blank=True)
-    code = models.ForeignKey(ATC, related_name="poatc",on_delete=models.PROTECT, null=True, blank=True)
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="poatc",on_delete=models.CASCADE, null=True, blank=True)
+    code = models.ForeignKey(ATC, related_name="poatc",on_delete=models.CASCADE, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
     
 class ReceivingReport(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     dateReceived = models.DateField()
-    party = models.ForeignKey(Party, related_name="receivingreport", on_delete=models.PROTECT)
-    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="receivingreport",on_delete=models.PROTECT, null=True, blank=True)
+    party = models.ForeignKey(Party, related_name="receivingreport", on_delete=models.CASCADE)
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name="receivingreport",on_delete=models.CASCADE, null=True, blank=True)
     amountDue = models.DecimalField(max_digits=20, decimal_places=5)
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
     taxType = models.CharField(max_length=20, null = True, blank = True)
@@ -517,18 +520,18 @@ class ReceivingReport(models.Model):
     dueDate = models.DateField(null = True, blank = True)
     bank = models.CharField(max_length=50, blank=True, null=True)
     remarks = models.TextField(null = True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "rrCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "rrApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "rrCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "rrApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default=False)
-    journal = models.ForeignKey(Journal, related_name="receivingreport", on_delete=models.PROTECT, null=True, blank=True)
+    journal = models.ForeignKey(Journal, related_name="receivingreport", on_delete=models.CASCADE, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     qtyReceived = models.IntegerField(null = True, blank = True)
     fullyReceived = models.BooleanField(null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     voided = models.BooleanField(null = True, default = False)
-    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "rrVoidedBy")
+    voidedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True, related_name = "rrVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
     first = models.BooleanField(null = True, default = False)
 
@@ -540,14 +543,14 @@ class ReceivingReport(models.Model):
         return self.code
 
 class RRItemsMerch(models.Model):
-    receivingReport = models.ForeignKey(ReceivingReport, related_name="rritemsmerch",on_delete=models.PROTECT, null=True, blank=True)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="rritemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    receivingReport = models.ForeignKey(ReceivingReport, related_name="rritemsmerch",on_delete=models.CASCADE, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="rritemsmerch", on_delete=models.CASCADE, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
     purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
     totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
     delivered = models.BooleanField(null = True, default=False)
-    poitemsmerch = models.ForeignKey(POItemsMerch, related_name='rritemsmerch', on_delete=models.PROTECT, null=True, blank=True)
+    poitemsmerch = models.ForeignKey(POItemsMerch, related_name='rritemsmerch', on_delete=models.CASCADE, null=True, blank=True)
     unit = models.IntegerField(choices=units, null=True, blank=True)
 
     class Meta:
@@ -559,45 +562,45 @@ class RRItemsMerch(models.Model):
 
 class RRItemsOther(models.Model):
     type = models.CharField(max_length = 255, blank=True, null=True)
-    receivingReport = models.ForeignKey(ReceivingReport, related_name="rritemsother",on_delete=models.PROTECT, null=True, blank=True)
-    otherInventory = models.ForeignKey(OtherInventory, related_name="rritemsother", on_delete=models.PROTECT, null=True, blank=True)
+    receivingReport = models.ForeignKey(ReceivingReport, related_name="rritemsother",on_delete=models.CASCADE, null=True, blank=True)
+    otherInventory = models.ForeignKey(OtherInventory, related_name="rritemsother", on_delete=models.CASCADE, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
     purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5)
     totalPrice = models.DecimalField(max_digits=20, decimal_places=5)
     delivered = models.BooleanField(null = True, default=False)
-    poitemsother = models.ForeignKey(POItemsOther, related_name='rritemsother', on_delete=models.PROTECT, null=True, blank=True)
+    poitemsother = models.ForeignKey(POItemsOther, related_name='rritemsother', on_delete=models.CASCADE, null=True, blank=True)
     unit = models.IntegerField(choices=units, null=True, blank=True)
 
 class RRatc(models.Model):
-    receivingReport = models.ForeignKey(ReceivingReport, related_name="rratc",on_delete=models.PROTECT, null=True, blank=True)
-    code = models.ForeignKey(ATC, related_name="rratc",on_delete=models.PROTECT, null=True, blank=True)
+    receivingReport = models.ForeignKey(ReceivingReport, related_name="rratc",on_delete=models.CASCADE, null=True, blank=True)
+    code = models.ForeignKey(ATC, related_name="rratc",on_delete=models.CASCADE, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
 
 class InwardInventory(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     dateInward = models.DateField()
-    party = models.ForeignKey(Party, related_name="inwardinventory", on_delete=models.PROTECT, null=True, blank=True)
+    party = models.ForeignKey(Party, related_name="inwardinventory", on_delete=models.CASCADE, null=True, blank=True)
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "iiCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "iiApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "iiCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "iiApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default = False)
-    adjustedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "iiAdjustedBy")
+    adjustedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "iiAdjustedBy")
     datetimeAdjusted = models.DateTimeField(null=True, blank=True)
     adjusted = models.BooleanField(null = True, default = False)
-    journal = models.ForeignKey(Journal, related_name="inwardinventory", on_delete=models.PROTECT, null=True, blank=True)
+    journal = models.ForeignKey(Journal, related_name="inwardinventory", on_delete=models.CASCADE, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     voided = models.BooleanField(null = True, default = False)
-    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "iiVoidedBy")
+    voidedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True, related_name = "iiVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
     first = models.BooleanField(null = True, default = False)
 
 class IIItemsMerch(models.Model):
-    inwardInventory = models.ForeignKey(InwardInventory, related_name="iiitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="iiitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    inwardInventory = models.ForeignKey(InwardInventory, related_name="iiitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="iiitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
     qty = models.IntegerField()
     pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
@@ -611,9 +614,9 @@ class IIItemsMerch(models.Model):
     vol = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class IIAdjustedItems(models.Model):
-    inwardInventory = models.ForeignKey(InwardInventory, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
-    iiItemsMerch = models.ForeignKey(IIItemsMerch, related_name="iiadjusteditems", on_delete=models.PROTECT, null=True, blank=True)
+    inwardInventory = models.ForeignKey(InwardInventory, related_name="iiadjusteditems", on_delete=models.CASCADE, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="iiadjusteditems", on_delete=models.CASCADE, null=True, blank=True)
+    iiItemsMerch = models.ForeignKey(IIItemsMerch, related_name="iiadjusteditems", on_delete=models.CASCADE, null=True, blank=True)
     qty = models.IntegerField()
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     code = models.CharField(max_length=50)
@@ -630,7 +633,7 @@ class Quotations(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     dateQuoted = models.DateField()
-    party = models.ForeignKey(Party, related_name="quotations", on_delete=models.PROTECT, null=True, blank=True)
+    party = models.ForeignKey(Party, related_name="quotations", on_delete=models.CASCADE, null=True, blank=True)
     amountDue = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
     discountPercent = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
@@ -638,9 +641,9 @@ class Quotations(models.Model):
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "qCreatedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "qCreatedBy")
     remarks = models.TextField(null = True, blank=True)
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "qApprovedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "qApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(default=False)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
@@ -655,9 +658,9 @@ class Quotations(models.Model):
 
 
 class QQItemsMerch(models.Model):
-    quotations = models.ForeignKey(Quotations, related_name="qqitemsmerch",on_delete=models.PROTECT, null=True, blank=True)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="qqitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
-    warehouse = models.ForeignKey(Warehouse, related_name="qqitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    quotations = models.ForeignKey(Quotations, related_name="qqitemsmerch",on_delete=models.CASCADE, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="qqitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
+    warehouse = models.ForeignKey(Warehouse, related_name="qqitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.PositiveIntegerField()
     cbm = models.CharField(max_length=10, null = True)
@@ -673,21 +676,21 @@ class QQItemsMerch(models.Model):
         return self.quotations.code + " - " + self.merchInventory.code
 
 class QQCOtherFees(models.Model):
-    quotations = models.ForeignKey(Quotations, related_name="qqotherfees",on_delete=models.PROTECT, null=True, blank=True)
+    quotations = models.ForeignKey(Quotations, related_name="qqotherfees",on_delete=models.CASCADE, null=True, blank=True)
     fee = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
     description = models.CharField(max_length=255, null = True)
 
 class QQatc(models.Model):
-    quotations = models.ForeignKey(Quotations, related_name="qqatc",on_delete=models.PROTECT, null=True, blank=True)
-    code = models.ForeignKey(ATC, related_name="qqatc",on_delete=models.PROTECT, null=True, blank=True)
+    quotations = models.ForeignKey(Quotations, related_name="qqatc",on_delete=models.CASCADE, null=True, blank=True)
+    code = models.ForeignKey(ATC, related_name="qqatc",on_delete=models.CASCADE, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
 
 class SalesOrder(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     dateSold = models.DateField()
-    party = models.ForeignKey(Party, related_name="salesorder", on_delete=models.PROTECT, null=True, blank=True)
-    quotations = models.ForeignKey(Quotations, related_name = "salesorder", on_delete = models.PROTECT, null = True, blank = True)
+    party = models.ForeignKey(Party, related_name="salesorder", on_delete=models.CASCADE, null=True, blank=True)
+    quotations = models.ForeignKey(Quotations, related_name = "salesorder", on_delete = models.CASCADE, null = True, blank = True)
     amountDue = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
     discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
@@ -699,13 +702,13 @@ class SalesOrder(models.Model):
     dueDate = models.DateField(null = True, blank = True)
     bank = models.CharField(max_length=50, null = True, blank = True)
     remarks = models.TextField(null = True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "soCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "soApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "soCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "soApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default = False)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     voided = models.BooleanField(null = True, default = False)
-    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "soVoidedBy")
+    voidedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True, related_name = "soVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
     soed = models.BooleanField(null = True, default = False)
 
@@ -718,8 +721,8 @@ class SalesOrder(models.Model):
 
     
 class SOItemsMerch(models.Model):
-    salesOrder = models.ForeignKey(SalesOrder, related_name="soitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="soitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    salesOrder = models.ForeignKey(SalesOrder, related_name="soitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="soitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.IntegerField()
     cbm = models.CharField(max_length=10, null = True)
@@ -736,13 +739,13 @@ class SOItemsMerch(models.Model):
         return self.salesOrder.code + " - " + self.merchInventory.code
 
 class SOOtherFees(models.Model):
-    salesOrder = models.ForeignKey(SalesOrder, related_name="sootherfees", on_delete=models.PROTECT, null=True, blank=True)
+    salesOrder = models.ForeignKey(SalesOrder, related_name="sootherfees", on_delete=models.CASCADE, null=True, blank=True)
     fee = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
     description = models.CharField(max_length=255, null = True)
 
 class SOatc(models.Model):
-    salesOrder = models.ForeignKey(SalesOrder, related_name="soatc", on_delete=models.PROTECT, null=True, blank=True)
-    code = models.ForeignKey(ATC, related_name="soatc",on_delete=models.PROTECT, null=True, blank=True)
+    salesOrder = models.ForeignKey(SalesOrder, related_name="soatc", on_delete=models.CASCADE, null=True, blank=True)
+    code = models.ForeignKey(ATC, related_name="soatc",on_delete=models.CASCADE, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
 
 
@@ -750,8 +753,8 @@ class SalesContract(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     dateSold = models.DateField()
-    party = models.ForeignKey(Party, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
-    salesOrder = models.ForeignKey(SalesOrder, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
+    party = models.ForeignKey(Party, related_name="salescontract", on_delete=models.CASCADE, null=True, blank=True)
+    salesOrder = models.ForeignKey(SalesOrder, related_name="salescontract", on_delete=models.CASCADE, null=True, blank=True)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     amountDue = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
@@ -766,14 +769,14 @@ class SalesContract(models.Model):
     dueDate = models.DateField(null = True, blank = True)
     bank = models.CharField(max_length=50, null = True, blank = True)
     remarks = models.TextField(null = True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "tempscCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "tempscApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "tempscCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "tempscApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(null = True, default = False)
     voided = models.BooleanField(null = True, default = False)
-    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name= "scVoidedBy")
+    voidedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True, related_name= "scVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
-    journal = models.ForeignKey(Journal, related_name="salescontract", on_delete=models.PROTECT, null=True, blank=True)
+    journal = models.ForeignKey(Journal, related_name="salescontract", on_delete=models.CASCADE, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
@@ -790,66 +793,66 @@ class PaymentVoucher(models.Model):
     code = models.CharField(max_length = 50, null = True, blank=True)
     datetimeCreated = models.DateTimeField(null = True, blank=True)
     paymentDate = models.DateField(null = True, blank=True)
-    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank=True)
-    transaction = models.ForeignKey(SalesContract, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank=True )
-    receivingReport = models.ForeignKey(ReceivingReport, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank=True)
-    inwardInventory = models.ForeignKey(InwardInventory, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank = True)
-    journal = models.ForeignKey(Journal, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank=True)
+    purchaseOrder = models.ForeignKey(PurchaseOrder, related_name= "paymentvoucher", on_delete=models.CASCADE, null = True, blank=True)
+    transaction = models.ForeignKey(SalesContract, related_name= "paymentvoucher", on_delete=models.CASCADE, null = True, blank=True )
+    receivingReport = models.ForeignKey(ReceivingReport, related_name= "paymentvoucher", on_delete=models.CASCADE, null = True, blank=True)
+    inwardInventory = models.ForeignKey(InwardInventory, related_name= "paymentvoucher", on_delete=models.CASCADE, null = True, blank = True)
+    journal = models.ForeignKey(Journal, related_name= "paymentvoucher", on_delete=models.CASCADE, null = True, blank=True)
     remarks = models.TextField(null = True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vCreatedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True , related_name="vCreatedBy")
     approved = models.BooleanField(default = 'False', null = True, blank = True)
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="vApprovedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True , related_name="vApprovedBy")
     datetimeApproved = models.DateTimeField(null = True, blank=True)
     paymentMethod = models.CharField(max_length = 50, null = True, blank=True)
     paymentPeriod = models.CharField(max_length = 50, null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default = 0.0)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     voided = models.BooleanField(null = True, default = False)
-    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name = "pvVoidedBy")
+    voidedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True, related_name = "pvVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
     first = models.BooleanField(null = True, default = False, blank=True)
-    cheque = models.ForeignKey(Cheques, related_name= "paymentvoucher", on_delete=models.PROTECT, null = True, blank = True )
+    cheque = models.ForeignKey(Cheques, related_name= "paymentvoucher", on_delete=models.CASCADE, null = True, blank = True )
     party = models.ForeignKey(Party, on_delete=models.CASCADE, null=True, blank=True)
 
 class CustomPVEntries(models.Model):
-    paymentVoucher = models.ForeignKey(PaymentVoucher, related_name="custompventries", on_delete=models.PROTECT, null=True, blank=True)
+    paymentVoucher = models.ForeignKey(PaymentVoucher, related_name="custompventries", on_delete=models.CASCADE, null=True, blank=True)
     normally = models.CharField(max_length=50, choices=normally)
-    accountChild = models.ForeignKey(AccountChild, related_name="custompventries", on_delete=models.PROTECT, null=True, blank=True)
+    accountChild = models.ForeignKey(AccountChild, related_name="custompventries", on_delete=models.CASCADE, null=True, blank=True)
     amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,default= 0)
 
 class TempSalesContract(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     dateSold = models.DateField()
-    party = models.ForeignKey(Party, related_name="tempsalescontract", on_delete=models.PROTECT, null=True, blank=True)
+    party = models.ForeignKey(Party, related_name="tempsalescontract", on_delete=models.CASCADE, null=True, blank=True)
     subTotal = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
     discountPercent = models.DecimalField(max_digits=10, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "scCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "scApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "scCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "scApprovedBy")
     datetimeApproved = models.DateTimeField(null=True, blank=True)
-    journal = models.ForeignKey(Journal, related_name="tempsalescontract", on_delete=models.PROTECT, null=True, blank=True)
+    journal = models.ForeignKey(Journal, related_name="tempsalescontract", on_delete=models.CASCADE, null=True, blank=True)
     approved = models.BooleanField(default=False)
     
 
 class TempSCItemsMerch(models.Model):
-    salesContract = models.ForeignKey(TempSalesContract, related_name='tempscitemsmerch', on_delete=models.PROTECT)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="tempscitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    salesContract = models.ForeignKey(TempSalesContract, related_name='tempscitemsmerch', on_delete=models.CASCADE)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="tempscitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.IntegerField()
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, validators=[MinValueValidator(0)])
     delivered = models.BooleanField(null = True, default=False)
 
 class TempSCOtherFees(models.Model):
-    salesContract = models.ForeignKey(SalesContract, related_name='scotherfees', on_delete=models.PROTECT)
+    salesContract = models.ForeignKey(SalesContract, related_name='scotherfees', on_delete=models.CASCADE)
     fee = models.DecimalField(max_digits=20, decimal_places=5)
     description = models.CharField(max_length=255, null = True)
 
 class SCItemsMerch(models.Model):
-    salesContract = models.ForeignKey(SalesContract, related_name="scitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="scitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    salesContract = models.ForeignKey(SalesContract, related_name="scitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="scitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
     remaining = models.IntegerField()
     qty = models.IntegerField()
     cbm = models.CharField(max_length=10, null = True)
@@ -866,8 +869,8 @@ class SCItemsMerch(models.Model):
         return self.merchInventory.code
 
 class SCatc(models.Model):
-    salesContract = models.ForeignKey(SalesContract, related_name="scatc",on_delete=models.PROTECT, null=True, blank=True)
-    code = models.ForeignKey(ATC, related_name="scatc",on_delete=models.PROTECT, null=True, blank=True)
+    salesContract = models.ForeignKey(SalesContract, related_name="scatc",on_delete=models.CASCADE, null=True, blank=True)
+    code = models.ForeignKey(ATC, related_name="scatc",on_delete=models.CASCADE, null=True, blank=True)
     amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
 
 
@@ -875,47 +878,47 @@ class SalesInvoice(models.Model):
     code = models.CharField(max_length = 50, null = True)
     datetimeCreated = models.DateTimeField(null = True)
     paymentDate = models.DateField(null = True)
-    salesOrder = models.ForeignKey(SalesOrder, related_name= "salesinvoice", on_delete=models.PROTECT, null = True)
-    salesContract = models.ForeignKey(SalesContract, related_name= "salesinvoice", on_delete=models.PROTECT, null = True)
-    journal = models.ForeignKey(Journal, related_name= "salesinvoice", on_delete=models.PROTECT, null = True)
+    salesOrder = models.ForeignKey(SalesOrder, related_name= "salesinvoice", on_delete=models.CASCADE, null = True)
+    salesContract = models.ForeignKey(SalesContract, related_name= "salesinvoice", on_delete=models.CASCADE, null = True)
+    journal = models.ForeignKey(Journal, related_name= "salesinvoice", on_delete=models.CASCADE, null = True)
     remarks = models.TextField(null = True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="siCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="siApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True , related_name="siCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True , related_name="siApprovedBy")
     datetimeApproved = models.DateTimeField(null = True)
     paymentMethod = models.CharField(max_length = 50, null = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class VendorQuotesMerch(models.Model):
-    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="vendorquotesmerch",on_delete=models.PROTECT, null=True, blank=True)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="vendorquotesmerch", on_delete=models.PROTECT, null=True, blank=True)
+    purchaseRequest = models.ForeignKey(PurchaseRequest, related_name="vendorquotesmerch",on_delete=models.CASCADE, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="vendorquotesmerch", on_delete=models.CASCADE, null=True, blank=True)
 
 class VendorQuotesItemsMerch(models.Model):
-    vendorquotesmerch = models.ForeignKey(VendorQuotesMerch, related_name="vendorquotesitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    vendorquotesmerch = models.ForeignKey(VendorQuotesMerch, related_name="vendorquotesitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
     price = models.DecimalField(max_digits=20, decimal_places=5)
-    party = models.ForeignKey(Party, related_name="vendorquotesitemsmerch", on_delete=models.PROTECT)
+    party = models.ForeignKey(Party, related_name="vendorquotesitemsmerch", on_delete=models.CASCADE)
 
 class ReceivePayment(models.Model):
     code = models.CharField(max_length=50, null = True)
     datetimeCreated = models.DateTimeField(null = True)
     paymentDate = models.DateField(null = True)
-    salesContract = models.ForeignKey(SalesContract, related_name= "receivepayment", on_delete=models.PROTECT, null = True)
-    transaction = models.ForeignKey(PurchaseOrder, related_name= "receivepayment", on_delete=models.PROTECT, null = True )
-    journal = models.ForeignKey(Journal, related_name= "receivepayment", on_delete=models.PROTECT, null = True)
+    salesContract = models.ForeignKey(SalesContract, related_name= "receivepayment", on_delete=models.CASCADE, null = True)
+    transaction = models.ForeignKey(PurchaseOrder, related_name= "receivepayment", on_delete=models.CASCADE, null = True )
+    journal = models.ForeignKey(Journal, related_name= "receivepayment", on_delete=models.CASCADE, null = True)
     remarks = models.TextField(null = True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="rpCreatedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True , related_name="rpCreatedBy")
     paymentMethod = models.CharField(max_length = 50, null = True)
     paymentPeriod = models.CharField(max_length = 50, null = True)
     amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True, default= 0.0)
     voided = models.BooleanField(default = False)
-    cheque = models.ForeignKey(Cheques, related_name= "receivepayment", on_delete=models.PROTECT, null = True, blank = True )
+    cheque = models.ForeignKey(Cheques, related_name= "receivepayment", on_delete=models.CASCADE, null = True, blank = True )
     party = models.ForeignKey(Party, on_delete=models.CASCADE, null=True, blank=True)
 
 class CustomRPEntries(models.Model):
-    receivePayment = models.ForeignKey(ReceivePayment, related_name="customrpentries", on_delete=models.PROTECT, null=True, blank=True)
+    receivePayment = models.ForeignKey(ReceivePayment, related_name="customrpentries", on_delete=models.CASCADE, null=True, blank=True)
     normally = models.CharField(max_length=50, choices=normally)
-    accountChild = models.ForeignKey(AccountChild, related_name="customrpentries", on_delete=models.PROTECT, null=True, blank=True)
+    accountChild = models.ForeignKey(AccountChild, related_name="customrpentries", on_delete=models.CASCADE, null=True, blank=True)
     amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True,default= 0)
 
 class Driver(models.Model):
@@ -935,7 +938,7 @@ class Truck(models.Model):
     plate = models.CharField(max_length=50)
     brand = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
-    driver = models.ForeignKey(Driver, on_delete=models.PROTECT, null=True, blank=True)
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=50, null = True, default = 'Available')
     currentDelivery = models.IntegerField(null=True, blank=True)
 
@@ -949,17 +952,17 @@ class Truck(models.Model):
 class Deliveries(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated =  models.DateTimeField()
-    truck = models.ForeignKey(Truck, related_name="deliveries", on_delete=models.PROTECT, null=True, blank=True)
-    driver = models.ForeignKey(Driver, related_name="deliveries", on_delete=models.PROTECT, null=True, blank=True)
+    truck = models.ForeignKey(Truck, related_name="deliveries", on_delete=models.CASCADE, null=True, blank=True)
+    driver = models.ForeignKey(Driver, related_name="deliveries", on_delete=models.CASCADE, null=True, blank=True)
     scheduleStart = models.DateTimeField(null=True, blank=True)
     scheduleEnd = models.DateTimeField(null=True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="deCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True , related_name="deApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True , related_name="deCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True , related_name="deApprovedBy")
     approved = models.BooleanField(null = True, default=False)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
     voided = models.BooleanField(null = True, default=False)
-    voidedBy = models.ForeignKey(User, on_delete=models.PROTECT, null = True, blank = True, related_name="deVoidedBy")
+    voidedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True, related_name="deVoidedBy")
     datetimeVoided = models.DateTimeField(null = True, blank = True)
 
     class Meta:
@@ -970,7 +973,7 @@ class Deliveries(models.Model):
         return self.code
 
 class DeliveryDestinations(models.Model):
-    deliveries = models.ForeignKey(Deliveries, related_name='deliverydestinations', on_delete=models.PROTECT, null=True, blank=True)
+    deliveries = models.ForeignKey(Deliveries, related_name='deliverydestinations', on_delete=models.CASCADE, null=True, blank=True)
     destination = models.CharField(max_length=500, null=True, blank=True)
 
     class Meta:
@@ -981,7 +984,7 @@ class DeliveryDestinations(models.Model):
         return self.destination + ' ' + self.deliveries.code
 
 class DeliveryPhotos(models.Model):
-    deliveries = models.ForeignKey(Deliveries, related_name="deliveryphotos", on_delete=models.PROTECT, null=True, blank=True)
+    deliveries = models.ForeignKey(Deliveries, related_name="deliveryphotos", on_delete=models.CASCADE, null=True, blank=True)
     picture = models.ImageField(null=True, blank=True, upload_to="delivery_photos")
 
     class Meta:
@@ -992,7 +995,7 @@ class DeliveryPhotos(models.Model):
         return self.deliveries.code
 
 class DeliveryItemsGroup(models.Model):
-    deliveries = models.ForeignKey(Deliveries, related_name="deliveryitemsgroup", on_delete=models.PROTECT, null=True, blank=True)
+    deliveries = models.ForeignKey(Deliveries, related_name="deliveryitemsgroup", on_delete=models.CASCADE, null=True, blank=True)
     deliveryType = models.CharField(max_length=50)
     referenceNo = models.CharField(max_length=50)
 
@@ -1004,8 +1007,8 @@ class DeliveryItemsGroup(models.Model):
         return self.deliveries.code
 
 class DeliveryItemMerch(models.Model):
-    deliveryItemsGroup = models.ForeignKey(DeliveryItemsGroup, related_name="deliveryitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="deliveryitemsmerch", on_delete=models.PROTECT, null=True, blank=True)
+    deliveryItemsGroup = models.ForeignKey(DeliveryItemsGroup, related_name="deliveryitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="deliveryitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
     qty = models.IntegerField()
 
     class Meta:
@@ -1019,42 +1022,42 @@ class Transfer(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     remarks = models.TextField(null = True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "trCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "trApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "trCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "trApprovedBy")
     approved = models.BooleanField(null = True, default=False)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
-    newWarehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, null = True, blank = True, related_name= "transfer")
+    newWarehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, null = True, blank = True, related_name= "transfer")
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class TransferItems(models.Model):
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="tritems", on_delete=models.PROTECT, null=True, blank=True)
-    transfer = models.ForeignKey(Transfer, on_delete=models.PROTECT, null = True, blank = True, related_name= "tritems")
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="tritems", on_delete=models.CASCADE, null=True, blank=True)
+    transfer = models.ForeignKey(Transfer, on_delete=models.CASCADE, null = True, blank = True, related_name= "tritems")
     qtyTransfered = models.IntegerField(null = True, blank = True)
-    oldWarehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, null = True, blank = True, related_name= "tritems")
+    oldWarehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, null = True, blank = True, related_name= "tritems")
 
 
 class Adjustments(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
     remarks = models.TextField(null = True, blank=True)
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "adCreatedBy")
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name= "adApprovedBy")
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "adCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "adApprovedBy")
     approved = models.BooleanField(null = True, default=False)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     totalLost = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     type = models.CharField(max_length=50)
 
 class AdjustmentsItems(models.Model):
-    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="aditems", on_delete=models.PROTECT, null=True, blank=True)
-    adjustments = models.ForeignKey(Adjustments, on_delete=models.PROTECT, null = True, blank = True, related_name= "aditems")
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="aditems", on_delete=models.CASCADE, null=True, blank=True)
+    adjustments = models.ForeignKey(Adjustments, on_delete=models.CASCADE, null = True, blank = True, related_name= "aditems")
     qtyAdjusted = models.IntegerField(null = True, blank = True)
     remaining = models.IntegerField(null = True, blank = True)
     unitCost = models.DecimalField(max_digits = 20, decimal_places=5, null = True, blank = True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    oldWarehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, null = True, blank = True, related_name= "aditems")
+    oldWarehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, null = True, blank = True, related_name= "aditems")
 
 class AdjustmentsPhotos(models.Model):
-    adjustments = models.ForeignKey(Deliveries, related_name="adjustmentsphotos", on_delete=models.PROTECT, null=True, blank=True)
+    adjustments = models.ForeignKey(Deliveries, related_name="adjustmentsphotos", on_delete=models.CASCADE, null=True, blank=True)
     picture = models.ImageField(null=True, blank=True, upload_to="adjustment_photos")
 
 class PPE(models.Model):
@@ -1086,19 +1089,19 @@ class TestUploadFile(models.Model):
 class CompletionReport(models.Model):
     code = models.CharField(max_length=50)
     datetimeCreated = models.DateTimeField()
-    createdBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='completionreportcreatedby')
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='completionreportcreatedby')
     reportDate = models.DateField(null=True, blank=True)
-    ppe = models.ForeignKey(PPE, on_delete=models.PROTECT, null=True, blank=True, related_name='completionreport')
+    ppe = models.ForeignKey(PPE, on_delete=models.CASCADE, null=True, blank=True, related_name='completionreport')
     malfuncDate = models.DateField(null=True, blank=True)
     damageDescription = models.TextField(null=True, blank=True)
-    spareParts = models.ForeignKey(ReceivingReport, on_delete=models.PROTECT, null=True, blank=True, related_name='completionreport')
+    spareParts = models.ForeignKey(ReceivingReport, on_delete=models.CASCADE, null=True, blank=True, related_name='completionreport')
     damagePhoto = models.ImageField(null=True, blank=True, upload_to="cr/damage/")
     recommendation = models.TextField(null=True, blank=True)
     status = models.CharField(max_length=20, null=True, blank=True)
     reason = models.TextField(null=True, blank=True)
     successPhoto = models.ImageField(null=True, blank=True, upload_to="cr/success/")
     approved = models.BooleanField(default=False)
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='completionreportapprovedby')
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='completionreportapprovedby')
     datetimeApproved = models.DateTimeField(null = True, blank=True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     capitalized = models.BooleanField(default=False)
@@ -1107,15 +1110,15 @@ class CompletionReport(models.Model):
         return self.code
 
 class CRSpareParts(models.Model):
-    cr = models.ForeignKey(CompletionReport, on_delete=models.PROTECT, related_name='crspareparts')
-    receivingReport = models.ForeignKey(ReceivingReport, on_delete=models.PROTECT, related_name='crspareparts')
+    cr = models.ForeignKey(CompletionReport, on_delete=models.CASCADE, related_name='crspareparts')
+    receivingReport = models.ForeignKey(ReceivingReport, on_delete=models.CASCADE, related_name='crspareparts')
 
     def __str__(self):
         return self.cr.code + " --- " + self.receivingReport.code
 
 class CRPO(models.Model):
-    cr = models.ForeignKey(CompletionReport, on_delete=models.PROTECT, related_name='crpo')
-    purchaseOrder = models.ForeignKey(PurchaseOrder, on_delete=models.PROTECT, related_name='crpo')
+    cr = models.ForeignKey(CompletionReport, on_delete=models.CASCADE, related_name='crpo')
+    purchaseOrder = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, related_name='crpo')
 
     def __str__(self):
         return self.cr.code + " --- " + self.purchaseOrder.code
@@ -1130,7 +1133,7 @@ class Holiday(models.Model):
         return str(self.date) + " " + self.description
 
 class Timesheet(models.Model):
-    dtr = OneToOneField(DTR, on_delete=models.PROTECT)
+    dtr = OneToOneField(DTR, on_delete=models.CASCADE)
     bh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     ot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     ut = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
@@ -1145,36 +1148,36 @@ class Timesheet(models.Model):
     normalDay = models.BooleanField(default=True)
 
 class DTRDayCategory(models.Model):
-    dtr = models.ForeignKey(DTR, on_delete=models.PROTECT)
-    holiday = models.ForeignKey(Holiday, on_delete=models.PROTECT)
+    dtr = models.ForeignKey(DTR, on_delete=models.CASCADE)
+    holiday = models.ForeignKey(Holiday, on_delete=models.CASCADE)
 
 class OTRequest(models.Model):
-    requestedBy = models.ForeignKey(User, on_delete=models.PROTECT, related_name='otrequestrequestedby') 
+    requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otrequestrequestedby') 
     hours = models.DecimalField(max_digits=4, decimal_places=2)
     date = models.DateField()
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='otrequestapprovedby')
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='otrequestapprovedby')
     status = models.CharField(max_length=64, null=True, blank=True)
     reason = models.TextField(null=True, blank=True)
     datetimeCreated = models.DateTimeField(null=True, blank=True)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
 
 class UTRequest(models.Model):
-    requestedBy = models.ForeignKey(User, on_delete=models.PROTECT, related_name="utrequestrequestedby")
+    requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name="utrequestrequestedby")
     timeOut = models.TimeField()
     date = models.DateField()
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name='utrequestapprovedby')
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='utrequestapprovedby')
     status = models.CharField(max_length=64, null=True, blank=True)
     datetimeCreated = models.DateTimeField(null=True, blank=True)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     reason = models.TextField(null=True, blank=True)
 
 class LeaveRequest(models.Model):
-    requestedBy = models.ForeignKey(User, on_delete=models.PROTECT, related_name='leaverequestrequestedby')
+    requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name='leaverequestrequestedby')
     dateStart = models.DateField()
     dateEnd = models.DateField()
     reason = models.TextField(null=True, blank=True)
     leaveType = models.CharField(max_length=64, null=True, blank=True)
-    approvedBy = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True, related_name="leaverequestapprovedby")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="leaverequestapprovedby")
     datetimeCreated = models.DateTimeField(null=True, blank=True)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=64, null=True, blank=True)
@@ -1184,33 +1187,33 @@ class LeaveRequest(models.Model):
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
-    rm = models.ForeignKey(AccountChild, related_name="branchdefaultrm", on_delete=models.PROTECT, null=True, blank=True)
-    defaultWarehouse = models.ForeignKey(Warehouse, related_name = 'branchdefaultwarehouse', on_delete=models.PROTECT, blank = True, null = True)
-    cashOnHand = models.ForeignKey(AccountChild, related_name='branchcashonhand', on_delete=models.PROTECT, blank=True, null=True)
+    rm = models.ForeignKey(AccountChild, related_name="branchdefaultrm", on_delete=models.CASCADE, null=True, blank=True)
+    defaultWarehouse = models.ForeignKey(Warehouse, related_name = 'branchdefaultwarehouse', on_delete=models.CASCADE, blank = True, null = True)
+    cashOnHand = models.ForeignKey(AccountChild, related_name='branchcashonhand', on_delete=models.CASCADE, blank=True, null=True)
     cashInBank = models.ManyToManyField(AccountChild, related_name='branchcashinbank', blank=True)
-    pettyCash = models.ForeignKey(AccountChild, related_name='branchpettycash', on_delete=models.PROTECT, blank=True, null=True)
-    merchInventory = models.ForeignKey(AccountChild, related_name='branchmerchinventory', on_delete=models.PROTECT, blank=True, null=True)
-    manuInventory = models.ForeignKey(AccountChild, related_name='branchmanuinventory', on_delete=models.PROTECT, blank=True, null=True)
-    ppeProperty = models.ForeignKey(AccountChild, related_name='branchppeproperty', on_delete=models.PROTECT, blank=True, null=True)
-    ppePlant = models.ForeignKey(AccountChild, related_name='branchppeplant', on_delete=models.PROTECT, blank=True, null=True)
-    ppeEquipment = models.ForeignKey(AccountChild, related_name='branchppeequipment', on_delete=models.PROTECT, blank=True, null=True)
-    inputVat = models.ForeignKey(AccountChild, related_name='branchinputvat', on_delete=models.PROTECT, blank=True, null=True)
-    outputVat = models.ForeignKey(AccountChild, related_name="branchoutputvat", on_delete=models.PROTECT, blank=True, null=True)
-    ewp = models.ForeignKey(AccountChild, related_name='branchewp', on_delete=models.PROTECT, blank=True, null=True)
+    pettyCash = models.ForeignKey(AccountChild, related_name='branchpettycash', on_delete=models.CASCADE, blank=True, null=True)
+    merchInventory = models.ForeignKey(AccountChild, related_name='branchmerchinventory', on_delete=models.CASCADE, blank=True, null=True)
+    manuInventory = models.ForeignKey(AccountChild, related_name='branchmanuinventory', on_delete=models.CASCADE, blank=True, null=True)
+    ppeProperty = models.ForeignKey(AccountChild, related_name='branchppeproperty', on_delete=models.CASCADE, blank=True, null=True)
+    ppePlant = models.ForeignKey(AccountChild, related_name='branchppeplant', on_delete=models.CASCADE, blank=True, null=True)
+    ppeEquipment = models.ForeignKey(AccountChild, related_name='branchppeequipment', on_delete=models.CASCADE, blank=True, null=True)
+    inputVat = models.ForeignKey(AccountChild, related_name='branchinputvat', on_delete=models.CASCADE, blank=True, null=True)
+    outputVat = models.ForeignKey(AccountChild, related_name="branchoutputvat", on_delete=models.CASCADE, blank=True, null=True)
+    ewp = models.ForeignKey(AccountChild, related_name='branchewp', on_delete=models.CASCADE, blank=True, null=True)
     advancesToSupplier = models.ManyToManyField(AccountChild, related_name="branchadvancestosupplier", blank=True)
-    prepaidExpense = models.ForeignKey(AccountChild, related_name="branchprepaidexpense", on_delete=models.PROTECT, blank = True, null = True)
-    sales = models.ForeignKey(AccountChild, related_name="branchsales", on_delete=models.PROTECT, blank = True, null = True)
-    costOfSales = models.ForeignKey(AccountChild, related_name="branchcostofsales", on_delete=models.PROTECT, blank = True, null = True)
-    otherIncome = models.ForeignKey(AccountChild, related_name="branchotherincome", on_delete=models.PROTECT, blank = True, null = True)
-    cwit = models.ForeignKey(AccountChild, related_name="branchcwit", on_delete=models.PROTECT, blank = True, null = True)
+    prepaidExpense = models.ForeignKey(AccountChild, related_name="branchprepaidexpense", on_delete=models.CASCADE, blank = True, null = True)
+    sales = models.ForeignKey(AccountChild, related_name="branchsales", on_delete=models.CASCADE, blank = True, null = True)
+    costOfSales = models.ForeignKey(AccountChild, related_name="branchcostofsales", on_delete=models.CASCADE, blank = True, null = True)
+    otherIncome = models.ForeignKey(AccountChild, related_name="branchotherincome", on_delete=models.CASCADE, blank = True, null = True)
+    cwit = models.ForeignKey(AccountChild, related_name="branchcwit", on_delete=models.CASCADE, blank = True, null = True)
 
 class BranchProfile(models.Model):
-    branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.PROTECT, null=True, blank=True)
+    branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.CASCADE, null=True, blank=True)
 
 # request.user.branch.accountChild.add()
 class Branch(models.Model):
     name = models.CharField(max_length=255)
-    branchProfile = models.ForeignKey(BranchProfile, related_name='branch', on_delete=models.PROTECT, null=True, blank=True)
+    branchProfile = models.ForeignKey(BranchProfile, related_name='branch', on_delete=models.CASCADE, null=True, blank=True)
     ##### CHART OF ACCOUNTS #####
     accountGroup = models.ManyToManyField(AccountGroup, blank = True)
     subGroup = models.ManyToManyField(AccountSubGroup, blank = True)

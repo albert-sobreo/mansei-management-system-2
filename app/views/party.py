@@ -37,22 +37,22 @@ class SaveParty(APIView):
             ARcode = subGroupAR.accountchild.latest('pk')
             current_AR = int(ARcode.code)
             current_AR += 1
-            new_AR = str(current_AR).zfill(3)
+            new_AR = str(current_AR).zfill(4)
 
         except Exception as e:
             print(e)
-            new_AR = '001'
+            new_AR = '0001'
 
         try:
             subGroupAP = request.user.branch.subGroup.get(name="Accounts Payables")
             APcode = subGroupAP.accountchild.latest('pk')
             current_AP = int(APcode.code)
             current_AP += 1
-            new_AP = str(current_AP).zfill(3)
+            new_AP = str(current_AP).zfill(4)
 
         except Exception as e:
             print(e)
-            new_AP = '001'
+            new_AP = '0001'
 
         childAR.code = new_AR 
         childAR.name = 'Trade Receivable - ' + jsonParty['name']
