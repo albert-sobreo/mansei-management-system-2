@@ -150,6 +150,22 @@ class DTRProcess(APIView):
         ot = Decimal(0)
         nd = Decimal(0)
         ndot = Decimal(0)
+        sun = Decimal(0)
+        sunot = Decimal(0)
+        sunnd = Decimal(0)
+        sunndot = Decimal(0)
+        rh = Decimal(0)
+        rhot = Decimal(0)
+        rhnd = Decimal(0)
+        rhndot = Decimal(0)
+        sh = Decimal(0)
+        shot = Decimal(0)
+        shnd = Decimal(0)
+        shndot = Decimal(0)
+        shw = Decimal(0)
+        shwot = Decimal(0)
+        shwnd = Decimal(0)
+        shwndot = Decimal(0)
         
         tolerance = {
             'default': datetime.timedelta(minutes=5),
@@ -325,6 +341,32 @@ class DTRProcess(APIView):
 
             ndot += getNDOT(scheduleTimeIn, scheduleTimeOut, scheduleTimeIn, scheduleTimeOut)
 
+            holidays = Holiday.objects.filter(date=datetime.date.today())
+            
+            if datetime.date.today().weekday() == 6:
+                sun += bh
+                sunot += ot
+                sunnd += nd
+                sunndot += ndot
+
+            if holidays:
+                for holiday in holidays:
+                    if holiday.type == "rh":
+                        rh += bh
+                        rhot += ot
+                        rhnd += nd
+                        rhndot += ndot
+                    elif holiday.type == "sh":
+                        sh += bh
+                        shot += ot
+                        shnd += nd
+                        shndot += ndot
+                    elif holiday.type == "shw":
+                        shw += bh
+                        shwot += ot
+                        shwnd += nd
+                        shwndot += ndot
+
             # durationDTR = scheduleTimeOut - scheduleTimeIn
             # durationDTR = deductBreak(durationDTR)
 
@@ -365,6 +407,32 @@ class DTRProcess(APIView):
             bh += Decimal(bhDuration.seconds/3600)
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
+
+            holidays = Holiday.objects.filter(date=datetime.date.today())
+            
+            if datetime.date.today().weekday() == 6:
+                sun += bh
+                sunot += ot
+                sunnd += nd
+                sunndot += ndot
+
+            if holidays:
+                for holiday in holidays:
+                    if holiday.type == "rh":
+                        rh += bh
+                        rhot += ot
+                        rhnd += nd
+                        rhndot += ndot
+                    elif holiday.type == "sh":
+                        sh += bh
+                        shot += ot
+                        shnd += nd
+                        shndot += ndot
+                    elif holiday.type == "shw":
+                        shw += bh
+                        shwot += ot
+                        shwnd += nd
+                        shwndot += ndot
 
 
             # durationDTR = dtr.dateTimeOut - dtr.dateTimeIn
@@ -421,6 +489,32 @@ class DTRProcess(APIView):
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
 
+            holidays = Holiday.objects.filter(date=datetime.date.today())
+            
+            if datetime.date.today().weekday() == 6:
+                sun += bh
+                sunot += ot
+                sunnd += nd
+                sunndot += ndot
+
+            if holidays:
+                for holiday in holidays:
+                    if holiday.type == "rh":
+                        rh += bh
+                        rhot += ot
+                        rhnd += nd
+                        rhndot += ndot
+                    elif holiday.type == "sh":
+                        sh += bh
+                        shot += ot
+                        shnd += nd
+                        shndot += ndot
+                    elif holiday.type == "shw":
+                        shw += bh
+                        shwot += ot
+                        shwnd += nd
+                        shwndot += ndot
+
         # DEPARTURE ON-TIME ONLY
         elif arrival['offTime'] and departure['onTime']:
             # PSEUCODE FOR DAY SHIFT
@@ -456,6 +550,32 @@ class DTRProcess(APIView):
             bh += Decimal(bhDuration.seconds/3600)
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
+
+            holidays = Holiday.objects.filter(date=datetime.date.today())
+            
+            if datetime.date.today().weekday() == 6:
+                sun += bh
+                sunot += ot
+                sunnd += nd
+                sunndot += ndot
+
+            if holidays:
+                for holiday in holidays:
+                    if holiday.type == "rh":
+                        rh += bh
+                        rhot += ot
+                        rhnd += nd
+                        rhndot += ndot
+                    elif holiday.type == "sh":
+                        sh += bh
+                        shot += ot
+                        shnd += nd
+                        shndot += ndot
+                    elif holiday.type == "shw":
+                        shw += bh
+                        shwot += ot
+                        shwnd += nd
+                        shwndot += ndot
         
         # IF NONE OF ABOVE APPLIES
         else:
@@ -488,6 +608,18 @@ class DTRProcess(APIView):
         dtr.ot = ot
         dtr.nd = nd
         dtr.ndot = ndot
+        dtr.sun = sun
+        dtr.sunot = sunot
+        dtr.sunnd = sunnd
+        dtr.sunndot = sunndot
+        dtr.rh = rh
+        dtr.rhot = rhot
+        dtr.rhnd = rhnd
+        dtr.rhndot = rhndot
+        dtr.sh = sh
+        dtr.shot = shot
+        dtr.shnd = shnd
+        dtr.shndot = shndot
         dtr.save()
         
     def post(self, request, format=None):

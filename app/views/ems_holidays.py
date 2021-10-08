@@ -56,7 +56,12 @@ class EMS_ImportHolidays(APIView):
 
             h.date = datetime.fromtimestamp((item['Date'])/1000)
             h.description = item['Description']
-            h.type = 'sh' if item['Type'] == 'Special Non-working Holiday' else 'rh'
+            if item['Type'] == 'Special Non-working Holiday':
+                h.type = 'sh'
+            elif item['Type'] == 'Regular Holiday':
+                h.type = 'rh'
+            else:
+                h.type = 'shw'
 
             h.save()
             h.year = h.date.year

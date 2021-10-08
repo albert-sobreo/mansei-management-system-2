@@ -84,6 +84,7 @@ class DTR(models.Model):
     dateTimeOut = models.DateTimeField( null = True, blank = True)
     date = models.DateField( null = True, blank = True)
     user = models.ForeignKey(User, related_name = "dtr", on_delete=models.CASCADE, null = True, blank = True)
+
     bh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     ot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     ut = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
@@ -91,10 +92,21 @@ class DTR(models.Model):
     ndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     sun = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     sunot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    sunnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    sunndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     rh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     rhot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     sh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     shot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shw = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shwot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shwnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shwndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+
     normalDay = models.BooleanField(default=True)
 
 class Register(models.Model):
