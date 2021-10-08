@@ -84,11 +84,18 @@ class DTR(models.Model):
     dateTimeOut = models.DateTimeField( null = True, blank = True)
     date = models.DateField( null = True, blank = True)
     user = models.ForeignKey(User, related_name = "dtr", on_delete=models.PROTECT, null = True, blank = True)
-
-    rh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    bh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     ot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     ut = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-
+    nd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    ndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    sun = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    sunot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    sh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    normalDay = models.BooleanField(default=True)
 
 class Register(models.Model):
     username = models.CharField(max_length=50, null=True, blank=True)
@@ -1137,9 +1144,9 @@ class Timesheet(models.Model):
     shot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     normalDay = models.BooleanField(default=True)
 
-class TimesheetDayCategory(models.Model):
-     timesheet = models.ForeignKey(Timesheet, on_delete=models.PROTECT)
-     holiday = models.ForeignKey(Holiday, on_delete=models.PROTECT)
+class DTRDayCategory(models.Model):
+    dtr = models.ForeignKey(DTR, on_delete=models.PROTECT)
+    holiday = models.ForeignKey(Holiday, on_delete=models.PROTECT)
 
 class OTRequest(models.Model):
     requestedBy = models.ForeignKey(User, on_delete=models.PROTECT, related_name='otrequestrequestedby') 
@@ -1309,7 +1316,7 @@ class Branch(models.Model):
     #### DTR 2 ####
     holiday = models.ManyToManyField(Holiday, blank=True)
     timesheet = models.ManyToManyField(Timesheet, blank=True)
-    timesheetDayCategory = models.ManyToManyField(TimesheetDayCategory, blank=True)
+    dtrDayCategory = models.ManyToManyField(DTRDayCategory, blank=True)
     otRequest = models.ManyToManyField(OTRequest, blank=True)
     utRequest = models.ManyToManyField(UTRequest, blank=True)
     leaveRequest = models.ManyToManyField(LeaveRequest, blank=True)

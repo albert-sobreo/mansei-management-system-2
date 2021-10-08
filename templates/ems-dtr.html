@@ -1,6 +1,12 @@
 {% extends 'base-template.html'%}
 {% block title %}DTR{% endblock %}
 
+{% block header_scripts %}
+
+<script src="https://rawgit.com/sitepoint-editors/jsqrcode/master/src/qr_packed.js"></script>
+
+{% endblock %}
+
 {% block body %}
 
 <div id="app" class="vw100">
@@ -31,8 +37,8 @@
         </div>
 
         <!-- QR SCANNER -->
-        <div id="qrScanner" class="b-radius-15 d-md-flex d-xs-flex flex-nowrap justify-content-center align-items-center qr-scanner">
-            <span class="font-bold font-size-16">Live QR Feed Here</span>
+        <div id="qr-container" class="b-radius-15 d-md-flex d-xs-flex flex-nowrap justify-content-center align-items-center qr-scanner" style="position: relative;">
+            <canvas id="qr-canvas" hidden="" class="b-radius-15"></canvas>
         </div>
 
         <span id="errMessage" class="mt-2 font-semibold text-danger d-none">Probable cause: User does not exist</span>
@@ -99,6 +105,10 @@
         },
 
         methods: {
+            fetchID(id){
+                this.input.idNum = id
+                this.submit()
+            },
             submit(){
                 if(this.input.idNum === null || this.input.idNum == 0){
                     document.getElementById('input').classList.add('form-control-invalid', 'is-invalid')
@@ -134,7 +144,7 @@
                     setTimeout(()=>{
                         document.getElementById('errMessage').classList.add('d-none')
                         document.getElementById('input').classList.remove('form-control-invalid', 'is-invalid')
-                    }, 2000)
+                    }, 3000)
                 })
             },
             formatTime(value){
@@ -206,6 +216,71 @@
         setTimeout(DateTime, 1000)
 
     }
+</script>
+
+<script>
+
+    const video = document.createElement("video");
+    const canvasElement = document.getElementById("qr-canvas");
+    const canvas = canvasElement.getContext("2d");
+    
+    const qrResult = document.getElementById("qr-result");
+    const outputData = document.getElementById("outputData");
+    const btnScanQR = document.getElementById("btn-scan-qr");
+    
+    let scanning = true;
+    
+    //FUNCTION FOR RUNNING THE SCANNER; WILL BE USED ON LATER FUNCTIONS
+    function runScanner(){
+      navigator.mediaDevices
+        .getUserMedia({ video: { facingMode: "environment" } })
+        .then(function(stream) {
+          scanning = true;
+          canvasElement.hidden = false;
+          video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+          video.srcObject = stream;
+          video.play();
+          tick();
+          scan()
+        });
+    }
+    
+    //SYSTEM WILL RUN THIS CODE WHEN QR CODE IS DETECTED
+    qrcode.callback = res => {
+      if (res) {
+        console.log(res)
+        app.fetchID(res)
+        video.srcObject.getTracks().forEach((track) => {
+            track.stop();
+        });
+        setTimeout(runScanner, 3000)
+      }
+    };
+    
+    //RUNS SCANNER ONLOAD
+    window.addEventListener('load', runScanner())
+    
+    //RENDERS THE VIDEO
+    function tick() {
+      canvasElement.width = document.getElementById('qr-container').clientWidth;
+      width = (document.getElementById('qr-container').clientWidth)/(4/3)
+      document.getElementById('qr-container').style.height = String(width) + 'px'
+      canvasElement.height = (document.getElementById('qr-container').clientWidth)/(4/3);
+
+      canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+    
+      scanning && requestAnimationFrame(tick);
+    }
+    
+    //SCANS THE RENDERED VIDEO
+    function scan() {
+      try {
+        qrcode.decode();
+      } catch (e) {
+        setTimeout(scan, 300);
+      }
+    }
+    
 </script>
 
 {% endblock %}
