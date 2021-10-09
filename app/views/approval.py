@@ -336,8 +336,8 @@ class RRVoid(APIView):
 
         if rr.first == True:
             if merchAmountDue:
-                for item in receive.rritemsmerch.all():
-                        jeAPI(request, j, 'Credit', item.merchInventory.childAccountInventory, (item.totalPrice/(1+(receive.taxRate/100))))
+                for item in rr.rritemsmerch.all():
+                        jeAPI(request, j, 'Credit', item.merchInventory.childAccountInventory, (item.totalPrice/(1+(rr.taxRate/100))))
             
             for key, val in expenseAmountDue.items():
                 if val:
@@ -349,8 +349,8 @@ class RRVoid(APIView):
 
         else:
             if merchAmountDue:
-                for item in receive.rritemsmerch.all():
-                        jeAPI(request, j, 'Credit', item.merchInventory.childAccountInventory, (item.totalPrice/(1+(receive.taxRate/100))))
+                for item in rr.rritemsmerch.all():
+                        jeAPI(request, j, 'Credit', item.merchInventory.childAccountInventory, (item.totalPrice/(1+(rr.taxRate/100))))
             
             for key, val in expenseAmountDue.items():
                 if val:
@@ -1129,17 +1129,18 @@ class SCApprovalAPI(APIView):
 
         
         totalFees = Decimal(0.0)
-
+        num = 0
         for fees in sale.scotherfees.all():
             totalFees += fees.fee
-        
+
         if totalFees != 0.0:
             jeAPI(request, j, 'Credit', dChildAccount.otherIncome, totalFees)
 
         if sale.taxPeso != 0.0:
             jeAPI(request, j, 'Credit', dChildAccount.outputVat, sale.taxPeso)
 
-        jeAPI(request, j, 'Credit', dChildAccount.sales, sale.amountTotal - sale.taxPeso - totalFees)
+        for item in sale.scitemsmerch.all():
+            jeAPI(request, j, 'Credit', item.merchInventory.childAccountSales, (item.totalCost)-(sale.discountPeso/sale.scitemsmerch.all().count()))
 
         jeAPI(request, j, 'Debit', sale.party.accountChild.get(name__regex=r"[Rr]eceivable"), sale.amountTotal)
 
@@ -1342,9 +1343,17 @@ class DeliveriesApprovalAPI(APIView):
         j.save()
         request.user.branch.journal.add(j)
 
-        jeAPI(request, j, 'Credit', dChildAccount.merchInventory, d.amountTotal)
+        for item in d.deliveryitemsgroup.all():
+            if item.deliveryType == 'Sales Contract':
+                sc = SalesContract.objects.get(pk=item.referenceNo)
+                for element in sc.scitemsmerch.all():
+                    jeAPI(request, j, 'Credit', element.merchInventory.childAccountInventory, element.totalCost)
 
-        jeAPI(request, j, 'Debit', dChildAccount.costOfSales, d.amountTotal)
+        for item in d.deliveryitemsgroup.all():
+            if item.deliveryType == 'Sales Contract':
+                sc = SalesContract.objects.get(pk=item.referenceNo)
+                for element in sc.scitemsmerch.all():
+                    jeAPI(request, j, 'Debit', element.merchInventory.childAccountCostOfSales, element.totalCost)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

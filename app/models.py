@@ -301,9 +301,9 @@ class MerchandiseInventory(models.Model):
     def invAccounts(self, request, name, classification):
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
-        inv = "{} - {} {}".format(dChildAccount.merchInventory, name, classification)
-        sales = '{} - {} {}'.format(dChildAccount.sales, name, classification)
-        cos = '{} - {} {}'.format(dChildAccount.costOfSales, name, classification)
+        inv = "{} - {} {}".format(dChildAccount.merchInventory.name, name, classification)
+        sales = '{} - {} {}'.format(dChildAccount.sales.name, name, classification)
+        cos = '{} - {} {}'.format(dChildAccount.costOfSales.name, name, classification)
 
         if AccountChild.objects.filter(name = inv):
             objects = {
@@ -829,7 +829,7 @@ class SalesContract(models.Model):
     dateSold = models.DateField()
     party = models.ForeignKey(Party, related_name="salescontract", on_delete=models.CASCADE, null=True, blank=True)
     salesOrder = models.ForeignKey(SalesOrder, related_name="salescontract", on_delete=models.CASCADE, null=True, blank=True)
-    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null = True)
     amountDue = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
     discountPercent = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
@@ -837,8 +837,8 @@ class SalesContract(models.Model):
     taxType = models.CharField(max_length=20, null = True, blank = True)
     taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
-    paymentMethod = models.CharField(max_length=50)
-    paymentPeriod = models.CharField(max_length=50)
+    paymentMethod = models.CharField(max_length=50, null=True, blank=True)
+    paymentPeriod = models.CharField(max_length=50, null=True, blank=True)
     chequeNo = models.CharField(max_length=50, null=True, blank=True)
     dueDate = models.DateField(null = True, blank = True)
     bank = models.CharField(max_length=50, null = True, blank = True)
