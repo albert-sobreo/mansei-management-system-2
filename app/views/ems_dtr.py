@@ -12,7 +12,10 @@ from datetime import datetime
 
 class EMS_MyDTRView(View):
     def get(self, request):
-        return render(request, 'ems-my-dtr.html')
+        context = {
+            'dtrs': request.user.branch.dtr.filter(user=request.user).order_by('-date')
+        }
+        return render(request, 'ems-my-dtr.html', context)
 
 class EMS_EmployeeDTRView(View):
     def get(self, request):

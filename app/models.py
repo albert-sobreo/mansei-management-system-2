@@ -298,6 +298,68 @@ class MerchandiseInventory(models.Model):
     def __str__(self):
         return str(self.pk) + ' ' + str(self.code)
 
+    def invAccounts(self, request, name, classification):
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
+        inv = "{} - {} {}".format(dChildAccount.merchInventory, name, classification)
+        sales = '{} - {} {}'.format(dChildAccount.sales, name, classification)
+        cos = '{} - {} {}'.format(dChildAccount.costOfSales, name, classification)
+
+        if AccountChild.objects.filter(name = inv):
+            objects = {
+                'inv': AccountChild.objects.get(name=inv),
+                'sales': AccountChild.objects.get(name=sales),
+                'cos': AccountChild.objects.get(name=cos),
+            }
+            self.childAccountInventory = objects['inv']
+            self.childAccountSales = objects['sales']
+            self.childAccountCostOfSales = objects['cos']
+        
+        else:
+            try:
+                inventory = dChildAccount.merchInventory.accountSubGroup
+                invCode = inventory.accountchild.latest('pk')
+                invCurrentCode = int(invCode)
+                invCurrentCode += 1
+                invNewCode = str(invCurrentCode).zfill(4)
+            except Exception as e:
+                invNewCode = '0001'
+
+            try:
+                salesObj = dChildAccount.sales.accountSubGroup
+                salesCode = salesObj.accountchild.latest('pk')
+                salesCurrentCode = int(salesCode)
+                salesCurrentCode += 1
+                salesNewCode = str(salesCurrentCode).zfill(4)
+            except Exception as e:
+                salesNewCode = '0001'
+
+            try:
+                cosObj = dChildAccount.costOfSales.accountSubGroup
+                cosCode = cosObj.accountchild.latest('pk')
+                cosCurrentCode = int(cosCode)
+                cosCurrentCode += 1
+                cosNewCode = str(cosCurrentCode).zfill(4)
+            except Exception as e:
+                cosNewCode = '0001'
+
+            childInventory = AccountChild.objects.create(code = invNewCode, name = inv, accountSubGroup = dChildAccount.merchInventory.accountSubGroup, me = dChildAccount.merchInventory, amount = 0.0, description = "")
+            childSales = AccountChild.objects.create(code=salesNewCode, name=sales, accountSubGroup=dChildAccount.sales.accountSubGroup, me=dChildAccount.sales, amount=0, description='')
+            childCoS = AccountChild.objects.create(code=cosNewCode, name=cos, accountSubGroup=dChildAccount.costOfSales.accountSubGroup, me=dChildAccount.costOfSales, amount=0, description='')
+
+            childInventory.save()
+            childSales.save()
+            childCoS.save()
+
+            self.childAccountInventory = childInventory
+            self.childAccountSales = childSales
+            self.childAccountCostOfSales = childCoS
+            
+            request.user.branch.accountChild.add(childInventory)
+            request.user.branch.accountChild.add(childSales)
+            request.user.branch.accountChild.add(childCoS)
+        self.save()
+
 class OtherInventory(models.Model):
     name = models.CharField(max_length=100)
     qty = models.IntegerField()

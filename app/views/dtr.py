@@ -49,7 +49,7 @@ class DTRView(View):
 # 1 - DID NOT TIMEOUT
 
 class DTRProcess(APIView):
-    def timeIn(self, userID):
+    def timeIn(self, userID, request):
         employee = User.objects.get(idUser=userID)
         
         dtr = DTR()
@@ -57,6 +57,7 @@ class DTRProcess(APIView):
         dtr.user = employee
         dtr.date = datetime.date.today()
         dtr.save()
+        request.user.branch.dtr.add(dtr)
     
     # def timeOut(self, userID):
     #     employee = User.objects.get(idUser=userID)
@@ -634,7 +635,7 @@ class DTRProcess(APIView):
             x['dtr'] = serializer.data['dtr'][-1]
             return Response(x)
         else:
-            self.timeIn(id)
+            self.timeIn(id, request)
             serializer = UserWithDTRSZ(employee)
             x = serializer.data
             x['dtr'] = serializer.data['dtr'][-1]

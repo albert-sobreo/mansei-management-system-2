@@ -255,7 +255,8 @@ class RRApprovalAPI(APIView):
                 receive.first = True
                 receive.save()
                 if merchAmountDue:
-                    jeAPI(request, j, 'Debit', dChildAccount.merchInventory, (merchAmountDue/(1+(receive.taxRate/100))))
+                    for item in receive.rritemsmerch.all():
+                        jeAPI(request, j, 'Debit', item.merchInventory.childAccountInventory, (item.totalPrice/(1+(receive.taxRate/100))))
 
                 for key, val in expenseAmountDue.items():
                     if val:
@@ -267,7 +268,8 @@ class RRApprovalAPI(APIView):
 
             else:
                 if merchAmountDue:
-                    jeAPI(request, j, 'Debit', dChildAccount.merchInventory, (merchAmountDue/(1+(receive.taxRate/100))))
+                    for item in receive.rritemsmerch.all():
+                        jeAPI(request, j, 'Debit', item.merchInventory.childAccountInventory, (item.totalPrice/(1+(receive.taxRate/100))))
 
                 for key, val in expenseAmountDue.items():
                     if val:
@@ -334,7 +336,8 @@ class RRVoid(APIView):
 
         if rr.first == True:
             if merchAmountDue:
-                jeAPI(request, j, 'Credit', dChildAccount.merchInventory, (merchAmountDue/(1+(rr.taxRate/100))))
+                for item in receive.rritemsmerch.all():
+                        jeAPI(request, j, 'Credit', item.merchInventory.childAccountInventory, (item.totalPrice/(1+(receive.taxRate/100))))
             
             for key, val in expenseAmountDue.items():
                 if val:
@@ -346,7 +349,8 @@ class RRVoid(APIView):
 
         else:
             if merchAmountDue:
-                jeAPI(request, j, 'Credit', dChildAccount.merchInventory, (merchAmountDue/(1+(rr.taxRate/100))))
+                for item in receive.rritemsmerch.all():
+                        jeAPI(request, j, 'Credit', item.merchInventory.childAccountInventory, (item.totalPrice/(1+(receive.taxRate/100))))
             
             for key, val in expenseAmountDue.items():
                 if val:

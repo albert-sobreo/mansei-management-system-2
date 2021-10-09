@@ -25,7 +25,7 @@ class InwardAdjustmentsView(View):
 
 class ImportInwardInventory(View):
     def post(self, request, format= None):
-
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         try:
             ii = request.user.branch.inwardInventory.latest('pk')
 
@@ -91,7 +91,10 @@ class ImportInwardInventory(View):
 
             print(iiitemsMerch.length, iiitemsMerch.width, iiitemsMerch.thicc, iiitemsMerch.vol, iiitemsMerch.pricePerCubic, iiitemsMerch.totalCost)
 
+            iiitemsMerch.invAccounts(request, iiitemsMerch.name, iiitemsMerch.classification)
+
             iiitemsMerch.save()
+
             request.user.branch.iiItemsMerch.add(iiitemsMerch)
 
         ii.amountTotal = total

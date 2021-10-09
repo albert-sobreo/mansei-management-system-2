@@ -32,11 +32,13 @@
                 <th>Time-Out</th>
             </thead>
             <tbody>
+                {% for dtr in dtrs %}
                 <tr>
-                    <td>Mar</td>
-                    <td>1300</td>
-                    <td>0800</td>
+                    <td>{{dtr.date}}</td>
+                    <td>[[formatTime('{{dtr.dateTimeIn.isoformat}}')]]</td>
+                    <td>[[formatTime('{{dtr.dateTimeOut.isoformat}}')]]</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 
@@ -51,6 +53,22 @@
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: "#app",
+        data: {
+
+        },
+        methods: {
+            formatTime(value){
+                console.log(value)
+                value = new Date(value)
+                console.log(value)
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+        }
     })
 </script>
 
@@ -59,6 +77,7 @@
         $.fn.dataTable.moment( 'MMMM D, YYYY' );
         $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
         $('#table').DataTable({
+            "order": [],
             language: { search: '', searchPlaceholder: 'Search'},
             dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
             "<'row'<'col-sm-12'tr>>" +

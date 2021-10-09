@@ -30,17 +30,21 @@
             <div class="form-inline">
                 <div class="form-group">
                     <label for="" class="mx-1">Period</label>
-                    <select class="form-control mx-1">
+                    <select @change="setSemiMonthPeriod()" v-model="year" class="form-control mx-1">
                         <option value="" selected disabled>Select Year</option>
                         <option v-for="year in yearList" :value="year">[[year]]</option>
                     </select>
-                    <select class="form-control mx-1">
+                    <select v-model="period" class="form-control mx-1">
                         <option value="" selected disabled>Select Period</option>
+                        <option value="semi">Semi-Monthly</option>
                     </select>
-                    <select class="form-control mx-1">
+                    <select v-model="dateRange" class="form-control mx-1">
                         <option value="" selected disabled>Date Range</option>
+                        <template v-if="period == 'semi'">
+                            <option v-for="date in semiMonthPeriod" :value="date[0]+' '+date[1]">[[ date[2] ]] - [[ date[3] ]]</option>
+                        </template>
                     </select>
-                    <button class="mx-1 btn btn-warning btn-sm">
+                    <button @click="setDate()" class="mx-1 btn btn-warning btn-sm">
                         Set
                     </button>
                 </div>
@@ -48,43 +52,49 @@
         </div>
 
         <!-- TIMESHEET -->
-
-        <div class="row my-4     b-radius-15 box-shadow-medium">
+        {% for dtr in dtrs %}
+        <div class="row my-4 b-radius-15 box-shadow-medium">
             <div class="col-12 m-3">
-                <span class="font-bold font-size-20">March 31, 2021</span>
+                <span class="font-bold font-size-20">{{dtr.date|date:"F d, Y"}}</span>
             </div>
             <div class="col-12 px-3 mb-3">
                 <div class="row px-3">
                     <div class="col">
                         <label for="" class="gray font-bold">Time-In</label><br>
-                        <span class="font-bold font-size-16">7:55 AM</span>
+                        <span class="font-bold font-size-16">[[formatTime('{{dtr.dateTimeIn.isoformat}}')]]</span>
                     </div>
                     <div class="col">
                         <label for="" class="gray font-bold">Time-Out</label><br>
-                        <span class="font-bold font-size-16">5:00 PM</span>
+                        <span class="font-bold font-size-16">[[formatTime('{{dtr.dateTimeOut.isoformat}}')]]</span>
                     </div>
                     <div class="col">
-                        <label for="" class="gray font-bold">Total Hours</label><br>
-                        <span class="font-bold font-size-16">8H</span>
+                        <label for="" class="gray font-bold">Basic Hours</label><br>
+                        <span class="font-bold font-size-16">{{dtr.bh}} <span class="gray">H</span></span>
                     </div>
                     <div class="col">
                         <label for="" class="gray font-bold">OT Hours</label><br>
-                        <span class="font-bold font-size-16">0H</span>
+                        <span class="font-bold font-size-16">{{dtr.ot}} <span class="gray">H</span></span>
                     </div>
                     <div class="col">
                         <label for="" class="gray font-bold">ND Hours</label><br>
-                        <span class="font-bold font-size-16">0H</span>
+                        <span class="font-bold font-size-16">{{dtr.nd}} <span class="gray">H</span></span>
                     </div>
                     <div class="col">
-                        <label for="" class="gray font-bold">Basic Pay</label><br>
-                        <span class="font-bold font-size-16">₱980.00</span>
+                        <label for="" class="gray font-bold">NDOT Hours</label><br>
+                        <span class="font-bold font-size-16">{{dtr.ndot}} <span class="gray">H</span></span>
                     </div>
                     <div class="col">
                         <label for="" class="gray font-bold">Day Category</label><br>
+                        {% if dtr.normalDay %}
+                        <div class="d-flex flex-column">
+                            <span class="font-bold font-size-16 mb-2">Normal Day</span>
+                        </div>
+                        {% else %}
                         <div class="d-flex flex-column">
                             <span class="font-bold font-size-16 mb-2">Regular Holiday</span>
                             <span class="font-bold font-size-16 mb-2">Rest Day</span>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -158,7 +168,8 @@
                 </div>
             </div>
         </div>
-
+        {% endfor %}
+        <pre>[[$data]]</pre>
 
     </div>
 </div>
@@ -167,16 +178,25 @@
 
 {% block scripts %}
 
+<script src="/static/js/semi-monthly.js"></script>
+
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: "#app",
 
         data: {
-            yearList: []
+            year: '',
+            period: '',
+            dateRange: '',
+            yearList: [],
+            semiMonthPeriod: ''
         },
 
         methods: {
+            setSemiMonthPeriod(){
+                this.semiMonthPeriod = semi_months(this.year)
+            },
             onload(){
                 axios.get('/year-api/')
                 .then(res=>this.yearList=res.data)
@@ -187,10 +207,34 @@
                         html: err.message
                     })
                 })
+            },
+            formatTime(value){
+                value = new Date(value)
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+            setDate(){
+                if (this.year && this.period && this.dateRange){
+                    location.href=`/ems-my-timesheet/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`
+                } else {
+                    Swal.fire({
+                        title: "Fill up all the inputs.",
+                        icon: 'error',
+                    })
+                }
             }
         },
         mounted(){
             this.onload()
+            let params = new URLSearchParams(location.search);
+            this.year = params.get('year') ? params.get('year') : ''
+            this.dateRange = params.get('dateRange') ? params.get('dateRange').replace('%', ' ') : ''
+            this.period = params.get('period') ? params.get('period') : ''
+            this.semiMonthPeriod = semi_months(this.year)
         }
     })
 </script>
