@@ -151,10 +151,10 @@ class DTRProcess(APIView):
         ot = Decimal(0)
         nd = Decimal(0)
         ndot = Decimal(0)
-        sun = Decimal(0)
-        sunot = Decimal(0)
-        sunnd = Decimal(0)
-        sunndot = Decimal(0)
+        rd = Decimal(0)
+        rdot = Decimal(0)
+        rdnd = Decimal(0)
+        rdndot = Decimal(0)
         rh = Decimal(0)
         rhot = Decimal(0)
         rhnd = Decimal(0)
@@ -167,6 +167,14 @@ class DTRProcess(APIView):
         shwot = Decimal(0)
         shwnd = Decimal(0)
         shwndot = Decimal(0)
+        rhrd = Decimal(0)
+        rhrdot = Decimal(0)
+        rhrdnd = Decimal(0)
+        rhrdndot = Decimal(0)
+        shrd = Decimal(0)
+        shrdot = Decimal(0)
+        shrdnd = Decimal(0)
+        shrdndot = Decimal(0)
         
         tolerance = {
             'default': datetime.timedelta(minutes=5),
@@ -344,13 +352,28 @@ class DTRProcess(APIView):
 
             holidays = Holiday.objects.filter(date=datetime.date.today())
             
-            if datetime.date.today().weekday() == 6:
-                sun += bh
-                sunot += ot
-                sunnd += nd
-                sunndot += ndot
+            restDayMarker = False
+            if datetime.date.today().weekday() == 6 or (datetime.date.today().weekday() == 5 and datetime.date.today().weekday() in employee.schedule.workDays):
+                restDayMarker = True
+                if holidays:
+                    for holiday in holidays:
+                        if holiday.type == "rh":
+                            rhrd += bh
+                            rhrdot += ot
+                            rhrdnd += nd
+                            rhrdndot += ndot
+                        elif holiday.type == "sh":
+                            shrd += bh
+                            shrdot += ot
+                            shrdnd += nd
+                            shrdndot += ndot
+                else:
+                    rd += bh
+                    rdot += ot
+                    rdnd += nd
+                    rdndot += ndot
 
-            if holidays:
+            if holidays and not restDayMarker:
                 for holiday in holidays:
                     if holiday.type == "rh":
                         rh += bh
@@ -411,13 +434,28 @@ class DTRProcess(APIView):
 
             holidays = Holiday.objects.filter(date=datetime.date.today())
             
-            if datetime.date.today().weekday() == 6:
-                sun += bh
-                sunot += ot
-                sunnd += nd
-                sunndot += ndot
+            restDayMarker = False
+            if datetime.date.today().weekday() == 6 or (datetime.date.today().weekday() == 5 and datetime.date.today().weekday() in employee.schedule.workDays):
+                restDayMarker = True
+                if holidays:
+                    for holiday in holidays:
+                        if holiday.type == "rh":
+                            rhrd += bh
+                            rhrdot += ot
+                            rhrdnd += nd
+                            rhrdndot += ndot
+                        elif holiday.type == "sh":
+                            shrd += bh
+                            shrdot += ot
+                            shrdnd += nd
+                            shrdndot += ndot
+                else:
+                    rd += bh
+                    rdot += ot
+                    rdnd += nd
+                    rdndot += ndot
 
-            if holidays:
+            if holidays and not restDayMarker:
                 for holiday in holidays:
                     if holiday.type == "rh":
                         rh += bh
@@ -492,13 +530,28 @@ class DTRProcess(APIView):
 
             holidays = Holiday.objects.filter(date=datetime.date.today())
             
-            if datetime.date.today().weekday() == 6:
-                sun += bh
-                sunot += ot
-                sunnd += nd
-                sunndot += ndot
+            restDayMarker = False
+            if datetime.date.today().weekday() == 6 or (datetime.date.today().weekday() == 5 and datetime.date.today().weekday() in employee.schedule.workDays):
+                restDayMarker = True
+                if holidays:
+                    for holiday in holidays:
+                        if holiday.type == "rh":
+                            rhrd += bh
+                            rhrdot += ot
+                            rhrdnd += nd
+                            rhrdndot += ndot
+                        elif holiday.type == "sh":
+                            shrd += bh
+                            shrdot += ot
+                            shrdnd += nd
+                            shrdndot += ndot
+                else:
+                    rd += bh
+                    rdot += ot
+                    rdnd += nd
+                    rdndot += ndot
 
-            if holidays:
+            if holidays and not restDayMarker:
                 for holiday in holidays:
                     if holiday.type == "rh":
                         rh += bh
@@ -554,13 +607,28 @@ class DTRProcess(APIView):
 
             holidays = Holiday.objects.filter(date=datetime.date.today())
             
-            if datetime.date.today().weekday() == 6:
-                sun += bh
-                sunot += ot
-                sunnd += nd
-                sunndot += ndot
+            restDayMarker = False
+            if datetime.date.today().weekday() == 6 or (datetime.date.today().weekday() == 5 and datetime.date.today().weekday() in employee.schedule.workDays):
+                restDayMarker = True
+                if holidays:
+                    for holiday in holidays:
+                        if holiday.type == "rh":
+                            rhrd += bh
+                            rhrdot += ot
+                            rhrdnd += nd
+                            rhrdndot += ndot
+                        elif holiday.type == "sh":
+                            shrd += bh
+                            shrdot += ot
+                            shrdnd += nd
+                            shrdndot += ndot
+                else:
+                    rd += bh
+                    rdot += ot
+                    rdnd += nd
+                    rdndot += ndot
 
-            if holidays:
+            if holidays and not restDayMarker:
                 for holiday in holidays:
                     if holiday.type == "rh":
                         rh += bh
@@ -609,10 +677,10 @@ class DTRProcess(APIView):
         dtr.ot = ot
         dtr.nd = nd
         dtr.ndot = ndot
-        dtr.sun = sun
-        dtr.sunot = sunot
-        dtr.sunnd = sunnd
-        dtr.sunndot = sunndot
+        dtr.rd = rd
+        dtr.rdot = rdot
+        dtr.rdnd = rdnd
+        dtr.rdndot = rdndot
         dtr.rh = rh
         dtr.rhot = rhot
         dtr.rhnd = rhnd
@@ -621,6 +689,18 @@ class DTRProcess(APIView):
         dtr.shot = shot
         dtr.shnd = shnd
         dtr.shndot = shndot
+        dtr.shw = shw
+        dtr.shwot = shwot
+        dtr.shwnd = shwnd
+        dtr.shwndot = shwndot
+        dtr.rhrd = rhrd
+        dtr.rhrdot = rhrdot
+        dtr.rhrdnd = rhrdnd
+        dtr.rhrdndot = rhrdndot
+        dtr.shrd = shrd
+        dtr.shrdot = shrdot
+        dtr.shrdnd = shrdnd
+        dtr.shrdndot = shrdndot
         dtr.save()
         
     def post(self, request, format=None):

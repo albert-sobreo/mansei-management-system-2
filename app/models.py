@@ -30,6 +30,7 @@ units = [
 class Schedule(models.Model):
     timeIn = models.TimeField()
     timeOut = models.TimeField()
+    workDays = models.CharField(max_length=16, null=True, blank=True)
         
     def __str__(self):
         return str(self.timeIn) + " - " + str(self.timeOut)
@@ -63,18 +64,18 @@ class User(AbstractUser):
 
 
 dayOff = [
-    (0, 'SUN'),
-    (1, 'MON'),
-    (2, 'TUE'),
-    (3, 'WED'),
-    (4, 'THU'),
-    (5, 'FRI'),
-    (6, 'SAT')
+    (0, 'MON'),
+    (1, 'TUE'),
+    (2, 'WED'),
+    (3, 'THU'),
+    (4, 'FRI'),
+    (5, 'SAT'),
+    (6, 'SUN')
 ]
 
 class DayOff(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True, blank=True)
-    day = models.IntegerField(choices=dayOff, null=True, blank=True)
+    day = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
         return str(self.day)
@@ -90,10 +91,10 @@ class DTR(models.Model):
     ut = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     nd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     ndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    sun = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    sunot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    sunnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    sunndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rdot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rdnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rdndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     rh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     rhot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     rhnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
@@ -106,7 +107,15 @@ class DTR(models.Model):
     shwot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     shwnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     shwndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-
+    rhrd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhrdot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhrdnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhrdndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shrd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shrdot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shrdnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shrdndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    
     normalDay = models.BooleanField(default=True)
 
 class Register(models.Model):
