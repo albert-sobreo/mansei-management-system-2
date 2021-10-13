@@ -83,7 +83,7 @@ class DTR(models.Model):
     dateTimeIn = models.DateTimeField( null = True, blank = True)
     dateTimeOut = models.DateTimeField( null = True, blank = True)
     date = models.DateField( null = True, blank = True)
-    user = models.ForeignKey(User, related_name = "dtr", on_delete=models.CASCADE, null = True, blank = True)
+    user = models.ForeignKey(User, related_name = "dtr", on_delete=models.PROTECT, null = True, blank = True)
 
     bh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     ot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
@@ -1256,7 +1256,14 @@ class LeaveRequest(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=64, null=True, blank=True)
 
-
+# class Payroll(models.Model):
+#     Bonus = 
+#     bhPay
+#     otPay
+#     utPay
+#     ndPay
+#     ndotPay
+    
 
 
 class BranchDefaultChildAccount(models.Model):
