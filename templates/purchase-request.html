@@ -63,7 +63,7 @@
 						<label class="m-0">Inventory</label>
 					</div>
 					<div class="col px-1">
-						<label for="warehouse" class="m-0">Item-Code - Item name</label>
+						<label for="warehouse" class="m-0">Code - Name Type --- T x W x L mm <span class="gray font-size-12">format</span></label>
 					</div>
 					<div class="col-2 px-1">
 						<label for="remaining" class="m-0">On-hand</label>
@@ -89,7 +89,7 @@
 					<div class="col px-1">
 						<select @change="testData(item.code, index, 'Merchandise')" v-model="item.code" class="form-control" v-if="item.type=='Merchandise'">
 							<option value="" selected disabled>Choose Merchandise Inventory</option>
-							<option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]]</option>
+							<option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]] --- [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
 						</select>
 						<input @blur="testData2(item.other, index)" placeholder="Type or select the item from the datalist" list="others" v-model="item.other" class="form-control" v-else-if="item.type!='Merchandise' && item.type!='Manufacturing' && item.type!=''">
 						<select class="form-control" v-else>
@@ -295,6 +295,14 @@
 				val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
 				return val
 			},
+            roundNumber0(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(0).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
 			addLine(){
 				this.purchaseRequest.items.push({
 					type: '',

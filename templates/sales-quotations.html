@@ -211,7 +211,7 @@
             <div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
                 <div class="row">
                     <div class="col px-1">
-                        <label for="warehouse" class="m-0">Item-Code - Item name</label>
+                        <label for="warehouse" class="m-0">Code - Name Type --- T x W x L mm <span class="gray font-size-12">format</span></label>
                     </div>
                     <div class="col-1 px-1">
                         <label for="remaining" class="m-0">Remaining</label>
@@ -238,14 +238,14 @@
                     <div class="col px-1">
                         <select @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control">
                             <option value="" selected disabled>Choose Merchandise Inventory</option>
-                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]]</option>
+                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]] --- [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
                         </select>
                     </div>
                     <div class="col-1 px-1">
                         <input v-model="item.remaining" type="number" class="form-control" readonly>
                     </div>
                     <div class="col-1 px-1">
-                        <input v-model="item.quantity" @change="onForTotalCost(index)" type="number" class="form-control" min="0">
+                        <input v-model="item.quantity" @change="onForVol(index)" type="number" class="form-control" min="0">
                     </div>
                     <div class="col-1 px-1">
                         <select v-model="item.cbm" class="form-control">
@@ -492,6 +492,7 @@
                     quantity: 0,
                     cbm: 'm3',
                     vol: null,
+                    refVol: null,
                     pricePerCubic: 0.00,
                     totalCost: null
                 }],
@@ -844,13 +845,19 @@
                 this.order.items[index].remaining = item.qtyA
                 this.order.items[index].pricePerCubic = Number(item.pricePerCubic).toFixed(2)
                 this.order.items[index].vol = item.vol
+                this.order.items[index].refVol = item.vol
 
+                this.onForTotalCost(index)
+            },
+            onForVol(index){
+                row = this.order.items[index]
+                row.vol = Number(row.refVol * row.quantity).toFixed(4)
                 this.onForTotalCost(index)
             },
 
             onForTotalCost(index){
                 row = this.order.items[index]
-                row.totalCost = Number(row.pricePerCubic * row.quantity * row.vol).toFixed(4)
+                row.totalCost = Number(row.pricePerCubic * row.vol).toFixed(4)
             },
 
             remove (index) {
@@ -880,6 +887,14 @@
                     return value
                 } else {
                     let val = (value/1).toFixed(2).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            roundNumber0(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(0).replace(',', '.')
                     return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 }
             },

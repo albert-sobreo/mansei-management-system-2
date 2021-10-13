@@ -217,20 +217,21 @@
             <!-- PURCHASE ITEMS AND DETAILS -->
             <div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
                 <div class="row">
-                    <div class="col px-1">
+                    <div class="col-2 px-1">
                         <label for="code" class="m-0">Inventory</label>
                     </div>
-                    <div class="col-3 px-1">
-                        <label for="warehouse" class="m-0">Item-Code - Item name</label>
+                    <div class="col px-1">
+                        <label v-if="purchaseOrder.items[0].type == 'Merchandise'" class="m-0">Code - Name Type --- T x W x L mm <span class="gray font-size-12">format</span></label>
+                        <label v-else class="m-0">Item Name</label>
                     </div>
                     <div class="col-1 px-1">
                         <label for="remaining" class="m-0">Remaining</label>
                     </div>
-                    <div class="col px-1">
+                    <div class="col-1 px-1">
                         <label for="order-quantity" class="m-0">Order Qty</label>
                     </div>
                     <div class="col-2 px-1">
-                        <label for="order-quantity" class="m-0">Purchasing Price</label>
+                        <label class="m-0">Purchasing Price</label>
                     </div>
                     <div class="col-2 px-1">
                         <label for="Total Cost" class="m-0">Total Cost</label>
@@ -239,7 +240,7 @@
                 </div>
                 <!-- V-FOR ITEMS -->
                 <div class="row" v-for="(item, index) in purchaseOrder.items">
-                    <div class="col px-1">
+                    <div class="col-2 px-1">
                         <select v-model="item.type" class="form-control">
                             <option value="" selected disabled>Choose Type</option>
                             <optgroup label="Inventory">
@@ -250,11 +251,11 @@
 							</optgroup>
                         </select>
                     </div>
-                    <div class="col-3 px-1">
+                    <div class="col px-1">
                         <!-- V-IF ELSE FOR DIFFERENT INVENTORY LIST -->
                         <select @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control" v-if="item.type == 'Merchandise'">
                             <option value="" selected disabled>Choose Merchandise Inventory</option>
-                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]]</option>
+                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]] --- [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
                         </select>
                         <input @blur="getMerchRemaining2(item.other, index)" placeholder="Type or select the item from the datalist" list="others" v-model="item.other" class="form-control" v-else-if="item.type!='Merchandise' && item.type!='Manufacturing' && item.type!=''">
                         <select class="form-control" v-else>
@@ -271,7 +272,7 @@
                     <div class="col-1 px-1">
                         <input v-model="item.remaining" type="number" class="form-control" readonly>
                     </div>
-                    <div class="col px-1">
+                    <div class="col-1 px-1">
                         <div class="input-group">
                             <input v-model="item.quantity" @change="onForTotalCost(index)" type="text" class="form-control box-shadow-off" onkeypress="validate()">
                             <div @click="cycleUnit(index)" class="input-group-append bg-primary-2" style="cursor: pointer;" title="Click me to change unit">
@@ -754,6 +755,16 @@
                         icon: 'error'
                     })
                 })
+            },
+
+
+            roundNumber0(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(0).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
             },
 
             checkForm(e){
