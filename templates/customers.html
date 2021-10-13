@@ -46,7 +46,7 @@
                     <div class="modal-body">
                         <div class="row my-5">
                             <div class="col-12 d-flex justify-content-center">
-                                <h1 class="font-bold">[[customerModal.name]]</h1>
+                                <h3 class="font-bold">[[customerModal.name]]</h3>
                             </div>
                         </div>
 
@@ -137,13 +137,33 @@
 
                         <hr>
 
-                        <div class="row">
+                        <div class="row order-card py-2">
+                            <div class="col-7">
+                                <span class="gray font-bold">Account Name</span>
+                            </div>
+                            <div class="col-5">
+                                <span class="gray font-bold">Balance</span>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="row" v-for="child in customerModal.accountChild">
+                                    <div class="col-7 my-1">
+                                        <span class="font-semibold">[[child.name]]</span>
+                                    </div>
+                                    <div class="col-5 my-1">
+                                        <span class="font-semibold">₱[[formatPrice(child.amount)]]</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- <div class="row">
                             <div class="col-12">
                                 <span class="font-bold font-size-18">Transaction History</span>
                             </div>
                         </div>
 
-                        <!-- TABLE -->
+                        
                         <div class="row">
                             <div class="col-12">
                                 <table class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-5" id="transactionTable">
@@ -161,7 +181,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -540,7 +560,8 @@
                 bankNo: null,
                 tin: null,
                 crte: false,
-                prefferedPayment: null
+                prefferedPayment: null,
+                childAccount: [],
             },
 
             addCustomerModal:{
@@ -588,6 +609,14 @@
             submitEdit(id){
                 axios.put(`/edit-party/${id}/`, this.editCustomerModal, this.config)
                 .then(res=>res.data==0?location.reload():'')
+            },
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
             },
             addCustomerModalInitial(){
                 return{

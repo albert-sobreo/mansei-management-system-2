@@ -209,6 +209,55 @@
                                 </div>
                             </template>
                         </div>
+                        <!-- REAL BOTTOM CARD -->
+                        <div class="order-card row my-2">
+                            <!-- LVL 1 -->
+                            <div class="col-4 mt-3">
+                                <span class="gray font-bold">Accounts</span>
+                            </div>
+                            <div class="col-5 mt-3">
+                                <span class="gray font-bold">Account Name</span>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <span class="gray font-bold">Balance</span>
+                            </div>
+                            <!-- LVL 2 -->
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-4 my-1">
+                                        <span class="font-semibold  ">Account Inventory</span>
+                                    </div>
+                                    <div class="col-5 my-1">
+                                        <span class="font-semibold font-size-10">[[modal.childAccountInventory.name]]</span>
+                                    </div>
+                                    <div class="col-3 my-1">
+                                        <span class="font-semibold">₱[[formatPrice(modal.childAccountInventory.amount)]]</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4 my-1">
+                                        <span class="font-semibold  ">Account Sales</span>
+                                    </div>
+                                    <div class="col-5 my-1">
+                                        <span class="font-semibold font-size-10">[[modal.childAccountSales.name]]</span>
+                                    </div>
+                                    <div class="col-3 my-1">
+                                        <span class="font-semibold">₱[[formatPrice(modal.childAccountSales.amount)]]</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4 my-1">
+                                        <span class="font-semibold  ">Account Cost of Sales</span>
+                                    </div>
+                                    <div class="col-5 my-1">
+                                        <span class="font-semibold font-size-10">[[modal.childAccountCostOfSales.name]]</span>
+                                    </div>
+                                    <div class="col-3 my-1">
+                                        <span class="font-semibold">₱[[formatPrice(modal.childAccountCostOfSales.amount)]]</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row mb-2">
                             <div class="col">
                                 <a @click="edit()" href="#" data-toggle="modal" data-target="#editModal">Edit this item</a>
@@ -478,6 +527,18 @@
                 warehouseitems: [],
                 totalCost: 0, 
                 inventoryDate: null,
+                childAccountInventory: {
+                    name: null,
+                    amount: null
+                },
+                childAccountSales: {
+                    name: null,
+                    amount: null,
+                },
+                childAccountCostOfSales: {
+                    name: null,
+                    amount: null
+                }
             },
             editModal: {
                 inventoryDate: null,

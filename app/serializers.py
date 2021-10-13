@@ -94,6 +94,7 @@ class SalesContractSZ(serializers.ModelSerializer):
 class PartyNestedTransactionSZ(serializers.ModelSerializer):
     purchaseorder = PurchaseOrderSZ(read_only = True, many = True)
     salescontract = SalesContractSZ(read_only = True, many = True)
+    childAccount = AccountChildSZ(read_only=True, many=True)
     class Meta:
         model = Party
         fields = '__all__'
@@ -150,6 +151,9 @@ class WarehouseNestedSZ(serializers.ModelSerializer):
 
 class MerchandiseInventoryNestedSZ(serializers.ModelSerializer):
     warehouseitems = WarehouseItemsSZ(read_only=True, many=True)
+    childAccountInventory = AccountChildSZ(read_only=True)
+    childAccountSales = AccountChildSZ(read_only=True)
+    childAccountCostOfSales = AccountChildSZ(read_only=True)
     class Meta:
         model = MerchandiseInventory
         fields = '__all__'
