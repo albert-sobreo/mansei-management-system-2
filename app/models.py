@@ -1272,6 +1272,38 @@ class LeaveRequest(models.Model):
 #     utPay
 #     ndPay
 #     ndotPay
+
+class RatesGroup(models.Model):
+    bh = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    ot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    ut = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    nd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    ndot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rdot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rdnd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rdndot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rh = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rhot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rhnd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rhndot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    sh = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shnd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shndot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shw = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shwot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shwnd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shwndot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rhrd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rhrdot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rhrdnd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    rhrdndot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shrd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shrdot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shrdnd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    shrdndot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+    
     
 
 
@@ -1393,6 +1425,7 @@ class Branch(models.Model):
     #### DTR ####
     dayOff = models.ManyToManyField(DayOff, blank=True)
     dtr = models.ManyToManyField(DTR, blank=True)
+    schedule = models.ManyToManyField(Schedule, blank=True)
 
     #### CHEQUE ####
     cheque = models.ManyToManyField(Cheques, blank=True)
@@ -1413,6 +1446,7 @@ class Branch(models.Model):
     otRequest = models.ManyToManyField(OTRequest, blank=True)
     utRequest = models.ManyToManyField(UTRequest, blank=True)
     leaveRequest = models.ManyToManyField(LeaveRequest, blank=True)
+    ratesGroup = models.ManyToManyField(RatesGroup, blank=True)
     
 
     def __str__(self):
