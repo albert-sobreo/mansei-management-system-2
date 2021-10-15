@@ -62,6 +62,15 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+class DeMinimisOfUser(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
+
+class BonusOfUser(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
 
 dayOff = [
     (0, 'MON'),
@@ -1208,6 +1217,19 @@ class Payroll(models.Model):
     dateGenerated = models.DateField(null=True, blank=True)
     dateApproved = models.DateField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
+
+class DeMinimisPay(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="deminimispay")
+    payroll = models.ForeignKey(Payroll, on_delete=models.PROTECT, related_name='deminimispay')
+    name = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
+
+class BonusPay(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="bonuspay")
+    payroll = models.ForeignKey(Payroll, on_delete=models.PROTECT, related_name="bonuspay")
+    name = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
+    
 
 class DayOff(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True, blank=True)
