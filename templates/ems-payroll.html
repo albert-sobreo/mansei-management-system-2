@@ -19,7 +19,7 @@
         <!-- BUTTONS -->
         <div class="d-flex align-items-center mb-3 justify-content-between">
             <div>
-                <button class="btn btn-primary mr-1">Generate Payroll</button>
+                <button class="btn btn-primary mr-1" @click="confirmPayroll()">Generate Payroll</button>
                 <button class="btn btn-secondary ml-1" data-toggle="modal" data-target="#bonusModal">Give Bonus & De Minimis</button>
             </div>
 
@@ -27,17 +27,21 @@
                 <div class="form-inline">
                     <div class="form-group">
                         <label for="" class="mx-1">Period</label>
-                        <select class="form-control mx-1">
+                        <select @change="setSemiMonthPeriod()" v-model="year" class="form-control mx-1">
                             <option value="" selected disabled>Select Year</option>
                             <option v-for="year in yearList" :value="year">[[year]]</option>
                         </select>
-                        <select class="form-control mx-1">
+                        <select v-model="period" class="form-control mx-1">
                             <option value="" selected disabled>Select Period</option>
+                            <option value="semi">Semi-Monthly</option>
                         </select>
-                        <select class="form-control mx-1">
+                        <select v-model="dateRange" class="form-control mx-1">
                             <option value="" selected disabled>Date Range</option>
+                            <template v-if="period == 'semi'">
+                                <option v-for="date in semiMonthPeriod" :value="date[0]+' '+date[1]">[[ date[2] ]] - [[ date[3] ]]</option>
+                            </template>
                         </select>
-                        <button class="mx-1 btn btn-warning btn-sm">
+                        <button @click="setDate()" class="mx-1 btn btn-warning btn-sm">
                             Set
                         </button>
                     </div>
@@ -57,8 +61,17 @@
                 <th>Net Pay</th>
             </thead>
             <tbody>
+                {% if not payrolls %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#payrollModal">0033113</td>
+                    <td colspan="99" class="text-center">No Data</td>
+                </tr>
+                <tr>
+                    <td colspan="99" class="text-center gray">Generate Payroll or Select a Period to show data</td>
+                </tr>
+                {% else %}
+                {% for payroll in payrolls %}
+                <tr>
+                    <td class="link" data-toggle="modal" data-target="#payrollModal">{{payroll}}</td>
                     <td>Clark Kent</td>
                     <td>₱620.00</td>
                     <td>114H 30M</td>
@@ -66,6 +79,8 @@
                     <td>₱12,712.00</td>
                     <td class="font-bold font-size-14">₱11,840.00</td>
                 </tr>
+                {% endfor %}
+                {% endif %}
             </tbody>
         </table>
 
@@ -322,12 +337,23 @@
 
 {% block scripts %}
 
+<script src="/static/js/semi-monthly.js"></script>
+
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: "#app",
         
         data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            year: '',
+            period: '',
+            dateRange: '',
+            semiMonthPeriod: '',
             yearList: []
         },
 
@@ -342,10 +368,95 @@
                         html: err.message
                     })
                 })
-            }
+            },
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
+            
+            setSemiMonthPeriod(){
+                this.semiMonthPeriod = semi_months(this.year)
+            },
+            setDate(){
+                if (this.year && this.period && this.dateRange){
+                    location.href=`/ems-payroll/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`
+                } else {
+                    Swal.fire({
+                        title: "Fill up all the inputs.",
+                        icon: 'error',
+                    })
+                }
+            },
+            confirmPayroll(){
+                if (this.year && this.period && this.dateRange){
+                    Swal.fire({
+                        confirmButtonText: 'I am sure.',
+                        showCancelButton: true,
+                        title: 'Generate payroll?',
+                        icon: 'warning',
+                        html: `Are you sure you want to generate a payroll for this time period? <br/><br/> <b>${this.formatDate(this.dateRange.split(' ')[0])}</b> - <b>${this.formatDate(this.dateRange.split(' ')[1])}</b>`
+                    })
+                    .then(result=>{
+                        if(result.isConfirmed){
+                            Swal.fire({
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning" role="status"></div> <br><br> <span class="font-bold font-size-18">Generating Payroll . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                            })
+                            axios.post('/ems-generate-payroll/', [this.year, this.period, this.dateRange], this.config)
+                            .then(res=>{
+                                res.data==0?location.reload():''
+                            })
+                        }
+                    })
+                } else {
+                    Swal.fire({
+                        title: "No Time Period Set.",
+                        icon: 'error',
+                        html: 'Set the time period first.'
+                    })
+                }
+                
+            },
         },
         mounted(){
             this.onload()
+            let params = new URLSearchParams(location.search);
+            this.year = params.get('year') ? params.get('year') : ''
+            this.dateRange = params.get('dateRange') ? params.get('dateRange').replace('%', ' ') : ''
+            this.period = params.get('period') ? params.get('period') : ''
+            this.semiMonthPeriod = semi_months(this.year)
         }
     })
 </script>

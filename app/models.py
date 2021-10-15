@@ -73,51 +73,6 @@ dayOff = [
     (6, 'SUN')
 ]
 
-class DayOff(models.Model):
-    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True, blank=True)
-    day = models.CharField(max_length=20, null=True, blank=True)
-
-    def __str__(self):
-        return str(self.day)
-
-class DTR(models.Model):
-    dateTimeIn = models.DateTimeField( null = True, blank = True)
-    dateTimeOut = models.DateTimeField( null = True, blank = True)
-    date = models.DateField( null = True, blank = True)
-    user = models.ForeignKey(User, related_name = "dtr", on_delete=models.PROTECT, null = True, blank = True)
-
-    bh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    ot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    ut = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    nd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    ndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rdot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rdnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rdndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rhot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rhnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rhndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    sh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shw = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shwot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shwnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shwndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rhrd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rhrdot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rhrdnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rhrdndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shrd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shrdot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shrdnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shrdndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    
-    normalDay = models.BooleanField(default=True)
-
 class Register(models.Model):
     username = models.CharField(max_length=50, null=True, blank=True)
     first_name = models.CharField(max_length=50, null = True, blank = True)
@@ -1215,25 +1170,6 @@ class Holiday(models.Model):
     def __str__(self):
         return str(self.date) + " " + self.description
 
-class Timesheet(models.Model):
-    dtr = OneToOneField(DTR, on_delete=models.CASCADE)
-    bh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    ot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    ut = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    nd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    ndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    sun = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    sunot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    rhot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    sh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    shot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
-    normalDay = models.BooleanField(default=True)
-
-class DTRDayCategory(models.Model):
-    dtr = models.ForeignKey(DTR, on_delete=models.CASCADE)
-    holiday = models.ForeignKey(Holiday, on_delete=models.CASCADE)
-
 class OTRequest(models.Model):
     requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otrequestrequestedby') 
     hours = models.DecimalField(max_digits=4, decimal_places=2)
@@ -1265,13 +1201,63 @@ class LeaveRequest(models.Model):
     datetimeApproved = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=64, null=True, blank=True)
 
-# class Payroll(models.Model):
-#     Bonus = 
-#     bhPay
-#     otPay
-#     utPay
-#     ndPay
-#     ndotPay
+class Payroll(models.Model):
+    year = models.CharField(max_length=6)
+    dateStart = models.DateField(null=True, blank=True)
+    dateEnd = models.DateField(null=True, blank=True)
+    dateGenerated = models.DateField(null=True, blank=True)
+    dateApproved = models.DateField(null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+
+class DayOff(models.Model):
+    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True, blank=True)
+    day = models.CharField(max_length=20, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.day)
+
+class DTR(models.Model):
+    dateTimeIn = models.DateTimeField( null = True, blank = True)
+    dateTimeOut = models.DateTimeField( null = True, blank = True)
+    date = models.DateField( null = True, blank = True)
+    user = models.ForeignKey(User, related_name = "dtr", on_delete=models.PROTECT, null = True, blank = True)
+    payroll = models.ForeignKey(Payroll, related_name='dtr', on_delete=models.PROTECT, null=True, blank=True)
+
+    bh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    ot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    ut = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    nd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    ndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rdot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rdnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rdndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    sh = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shw = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shwot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shwnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shwndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhrd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhrdot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhrdnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    rhrdndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shrd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shrdot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shrdnd = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    shrdndot = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    
+    normalDay = models.BooleanField(default=True)
+
+class DTRDayCategory(models.Model):
+    dtr = models.ForeignKey(DTR, on_delete=models.CASCADE)
+    holiday = models.ForeignKey(Holiday, on_delete=models.CASCADE)
 
 class RatesGroup(models.Model):
     bh = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
@@ -1441,12 +1427,14 @@ class Branch(models.Model):
 
     #### DTR 2 ####
     holiday = models.ManyToManyField(Holiday, blank=True)
-    timesheet = models.ManyToManyField(Timesheet, blank=True)
     dtrDayCategory = models.ManyToManyField(DTRDayCategory, blank=True)
     otRequest = models.ManyToManyField(OTRequest, blank=True)
     utRequest = models.ManyToManyField(UTRequest, blank=True)
     leaveRequest = models.ManyToManyField(LeaveRequest, blank=True)
     ratesGroup = models.ManyToManyField(RatesGroup, blank=True)
+
+    #### PAYROLL ####
+    payroll = models.ManyToManyField(Payroll, blank=True)
     
 
     def __str__(self):

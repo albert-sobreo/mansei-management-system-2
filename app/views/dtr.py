@@ -591,12 +591,12 @@ class DTRProcess(APIView):
             if datetime.time(13) <= dtr.dateTimeIn.time() <= datetime.time(17) or datetime.time(23) <= dtr.dateTimeIn.time():
                 utDuration -= datetime.timedelta(hours=1)
 
-            # # AT EARLY DEPARTURE
-            # if otMark > scheduleTimeOut:
-            #     utDuration += abs(otMark - scheduleTimeOut)
-            # # AT LATE DEPARTURE
-            # if otMark < scheduleTimeOut:
-            #     otDuration = abs(scheduleTimeOut - otMark)
+            # AT EARLY DEPARTURE FROM THE OT MARK
+            if otMark > scheduleTimeOut:
+                utDuration += abs(otMark - scheduleTimeOut)
+            # AT LATE DEPARTURE FROM THE OT MARK
+            if otMark < scheduleTimeOut:
+                otDuration = abs(scheduleTimeOut - otMark)
 
             nd += getND(dtr.dateTimeIn, scheduleTimeOut)
             ndot += getNDOT(dtr.dateTimeIn, scheduleTimeOut, dtr.dateTimeIn, scheduleTimeOut)
