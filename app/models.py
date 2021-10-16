@@ -53,7 +53,10 @@ class User(AbstractUser):
     department = models.CharField(max_length=50, null = True, blank = True)
     mobile = models.CharField(max_length=15, null = True, blank = True)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True, blank=True)
-    branch = models.ForeignKey('Branch', on_delete=models.CASCADE, null=True, blank=True)
+    branch = models.ForeignKey('Branch', related_name="user", on_delete=models.CASCADE, null=True, blank=True)
+    payrollable = models.BooleanField(default=True)
+
+    # DISCONNECT USER TO BRANCH IF THE USER IS NO LONGER IN THAT COMPANY
 
     class Meta:
         verbose_name = "User"
@@ -1457,9 +1460,12 @@ class Branch(models.Model):
 
     #### PAYROLL ####
     payroll = models.ManyToManyField(Payroll, blank=True)
+    deMinimisOfUser = models.ManyToManyField(DeMinimisOfUser, blank=True)
+    deMinimisPay = models.ManyToManyField(DeMinimisPay, blank=True)
+
+    bonusOfUser = models.ManyToManyField(BonusOfUser, blank=True)
+    bonusPay = models.ManyToManyField(BonusPay, blank=True)
     
 
     def __str__(self):
         return self.name
-
-

@@ -34,12 +34,14 @@
                 <th>Position</th>
             </thead>
             <tbody>
+                {% for employee in employees %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#modal">Clark Kent</td>
-                    <td>smpale@gmail.com</td>
-                    <td>+639741258378</td>
-                    <td>Accountant</td>
+                    <td class="link" data-toggle="modal" data-target="#modal">{{employee.first_name}} {{employee.last_name}}</td>
+                    <td>{{employee.email}}</td>
+                    <td>{{employee.mobile}}</td>
+                    <td>{{employee.position}}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 
@@ -152,11 +154,17 @@
                         </div>
 
                         <div class="row mt-3">
-                            <div class="col-3 mr-1">
+                            <div class="col-3">
                                 <a type="button" class="link" data-toggle="modal" data-target="#promotionModal">Give Promotion</a>
                             </div>
-                            <div class="col-3 ml-1">
+                            <div class="col-3">
                                 <a type="button" class="link" data-toggle="modal" data-target="#raiseModal">Give Raise</a>
+                            </div>
+                            <div class="col-3">
+                                <a type="button" class="link" data-toggle="modal" data-target="#bonusModal">Give Bonus</a>
+                            </div>
+                            <div class="col-3">
+                                <a type="button" class="link" data-toggle="modal" data-target="#bonusModal">Give Benefits</a>
                             </div>
                         </div>
 
@@ -290,6 +298,8 @@
             </div>
         </div>
 
+        <!-- GIVE BONUS MODAL -->
+
         <!-- ADD EMPLOYEE MODAL -->
         <div class="modal fade" id="addModal">
             <div class="modal-dialog">
@@ -411,7 +421,32 @@
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
-        el: "#app"
+        el: "#app",
+
+        data: {
+            modal: {
+
+            },
+            giveBenefits: {
+                user: null, //pk
+                benefits: [{
+                    name: null,
+                    amount: null,
+                }]
+            },
+
+            giveBonus: {
+                user: null,
+                bonuses: [{
+                    name: null,
+                    amount: null,
+                }]
+            }
+        },
+
+        methods: {
+
+        }
     })
 </script>
 
