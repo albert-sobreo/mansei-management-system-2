@@ -1031,7 +1031,7 @@ class DeliveryDestinations(models.Model):
         verbose_name_plural = "Delivery Destinations"
 
     def __str__(self):
-        return self.destination + ' ' + self.deliveries.code
+        return self.deliveries.code
 
 class DeliveryPhotos(models.Model):
     deliveries = models.ForeignKey(Deliveries, related_name="deliveryphotos", on_delete=models.CASCADE, null=True, blank=True)
@@ -1221,6 +1221,42 @@ class Payroll(models.Model):
     dateApproved = models.DateField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
 
+    bh = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    ot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    ut = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    nd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    ndot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rdot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rdnd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rdndot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rh = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rhot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rhnd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rhndot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    sh = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shnd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shndot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shw = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shwot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shwnd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shwndot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rhrd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rhrdot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rhrdnd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    rhrdndot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shrd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shrdot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shrdnd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    shrdndot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+
+    basicPay = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    grossPay = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    netPay = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+
+
+
 class DeMinimisPay(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="deminimispay")
     payroll = models.ForeignKey(Payroll, on_delete=models.PROTECT, related_name='deminimispay')
@@ -1285,6 +1321,7 @@ class DTRDayCategory(models.Model):
     holiday = models.ForeignKey(Holiday, on_delete=models.CASCADE)
 
 class RatesGroup(models.Model):
+    name = models.CharField(max_length=100, null=True, blank=True)
     bh = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
     ot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
     ut = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
@@ -1315,7 +1352,8 @@ class RatesGroup(models.Model):
     shrdnd = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
     shrdndot = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
     
-    
+    def __str__(self):
+        return self.name
 
 
 class BranchDefaultChildAccount(models.Model):
