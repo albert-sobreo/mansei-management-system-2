@@ -353,7 +353,7 @@ class DTRProcess(APIView):
             holidays = Holiday.objects.filter(date=datetime.date.today())
             
             restDayMarker = False
-            if datetime.date.today().weekday() == 6 or (datetime.date.today().weekday() == 5 and datetime.date.today().weekday() in employee.schedule.workDays):
+            if datetime.date.today().weekday() == 6 or (datetime.date.today().weekday() == 5 and str(datetime.date.today().weekday()) not in employee.schedule.workDays):
                 restDayMarker = True
                 if holidays:
                     for holiday in holidays:
@@ -707,26 +707,32 @@ class DTRProcess(APIView):
         
         id = request.data['idNum']
         employee = User.objects.get(idUser = id)
-        # try:   
-        if employee.dtr.all().latest('pk').dateTimeOut == None:
-            self.timeOut(id)
-            serializer = UserWithDTRSZ(employee)
-            x = serializer.data
-            x['dtr'] = serializer.data['dtr'][-1]
-            return Response(x)
+        # try:
+        try:
+            employee.dtr.all().latest('pk')
+            success=True
+
+        except:
+            success=False
+        if success:
+            if employee.dtr.all().latest('pk').dateTimeOut == None:
+                self.timeOut(id)
+                serializer = UserWithDTRSZ(employee)
+                x = serializer.data
+                x['dtr'] = serializer.data['dtr'][-1]
+                return Response(x)
+            else:
+                self.timeIn(id, request)
+                serializer = UserWithDTRSZ(employee)
+                x = serializer.data
+                x['dtr'] = serializer.data['dtr'][-1]
+                return Response(x)
         else:
             self.timeIn(id, request)
             serializer = UserWithDTRSZ(employee)
             x = serializer.data
+            print(x)
             x['dtr'] = serializer.data['dtr'][-1]
             return Response(x)
-        # except Exception as e:
-            # print(e)
-            # self.timeIn(id)
-            # serializer = UserWithDTRSZ(employee)
-            # x = serializer.data
-            # print(x)
-            # x['dtr'] = serializer.data['dtr'][-1]
-            # return Response(x)
         
         

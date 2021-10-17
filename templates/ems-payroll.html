@@ -71,13 +71,13 @@
                 {% else %}
                 {% for payroll in payrolls %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#payrollModal">{{payroll}}</td>
-                    <td>Clark Kent</td>
-                    <td>₱620.00</td>
-                    <td>114H 30M</td>
-                    <td>₱11,350.00</td>
-                    <td>₱12,712.00</td>
-                    <td class="font-bold font-size-14">₱11,840.00</td>
+                    <td class="link" data-toggle="modal" data-target="#payrollModal">{{payroll.user.idUser}}</td>
+                    <td>{{payroll.user.first_name}} {{payroll.user.last_name}}</td>
+                    <td>{{payroll.user.rate}}</td>
+                    <td>#H #M</td>
+                    <td>₱{{payroll.basicPay}}</td>
+                    <td>₱{{payroll.grossPay}}</td>
+                    <td class="font-bold font-size-14">₱{{payroll.netPay}}</td>
                 </tr>
                 {% endfor %}
                 {% endif %}

@@ -8,7 +8,7 @@ import sweetify
 from decimal import Decimal
 import pandas as pd
 import json
-from datetime import datetime
+import datetime
 
 class EMS_PayrollView(View):
     def get(self, request):
@@ -41,7 +41,84 @@ class EMS_GeneratePayroll(APIView):
         print(holidays)
 
         for user in users:
+            payroll = Payroll()
+            payroll.year = year
+            payroll.dateStart = dateStart
+            payroll.dateEnd = dateEnd
+            payroll.dateGenerated = datetime.date.today()
+            payroll.user = user
+            payroll.save()
+            request.user.branch.payroll.add(payroll)
+            rates = request.user.branch.ratesGroup.get(name='DOLE Standard')
+
             for dtr in user.dtr.filter(date__range=[dateStart, dateEnd]):
                 print(dtr)
+                if not dtr.payroll:
+                    dtr.payroll = payroll
+                    dtr.save()
+
+                    payroll.bh += dtr.bh * rates.bh * Decimal(user.rate/8)
+                    payroll.ot += dtr.ot * rates.ot * Decimal(user.rate/8)
+                    payroll.ut += dtr.ut * rates.ut * Decimal(user.rate/8)
+                    payroll.nd += dtr.nd * rates.nd * Decimal(user.rate/8)
+                    payroll.ndot += dtr.ndot * rates.ndot * Decimal(user.rate/8)
+                    payroll.rd += dtr.rd * rates.rd * Decimal(user.rate/8)
+                    payroll.rdot += dtr.rdot * rates.rdot * Decimal(user.rate/8)
+                    payroll.rdnd += dtr.rdnd * rates.rdnd * Decimal(user.rate/8)
+                    payroll.rdndot += dtr.rdndot * rates.rdndot * Decimal(user.rate/8)
+                    payroll.rh += dtr.rh * rates.rh * Decimal(user.rate/8)
+                    payroll.rhot += dtr.rhot * rates.rhot * Decimal(user.rate/8)
+                    payroll.rhnd += dtr.rhnd * rates.rhnd * Decimal(user.rate/8)
+                    payroll.rhndot += dtr.rhndot * rates.rhndot * Decimal(user.rate/8)
+                    payroll.sh += dtr.sh * rates.sh * Decimal(user.rate/8)
+                    payroll.shot += dtr.shot * rates.shot * Decimal(user.rate/8)
+                    payroll.shnd += dtr.shnd * rates.shnd * Decimal(user.rate/8)
+                    payroll.shndot += dtr.shndot * rates.shndot * Decimal(user.rate/8)
+                    payroll.shw += dtr.shw * rates.shw * Decimal(user.rate/8)
+                    payroll.shwot += dtr.shwot * rates.shwot * Decimal(user.rate/8)
+                    payroll.shwnd += dtr.shwnd * rates.shwnd * Decimal(user.rate/8)
+                    payroll.shwndot += dtr.shwndot * rates.shwndot * Decimal(user.rate/8)
+                    payroll.rhrd += dtr.rhrd * rates.rhrd * Decimal(user.rate/8)
+                    payroll.rhrdot += dtr.rhrdot * rates.rhrdot * Decimal(user.rate/8)
+                    payroll.rhrdnd += dtr.rhrdnd * rates.rhrdnd * Decimal(user.rate/8)
+                    payroll.rhrdndot += dtr.rhrdndot * rates.rhrdndot * Decimal(user.rate/8)
+                    payroll.shrd += dtr.shrd * rates.shrd * Decimal(user.rate/8)
+                    payroll.shrdot += dtr.shrdot * rates.shrdot * Decimal(user.rate/8)
+                    payroll.shrdnd += dtr.shrdnd * rates.shrdnd * Decimal(user.rate/8)
+                    payroll.shrdndot += dtr.shrdndot * rates.shrdndot * Decimal(user.rate/8)
+
+
+            payroll.basicPay = payroll.bh
+            payroll.grossPay = \
+                payroll.basicPay + \
+                payroll.ot + \
+                payroll.ut + \
+                payroll.nd + \
+                payroll.ndot + \
+                payroll.rd + \
+                payroll.rdot + \
+                payroll.rdnd + \
+                payroll.rdndot + \
+                payroll.rh + \
+                payroll.rhot + \
+                payroll.rhnd + \
+                payroll.rhndot + \
+                payroll.sh + \
+                payroll.shot + \
+                payroll.shnd + \
+                payroll.shndot + \
+                payroll.shw + \
+                payroll.shwot + \
+                payroll.shwnd + \
+                payroll.shwndot + \
+                payroll.rhrd + \
+                payroll.rhrdot + \
+                payroll.rhrdnd + \
+                payroll.rhrdndot + \
+                payroll.shrd + \
+                payroll.shrdot + \
+                payroll.shrdnd + \
+                payroll.shrdndot
+            payroll.save()
 
         return JsonResponse(0, safe=False)
