@@ -56,16 +56,16 @@ class SaveParty(APIView):
 
         childAR.code = new_AR 
         childAR.name = 'Trade Receivable - ' + jsonParty['name']
-        childAR.accountSubGroup = AccountSubGroup.objects.get(name='Accounts Receivable')
-        childAR.me = AccountChild.objects.get(name='Trade Receivable')
+        childAR.accountSubGroup = request.user.branch.subGroup.get(name='Accounts Receivable')
+        childAR.me = request.user.branch.accountChild.get(name='Trade Receivable')
         childAR.amount = 0.0
         childAR.description = " "
         childAR.save()
 
         childAP.code = new_AP
         childAP.name = 'Trade Payables - ' + jsonParty['name']
-        childAP.accountSubGroup = AccountSubGroup.objects.get(name='Accounts Payables')
-        childAP.me = AccountChild.objects.get(name='Trade Payables')
+        childAP.accountSubGroup = request.user.branch.subGroup.get(name='Accounts Payables')
+        childAP.me = request.user.branch.accountChild.get(name='Trade Payables')
         childAP.amount = 0.0
         childAP.description = ""
         childAP.save()
