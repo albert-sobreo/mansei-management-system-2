@@ -31,7 +31,12 @@ class AddPPE(APIView):
         equipment.usefulLife = request.data['usefulLife']
         # equipment.deprCycle = request.date['deprCycle']
         equipment.deprCycle = 1
-        equipment.deprRate = Decimal(Decimal(equipment.purchasePrice)*equipment.deprCycle)/(int(equipment.usefulLife)*12)
+        try:
+            equipment.deprRate = Decimal(Decimal(equipment.purchasePrice)*equipment.deprCycle)/(int(equipment.usefulLife)*12)
+        except Exception as e:
+            print(e)
+            sweetify.sweetalert(request, icon='error', title='Error!', text="Purchasing Price and Useful Life are required to calculate Depr. rate.", persistent='Dismiss')
+            return JsonResponse(0, safe=False)
 
         pDate = (equipment.purchaseDate).split('-')
         equipment.startingDeprDate = date(int(pDate[0]), int(pDate[1]), 1)
