@@ -209,7 +209,7 @@ class SaveQuotations(APIView):
             qqitemsmerch.quotations = qq
             qqitemsmerch.pricePerCubic = item['pricePerCubic']
             qqitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
-            qqitemsmerch.warehouse = Warehouse.objects.get(pk=item['warehouse'])
+            qqitemsmerch.warehouse = qqitemsmerch.merchInventory.warehouseitems.all()[0].warehouse
             qqitemsmerch.remaining = item['remaining']
             qqitemsmerch.qty = item['quantity']
             qqitemsmerch.totalCost = Decimal(item['totalCost'])
