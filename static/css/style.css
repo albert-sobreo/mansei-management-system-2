@@ -1118,3 +1118,12 @@ select.form-control{
 .delay-2{
     animation-delay: .2s;
 }
+
+.timesheet-hours{
+    transition: 0.2s;
+}
+
+.timesheet-hours:hover{
+    transition: 0.2s;
+    color: black !important;
+}

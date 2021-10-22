@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from ..models import MerchandiseInventory, Warehouse, WarehouseItems
+from ..models import DTR, MerchandiseInventory, Warehouse, WarehouseItems
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
@@ -36,3 +36,43 @@ class EMS_EmployeeTimesheetView(View):
 class EMS_TimesheetTabularView(View):
     def get(self, request):
         return render(request, 'ems-timesheet-tabular.html')
+
+class EMS_EditTimesheetHours(View):
+    def post(self, request, pk, params):
+        print(pk, params)
+        for val, keys in request.POST.items():
+            print(val, keys)
+
+        dtr = DTR.objects.get(pk=pk)
+        dtr.bh = request.POST["bh"]
+        dtr.ot = request.POST["ot"]
+        dtr.nd = request.POST["nd"]
+        dtr.ndot = request.POST["ndot"]
+        dtr.rd = request.POST["rd"]
+        dtr.rdot = request.POST["rdot"]
+        dtr.rdnd = request.POST["rdnd"]
+        dtr.rdndot = request.POST["rdndot"]
+        dtr.rh = request.POST["rh"]
+        dtr.rhot = request.POST["rhot"]
+        dtr.rhnd = request.POST["rhnd"]
+        dtr.rhndot = request.POST["rhndot"]
+        dtr.sh = request.POST["sh"]
+        dtr.shot = request.POST["shot"]
+        dtr.shnd = request.POST["shnd"]
+        dtr.shndot = request.POST["shndot"]
+        dtr.shw = request.POST["shw"]
+        dtr.shwot = request.POST["shwot"]
+        dtr.shwnd = request.POST["shwnd"]
+        dtr.shwndot = request.POST["shwndot"]
+        dtr.rhrd = request.POST["rhrd"]
+        dtr.rhrdot = request.POST["rhrdot"]
+        dtr.rhrdnd = request.POST["rhrdnd"]
+        dtr.rhrdndot = request.POST["rhrdndot"]
+        dtr.shrd = request.POST["shrd"]
+        dtr.shrdot = request.POST["shrdot"]
+        dtr.shrdnd = request.POST["shrdnd"]
+        dtr.shrdndot = request.POST["shrdndot"]
+        dtr.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return redirect("/ems-my-timesheet/?{}".format(params))

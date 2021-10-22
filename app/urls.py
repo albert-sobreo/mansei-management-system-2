@@ -313,4 +313,5 @@ urlpatterns = [
     path('ems-import-holidays/', login_required(views.EMS_ImportHolidays.as_view())),
     path('import-chart-of-accounts/', login_required(views.ImportChartOfAccounts.as_view())),
     path('ems-generate-payroll/', login_required(views.EMS_GeneratePayroll.as_view())),
+    path('ems-edit-timesheet-hours/<int:pk>/<str:params>/', login_required(views.EMS_EditTimesheetHours.as_view()))
 ]

@@ -99,73 +99,210 @@
                 </div>
             </div>
             <div class="col-12 px-3 mb-3 order-card">
-                <div class="row px-3 mt-3">
+                <div class="row px-3 my-3">
                     <div class="col">
-                        <span class="font-bold font-size-14">Edit Hours</span>
+                        <button @click="toggleHoursView('hours{{dtr.pk}}')" class="font-bold btn btn-warning btn-sm">Edit Hours</button>
                     </div>
                 </div>
-                <div class="row px-3 mb-2">
-                    <div class="col my-3">
-                        <label for="" class="gray">BH</label><br>
-                        <div class="placeholder" data-placeholder="H">
-                            <input type="text" class="form-control-special" onkeypress="validate()">
+
+                <form :action="'/ems-edit-timesheet-hours/{{dtr.pk}}/' + params + '/'" method="POST" >{% csrf_token %}
+                    <div id="hours{{dtr.pk}}" style="display: none;"> <!-- SHOW/HIDE THIS DIV-->
+                        <!-- FIRST LINE -->
+                        <div class="row px-3 mb-2">
+                            <div class="col my-3">
+                                <label title="Basic Hours" for="" class="text-warning timesheet-hours">BH</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.bh}}" name="bh" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Overtime" for="" class="gray timesheet-hours">OT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.ot}}" name="ot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Night Differential" for="" class="gray timesheet-hours">ND</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.nd}}" name="nd" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Night Differential Overtime" for="" class="gray timesheet-hours">NDOT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.ndot}}" name="ndot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Rest Day Hours" for="" class="text-warning timesheet-hours">RD</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rd}}" name="rd" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Rest Day Overtime" for="" class="gray timesheet-hours">RD OT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rdot}}" name="rdot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Rest Day Night Differential" for="" class="gray timesheet-hours">RD ND</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rdnd}}" name="rdnd" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Rest Day Night Differential Overtime" for="" class="gray timesheet-hours">RD NDOT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rdndot}}" name="rdndot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- SECOND LINE -->
+                        <div class="row px-3 mb-2">
+                            <div class="col my-3">
+                                <label title="Regular Holiday Hours" for="" class="text-warning timesheet-hours">RH</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rh}}" name="rh" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Regular Holiday Overtime" for="" class="gray timesheet-hours">RH OT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rhot}}" name="rhot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Regular Holiday Night Differential" for="" class="gray timesheet-hours">RH ND</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rhnd}}" name="rhnd" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Regular Holiday Night Differential Overtime" for="" class="gray timesheet-hours">RH NDOT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rhndot}}" name="rhndot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Special Holiday Hours" for="" class="text-warning timesheet-hours">SH</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.sh}}" name="sh" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Special Holiday Overtime" for="" class="gray timesheet-hours">SH OT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shot}}" name="shot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Special Holiday Night Differential" for="" class="gray timesheet-hours">SH ND</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shnd}}" name="shnd" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Special Holiday Night Differential Overtime" for="" class="gray timesheet-hours">SH NDOT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shndot}}" name="shndot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- THIRD LINE -->
+                        <div class="row px-3 mb-2">
+                            <div class="col my-3">
+                                <label title="Special Working Holiday Hours" for="" class="text-warning timesheet-hours">SHW</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shw}}" name="shw" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Special Working Holiday Overtime" for="" class="gray timesheet-hours">SHW OT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shwot}}" name="shwot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Special Working Holiday Night Differential" for="" class="gray timesheet-hours">SHW ND</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shwnd}}" name="shwnd" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Special Holiday Night Differential Overtime" for="" class="gray timesheet-hours">SHW NDOT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shwndot}}" name="shwndot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Regular Holiday Rest Day Hours" for="" class="text-warning timesheet-hours">RHRD</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rhrd}}" name="rhrd" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Regular Holiday Rest Day Overtime" for="" class="gray timesheet-hours">RHRD OT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rhrdot}}" name="rhrdot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Regular Holiday Rest Day Night Differential" for="" class="gray timesheet-hours">RHRD ND</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rhrdnd}}" name="rhrdnd" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Regular Holiday Rest Day Night Differential Overtime" for="" class="gray timesheet-hours">RHRD NDOT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.rhrdndot}}" name="rhrdndot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECOND LINE -->
+                        <div class="row px-3 mb-2">
+                            <div class="col my-3">
+                                <label title="Special Holiday Rest Day Hours" for="" class="text-warning timesheet-hours">SHRD</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shrd}}" name="shrd" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Special Holiday Rest Day Overtime" for="" class="gray timesheet-hours">SHRD OT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shrdot}}" name="shrdot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Special Holiday Rest Day Night Differential" for="" class="gray timesheet-hours">SHRD ND</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shrdnd}}" name="shrdnd" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label title="Special Holiday Rest Day Night Differential Overtime" for="" class="gray timesheet-hours">SHRD NDOT</label><br>
+                                <div class="placeholder" data-placeholder="H">
+                                    <input value="{{dtr.shrdndot}}" name="shrdndot" type="text" class="form-control-special" onkeypress="validate()">
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                            </div>
+                            <div class="col my-3">
+                            </div>
+                            <div class="col my-3">
+                            </div>
+                            <div class="col my-3">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button @click="loadingModal()" class="col btn btn-primary" type="submit">Save</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="col my-3">
-                        <label for="" class="gray">OT</label><br>
-                        <div class="placeholder" data-placeholder="H">
-                            <input type="text" class="form-control-special" onkeypress="validate()">
-                        </div>
-                    </div>
-                    <div class="col my-3">
-                        <label for="" class="gray">ND</label><br>
-                        <div class="placeholder" data-placeholder="H">
-                            <input type="text" class="form-control-special" onkeypress="validate()">
-                        </div>
-                    </div>
-                    <div class="col my-3">
-                        <label for="" class="gray">SUN</label><br>
-                        <div class="placeholder" data-placeholder="H">
-                            <input type="text" class="form-control-special" onkeypress="validate()">
-                        </div>
-                    </div>
-                    <div class="col my-3">
-                        <label for="" class="gray">SUN OT</label><br>
-                        <div class="placeholder" data-placeholder="H">
-                            <input type="text" class="form-control-special" onkeypress="validate()">
-                        </div>
-                    </div>
-                    <div class="col my-3">
-                        <label for="" class="gray">RH</label><br>
-                        <div class="placeholder" data-placeholder="H">
-                            <input type="text" class="form-control-special" onkeypress="validate()">
-                        </div>
-                    </div>
-                    <div class="col my-3">
-                        <label for="" class="gray">RH OT</label><br>
-                        <div class="placeholder" data-placeholder="H">
-                            <input type="text" class="form-control-special" onkeypress="validate()">
-                        </div>
-                    </div>
-                    <div class="col my-3">
-                        <label for="" class="gray">SH</label><br>
-                        <div class="placeholder" data-placeholder="H">
-                            <input type="text" class="form-control-special" onkeypress="validate()">
-                        </div>
-                    </div>
-                    <div class="col my-3">
-                        <label for="" class="gray">SH OT</label><br>
-                        <div class="placeholder" data-placeholder="H">
-                            <input type="text" class="form-control-special" onkeypress="validate()">
-                        </div>
-                    </div>
-                    <div class="col my-3">
-                        <label for="" class="gray">BH</label><br>
-                        <div class="placeholder" data-placeholder="H">
-                            <input type="text" class="form-control-special" onkeypress="validate()">
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
         {% endfor %}
@@ -190,7 +327,8 @@
             period: '',
             dateRange: '',
             yearList: [],
-            semiMonthPeriod: ''
+            semiMonthPeriod: '',
+            params: '',
         },
 
         methods: {
@@ -226,11 +364,28 @@
                         icon: 'error',
                     })
                 }
+            },
+            toggleHoursView(id){
+                hourID = document.getElementById(id)
+                if(hourID.style.display == "block"){
+                    hourID.style.display = 'none'
+                } else {
+                    hourID.style.display = 'block'
+                }
+            },
+            loadingModal(){
+                message = "Saving Changes"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
             }
         },
         mounted(){
             this.onload()
             let params = new URLSearchParams(location.search);
+            this.params = params.toString()
             this.year = params.get('year') ? params.get('year') : ''
             this.dateRange = params.get('dateRange') ? params.get('dateRange').replace('%', ' ') : ''
             this.period = params.get('period') ? params.get('period') : ''
