@@ -9,9 +9,12 @@ from rest_framework.response import Response
 from decimal import Decimal
 from django.core import serializers
 import datetime
+from django.core.exceptions import PermissionDenied
 
 class DTRList(View):
     def get(self, request, format=None):
+        if request.user.authLevel != 'dtr':
+            raise PermissionDenied()
         context = {
             'User': User.objects.all()
         }
@@ -41,7 +44,8 @@ class FetchUserDTR(APIView):
 
 class DTRView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel != 'dtr':
+            raise PermissionDenied()
         return render(request, 'ems-dtr.html')
 
 # RETURN MESSAGES

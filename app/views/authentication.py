@@ -19,6 +19,8 @@ class LoginView(View):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             auth_login(request, user)
+            if user.authLevel == 'dtr':
+                return redirect('/ems-dtr/')
             return redirect('/')
         else:
             return HttpResponse(user)

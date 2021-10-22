@@ -29,7 +29,7 @@ class EMS_PayrollView(View):
 
 class EMS_GeneratePayroll(APIView):
     def post(self, request):
-        users = User.objects.filter(branch = request.user.branch)
+        users = User.objects.filter(branch = request.user.branch, payrollable = True)
         year = request.data[0]
         period = request.data[1]
         dateRange = request.data[2]
