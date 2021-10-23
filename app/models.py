@@ -1219,7 +1219,7 @@ class Payroll(models.Model):
     dateEnd = models.DateField(null=True, blank=True)
     dateGenerated = models.DateField(null=True, blank=True)
     dateApproved = models.DateField(null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="payroll")
 
     bh = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     ot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
@@ -1252,8 +1252,10 @@ class Payroll(models.Model):
     shrdndot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
 
     basicPay = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
-    grossPay = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
-    netPay = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    grossPayBeforeBonus = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    grossPayAfterBonus = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    netPayBeforeTaxes = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    netPayAfterTaxes = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
 
 
 
@@ -1354,6 +1356,62 @@ class RatesGroup(models.Model):
     
     def __str__(self):
         return self.name
+
+class SSSContributionRate(models.Model):
+    name = models.CharField(max_length=250, null=True, blank=True)
+    upperLimit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    lowerLimit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    ee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    er = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    def __str__(self):
+        return self.name + "   " + str(self.lowerLimit) + " --- " + str(self.upperLimit)
+
+class PHICContributionRate(models.Model):
+    name = models.CharField(max_length=250, null=True, blank=True)
+    upperLimit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    lowerLimit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    rate = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
+
+    def __str__(self):
+        return self.name + "   " + str(self.lowerLimit) + " --- " + str(self.upperLimit)
+
+class PagibigContributionRate(models.Model):
+    name = models.CharField(max_length=250, null=True, blank=True)
+    rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    def __str__(self):
+        return self.name + "   " + str(self.rate)
+
+class SSSEmployeeDeduction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, null=True, blank=True)
+    ee = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    er = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    sssContributionRate = models.ForeignKey(SSSContributionRate, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name + "   " + str(self.payroll.dateStart) + " --- " + str(self.payroll.dateEnd)
+
+class PHICEmployeeDeduction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, null=True, blank=True)
+    ee = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    er = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    phicContributionRate = models.ForeignKey(PHICContributionRate, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name + "   " + str(self.payroll.dateStart) + " --- " + str(self.payroll.dateEnd)
+
+class PagibigEmployeeDeduction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, null=True, blank=True)
+    amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    pagibigContributionRate = models.ForeignKey(PagibigContributionRate, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name + "   " + str(self.payroll.dateStart) + " --- " + str(self.payroll.dateEnd)
+
 
 
 class BranchDefaultChildAccount(models.Model):
@@ -1503,7 +1561,11 @@ class Branch(models.Model):
 
     bonusOfUser = models.ManyToManyField(BonusOfUser, blank=True)
     bonusPay = models.ManyToManyField(BonusPay, blank=True)
-    
+
+    #### EMPLOYEE DEDUCTIONS ####
+    sssEmployeeDeduction = models.ManyToManyField(SSSEmployeeDeduction, blank=True)
+    phicEmployeeDeduction = models.ManyToManyField(PHICEmployeeDeduction, blank=True)
+    pagibigEmployeeDeduction = models.ManyToManyField(PagibigEmployeeDeduction, blank=True)
 
     def __str__(self):
         return self.name

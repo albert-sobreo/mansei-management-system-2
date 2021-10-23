@@ -6,6 +6,10 @@ from rest_framework.views import APIView
 from ..forms import *
 from ..models import *
 import sweetify
+from decimal import Decimal
+import pandas as pd
+import json
+from datetime import datetime
 
 class BranchProfileView(View):
     def get(self, request, format=None):
@@ -114,3 +118,50 @@ class SaveDefaultAccounts(APIView):
 class BranchesView(View):
     def get(self, request, format=None):
         return render(request, 'branches.html')
+
+class PayrollContributionsView(View):
+    def get(self, request):
+        return render(request, 'contribution-branch-profile.html')
+
+class ImportSSSContributions(View):
+    def post(self, request):
+        df = pd.read_excel(request.FILES['sss'])
+        jsonDF = json.loads(df.to_json(orient='records'))
+
+        for item in jsonDF:
+            sss = SSSContributionRate()
+            print(item)
+
+            if SSSContributionRate.objects.filter(name=request.POST['sssName'], upperLimit=item['Upper Limit'], lowerLimit=item['Lower Limit']):
+                print('This SSS contribution rate already exists')
+                continue
+            sss.name = request.POST['sssName']
+            sss.upperLimit = item['Upper Limit']
+            sss.lowerLimit = item['Lower Limit']
+            sss.ee = item['EE']
+            sss.er = item['ER']
+
+            sss.save()
+
+        sweetify.sweetalert(request, icon="success", title="Success!", persistent="Dismiss")
+        return redirect('/contribution-profile/')
+
+class ImportPHICContributions(View):
+    def post(self, request):
+        df = pd.read_excel(request.FILES['phic'])
+        jsonDF = json.loads(df.to_json(orient='records'))
+
+        for item in jsonDF:
+            phic = PHICContributionRate()
+
+            if PHICContributionRate.objects.filter(name=request.POST['phicName']):
+                print('This PHIC contribution rate already exists')
+                continue
+            phic.name = request.POST['phicName']
+            phic.upperLimit = item['Upper Limit']
+            phic.lowerLimit = item['Lower Limit']
+            phic.rate = item['Rate']
+            phic.save()
+
+        sweetify.sweetalert(request, icon="success", title="Success!", persistent="Dismiss")
+        return redirect('/contribution-profile/')

@@ -689,16 +689,18 @@
             watchers(){
                 this.order.otherFeesTotal = this.otherFeesTotal.reduce((a,b)=>Number(a)+Number(b), 0)
                 this.order.amountDue = this.amountDue.reduce((a,b)=>Number(a)+Number(b),0)
-                this.order.taxPeso = this.order.amountDue * (this.order.taxRate/100)
-                this.order.atc[0].amount = this.order.amountDue
+                this.order.atc[0].amount = this.order.amountDue - this.order.taxPeso
                 this.order.atc[0].amountWithheld = (((this.order.atc[0].taxRate)/100) * this.order.atc[0].amount)
                 if (this.order.discountType == 'percent'){
                     this.order.totalDiscount = (this.order.amountDue*(this.order.discount / 100))
+                    this.order.amountDue = this.order.amountDue - this.order.totalDiscount
                 }
                 else if (this.order.discountType == 'peso'){
                     this.order.totalDiscount = this.order.discount
+                    this.order.amountDue = this.order.amountDue - this.order.totalDiscount
                 }
-                this.order.amountTotal = this.order.amountDue + this.order.otherFeesTotal + this.order.taxPeso - this.order.totalDiscount
+                this.order.taxPeso = this.order.amountDue * (this.order.taxRate/100)
+                this.order.amountTotal = this.order.amountDue + this.order.otherFeesTotal - this.order.withholdingTax
                 this.order.withholdingTax = Number(this.order.amountPaid/((1+(this.order.taxRate/100)-(this.order.atc[0].taxRate)/100))) * (this.order.atc[0].taxRate)/100
             },
 

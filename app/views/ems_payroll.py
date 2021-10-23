@@ -41,6 +41,15 @@ class EMS_GeneratePayroll(APIView):
         print(holidays)
 
         for user in users:
+            try:
+                previousPayroll = user.payroll.latest('pk')
+            except:
+                previousPayroll = Payroll()
+                previousPayroll.basicPay = Decimal(0)
+                previousPayroll.grossPayBeforeBonus = Decimal(0)
+                previousPayroll.grossPayAfterBonus = Decimal(0)
+                previousPayroll.netPayAfterTaxes = Decimal(0)
+                previousPayroll.netPayBeforeTaxes = Decimal(0)
             payroll = Payroll()
             payroll.year = year
             payroll.dateStart = dateStart
@@ -89,7 +98,7 @@ class EMS_GeneratePayroll(APIView):
 
 
             payroll.basicPay = payroll.bh
-            payroll.grossPay = \
+            payroll.grossPayBeforeBonus = \
                 payroll.basicPay + \
                 payroll.ot + \
                 payroll.ut + \
@@ -119,6 +128,69 @@ class EMS_GeneratePayroll(APIView):
                 payroll.shrdot + \
                 payroll.shrdnd + \
                 payroll.shrdndot
+
             payroll.save()
 
+            payroll.grossPayAfterBonus = payroll.grossPayBeforeBonus
+            payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
+
+            monthlyBasicPay = previousPayroll.basicPay + payroll.basicPay
+            monthlyGrossPayBeforeBonus = previousPayroll.grossPayBeforeBonus + payroll.grossPayBeforeBonus
+            monthlyGrossPayAfterBonus = previousPayroll.grossPayAfterBonus + payroll.grossPayAfterBonus
+            monthlyNetPayBeforeTaxes = previousPayroll.netPayBeforeTaxes + payroll.netPayBeforeTaxes
+            montlyNetPayAfterTaxes = previousPayroll.netPayAfterTaxes = payroll.netPayAfterTaxes
+            
+            dateObj = datetime.datetime.strptime(payroll.dateEnd, '%Y-%m-%d')
+            if dateObj.day == 25:
+                sss = SSSContributionRate.objects.all()
+                for rates in sss:
+                    print(rates)
+                    if rates.lowerLimit <= monthlyGrossPayBeforeBonus < rates.upperLimit:
+                        sssDeduction = SSSEmployeeDeduction()
+                        sssDeduction.ee = rates.ee
+                        sssDeduction.er = rates.er
+                        sssDeduction.sssContributionRate = rates
+                        sssDeduction.user = user
+                        sssDeduction.payroll = payroll
+                        sssDeduction.save()
+                        request.user.branch.sssEmployeeDeduction.add(sssDeduction)
+
+                        payroll.netPayBeforeTaxes -= sssDeduction.ee
+
+                phic = PHICContributionRate.objects.all()
+                for rates in phic:
+                    if rates.lowerLimit <= monthlyGrossPayBeforeBonus <= rates.upperLimit:
+                        phicDeduction = PHICEmployeeDeduction()
+                        phicDeduction.ee = (rates.rate*monthlyGrossPayBeforeBonus)
+                        phicDeduction.er = (rates.rate*monthlyGrossPayBeforeBonus)
+                        phicDeduction.phicContributionRate = rates
+                        phicDeduction.user = user
+                        phicDeduction.payroll = payroll
+                        phicDeduction.save()
+                        request.user.branch.phicEmployeeDeduction.add(phicDeduction)
+                        payroll.netPayBeforeTaxes -= phicDeduction.ee
+                    elif monthlyGrossPayBeforeBonus > rates.upperLimit:
+                        phicDeduction = PHICEmployeeDeduction()
+                        phicDeduction.ee = rates.rate*rates.upperLimit
+                        phicDeduction.er = rates.rate*rates.upperLimit
+                        phicDeduction.phicContributionRate = rates
+                        phicDeduction.user = user
+                        phicDeduction.payroll = payroll
+                        phicDeduction.save()
+                        request.user.branch.phicEmployeeDeduction.add(phicDeduction)
+                        payroll.netPayBeforeTaxes -= phicDeduction.ee
+
+                pagibig = PagibigContributionRate.objects.latest('pk')
+                pagibigDeduction = PagibigEmployeeDeduction()
+                pagibigDeduction.payroll = payroll
+                pagibigDeduction.amount = pagibig.rate
+                pagibigDeduction.pagibigContributionRate = pagibig
+                pagibigDeduction.user = user
+                payroll.netPayBeforeTaxes -= pagibigDeduction.amount
+                pagibigDeduction.save()
+                request.user.branch.pagibigEmployeeDeduction.add(pagibigDeduction)
+
+            payroll.netPayAfterTaxes = payroll.netPayBeforeTaxes
+                
+            payroll.save()
         return JsonResponse(0, safe=False)
