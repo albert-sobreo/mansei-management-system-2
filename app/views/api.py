@@ -2,6 +2,7 @@ from django.db.models import query
 from django.http.response import Http404, JsonResponse
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework.decorators import permission_classes
 from ..serializers import *
 from rest_framework.views import APIView
 from ..models import *
@@ -402,3 +403,12 @@ class CRNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = CRNestedSZ
     queryset = CompletionReport.objects.all()
+
+
+
+
+########## PAYROLL ##########
+class ComplexPayrollAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ComplexPayrollSZ
+    queryset = Payroll.objects.all()

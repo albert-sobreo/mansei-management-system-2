@@ -12,9 +12,19 @@ class UserNameOnlySZ(serializers.ModelSerializer):
         model = User
         fields = [
             'first_name',
-            'last_name'
+            'last_name',
+            'idUser'
         ]
 
+class UserNameIDRateSZZ(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'idUser',
+            'rate'
+        ]
 
 
 
@@ -801,7 +811,7 @@ class CRNestedSZ(serializers.ModelSerializer):
 
 
 
-
+########## LEAVE AND OT REQUESTS ##########
 class OTRequestSZ(serializers.ModelSerializer):
     requestedBy = UserNameOnlySZ(read_only=True)
     approvedBy = UserNameOnlySZ(read_only=True)
@@ -822,3 +832,34 @@ class LeaveRequestSZ(serializers.ModelSerializer):
     class Meta:
         model = LeaveRequest
         fields = '__all__'
+
+
+
+
+
+########## PAYROLL ##########
+class SSSEmployeeDeductionSZ(serializers.ModelSerializer):
+    class Meta:
+        model = SSSEmployeeDeduction
+        fields = "__all__"
+
+class PHICEmployeeDeductionSZ(serializers.ModelSerializer):
+    class Meta:
+        model = PHICEmployeeDeduction
+        fields = "__all__"
+
+class PagibigEmployeeDeductionSZ(serializers.ModelSerializer):
+    class Meta:
+        model = PagibigEmployeeDeduction
+        fields = "__all__"
+
+class ComplexPayrollSZ(serializers.ModelSerializer):
+    user = UserNameIDRateSZZ(read_only=True)
+    sssemployeededuction = SSSEmployeeDeductionSZ(read_only=True)
+    phicemployeededuction = PHICEmployeeDeductionSZ(read_only=True)
+    pagibigemployeededuction = PagibigEmployeeDeductionSZ(read_only=True)
+
+    class Meta:
+        model = Payroll
+        fields = "__all__"
+        depth = 1

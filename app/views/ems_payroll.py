@@ -50,6 +50,8 @@ class EMS_GeneratePayroll(APIView):
                 previousPayroll.grossPayAfterBonus = Decimal(0)
                 previousPayroll.netPayAfterTaxes = Decimal(0)
                 previousPayroll.netPayBeforeTaxes = Decimal(0)
+            if user.payroll.filter(dateStart=dateStart, dateEnd=dateEnd):
+                continue
             payroll = Payroll()
             payroll.year = year
             payroll.dateStart = dateStart
@@ -95,6 +97,36 @@ class EMS_GeneratePayroll(APIView):
                     payroll.shrdot += dtr.shrdot * rates.shrdot * Decimal(user.rate/8)
                     payroll.shrdnd += dtr.shrdnd * rates.shrdnd * Decimal(user.rate/8)
                     payroll.shrdndot += dtr.shrdndot * rates.shrdndot * Decimal(user.rate/8)
+
+                    payroll.bhTotalHours += dtr.bh
+                    payroll.otTotalHours += dtr.ot
+                    payroll.utTotalHours += dtr.ut
+                    payroll.ndTotalHours += dtr.nd
+                    payroll.ndotTotalHours += dtr.ndot
+                    payroll.rdTotalHours += dtr.rd
+                    payroll.rdotTotalHours += dtr.rdot
+                    payroll.rdndTotalHours += dtr.rdnd
+                    payroll.rdndotTotalHours += dtr.rdndot
+                    payroll.rhTotalHours += dtr.rh
+                    payroll.rhotTotalHours += dtr.rhot
+                    payroll.rhndTotalHours += dtr.rhnd
+                    payroll.rhndotTotalHours += dtr.rhndot
+                    payroll.shTotalHours += dtr.sh
+                    payroll.shotTotalHours += dtr.shot
+                    payroll.shndTotalHours += dtr.shnd
+                    payroll.shndotTotalHours += dtr.shndot
+                    payroll.shwTotalHours += dtr.shw
+                    payroll.shwotTotalHours += dtr.shwot
+                    payroll.shwndTotalHours += dtr.shwnd
+                    payroll.shwndotTotalHours += dtr.shwndot
+                    payroll.rhrdTotalHours += dtr.rhrd
+                    payroll.rhrdotTotalHours += dtr.rhrdot
+                    payroll.rhrdndTotalHours += dtr.rhrdnd
+                    payroll.rhrdndotTotalHours += dtr.rhrdndot
+                    payroll.shrdTotalHours += dtr.shrd
+                    payroll.shrdotTotalHours += dtr.shrdot
+                    payroll.shrdndTotalHours += dtr.shrdnd
+                    payroll.shrdndotTotalHours += dtr.shrdndot
 
 
             payroll.basicPay = payroll.bh

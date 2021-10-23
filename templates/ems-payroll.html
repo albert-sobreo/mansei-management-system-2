@@ -55,7 +55,6 @@
                 <th>ID No.</th>
                 <th>Employee</th>
                 <th>Daily Rate</th>
-                <th>Total Hours</th>
                 <th>Basic Pay</th>
                 <th>Gross Pay</th>
                 <th>Net Pay</th>
@@ -71,13 +70,12 @@
                 {% else %}
                 {% for payroll in payrolls %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#payrollModal">{{payroll.user.idUser}}</td>
+                    <td @click="fetchPayroll('{{payroll.pk}}')" class="link" data-toggle="modal" data-target="#payrollModal">{{payroll.user.idUser}}</td>
                     <td>{{payroll.user.first_name}} {{payroll.user.last_name}}</td>
-                    <td>{{payroll.user.rate}}</td>
-                    <td>#H #M</td>
-                    <td>₱{{payroll.basicPay}}</td>
-                    <td>₱{{payroll.grossPayAfterBonus}}</td>
-                    <td class="font-bold font-size-14">₱{{payroll.netPayAfterTaxes}}</td>
+                    <td>₱[[formatPrice('{{payroll.user.rate}}')]]</td>
+                    <td>₱[[formatPrice('{{payroll.basicPay}}')]]</td>
+                    <td>₱[[formatPrice('{{payroll.grossPayAfterBonus}}')]]</td>
+                    <td class="font-bold font-size-14">₱[[formatPrice('{{payroll.netPayAfterTaxes}}')]]</td>
                 </tr>
                 {% endfor %}
                 {% endif %}
@@ -86,7 +84,7 @@
 
         <!-- PAYROLL MODAL -->
         <div class="modal fade" id="payrollModal">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content b-radius-15">
                     <div class="modal-body py-0">
                         <!-- TOP CARD -->
@@ -95,12 +93,12 @@
                             <div class="col my-3">
                                 <label for="" class="gray">ID Number</label>
                                 <br>
-                                <span class="font-size-14 font-bold">00331137</span>
+                                <span class="font-size-14 font-bold">[[modal.user.idUser]]</span>
                             </div>
                             <div class="col my-3">
                                 <label for="" class="gray">Employee Name</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Clark Kent</span>
+                                <span class="font-size-14 font-bold">[[modal.user.first_name]] [[modal.user.last_name]]</span>
                             </div>
                         </div>
 
@@ -110,12 +108,12 @@
                             <div class="col my-3">
                                 <label for="" class="gray">Total Hours</label>
                                 <br>
-                                <span class="font-size-14 font-bold">114H 30M</span>
+                                <span class="font-size-14 font-bold">[[roundNumber1(Number(modal.bhTotalHours) + Number(modal.otTotalHours))]] Hours</span>
                             </div>
                             <div class="col my-3">
                                 <label for="" class="gray">Period</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Mar. 16 - Mar. 31, 2021</span>
+                                <span class="font-size-14 font-bold">[[formatDate(modal.dateStart)]] - [[formatDate(modal.dateEnd)]]</span>
                             </div>
                         </div>
 
@@ -124,37 +122,45 @@
                             <div class="col my-3">
                                 <label for="" class="gray">Work Hours</label>
                                 <div class="d-flex flex-column">
-                                    <span class="font-bold mt-1">72H <span class="gray">BH</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">SUN</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">RH</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">SH</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.bhTotalHours)]]H <span class="gray">BH</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rdTotalHours)]]H <span class="gray">RD</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rhTotalHours)]]H <span class="gray">RH</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.shTotalHours)]]H <span class="gray">SH</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rhrdTotalHours)]]H <span class="gray">RHRD</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.shrdTotalHours)]]H <span class="gray">SHRD</span></span>
                                 </div>
                             </div>
                             <div class="col my-3">
                                 <label for="" class="gray">OT Hours</label>
                                 <div class="d-flex flex-column">
-                                    <span class="font-bold mt-1">2H 30M <span class="gray">OT</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">SUN OT</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">RH OT</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">SH OT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.otTotalHours)]] <span class="gray">OT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rdotTotalHours)]]H <span class="gray">RD OT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rhotTotalHours)]]H <span class="gray">RH OT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.shotTotalHours)]]H <span class="gray">SH OT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rhrdotTotalHours)]]H <span class="gray">RHRD OT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.shrdotTotalHours)]]H <span class="gray">SHRD OT</span></span>
                                 </div>
                             </div>
                             <div class="col my-3">
                                 <label for="" class="gray">ND Hours</label>
                                 <div class="d-flex flex-column">
-                                    <span class="font-bold mt-1">0H <span class="gray">ND</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">SUN ND</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">RH ND</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">SH ND</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.ndTotalHours)]]H <span class="gray">ND</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rdndTotalHours)]]H <span class="gray">RD ND</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rhndTotalHours)]]H <span class="gray">RH ND</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.shndTotalHours)]]H <span class="gray">SH ND</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rhrdndTotalHours)]]H <span class="gray">RHRD ND</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.shrdndTotalHours)]]H <span class="gray">SHRD ND</span></span>
                                 </div>
                             </div>
                             <div class="col my-3">
                                 <label for="" class="gray">ND OT Hours</label>
                                 <div class="d-flex flex-column">
-                                    <span class="font-bold mt-1">0H <span class="gray">ND OT</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">SUN ND OT</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">RH ND OT</span></span>
-                                    <span class="font-bold mt-1">0H <span class="gray">SH ND OT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.ndotTotalHours)]]H <span class="gray">NDOT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rdndotTotalHours)]]H <span class="gray">RD NDOT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rhndotTotalHours)]]H <span class="gray">RH NDOT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.shndotTotalHours)]]H <span class="gray">SH NDOT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.rhrdndotTotalHours)]]H <span class="gray">RHRD NDOT</span></span>
+                                    <span class="font-bold mt-1">[[roundNumber1(modal.shrdndotTotalHours)]]H <span class="gray">SHRD NDOT</span></span>
                                 </div>
                             </div>
                         </div>
@@ -164,22 +170,54 @@
                             <div class="col my-3">
                                 <label for="" class="gray">Daily Rate</label>
                                 <br>
-                                <span class="font-bold font-size-14">₱570.00</span>
+                                <span class="font-bold font-size-14">₱[[formatPrice(modal.user.rate)]]</span>
                             </div>
                         </div>
 
                         <!-- PAY -->
                         <div class="row my-2 order-card">
                             <div class="col my-3">
-                                <label for="" class="gray">Pay</label>
+                                <label for="" class="gray">Work Pay</label>
                                 <div class="d-flex flex-column">
-                                    <span class="font-bold mt-1">₱7,200.00 <span class="gray">BH</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.bh)]] <span class="gray">BH</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rd)]] <span class="gray">RD</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rh)]] <span class="gray">RH</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.sh)]] <span class="gray">SH</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rhrd)]] <span class="gray">RHRD</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.shrd)]] <span class="gray">SHRD</span></span>
                                 </div>
                             </div>
                             <div class="col my-3">
                                 <label for="" class="gray">OT Pay</label>
                                 <div class="d-flex flex-column">
-                                    <span class="font-bold mt-1">₱312.50 <span class="gray">OT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.ot)]] <span class="gray">OT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rdot)]] <span class="gray">RD OT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rhot)]] <span class="gray">RH OT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.shot)]] <span class="gray">SH OT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rhrdot)]] <span class="gray">RHRD OT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.shrdot)]] <span class="gray">SHRD OT</span></span>
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label for="" class="gray">ND Pay</label>
+                                <div class="d-flex flex-column">
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.nd)]] <span class="gray">ND</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rdnd)]] <span class="gray">RD ND</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rhnd)]] <span class="gray">RH ND</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.shnd)]] <span class="gray">SH ND</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rhrdot)]] <span class="gray">RHRD OT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.shrdot)]] <span class="gray">SHRD OT</span></span>
+                                </div>
+                            </div>
+                            <div class="col my-3">
+                                <label for="" class="gray">ND OT Pay</label>
+                                <div class="d-flex flex-column">
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.ndot)]] <span class="gray">NDOT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rdndot)]] <span class="gray">RD NDOT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rhndot)]] <span class="gray">RH NDOT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.shndot)]] <span class="gray">SH NDOT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.rhrdndot)]] <span class="gray">RHRD NDOT</span></span>
+                                    <span class="font-bold mt-1">₱[[formatPrice(modal.shrdndot)]] <span class="gray">SHRD NDOT</span></span>
                                 </div>
                             </div>
                         </div>
@@ -212,39 +250,39 @@
                             <div class="col-3 my-3">
                                 <label for="" class="gray">SSS</label>
                                 <br>
-                                <span class="font-bold font-size-14">₱581.30</span>
+                                <span class="font-bold font-size-14" v-if="modal.sssemployeededuction">₱[[formatPrice(modal.sssemployeededuction.ee)]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">PHIC</label>
                                 <br>
-                                <span class="font-bold font-size-14">₱349.58</span>
+                                <span class="font-bold font-size-14" v-if="modal.phicemployeededuction">₱[[formatPrice(modal.phicemployeededuction.ee)]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Pag-Ibig</label>
                                 <br>
-                                <span class="font-bold font-size-14">₱100.00</span>
+                                <span class="font-bold font-size-14" v-if="modal.pagibigemployeededuction">₱[[formatPrice(modal.pagibigemployeededuction.amount)]]</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Tax Due</label>
                                 <br>
-                                <span class="font-bold font-size-14">₱711.96</span>
+                                <span class="font-bold font-size-14">₱0.00</span>
                             </div>
 
                             <!-- LVL 2 -->
                             <div class="col-3 my-3">
                                 <label for="" class="gray">SSS Loans</label>
                                 <br>
-                                <span class="font-bold font-size-14">₱569.96</span>
+                                <span class="font-bold font-size-14">₱0.00</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">HDMF Loans</label>
                                 <br>
-                                <span class="font-bold font-size-14">525.45</span>
+                                <span class="font-bold font-size-14">₱0.00</span>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Late/Undertime Deductions</label>
                                 <br>
-                                <span class="font-size-14 font-bold">₱200.00</span>
+                                <span class="font-size-14 font-bold">₱0.00</span>
                             </div>
                         </div>
 
@@ -252,17 +290,17 @@
                             <div class="col">
                                 <label for="" class="earnings-text">Basic Pay</label>
                                 <br>
-                                <span class="font-size-18 font-bold">₱11,450.00</span>
+                                <span class="font-size-18 font-bold">₱[[formatPrice(modal.basicPay)]]</span>
                             </div>
                             <div class="col">
                                 <label for="" class="earnings-text">Gross Pay</label>
                                 <br>
-                                <span class="font-size-18 font-bold">₱13,712.50</span>
+                                <span class="font-size-18 font-bold">₱[[formatPrice(modal.grossPayAfterBonus)]]</span>
                             </div>
                             <div class="col">
                                 <label for="" class="earnings-text">Net Pay</label>
                                 <br>
-                                <span class="font-size-18 font-bold">₱11,969.66</span>
+                                <span class="font-size-18 font-bold">₱[[formatPrice(modal.netPayAfterTaxes)]]</span>
                             </div>
                         </div>
 
@@ -354,7 +392,96 @@
             period: '',
             dateRange: '',
             semiMonthPeriod: '',
-            yearList: []
+            yearList: [],
+
+            modal: {
+                year: null,
+                dateStart: null,
+                dateEnd: null,
+                dateGenerated: null,
+                dateApproved: null,
+                user: {
+                    first_name: null,
+                    last_name: null,
+                    idUser: null,
+                },
+                sssemployeededuction: {
+                    ee: null,
+                    er: null,
+                },
+                phicemployeededuction: {
+                    ee: null,
+                    er: null,
+                },
+                pagibigemployeededuction: {
+                    amount: null,
+                },
+                bh: null,
+                ot: null,
+                ut: null,
+                nd: null,
+                ndot: null,
+                rd: null,
+                rdot: null,
+                rdnd: null,
+                rdndot: null,
+                rh: null,
+                rhot: null,
+                rhnd: null,
+                rhndot: null,
+                sh: null,
+                shot: null,
+                shnd: null,
+                shndot: null,
+                shw: null,
+                shwot: null,
+                shwnd: null,
+                shwndot: null,
+                rhrd: null,
+                rhrdot: null,
+                rhrdnd: null,
+                rhrdndot: null,
+                shrd: null,
+                shrdot: null,
+                shrdnd: null,
+                shrdndot: null,
+
+                bhTotalHours: null,
+                otTotalHours: null,
+                utTotalHours: null,
+                ndTotalHours: null,
+                ndotTotalHours: null,
+                rdTotalHours: null,
+                rdotTotalHours: null,
+                rdndTotalHours: null,
+                rdndotTotalHours: null,
+                rhTotalHours: null,
+                rhotTotalHours: null,
+                rhndTotalHours: null,
+                rhndotTotalHours: null,
+                shTotalHours: null,
+                shotTotalHours: null,
+                shndTotalHours: null,
+                shndotTotalHours: null,
+                shwTotalHours: null,
+                shwotTotalHours: null,
+                shwndTotalHours: null,
+                shwndotTotalHours: null,
+                rhrdTotalHours: null,
+                rhrdotTotalHours: null,
+                rhrdndTotalHours: null,
+                rhrdndotTotalHours: null,
+                shrdTotalHours: null,
+                shrdotTotalHours: null,
+                shrdndTotalHours: null,
+                shrdndotTotalHours: null,
+
+                basicPay: null,
+                grossPayBeforeBonus: null,
+                grossPayAfterBonus: null,
+                netPayBeforeTaxes: null,
+                netPayAfterTaxes: null,
+            }
         },
 
         methods: {
@@ -400,6 +527,48 @@
                 month = months[value.getMonth()]
                 date = value.getDate()
                 day = days[value.getDay()]
+                formatted = `${day} - ${month}. ${date}, ${year}`
+
+                return formatted
+            },
+            fetchPayroll(id){
+                axios.get(`/api/complex-payroll/${id}/`)
+                .then(res=>{
+                    this.modal = res.data
+                    console.log(this.modal)
+                })
+            },
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
                 formatted = `${month}. ${date}, ${year}`
 
                 return formatted
@@ -408,6 +577,21 @@
             setSemiMonthPeriod(){
                 this.semiMonthPeriod = semi_months(this.year)
             },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            roundNumber1(value) {
+                let val = (value/1).toFixed(1).replace(',', '.')
+                return val
+            },
+
             setDate(){
                 if (this.year && this.period && this.dateRange){
                     location.href=`/ems-payroll/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`

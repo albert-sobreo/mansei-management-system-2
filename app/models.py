@@ -1251,6 +1251,36 @@ class Payroll(models.Model):
     shrdnd = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     shrdndot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
 
+    bhTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    otTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    utTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    ndTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    ndotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rdTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rdotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rdndTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rdndotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rhTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rhotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rhndTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rhndotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shndTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shndotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shwTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shwotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shwndTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shwndotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rhrdTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rhrdotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rhrdndTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    rhrdndotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shrdTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shrdotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shrdndTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    shrdndotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+
     basicPay = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     grossPayBeforeBonus = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     grossPayAfterBonus = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
@@ -1385,29 +1415,29 @@ class PagibigContributionRate(models.Model):
 
 class SSSEmployeeDeduction(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
-    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, null=True, blank=True)
+    payroll = models.OneToOneField(Payroll, related_name="sssemployeededuction", on_delete=models.CASCADE, null=True, blank=True)
     ee = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     er = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
-    sssContributionRate = models.ForeignKey(SSSContributionRate, on_delete=models.SET_NULL, null=True, blank=True)
+    sssContributionRate = models.ForeignKey(SSSContributionRate, related_name="sssemployeededuction", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name + "   " + str(self.payroll.dateStart) + " --- " + str(self.payroll.dateEnd)
 
 class PHICEmployeeDeduction(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
-    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, null=True, blank=True)
+    payroll = models.OneToOneField(Payroll, related_name="phicemployeededuction", on_delete=models.CASCADE, null=True, blank=True)
     ee = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     er = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
-    phicContributionRate = models.ForeignKey(PHICContributionRate, on_delete=models.SET_NULL, null=True, blank=True)
+    phicContributionRate = models.ForeignKey(PHICContributionRate, related_name="phicemployeededuction", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name + "   " + str(self.payroll.dateStart) + " --- " + str(self.payroll.dateEnd)
 
 class PagibigEmployeeDeduction(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
-    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, null=True, blank=True)
+    payroll = models.OneToOneField(Payroll, related_name="pagibigemployeededuction", on_delete=models.CASCADE, null=True, blank=True)
     amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
-    pagibigContributionRate = models.ForeignKey(PagibigContributionRate, on_delete=models.SET_NULL, null=True, blank=True)
+    pagibigContributionRate = models.ForeignKey(PagibigContributionRate, related_name="pagibigemployeededuction", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name + "   " + str(self.payroll.dateStart) + " --- " + str(self.payroll.dateEnd)

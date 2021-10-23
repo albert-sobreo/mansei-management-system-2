@@ -110,6 +110,9 @@ router.register(r'ot-request', views.OTRequestAPI, 'ot-request')
 ########## UT ##########
 router.register(r'ut-request', views.UTRequestAPI, 'ut-request')
 
+########## PAYROLL ##########
+router.register(r'complex-payroll', views.ComplexPayrollAPI, 'complex-payroll')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
