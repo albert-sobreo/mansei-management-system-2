@@ -37,10 +37,12 @@ class EMS_GeneratePayroll(APIView):
         dateStart = dateRange.split(' ')[0]
         dateEnd = dateRange.split(' ')[1]
 
-        holidays = Holiday.objects.filter(date__range=[dateStart, dateEnd])
-        print(holidays)
+        
 
         for user in users:
+            holidays = Holiday.objects.filter(date__range=[dateStart, dateEnd], type='rh')
+            holidays = list(holidays)
+            print(holidays)
             try:
                 previousPayroll = user.payroll.latest('pk')
             except:
@@ -63,10 +65,17 @@ class EMS_GeneratePayroll(APIView):
             rates = request.user.branch.ratesGroup.get(name='DOLE Standard')
 
             for dtr in user.dtr.filter(date__range=[dateStart, dateEnd]):
-                print(dtr)
+
                 if not dtr.payroll:
                     dtr.payroll = payroll
                     dtr.save()
+                    print(holidays)
+                    for dtrHoliday in list(dtr.dtrdaycategory.all()):
+                        print(dtrHoliday.holiday)
+                        try:
+                            holidays.remove(dtrHoliday.holiday)
+                        except:
+                            pass
 
                     payroll.bh += dtr.bh * rates.bh * Decimal(user.rate/8)
                     payroll.ot += dtr.ot * rates.ot * Decimal(user.rate/8)
@@ -127,7 +136,17 @@ class EMS_GeneratePayroll(APIView):
                     payroll.shrdotTotalHours += dtr.shrdot
                     payroll.shrdndTotalHours += dtr.shrdnd
                     payroll.shrdndotTotalHours += dtr.shrdndot
+                
 
+
+            print(len(holidays))
+            bonusPay = BonusPay()
+            bonusPay.user = user
+            bonusPay.payroll = payroll
+            bonusPay.name = 'Holiday Pay'
+            bonusPay.amount = (len(holidays)*user.rate)
+            bonusPay.save()
+            request.user.branch.bonusPay.add(bonusPay)
 
             payroll.basicPay = payroll.bh
             payroll.grossPayBeforeBonus = \
@@ -164,6 +183,9 @@ class EMS_GeneratePayroll(APIView):
             payroll.save()
 
             payroll.grossPayAfterBonus = payroll.grossPayBeforeBonus
+            for bonuses in payroll.bonuspay.all():
+                payroll.grossPayAfterBonus += bonuses.amount
+
             payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
 
             monthlyBasicPay = previousPayroll.basicPay + payroll.basicPay
@@ -176,7 +198,6 @@ class EMS_GeneratePayroll(APIView):
             if dateObj.day == 25:
                 sss = SSSContributionRate.objects.all()
                 for rates in sss:
-                    print(rates)
                     if rates.lowerLimit <= monthlyGrossPayBeforeBonus < rates.upperLimit:
                         sssDeduction = SSSEmployeeDeduction()
                         sssDeduction.ee = rates.ee
@@ -191,20 +212,30 @@ class EMS_GeneratePayroll(APIView):
 
                 phic = PHICContributionRate.objects.all()
                 for rates in phic:
-                    if rates.lowerLimit <= monthlyGrossPayBeforeBonus <= rates.upperLimit:
+                    if rates.lowerLimit <= monthlyBasicPay <= rates.upperLimit:
                         phicDeduction = PHICEmployeeDeduction()
-                        phicDeduction.ee = (rates.rate*monthlyGrossPayBeforeBonus)
-                        phicDeduction.er = (rates.rate*monthlyGrossPayBeforeBonus)
+                        phicDeduction.ee = ((rates.rate/2)*monthlyBasicPay)
+                        phicDeduction.er = ((rates.rate/2)*monthlyBasicPay)
                         phicDeduction.phicContributionRate = rates
                         phicDeduction.user = user
                         phicDeduction.payroll = payroll
                         phicDeduction.save()
                         request.user.branch.phicEmployeeDeduction.add(phicDeduction)
                         payroll.netPayBeforeTaxes -= phicDeduction.ee
-                    elif monthlyGrossPayBeforeBonus > rates.upperLimit:
+                    elif monthlyBasicPay > rates.upperLimit:
                         phicDeduction = PHICEmployeeDeduction()
-                        phicDeduction.ee = rates.rate*rates.upperLimit
-                        phicDeduction.er = rates.rate*rates.upperLimit
+                        phicDeduction.ee = (rates.rate/2)*rates.upperLimit
+                        phicDeduction.er = (rates.rate/2)*rates.upperLimit
+                        phicDeduction.phicContributionRate = rates
+                        phicDeduction.user = user
+                        phicDeduction.payroll = payroll
+                        phicDeduction.save()
+                        request.user.branch.phicEmployeeDeduction.add(phicDeduction)
+                        payroll.netPayBeforeTaxes -= phicDeduction.ee
+                    elif monthlyBasicPay < rates.lowerLimit:
+                        phicDeduction = PHICEmployeeDeduction()
+                        phicDeduction.ee = (rates.rate/2)*rates.lowerLimit
+                        phicDeduction.er = (rates.rate/2)*rates.lowerLimit
                         phicDeduction.phicContributionRate = rates
                         phicDeduction.user = user
                         phicDeduction.payroll = payroll

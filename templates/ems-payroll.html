@@ -226,13 +226,21 @@
                         <div class="row my-2">
                             <div class="col my-3">
                                 <label for="" class="gray">Bonus</label>
-                                <br>
-                                <span class="font-size-14 font-bold">-</span>
+                                <div class="row">
+                                    <div class="col-12" v-for="bonus in modal.bonuspay">
+                                        <span class="font-bold gray">[[bonus.name]] </span>
+                                        <span class="font-semibold"> ₱[[formatPrice(bonus.amount)]]</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col my-3">
                                 <label for="" class="gray">De Minimis</label>
-                                <br>
-                                <span class="font-size-14 font-bold">₱1,000.50</span>
+                                <div class="row">
+                                    <div class="col-12" v-for="pay in modal.deminimispay">
+                                        <span class="font-bold gray">[[pay.name]] </span>
+                                        <span class="font-semibold"> ₱[[formatPrice(pay.amount)]]</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col my-3">
                                 <label for="" class="gray">SILP to Cash</label>
@@ -400,6 +408,8 @@
                 dateEnd: null,
                 dateGenerated: null,
                 dateApproved: null,
+                bonuspay: [],
+                deminimispay: [],
                 user: {
                     first_name: null,
                     last_name: null,

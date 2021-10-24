@@ -1291,13 +1291,13 @@ class Payroll(models.Model):
 
 class DeMinimisPay(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="deminimispay")
-    payroll = models.ForeignKey(Payroll, on_delete=models.PROTECT, related_name='deminimispay')
+    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name='deminimispay')
     name = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=20, decimal_places=2)
 
 class BonusPay(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="bonuspay")
-    payroll = models.ForeignKey(Payroll, on_delete=models.PROTECT, related_name="bonuspay")
+    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name="bonuspay")
     name = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=20, decimal_places=2)
     
@@ -1349,8 +1349,8 @@ class DTR(models.Model):
     normalDay = models.BooleanField(default=True)
 
 class DTRDayCategory(models.Model):
-    dtr = models.ForeignKey(DTR, on_delete=models.CASCADE)
-    holiday = models.ForeignKey(Holiday, on_delete=models.CASCADE)
+    dtr = models.ForeignKey(DTR, on_delete=models.CASCADE, related_name="dtrdaycategory")
+    holiday = models.ForeignKey(Holiday, on_delete=models.CASCADE, related_name="dtrdaycategory")
 
 class RatesGroup(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)

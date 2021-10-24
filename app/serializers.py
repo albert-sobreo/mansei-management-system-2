@@ -853,11 +853,23 @@ class PagibigEmployeeDeductionSZ(serializers.ModelSerializer):
         model = PagibigEmployeeDeduction
         fields = "__all__"
 
+class BonusPaySZ(serializers.ModelSerializer):
+    class Meta:
+        model = BonusPay
+        fields = "__all__"
+
+class DeMinimisPaySZ(serializers.ModelSerializer):
+    class Meta:
+        model = DeMinimisPay
+        fields = "__all__"
+
 class ComplexPayrollSZ(serializers.ModelSerializer):
     user = UserNameIDRateSZZ(read_only=True)
     sssemployeededuction = SSSEmployeeDeductionSZ(read_only=True)
     phicemployeededuction = PHICEmployeeDeductionSZ(read_only=True)
     pagibigemployeededuction = PagibigEmployeeDeductionSZ(read_only=True)
+    deminimispay = DeMinimisPaySZ(read_only=True, many=True)
+    bonuspay = BonusPaySZ(read_only=True, many=True)
 
     class Meta:
         model = Payroll

@@ -56,12 +56,20 @@ class DTRProcess(APIView):
     def timeIn(self, userID, request):
         employee = User.objects.get(idUser=userID)
         
+        holidays = Holiday.objects.filter(date=datetime.date.today())
+
         dtr = DTR()
         dtr.dateTimeIn = datetime.datetime.now()
         dtr.user = employee
         dtr.date = datetime.date.today()
         dtr.save()
         request.user.branch.dtr.add(dtr)
+
+        dtrDayCategory = DTRDayCategory()
+        for holiday in holidays:
+            dtrDayCategory.dtr = dtr
+            dtrDayCategory.holiday = holiday
+            dtrDayCategory.save()
     
     # def timeOut(self, userID):
     #     employee = User.objects.get(idUser=userID)
@@ -354,7 +362,7 @@ class DTRProcess(APIView):
 
             ndot += getNDOT(scheduleTimeIn, scheduleTimeOut, scheduleTimeIn, scheduleTimeOut)
 
-            holidays = Holiday.objects.filter(date=datetime.date.today())
+            holidays = dtr.dtrdaycategory.all()
             
             restDayMarker = False
             if datetime.date.today().weekday() == 6 or (datetime.date.today().weekday() == 5 and str(datetime.date.today().weekday()) not in employee.schedule.workDays):
@@ -436,7 +444,7 @@ class DTRProcess(APIView):
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
 
-            holidays = Holiday.objects.filter(date=datetime.date.today())
+            holidays = dtr.dtrdaycategory.all()
             
             restDayMarker = False
             if datetime.date.today().weekday() == 6 or (datetime.date.today().weekday() == 5 and datetime.date.today().weekday() in employee.schedule.workDays):
@@ -532,7 +540,7 @@ class DTRProcess(APIView):
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
 
-            holidays = Holiday.objects.filter(date=datetime.date.today())
+            holidays = dtr.dtrdaycategory.all()
             
             restDayMarker = False
             if datetime.date.today().weekday() == 6 or (datetime.date.today().weekday() == 5 and datetime.date.today().weekday() in employee.schedule.workDays):
@@ -609,7 +617,7 @@ class DTRProcess(APIView):
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
 
-            holidays = Holiday.objects.filter(date=datetime.date.today())
+            holidays = dtr.dtrdaycategory.all()
             
             restDayMarker = False
             if datetime.date.today().weekday() == 6 or (datetime.date.today().weekday() == 5 and datetime.date.today().weekday() in employee.schedule.workDays):
