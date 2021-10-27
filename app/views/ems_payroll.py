@@ -65,7 +65,6 @@ class EMS_GeneratePayroll(APIView):
             rates = request.user.branch.ratesGroup.get(name='DOLE Standard')
 
             for dtr in user.dtr.filter(date__range=[dateStart, dateEnd]):
-
                 if not dtr.payroll:
                     dtr.payroll = payroll
                     dtr.save()
@@ -180,7 +179,7 @@ class EMS_GeneratePayroll(APIView):
                 payroll.shrdnd + \
                 payroll.shrdndot
 
-            payroll.save()
+            # payroll.save()
 
             payroll.grossPayAfterBonus = payroll.grossPayBeforeBonus
             for bonuses in payroll.bonuspay.all():
@@ -188,14 +187,18 @@ class EMS_GeneratePayroll(APIView):
 
             payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
 
+            #### INITIALIZE MONTHY PAYS #####
             monthlyBasicPay = previousPayroll.basicPay + payroll.basicPay
             monthlyGrossPayBeforeBonus = previousPayroll.grossPayBeforeBonus + payroll.grossPayBeforeBonus
             monthlyGrossPayAfterBonus = previousPayroll.grossPayAfterBonus + payroll.grossPayAfterBonus
             monthlyNetPayBeforeTaxes = previousPayroll.netPayBeforeTaxes + payroll.netPayBeforeTaxes
             montlyNetPayAfterTaxes = previousPayroll.netPayAfterTaxes = payroll.netPayAfterTaxes
             
+            ##### TO CHECK IF PAYROLL IS FOR SECOND PERIOD #####
             dateObj = datetime.datetime.strptime(payroll.dateEnd, '%Y-%m-%d')
             if dateObj.day == 25:
+
+                ##### SSS #####
                 sss = SSSContributionRate.objects.all()
                 for rates in sss:
                     if rates.lowerLimit <= monthlyGrossPayBeforeBonus < rates.upperLimit:
@@ -210,6 +213,7 @@ class EMS_GeneratePayroll(APIView):
 
                         payroll.netPayBeforeTaxes -= sssDeduction.ee
 
+                ##### PHILHEALTH #####
                 phic = PHICContributionRate.objects.all()
                 for rates in phic:
                     if rates.lowerLimit <= monthlyBasicPay <= rates.upperLimit:
@@ -243,6 +247,7 @@ class EMS_GeneratePayroll(APIView):
                         request.user.branch.phicEmployeeDeduction.add(phicDeduction)
                         payroll.netPayBeforeTaxes -= phicDeduction.ee
 
+                ##### PAGIBIG #####
                 pagibig = PagibigContributionRate.objects.latest('pk')
                 pagibigDeduction = PagibigEmployeeDeduction()
                 pagibigDeduction.payroll = payroll
@@ -253,7 +258,24 @@ class EMS_GeneratePayroll(APIView):
                 pagibigDeduction.save()
                 request.user.branch.pagibigEmployeeDeduction.add(pagibigDeduction)
 
-            payroll.netPayAfterTaxes = payroll.netPayBeforeTaxes
+            ##### TAX #####
+            incomeTaxTable = IncomeTaxTable.objects.all()
+
+            taxDeductedObj = EmployeeTaxDeduction()
+
+            for tax in incomeTaxTable:
+                taxDeducted = 0
+                if tax.lowerLimit < (payroll.netPayBeforeTaxes - (payroll.grossPayAfterBonus - payroll.grossPayBeforeBonus)) <= tax.upperLimit:
+                    print('i was here')
+                    taxDeducted = ((((payroll.netPayBeforeTaxes - (payroll.grossPayAfterBonus - payroll.grossPayBeforeBonus)) - tax.lowerLimit)) * tax.percentDeduction) + tax.fixedDeduction
+
+                    taxDeductedObj.user = user
+                    taxDeductedObj.payroll = payroll
+                    taxDeductedObj.amount = taxDeducted
+                    taxDeductedObj.incometaxtable = tax
+                    taxDeductedObj.save()
+
+                    payroll.netPayAfterTaxes = payroll.netPayBeforeTaxes - taxDeducted
                 
             payroll.save()
         return JsonResponse(0, safe=False)

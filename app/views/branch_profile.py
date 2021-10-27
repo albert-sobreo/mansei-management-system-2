@@ -121,7 +121,11 @@ class BranchesView(View):
 
 class PayrollContributionsView(View):
     def get(self, request):
-        return render(request, 'contribution-branch-profile.html')
+        context = {
+            "sssTable": SSSContributionRate.objects.all(),
+            "phicTable": PHICContributionRate.objects.all()
+        }
+        return render(request, 'contribution-branch-profile.html', context)
 
 class ImportSSSContributions(View):
     def post(self, request):
@@ -165,3 +169,22 @@ class ImportPHICContributions(View):
 
         sweetify.sweetalert(request, icon="success", title="Success!", persistent="Dismiss")
         return redirect('/contribution-profile/')
+
+class IncomeTaxDeductionProfile(View):
+    def get(self, request):
+        context = {
+            "incomeTaxes": IncomeTaxTable.objects.all()
+        }
+        return render(request, 'branch-profile-income-tax-deductions.html', context)
+
+    def post(self, request):
+        for x in IncomeTaxTable.objects.all():
+            x.name = request.POST['name{}'.format(x.pk)]
+            x.lowerLimit = request.POST['lowerLimit{}'.format(x.pk)]
+            x.upperLimit = request.POST['upperLimit{}'.format(x.pk)]
+            x.fixedDeduction = request.POST['fixedDeduction{}'.format(x.pk)]
+            x.percentDeduction = request.POST['percentDeduction{}'.format(x.pk)]
+            x.save()
+
+        return redirect('/income-tax-deductions')
+

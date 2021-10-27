@@ -1,0 +1,82 @@
+{% extends "base-template.html" %}
+{% block title %}Branches{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-plain photo="/media/{{request.user.image}}"></navbar-plain>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links imps-nav">
+                <a href="/branches/" class="mx-2">Branches</a>
+                <a href="/branch-profile/" class="mx-2">Accounting</a>
+                <a href="/contribution-profile/" class="mx-2">Contribution Rates</a>
+                <a href="/income-tax-deductions/" class="active-imps mx-2">Income Tax Deductions</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Income Tax Deductions</span>
+        </div>
+
+        <!-- BODY -->
+        <form action="/income-tax-deductions/" method="POST">{% csrf_token %}
+            <div class="row">
+                <div class="col">
+                    <label for="">Name</label>
+                </div>
+                <div class="col">
+                    <label for="">Lower Range</label>
+                </div>
+                <div class="col">
+                    <label for="">Upper Range</label>
+                </div>
+                <div class="col">
+                    <label for="">Fixed Deduction</label>
+                </div>
+                <div class="col">
+                    <label for="">Percent Deduction of excess</label>
+                </div>
+            </div>
+            {% for tax in  incomeTaxes %}
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control" name="name{{tax.pk}}" value="{{tax.name}}">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="lowerLimit{{tax.pk}}" value="{{tax.lowerLimit}}">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="upperLimit{{tax.pk}}" value="{{tax.upperLimit}}">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="fixedDeduction{{tax.pk}}" value="{{tax.fixedDeduction}}">
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="percentDeduction{{tax.pk}}" value="{{tax.percentDeduction}}">
+                </div>
+            </div>
+            {% endfor %}
+            <button class="btn btn-primary" type="submit">Save</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiter: ['[[', ']]'],
+        el: '#app'
+    })
+</script>
+
+{% endblock %}

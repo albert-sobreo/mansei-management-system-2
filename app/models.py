@@ -1442,6 +1442,25 @@ class PagibigEmployeeDeduction(models.Model):
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name + "   " + str(self.payroll.dateStart) + " --- " + str(self.payroll.dateEnd)
 
+class IncomeTaxTable(models.Model):
+    name = models.CharField(max_length=128, null=True, blank=True)
+    lowerLimit = models.DecimalField(max_digits=16, decimal_places=0, null=True, blank=True)
+    upperLimit = models.DecimalField(max_digits=16, decimal_places=0, null=True, blank=True)
+    fixedDeduction = models.DecimalField(max_digits=16, decimal_places=2, null=True, blank=True)
+    percentDeduction = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class EmployeeTaxDeduction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    payroll = models.OneToOneField(Payroll, related_name="employeetaxdeduction", on_delete=models.CASCADE, null=True, blank=True)
+    amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    incometaxtable = models.ForeignKey(IncomeTaxTable, on_delete=models.PROTECT, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name + "   " + str(self.payroll.dateStart) + " --- " + str(self.payroll.dateEnd)
+
 
 
 class BranchDefaultChildAccount(models.Model):
@@ -1596,6 +1615,7 @@ class Branch(models.Model):
     sssEmployeeDeduction = models.ManyToManyField(SSSEmployeeDeduction, blank=True)
     phicEmployeeDeduction = models.ManyToManyField(PHICEmployeeDeduction, blank=True)
     pagibigEmployeeDeduction = models.ManyToManyField(PagibigEmployeeDeduction, blank=True)
+
 
     def __str__(self):
         return self.name

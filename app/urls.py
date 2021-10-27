@@ -320,4 +320,5 @@ urlpatterns = [
     path('contribution-profile/', login_required(views.PayrollContributionsView.as_view())),
     path('import-sss/', login_required(views.ImportSSSContributions.as_view())),
     path('import-phic/', login_required(views.ImportPHICContributions.as_view())),
+    path('income-tax-deductions/', login_required(views.IncomeTaxDeductionProfile.as_view()))
 ]

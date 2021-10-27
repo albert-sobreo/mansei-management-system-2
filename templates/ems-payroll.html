@@ -245,7 +245,7 @@
                             <div class="col my-3">
                                 <label for="" class="gray">SILP to Cash</label>
                                 <br>
-                                <span class="font-size-14 font-bold">₱2,000.00</span>
+                                <span class="font-size-14 font-bold">₱0.00</span>
                             </div>
                         </div>
 
@@ -273,7 +273,7 @@
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Tax Due</label>
                                 <br>
-                                <span class="font-bold font-size-14">₱0.00</span>
+                                <span class="font-bold font-size-14" v-if="modal.employeetaxdeduction">₱[[formatPrice(modal.employeetaxdeduction.amount)]]</span>
                             </div>
 
                             <!-- LVL 2 -->
@@ -424,6 +424,9 @@
                     er: null,
                 },
                 pagibigemployeededuction: {
+                    amount: null,
+                },
+                employeetaxdeduction: {
                     amount: null,
                 },
                 bh: null,

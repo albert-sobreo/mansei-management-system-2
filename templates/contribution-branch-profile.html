@@ -1,5 +1,5 @@
 {% extends "base-template.html" %}
-{% block title %}Branches{% endblock %}
+{% block title %}Contribution Rates{% endblock %}
 
 {% block body %}
 
@@ -16,6 +16,7 @@
                 <a href="/branches/" class="mx-2">Branches</a>
                 <a href="/branch-profile/" class="mx-2">Accounting</a>
                 <a href="/contribution-profile/" class="active-imps mx-2">Contribution Rates</a>
+                <a href="/income-tax-deductions/" class="mx-2">Income Tax Deductions</a>
             </div>
         </div>
 
@@ -40,6 +41,56 @@
                 <button type="submit" class="btn btn-primary">Import</button>
             </form>
         </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center my-3">
+            <span class="font-size-18 font-bold mr-1">PHIC Contribution Table</span>
+        </div>
+
+        <table class="table table-sm table-striped">
+            <thead>
+                <th>Name</th>
+                <th>Lower Range</th>
+                <th>Upper Range</th>
+                <th>rate</th>
+            </thead>
+            <tbody>
+                {% for phic in phicTable %}
+                <tr>
+                    <td>{{phic.name}}</td>
+                    <td>[[formatPrice('{{phic.lowerLimit}}')]]</td>
+                    <td>[[formatPrice('{{phic.upperLimit}}')]]</td>
+                    <td>{{phic.rate}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center my-3">
+            <span class="font-size-18 font-bold mr-1">SSS Contribution Table</span>
+        </div>
+
+        <table class="table table-sm table-striped">
+            <thead class="">
+                <th>Name</th>
+                <th>Lower Range</th>
+                <th>Upper Range</th>
+                <th>Total EE</th>
+                <th>Total ER</th>
+            </thead>
+            <tbody>
+                {% for sss in sssTable %}
+                <tr>
+                    <td>{{sss.name}}</td>
+                    <td>₱[[formatPrice('{{sss.lowerLimit}}')]]</td>
+                    <td>₱[[formatPrice('{{sss.upperLimit}}')]]</td>
+                    <td>₱[[formatPrice({{sss.ee}})]]</td>
+                    <td>₱[[formatPrice('{{sss.er}}')]]</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -49,8 +100,23 @@
 
 <script>
     var app = new Vue({
-        delimiter: ['[[', ']]'],
-        el: '#app'
+        delimiters: ['[[', ']]'],
+        el: '#app',
+
+        data: {
+
+        },
+
+        methods: {
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+        }
     })
 </script>
 
