@@ -42,10 +42,16 @@ class EMS_GeneratePayroll(APIView):
         for user in users:
             holidays = Holiday.objects.filter(date__range=[dateStart, dateEnd], type='rh')
             holidays = list(holidays)
-            print(holidays)
+            print(dateStart)
+            x = dateStart.split('-')
+            x[2] = str(int(x[2]) - 1)
+            previousDateEnd = "-".join(x)
+            print(previousDateEnd)
             try:
-                previousPayroll = user.payroll.latest('pk')
-            except:
+                previousPayroll = user.payroll.get(dateEnd=previousDateEnd)
+            except Exception as e:
+                print(e)
+                print('i was here')
                 previousPayroll = Payroll()
                 previousPayroll.basicPay = Decimal(0)
                 previousPayroll.grossPayBeforeBonus = Decimal(0)
@@ -185,7 +191,7 @@ class EMS_GeneratePayroll(APIView):
             for bonuses in payroll.bonuspay.all():
                 payroll.grossPayAfterBonus += bonuses.amount
 
-            payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
+            payroll.netPayBeforeTaxes = payroll.grossPayAfterBonus
 
             #### INITIALIZE MONTHY PAYS #####
             monthlyBasicPay = previousPayroll.basicPay + payroll.basicPay
@@ -265,9 +271,8 @@ class EMS_GeneratePayroll(APIView):
 
             for tax in incomeTaxTable:
                 taxDeducted = 0
-                if tax.lowerLimit < (payroll.netPayBeforeTaxes - (payroll.grossPayAfterBonus - payroll.grossPayBeforeBonus)) <= tax.upperLimit:
-                    print('i was here')
-                    taxDeducted = ((((payroll.netPayBeforeTaxes - (payroll.grossPayAfterBonus - payroll.grossPayBeforeBonus)) - tax.lowerLimit)) * tax.percentDeduction) + tax.fixedDeduction
+                if tax.lowerLimit < (payroll.netPayBeforeTaxes) <= tax.upperLimit:
+                    taxDeducted = ((((payroll.netPayBeforeTaxes) - tax.lowerLimit)) * tax.percentDeduction) + tax.fixedDeduction
 
                     taxDeductedObj.user = user
                     taxDeductedObj.payroll = payroll

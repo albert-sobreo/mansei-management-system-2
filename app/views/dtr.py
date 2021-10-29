@@ -63,7 +63,7 @@ class DTRProcess(APIView):
         dtr.user = employee
         dtr.date = datetime.date.today()
         dtr.save()
-        request.user.branch.dtr.add(dtr)
+        employee.branch.dtr.add(dtr)
 
         dtrDayCategory = DTRDayCategory()
         for holiday in holidays:
@@ -387,17 +387,17 @@ class DTRProcess(APIView):
 
             if holidays and not restDayMarker:
                 for holiday in holidays:
-                    if holiday.type == "rh":
+                    if holiday.holiday.type == "rh":
                         rh += bh
                         rhot += ot
                         rhnd += nd
                         rhndot += ndot
-                    elif holiday.type == "sh":
+                    elif holiday.holiday.type == "sh":
                         sh += bh
                         shot += ot
                         shnd += nd
                         shndot += ndot
-                    elif holiday.type == "shw":
+                    elif holiday.holiday.type == "shw":
                         shw += bh
                         shwot += ot
                         shwnd += nd
