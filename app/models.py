@@ -1282,11 +1282,15 @@ class Payroll(models.Model):
     shrdndotTotalHours = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
 
     basicPay = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
+    holidayPay = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     grossPayBeforeBonus = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     grossPayAfterBonus = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     netPayBeforeTaxes = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     netPayAfterTaxes = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
 
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name
 
 
 class DeMinimisPay(models.Model):

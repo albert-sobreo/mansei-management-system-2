@@ -143,15 +143,7 @@ class EMS_GeneratePayroll(APIView):
                     payroll.shrdndotTotalHours += dtr.shrdndot
                 
 
-
-            print(len(holidays))
-            bonusPay = BonusPay()
-            bonusPay.user = user
-            bonusPay.payroll = payroll
-            bonusPay.name = 'Holiday Pay'
-            bonusPay.amount = (len(holidays)*user.rate)
-            bonusPay.save()
-            request.user.branch.bonusPay.add(bonusPay)
+            payroll.holidayPay = (len(holidays)*user.rate)
 
             payroll.basicPay = payroll.bh
             payroll.grossPayBeforeBonus = \
@@ -187,18 +179,36 @@ class EMS_GeneratePayroll(APIView):
 
             # payroll.save()
 
+            payroll.grossPayBeforeBonus += payroll.holidayPay
             payroll.grossPayAfterBonus = payroll.grossPayBeforeBonus
+
+            allPayrollThisYear = user.payroll.filter(year=dateEnd.split('-')[2])
+            
+            totalBonus = Decimal(0)
+            totalBonusThisPeriod = Decimal(0)
+
             for bonuses in payroll.bonuspay.all():
                 payroll.grossPayAfterBonus += bonuses.amount
+                totalBonusThisPeriod += bonuses.amount
 
-            payroll.netPayBeforeTaxes = payroll.grossPayAfterBonus
+            for pay in allPayrollThisYear:
+                for bonus in pay.bonuspay:
+                    totalBonus += bonus.amount
+
+            if totalBonus >= Decimal(90000):
+                if totalBonus - totalBonusThisPeriod < Decimal(90000):
+                    payroll.grossPayAfterBonus += Decimal(90000) - (totalBonus - totalBonusThisPeriod)
+                else:
+                    payroll.grossPayAfterBonus += totalBonusThisPeriod
+                payroll.netPayBeforeTaxes = payroll.grossPayAfterBonus
+            else:
+                payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
+            
 
             #### INITIALIZE MONTHY PAYS #####
             monthlyBasicPay = previousPayroll.basicPay + payroll.basicPay
             monthlyGrossPayBeforeBonus = previousPayroll.grossPayBeforeBonus + payroll.grossPayBeforeBonus
-            monthlyGrossPayAfterBonus = previousPayroll.grossPayAfterBonus + payroll.grossPayAfterBonus
-            monthlyNetPayBeforeTaxes = previousPayroll.netPayBeforeTaxes + payroll.netPayBeforeTaxes
-            montlyNetPayAfterTaxes = previousPayroll.netPayAfterTaxes = payroll.netPayAfterTaxes
+            
             
             ##### TO CHECK IF PAYROLL IS FOR SECOND PERIOD #####
             dateObj = datetime.datetime.strptime(payroll.dateEnd, '%Y-%m-%d')
@@ -263,6 +273,10 @@ class EMS_GeneratePayroll(APIView):
                 payroll.netPayBeforeTaxes -= pagibigDeduction.amount
                 pagibigDeduction.save()
                 request.user.branch.pagibigEmployeeDeduction.add(pagibigDeduction)
+                
+            monthlyGrossPayAfterBonus = previousPayroll.grossPayAfterBonus + payroll.grossPayAfterBonus
+            monthlyNetPayBeforeTaxes = previousPayroll.netPayBeforeTaxes + payroll.netPayBeforeTaxes
+            montlyNetPayAfterTaxes = previousPayroll.netPayAfterTaxes = payroll.netPayAfterTaxes
 
             ##### TAX #####
             incomeTaxTable = IncomeTaxTable.objects.all()
