@@ -1182,37 +1182,6 @@ class Holiday(models.Model):
     def __str__(self):
         return str(self.date) + " " + self.description
 
-class OTRequest(models.Model):
-    requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otrequestrequestedby') 
-    hours = models.DecimalField(max_digits=4, decimal_places=2)
-    date = models.DateField()
-    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='otrequestapprovedby')
-    status = models.CharField(max_length=64, null=True, blank=True)
-    reason = models.TextField(null=True, blank=True)
-    datetimeCreated = models.DateTimeField(null=True, blank=True)
-    datetimeApproved = models.DateTimeField(null=True, blank=True)
-
-class UTRequest(models.Model):
-    requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name="utrequestrequestedby")
-    timeOut = models.TimeField()
-    date = models.DateField()
-    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='utrequestapprovedby')
-    status = models.CharField(max_length=64, null=True, blank=True)
-    datetimeCreated = models.DateTimeField(null=True, blank=True)
-    datetimeApproved = models.DateTimeField(null=True, blank=True)
-    reason = models.TextField(null=True, blank=True)
-
-class LeaveRequest(models.Model):
-    requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name='leaverequestrequestedby')
-    dateStart = models.DateField()
-    dateEnd = models.DateField()
-    reason = models.TextField(null=True, blank=True)
-    leaveType = models.CharField(max_length=64, null=True, blank=True)
-    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="leaverequestapprovedby")
-    datetimeCreated = models.DateTimeField(null=True, blank=True)
-    datetimeApproved = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=64, null=True, blank=True)
-
 class Payroll(models.Model):
     year = models.CharField(max_length=6, blank=True, null=True)
     dateStart = models.DateField(null=True, blank=True)
@@ -1390,6 +1359,39 @@ class RatesGroup(models.Model):
     
     def __str__(self):
         return self.name
+
+class OTRequest(models.Model):
+    requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otrequestrequestedby') 
+    hours = models.DecimalField(max_digits=4, decimal_places=2)
+    date = models.DateField()
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='otrequestapprovedby')
+    status = models.CharField(max_length=64, null=True, blank=True)
+    reason = models.TextField(null=True, blank=True)
+    datetimeCreated = models.DateTimeField(null=True, blank=True)
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    dtr = models.ForeignKey(DTR, on_delete=models.SET_NULL, null=True, blank=True, default=None)
+
+class UTRequest(models.Model):
+    requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name="utrequestrequestedby")
+    timeOut = models.TimeField()
+    date = models.DateField()
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='utrequestapprovedby')
+    status = models.CharField(max_length=64, null=True, blank=True)
+    datetimeCreated = models.DateTimeField(null=True, blank=True)
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    reason = models.TextField(null=True, blank=True)
+    dtr = models.ForeignKey(DTR, on_delete=models.SET_NULL, null=True, blank=True, default=None)
+
+class LeaveRequest(models.Model):
+    requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name='leaverequestrequestedby')
+    dateStart = models.DateField()
+    dateEnd = models.DateField()
+    reason = models.TextField(null=True, blank=True)
+    leaveType = models.CharField(max_length=64, null=True, blank=True)
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="leaverequestapprovedby")
+    datetimeCreated = models.DateTimeField(null=True, blank=True)
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=64, null=True, blank=True)
 
 class SSSContributionRate(models.Model):
     name = models.CharField(max_length=250, null=True, blank=True)

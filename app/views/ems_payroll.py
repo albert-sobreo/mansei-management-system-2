@@ -179,6 +179,8 @@ class EMS_GeneratePayroll(APIView):
 
             # payroll.save()
 
+
+            #### SOME SPECIAL CODES ####
             payroll.grossPayBeforeBonus += payroll.holidayPay
             payroll.grossPayAfterBonus = payroll.grossPayBeforeBonus
 
@@ -203,7 +205,8 @@ class EMS_GeneratePayroll(APIView):
                 payroll.netPayBeforeTaxes = payroll.grossPayAfterBonus
             else:
                 payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
-            
+                
+            #### END ####
 
             #### INITIALIZE MONTHY PAYS #####
             monthlyBasicPay = previousPayroll.basicPay + payroll.basicPay
