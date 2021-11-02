@@ -113,6 +113,9 @@ router.register(r'ut-request', views.UTRequestAPI, 'ut-request')
 ########## PAYROLL ##########
 router.register(r'complex-payroll', views.ComplexPayrollAPI, 'complex-payroll')
 
+########## USER ##########
+router.register(r'user', views.UserAPI, 'user')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -320,5 +323,6 @@ urlpatterns = [
     path('contribution-profile/', login_required(views.PayrollContributionsView.as_view())),
     path('import-sss/', login_required(views.ImportSSSContributions.as_view())),
     path('import-phic/', login_required(views.ImportPHICContributions.as_view())),
-    path('income-tax-deductions/', login_required(views.IncomeTaxDeductionProfile.as_view()))
+    path('income-tax-deductions/', login_required(views.IncomeTaxDeductionProfile.as_view())),
+    path('give-deminimis/', login_required(views.GiveDeMinimis.as_view()))
 ]

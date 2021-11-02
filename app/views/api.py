@@ -383,6 +383,15 @@ class UserWithDTRAPI(viewsets.ModelViewSet):
 
 
 
+########## JUST USER ##########
+class UserAPI(viewsets.ModelViewSet):
+    serializer_class = UserNestedSZ
+    queryset = User.objects.all()
+
+
+
+
+
 ########## PPE ##########
 class PPENestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]

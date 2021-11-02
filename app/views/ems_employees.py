@@ -14,7 +14,8 @@ from ..models import*
 class EMS_EmployeesView(View):
     def get(self, request):
         context = {
-            'employees': request.user.branch.user.all()
+            'employees': request.user.branch.user.all(),
+            'deminimises': DeMinimis.objects.all(),
         }
         return render(request, 'ems-employees.html', context)
 
@@ -37,14 +38,26 @@ class AddBonus(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+class GiveDeMinimis(APIView):
+    def post(self, request):
+        for benefits in request.data['benefits']:
+            dm = DeMinimisOfUser()
+            dm.user = User.objects.get(pk=request.data['user'])
+            dm.name = DeMinimis.objects.get(pk=benefits['pk'])
+            dm.amount = Decimal(benefits['amount'])
+            dm.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
 class AddDeMinimis(APIView):
-    def post(self, request, formnat = None):
+    def post(self, request):
 
         for benefit in request.data['benefits']:
             dm = DeMinimisOfUser()
-            dm.user = User.objects.get(request.data['pk'])
-            dm.name = request.data['name']
-            dm.amount = request.data['amount']
+            dm.user = User.objects.get(benefit['pk'])
+            dm.name = benefit['name']
+            dm.amount = benefit['amount']
             dm.save()
             request.user.branch.deMinimisOfUser.add()
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')

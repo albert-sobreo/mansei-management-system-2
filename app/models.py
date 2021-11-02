@@ -37,8 +37,10 @@ class Schedule(models.Model):
 
 
 class User(AbstractUser):
+    address = models.CharField(max_length=1024, null=True, blank=True)
     authLevel = models.CharField(max_length=50, null = True, blank = True)
     position = models.CharField(max_length=20, null = True, blank = True)
+    bloodType = models.CharField(max_length=10, null=True, blank=True)
     image = models.ImageField(default='profile-pictures/person.png', upload_to='profile-pictures/', null = True, blank = True)
     idUser = models.CharField(max_length=50, null = True, blank = True)
     status = models.CharField(max_length=50, null = True, blank = True)
@@ -66,7 +68,7 @@ class User(AbstractUser):
         return self.username
 
 class DeMinimisOfUser(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='deminimisofuser')
     name = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=20, decimal_places=2)
 
@@ -1267,6 +1269,7 @@ class DeMinimisPay(models.Model):
     payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name='deminimispay')
     name = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=20, decimal_places=2)
+    taxable = models.BooleanField(default=False)
 
 class BonusPay(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="bonuspay")
@@ -1369,7 +1372,7 @@ class OTRequest(models.Model):
     reason = models.TextField(null=True, blank=True)
     datetimeCreated = models.DateTimeField(null=True, blank=True)
     datetimeApproved = models.DateTimeField(null=True, blank=True)
-    dtr = models.ForeignKey(DTR, on_delete=models.SET_NULL, null=True, blank=True, default=None)
+    dtr = models.ForeignKey(DTR, related_name='otrequest', on_delete=models.SET_NULL, null=True, blank=True, default=None)
 
 class UTRequest(models.Model):
     requestedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name="utrequestrequestedby")
@@ -1466,6 +1469,22 @@ class EmployeeTaxDeduction(models.Model):
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name + "   " + str(self.payroll.dateStart) + " --- " + str(self.payroll.dateEnd)
+
+class DeMinimis(models.Model):
+    name = models.CharField(max_length=255, null=True, blank=True)
+    limit = models.DecimalField(max_digits=6, decimal_places=0, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class TaxableDeMinimisPay(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="taxabledeminimispay")
+    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name='taxabledeminimispay')
+    name = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name + " --- " + self.name
 
 
 

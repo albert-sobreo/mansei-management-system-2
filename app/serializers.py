@@ -1,6 +1,19 @@
 from rest_framework import fields, serializers
 from .models import *
 
+########## DEMINIMIS OF USER ##########
+class DeMinimisOfUserSZ(serializers.ModelSerializer):
+    class Meta:
+        model = DeMinimisOfUser
+        fields = "__all__"
+
+
+
+
+
+
+
+
 ########## USER ###########
 class UserSZ(serializers.ModelSerializer):
     class Meta:
@@ -26,7 +39,12 @@ class UserNameIDRateSZZ(serializers.ModelSerializer):
             'rate'
         ]
 
-
+class UserNestedSZ(serializers.ModelSerializer):
+    deminimisofuser = DeMinimisOfUserSZ(read_only=True, many=True)
+    class Meta:
+        model = User
+        fields = "__all__"
+        depth = 1
 
 
 

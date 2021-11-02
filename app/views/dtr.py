@@ -65,6 +65,11 @@ class DTRProcess(APIView):
         dtr.save()
         employee.branch.dtr.add(dtr)
 
+        if employee.otrequestrequestedby.filter(date=datetime.date.today()):
+            for ot in employee.otrequestrequestedby.filter(date=datetime.date.today()):
+                ot.dtr = dtr
+                ot.save()
+
         dtrDayCategory = DTRDayCategory()
         for holiday in holidays:
             dtrDayCategory.dtr = dtr
