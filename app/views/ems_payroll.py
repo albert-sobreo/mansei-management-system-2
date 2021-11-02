@@ -208,6 +208,38 @@ class EMS_GeneratePayroll(APIView):
                 
             #### END ####
 
+            
+            for benefitOfUser in user.deminimisofuser.all():
+                if benefitOfUser.amount > DeMinimis.objects.get(name=benefitOfUser.name).limit:
+                    taxedBenefit = DeMinimisPay()
+                    taxedBenefit.user = request.user
+                    taxedBenefit.payroll = payroll
+                    taxedBenefit.name = "Excess " + benefitOfUser.name
+                    taxedBenefit.amount = benefitOfUser.amount - DeMinimis.objects.get(name=benefitOfUser.name).limit
+                    taxedBenefit.taxable = True
+                    taxedBenefit.save()
+                    request.user.branch.deMinimisPay.add(taxedBenefit)
+                    payroll.grossPayAfterBonus += taxedBenefit.amount
+
+                    benefitPay = DeMinimisPay()
+                    benefitPay.user = request.user
+                    benefitPay.payroll = payroll
+                    benefitPay.name = benefitOfUser.name
+                    benefitPay.amount = DeMinimis.objects.get(name=benefitOfUser.name).limit
+                    benefitPay.taxable = False
+                    benefitPay.save()
+                    request.user.branch.deMinimisPay.add(benefitPay)
+
+                else:
+                    benefitPay = DeMinimisPay()
+                    benefitPay.user = request.user
+                    benefitPay.payroll = payroll
+                    benefitPay.name = benefitOfUser.name
+                    benefitPay.amount = benefitOfUser.amount
+                    benefitPay.taxable = False
+                    benefitPay.save()
+                    request.user.branch.deMinimisPay.add(benefitPay)
+
             #### INITIALIZE MONTHY PAYS #####
             monthlyBasicPay = previousPayroll.basicPay + payroll.basicPay
             monthlyGrossPayBeforeBonus = previousPayroll.grossPayBeforeBonus + payroll.grossPayBeforeBonus
