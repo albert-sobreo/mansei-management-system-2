@@ -626,6 +626,20 @@ label{
     width: 40px;
 }
 
+.form-control-special-2{
+    position: relative;
+    font-size: 12px;
+    height: 24px;
+    border: 0;
+    border-bottom: 2px solid rgb(214, 214, 214);
+    font-weight: 600;
+    transition: 0.2s;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    background-color: rgba(0,0,0,0);
+    width: 130px;
+}
+
 .placeholder {
     position: relative;
     display: inline-block;
@@ -647,6 +661,13 @@ label{
 }
 
 .form-control-special:focus{
+    outline: none !important;
+    transition: 0.2s;
+    border: 0;
+    border-bottom: 2px solid var(--ems-green-text);
+}
+
+.form-control-special-2:focus{
     outline: none !important;
     transition: 0.2s;
     border: 0;

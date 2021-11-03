@@ -1,0 +1,857 @@
+{% extends 'base-template.html' %}
+{% block title %} EMS | Edit Payroll {% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-ems active="nav-payroll" photo="/static/media/{{request.user.image}}"></navbar-ems>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- TITLE -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Edit Payroll</span>
+        </div>
+
+        <!-- BODY -->
+        <div class="d-flex flex-row justify-content-center my-2">
+            <div class="w-75">
+
+                <!-- PAYROLL INFO -->
+                <div class="px-4 border mb-2 box-shadow-medium">
+                    <div class="row py-2">
+                        <div class="col">
+                            <span class="gray font-size-14 font-bold">Payroll Info</span>
+                        </div>
+                    </div>
+                    <div class="row py-2">
+                        <div class="col-6">
+                            <label for="" class="gray">Employee</label><br>
+                            <span class="font-bold">Clark Kent</span>
+                        </div>
+                        <div class="col-6">
+                            <label for="" class="gray">Year</label><br>
+                            <span class="font-bold">2021</span>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <label for="" class="gray">Period</label><br>
+                            <span class="font-bold">Oct. 11, 2021 - Oct. 25, 2021</span>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <label for="" class="gray">Date Generated</label><br>
+                            <span class="font-bold">Oct.30, 2021</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOTAL PAY -->
+                <div class="px-4 border mb-2 box-shadow-medium">
+                    <div class="row py-2">
+                        <div class="col">
+                            <span class="gray font-size-14 font-bold">Total Pay</span>
+                        </div>
+                    </div>
+                    <div class="row py-2">
+                        <!-- LINE ONE -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Basic Hours Pay" for="" class="timesheet-hours">BH</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Overtime Pay" for="" class="timesheet-hours">OT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Night Differential Pay" for="" class="timesheet-hours">ND</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Night Differential Overtime Pay" for="" class="timesheet-hours">NDOT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        
+
+                        <!-- LINE TWO -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Rest Day Pay" for="" class="timesheet-hours">RD</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Rest Day Overtime Pay" for="" class="timesheet-hours">RD OT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Rest Day Night Differential Pay" for="" class="timesheet-hours">RD ND</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Rest Day Night Differential Overtime Pay" for="" class="timesheet-hours">RD NDOT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LINE THREE -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Pay" for="" class="timesheet-hours">RH</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Overtime Pay" for="" class="timesheet-hours">RH OT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Night Differential Pay" for="" class="timesheet-hours">RH ND</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Night Differential Overtime Pay" for="" class="timesheet-hours">RH NDOT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LINE FOUR -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Pay" for="" class="timesheet-hours">SH</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Overtime Pay" for="" class="timesheet-hours">SHOT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Night Differential Pay" for="" class="timesheet-hours">SHND</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Night Differential Overtime Pay" for="" class="timesheet-hours">SH NDOT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LINE FIVE -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Working Holiday Pay" for="" class="timesheet-hours">SHW</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Working Holiday Overtime Pay" for="" class="timesheet-hours">SHW OT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Working Holiday Night Differential Pay" for="" class="timesheet-hours">SHW ND</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Night Differential Overtime Pay" for="" class="timesheet-hours">SHW NDOT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LINE SIX -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Rest Day Pay" for="" class="timesheet-hours">RHRD</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Rest Day Overtime Pay" for="" class="timesheet-hours">RHRD OT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Rest Day Night Differential Pay" for="" class="timesheet-hours">RHRD ND</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Rest Day Night Differential Overtime Pay" for="" class="timesheet-hours">RHRD NDOT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LINE SEVEN -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Rest Day Pay" for="" class="timesheet-hours">SHRD</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Rest Day Overtime Pay" for="" class="timesheet-hours">SHRD OT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Rest Day Night Differential Pay" for="" class="timesheet-hours">SHRD ND</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Rest Day Night Differential Overtime Pay" for="" class="timesheet-hours">SHRD NDOT</label><br>
+                            <div class="placeholder" data-placeholder="₱">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- TOTAL HOURS -->
+                <div class="px-4 border mb-2 box-shadow-medium">
+                    <div class="row py-2">
+                        <div class="col">
+                            <span class="gray font-size-14 font-bold">Total Hours</span>
+                        </div>
+                    </div>
+                    <div class="row py-2">
+                        <!-- LINE ONE -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Basic Hours Pay" for="" class=" timesheet-hours">BH</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Overtime Pay" for="" class=" timesheet-hours">OT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Night Differential Pay" for="" class=" timesheet-hours">ND</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Night Differential Overtime Pay" for="" class=" timesheet-hours">NDOT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        
+
+                        <!-- LINE TWO -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Rest Day Pay" for="" class=" timesheet-hours">RD</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Rest Day Overtime Pay" for="" class=" timesheet-hours">RD OT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Rest Day Night Differential Pay" for="" class=" timesheet-hours">RD ND</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Rest Day Night Differential Overtime Pay" for="" class=" timesheet-hours">RD NDOT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LINE THREE -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Pay" for="" class=" timesheet-hours">RH</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Overtime Pay" for="" class=" timesheet-hours">RH OT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Night Differential Pay" for="" class=" timesheet-hours">RH ND</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Night Differential Overtime Pay" for="" class=" timesheet-hours">RH NDOT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LINE FOUR -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Pay" for="" class=" timesheet-hours">SH</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Overtime Pay" for="" class=" timesheet-hours">SHOT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Night Differential Pay" for="" class=" timesheet-hours">SHND</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Night Differential Overtime Pay" for="" class=" timesheet-hours">SH NDOT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LINE FIVE -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Working Holiday Pay" for="" class=" timesheet-hours">SHW</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Working Holiday Overtime Pay" for="" class=" timesheet-hours">SHW OT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Working Holiday Night Differential Pay" for="" class=" timesheet-hours">SHW ND</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Night Differential Overtime Pay" for="" class=" timesheet-hours">SHW NDOT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LINE SIX -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Rest Day Pay" for="" class=" timesheet-hours">RHRD</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Rest Day Overtime Pay" for="" class=" timesheet-hours">RHRD OT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Rest Day Night Differential Pay" for="" class=" timesheet-hours">RHRD ND</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Regular Holiday Rest Day Night Differential Overtime Pay" for="" class=" timesheet-hours">RHRD NDOT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+
+
+                        <!-- LINE SEVEN -->
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Rest Day Pay" for="" class=" timesheet-hours">SHRD</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Rest Day Overtime Pay" for="" class=" timesheet-hours">SHRD OT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Rest Day Night Differential Pay" for="" class=" timesheet-hours">SHRD ND</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-3 text-center mt-2">
+                            <div class="mx-1 b-radius-5 border">
+                            <label title="Special Holiday Rest Day Night Differential Overtime Pay" for="" class=" timesheet-hours">SHRD NDOT</label><br>
+                            <div class="placeholder" data-placeholder="H">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SSS DEDUCTIONS -->
+                <div class="px-4 border mb-2 box-shadow-medium">
+                    <div class="row pt-2">
+                        <div class="col">
+                            <span class="gray font-size-14 font-bold">SSS Employee Deductions</span>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 py-2 order-card b-radius-5">
+                        <div class="col-12 pb-2">
+                            <label for="" class="gray">Basis | 2021 SSS Contribution Rate</label>
+                        </div>
+
+                        <div class="col">
+                            <label for="" class="gray">Lower Range</label><br>
+                            <span class="font-bold">₱500.00</span>
+                        </div>
+                        <div class="col">
+                            <label for="" class="gray">Upper Range</label><br>
+                            <span class="font-bold">₱500.00</span>
+                        </div>
+                        <div class="col">
+                            <label for="" class="gray">EE</label><br>
+                            <span class="font-bold">₱500.00</span>
+                        </div>
+                        <div class="col">
+                            <label for="" class="gray">ER</label><br>
+                            <span class="font-bold">₱500.00</span>
+                        </div>
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">Employee Contribution</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter EE Contribution">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">Employer Contribution</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter ER Contribution">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PHIC EMPLOYEE CONTRIBUTION -->
+                <div class="px-4 pb-1 border mb-2 box-shadow-medium">
+                    <div class="row pt-2">
+                        <div class="col">
+                            <span class="gray font-size-14 font-bold">PHIC Employee Deductions</span>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 py-2 order-card-darker b-radius-5">
+                        <div class="col-12 pb-2">
+                            <label for="" class="gray">Basis | 2021 PHIC Contribution Rate</label>
+                        </div>
+
+                        <div class="col">
+                            <label for="" class="gray">Lower Range</label><br>
+                            <span class="font-bold">₱500.00</span>
+                        </div>
+                        <div class="col">
+                            <label for="" class="gray">Upper Range</label><br>
+                            <span class="font-bold">₱500.00</span>
+                        </div>
+                        <div class="col">
+                            <label for="" class="gray">Rate</label><br>
+                            <span class="font-bold">5%</span>
+                        </div>
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">Employee Contribution</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter EE Contribution">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">Employer Contribution</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter ER Contribution">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAGIBIG CONTRIBUTION -->
+                <div class="px-4 border mb-2 box-shadow-medium">
+                    <div class="row pt-2">
+                        <div class="col">
+                            <span class="gray font-size-14 font-bold">Pag-Ibig Employee Deduction</span>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 py-2 order-card b-radius-5">
+                        <div class="col-12 pb-2">
+                            <label for="" class="gray">Basis | 2021 HDMF Contribution Rate</label>
+                        </div>
+
+                        <div class="col">
+                            <label for="" class="gray">Fixed Amount</label><br>
+                            <span class="font-bold">₱100.00</span>
+                        </div>
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">Employee Contribution</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter EE Contribution">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EMPLOYEE TAX DEDUCTION -->
+                <div class="px-4 border mb-2 box-shadow-medium">
+                    <div class="row pt-2">
+                        <div class="col">
+                            <span class="gray font-size-14 font-bold">Tax Deduction</span>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 py-2 order-card b-radius-5">
+                        <div class="col-12 pb-2">
+                            <label for="" class="gray">Basis | 2021 Tax Table</label>
+                        </div>
+
+                        <div class="col">
+                            <label for="" class="gray">Lower Range</label><br>
+                            <span class="font-bold">₱1000.00</span>
+                        </div>
+
+                        <div class="col">
+                            <label for="" class="gray">Upper Range</label><br>
+                            <span class="font-bold">₱2000.00</span>
+                        </div>
+
+                        <div class="col">
+                            <label for="" class="gray">Fixed Deduction</label><br>
+                            <span class="font-bold">₱500.00</span>
+                        </div>
+                        
+                        <div class="col">
+                            <label for="" class="gray">Percent Deduction</label><br>
+                            <span class="font-bold">5%</span>
+                        </div>
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">Tax Deduction</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter Tax Contribution">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- De Minimis Benefits -->
+                <div class="px-4 border mb-2 box-shadow-medium">
+                    <div class="row py-2">
+                        <div class="col">
+                            <span class="gray font-size-14 font-bold">De Minimis Pay</span>
+                        </div>
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col-5">
+                            <div class="form-group">
+                                <label for="">Name</label>
+                                <select name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Benefit</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-5">
+                            <div class="form-group">
+                                <label for="">Amount</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label for="">Taxable</label>
+                                <select name="" id="" class="form-control">
+                                    <option value="False">No</option>
+                                    <option value="True">Yes</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row pb-2">
+                        <div class="col">
+                            <button class="btn btn-warning">+ Add More Benefits</button>
+                            <button class="btn btn-danger">- Remove Benefit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="sticky-top ml-3 box-shadow-medium border px-3">
+                    <div class="row py-2">
+                        <div class="col">
+                            <label for="" class="gray">Basic Pay</label><br>
+                            <span class="font-bold font-size-14">₱23,000.00</span>
+                        </div>
+                    </div>
+                    <div class="row pt-4 pb-1">
+                        <div class="col">
+                            <label for="" class="gray">Gross Pay Before Bonus</label><br>
+                            <span class="font-bold font-size-14">₱23,000.00</span>
+                        </div>
+                    </div>
+                    <div class="row pb-4 pt-1">
+                        <div class="col">
+                            <label for="" class="gray">Gross Pay After Bonus</label><br>
+                            <span class="font-bold font-size-14">₱23,000.00</span>
+                        </div>
+                    </div>
+                    <div class="row pt-4 pb-1">
+                        <div class="col">
+                            <label for="" class="gray">Net Pay Before Tax</label><br>
+                            <span class="font-bold font-size-14">₱23,000.00</span>
+                        </div>
+                    </div>
+                    <div class="row pb-2 pt-1">
+                        <div class="col">
+                            <label for="" class="gray">Net Pay After Tax</label><br>
+                            <span class="font-bold font-size-14">₱23,000.00</span>
+                        </div>
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col">
+                            <button class="btn btn-primary col">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+    })
+</script>
+
+{% endblock %}

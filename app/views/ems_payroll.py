@@ -27,6 +27,10 @@ class EMS_PayrollView(View):
             }
         return render(request, 'ems-payroll.html', context)
 
+class EMS_EditPayrollView(View):
+    def get(self, request):
+        return render(request, 'ems-edit-payroll.html')
+
 class EMS_GeneratePayroll(APIView):
     def post(self, request):
         users = User.objects.filter(branch = request.user.branch, payrollable = True)
