@@ -421,3 +421,8 @@ class ComplexPayrollAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ComplexPayrollSZ
     queryset = Payroll.objects.all()
+
+class PayrollAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PayrollSZ
+    queryset = Payroll.objects.all()

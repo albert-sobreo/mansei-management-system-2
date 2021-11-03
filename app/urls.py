@@ -112,6 +112,7 @@ router.register(r'ut-request', views.UTRequestAPI, 'ut-request')
 
 ########## PAYROLL ##########
 router.register(r'complex-payroll', views.ComplexPayrollAPI, 'complex-payroll')
+router.register(r"payroll", views.PayrollAPI, 'payroll')
 
 ########## USER ##########
 router.register(r'user', views.UserAPI, 'user')

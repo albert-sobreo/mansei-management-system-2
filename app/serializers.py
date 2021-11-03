@@ -1,6 +1,8 @@
 from rest_framework import fields, serializers
 from .models import *
 
+from rest_framework.serializers import ModelSerializer as MS
+
 ########## DEMINIMIS OF USER ##########
 class DeMinimisOfUserSZ(serializers.ModelSerializer):
     class Meta:
@@ -897,5 +899,100 @@ class ComplexPayrollSZ(serializers.ModelSerializer):
 
     class Meta:
         model = Payroll
+        fields = "__all__"
+        depth = 1
+
+
+
+
+
+
+########## EVERYTHING NEEDED IN PAYROLL ##########
+class SSSContributionRateSZ2(serializers.ModelSerializer):
+    class Meta:
+        model = SSSContributionRate
+        fields = "__all__"
+
+class PHICContributionRateSZ2(serializers.ModelSerializer):
+    class Meta:
+        model = PHICContributionRate
+        fields = "__all__"
+
+class PagibigContributionRateSZ2(serializers.ModelSerializer):
+    class Meta:
+        model = PagibigContributionRate
+        fields = "__all__"
+
+class IncomeTaxTableSZ2(serializers.ModelSerializer):
+    class Meta:
+        model = IncomeTaxTable
+        fields = "__all__"
+
+class SSSEmployeeDeductionSZ2(MS):
+    sssContributionRate = SSSContributionRateSZ2(read_only=True)
+    class Meta:
+        model = SSSEmployeeDeduction
+        fields = [
+            'ee',
+            'er',
+            'sssContributionRate'
+        ]
+
+class PHICEmployeeDeductionSZ2(MS):
+    phicContributionRate = PHICContributionRateSZ2(read_only=True)
+    class Meta:
+        model = PHICEmployeeDeduction
+        fields = [
+            'ee',
+            'er',
+            'phicContributionRate'
+        ]
+
+class PagibigEmployeeDeductionSZ2(MS):
+    pagibigContributionRate = PagibigContributionRateSZ2(read_only=True)
+    class Meta:
+        model = PagibigEmployeeDeduction
+        fields = [
+            'amount',
+            'pagibigContributionRate'
+        ]
+
+class EmployeeTaxDeductionSZ2(MS):
+    incometaxtable = IncomeTaxTableSZ2(read_only=True)
+    class Meta:
+        model = EmployeeTaxDeduction
+        fields = [
+            'amount',
+            'incometaxtable',
+        ]
+
+class DeMinimisPaySZ2(MS):
+    class Meta:
+        model = DeMinimisPay
+        fields = [
+            'name',
+            'amount',
+            'taxable',
+        ]
+
+class BonusPaySZ2(MS):
+    class Meta:
+        model = BonusPay
+        fields = [
+            'name',
+            'amount',
+        ]
+
+class PayrollSZ(MS):
+    user = UserSZ(read_only=True)
+    sssemployeededuction = SSSEmployeeDeductionSZ2(read_only=True)
+    phicemployeededuction = PHICEmployeeDeductionSZ2(read_only=True)
+    pagibigemployeededuction = PagibigEmployeeDeductionSZ2(read_only=True)
+    employeetaxdeduction = EmployeeTaxDeductionSZ2(read_only=True)
+    deminimispay = DeMinimisPaySZ2(read_only=True, many=True)
+    bonuspay = BonusPaySZ2(read_only=True, many=True)
+
+    class Meta:
+        models = Payroll
         fields = "__all__"
         depth = 1
