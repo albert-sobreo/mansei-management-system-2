@@ -993,6 +993,6 @@ class PayrollSZ(MS):
     bonuspay = BonusPaySZ2(read_only=True, many=True)
 
     class Meta:
-        models = Payroll
+        model = Payroll
         fields = "__all__"
         depth = 1

@@ -30,19 +30,19 @@
                     <div class="row py-2">
                         <div class="col-6">
                             <label for="" class="gray">Employee</label><br>
-                            <span class="font-bold">Clark Kent</span>
+                            <span class="font-bold">[[payroll.user.first_name]] [[payroll.user.last_name]]</span>
                         </div>
                         <div class="col-6">
                             <label for="" class="gray">Year</label><br>
-                            <span class="font-bold">2021</span>
+                            <span class="font-bold">[[payroll.year]]</span>
                         </div>
                         <div class="col-6 mt-2">
                             <label for="" class="gray">Period</label><br>
-                            <span class="font-bold">Oct. 11, 2021 - Oct. 25, 2021</span>
+                            <span class="font-bold">[[formatDate(payroll.dateStart)]] - [[formatDate(payroll.dateEnd)]]</span>
                         </div>
                         <div class="col-6 mt-2">
                             <label for="" class="gray">Date Generated</label><br>
-                            <span class="font-bold">Oct.30, 2021</span>
+                            <span class="font-bold">[[formatDate(payroll.dateGenerated)]]</span>
                         </div>
                     </div>
                 </div>
@@ -60,7 +60,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Basic Hours Pay" for="" class="timesheet-hours">BH</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.bh)" @change="updateBH" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -68,7 +68,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Overtime Pay" for="" class="timesheet-hours">OT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.ot)" @change="updateOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -76,7 +76,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Night Differential Pay" for="" class="timesheet-hours">ND</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.nd)" @change="updateND" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -84,7 +84,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Night Differential Overtime Pay" for="" class="timesheet-hours">NDOT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.ndot)" @change="updateNDOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Rest Day Pay" for="" class="timesheet-hours">RD</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rd)" @change="updateRD" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Rest Day Overtime Pay" for="" class="timesheet-hours">RD OT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rdot)" @change="updateRDOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -111,7 +111,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Rest Day Night Differential Pay" for="" class="timesheet-hours">RD ND</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rdnd)" @change="updateRDND" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -119,7 +119,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Rest Day Night Differential Overtime Pay" for="" class="timesheet-hours">RD NDOT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rdndot)" @change="updateRDNDOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -130,7 +130,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Pay" for="" class="timesheet-hours">RH</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rh)" @change="updateRH" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -138,7 +138,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Overtime Pay" for="" class="timesheet-hours">RH OT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhot)" @change="updateRHOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -146,7 +146,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Night Differential Pay" for="" class="timesheet-hours">RH ND</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhnd)" @change="updateRHND" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -154,7 +154,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Night Differential Overtime Pay" for="" class="timesheet-hours">RH NDOT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhndot)" @change="updateRHNDOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -165,7 +165,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Pay" for="" class="timesheet-hours">SH</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.sh)" @change="updateSH" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -173,7 +173,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Overtime Pay" for="" class="timesheet-hours">SHOT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shot)" @change="updateSHOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -181,7 +181,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Night Differential Pay" for="" class="timesheet-hours">SHND</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shnd)" @change="updateSHND" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -189,7 +189,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Night Differential Overtime Pay" for="" class="timesheet-hours">SH NDOT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shndot)" @change="updateSHNDOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -200,7 +200,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Working Holiday Pay" for="" class="timesheet-hours">SHW</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shw)" @change="updateSHW" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -208,7 +208,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Working Holiday Overtime Pay" for="" class="timesheet-hours">SHW OT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shwot)" @change="updateSHWOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -216,7 +216,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Working Holiday Night Differential Pay" for="" class="timesheet-hours">SHW ND</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shwnd)" @change="updateSHWND" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -224,7 +224,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Night Differential Overtime Pay" for="" class="timesheet-hours">SHW NDOT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shwndot)" @change="updateSHWNDOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -235,7 +235,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Rest Day Pay" for="" class="timesheet-hours">RHRD</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhrd)" @change="updateRHRD" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -243,7 +243,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Rest Day Overtime Pay" for="" class="timesheet-hours">RHRD OT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhrdot)" @change="updateRHRDOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -251,7 +251,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Rest Day Night Differential Pay" for="" class="timesheet-hours">RHRD ND</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhrdnd)" @change="updateRHRDND" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -259,7 +259,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Rest Day Night Differential Overtime Pay" for="" class="timesheet-hours">RHRD NDOT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhrdndot)" @change="updateRHRDNDOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -270,7 +270,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Rest Day Pay" for="" class="timesheet-hours">SHRD</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shrd)" @change="updateSHRD" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -278,7 +278,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Rest Day Overtime Pay" for="" class="timesheet-hours">SHRD OT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shrdot)" @change="updateSHRDOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -286,7 +286,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Rest Day Night Differential Pay" for="" class="timesheet-hours">SHRD ND</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shrdnd)" @change="updateSHRDND" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -294,7 +294,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Rest Day Night Differential Overtime Pay" for="" class="timesheet-hours">SHRD NDOT</label><br>
                             <div class="placeholder" data-placeholder="₱">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shrdndot)" @change="updateSHRDNDOT" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -315,7 +315,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Basic Hours Pay" for="" class=" timesheet-hours">BH</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.bhTotalHours)" @change="updateBHHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -323,7 +323,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Overtime Pay" for="" class=" timesheet-hours">OT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.otTotalHours)" @change="updateOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -331,7 +331,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Night Differential Pay" for="" class=" timesheet-hours">ND</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.ndTotalHours)" @change="updateNDHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -339,7 +339,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Night Differential Overtime Pay" for="" class=" timesheet-hours">NDOT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.ndotTotalHours)" @change="updateNDOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -350,7 +350,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Rest Day Pay" for="" class=" timesheet-hours">RD</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rdTotalHours)" @change="updateRDHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -358,7 +358,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Rest Day Overtime Pay" for="" class=" timesheet-hours">RD OT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rdotTotalHours)" @change="updateRDOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -366,7 +366,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Rest Day Night Differential Pay" for="" class=" timesheet-hours">RD ND</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rdndTotalHours)" @change="updateRDNDHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -374,7 +374,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Rest Day Night Differential Overtime Pay" for="" class=" timesheet-hours">RD NDOT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rdndotTotalHours)" @change="updateRDNDOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -385,7 +385,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Pay" for="" class=" timesheet-hours">RH</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhTotalHours)" @change="updateRHHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -393,7 +393,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Overtime Pay" for="" class=" timesheet-hours">RH OT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhotTotalHours)" @change="updateRHOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -401,7 +401,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Night Differential Pay" for="" class=" timesheet-hours">RH ND</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhndTotalHours)" @change="updateRHNDHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -409,7 +409,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Night Differential Overtime Pay" for="" class=" timesheet-hours">RH NDOT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhndotTotalHours)" @change="updateRHNDOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -420,7 +420,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Pay" for="" class=" timesheet-hours">SH</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shTotalHours)" @change="updateSHHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -428,7 +428,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Overtime Pay" for="" class=" timesheet-hours">SHOT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shotTotalHours)" @change="updateSHOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -436,7 +436,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Night Differential Pay" for="" class=" timesheet-hours">SHND</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shndTotalHours)" @change="updateSHNDHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -444,7 +444,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Night Differential Overtime Pay" for="" class=" timesheet-hours">SH NDOT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shndotTotalHours)" @change="updateSHNDOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -455,7 +455,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Working Holiday Pay" for="" class=" timesheet-hours">SHW</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shwTotalHours)" @change="updateSHWHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -463,7 +463,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Working Holiday Overtime Pay" for="" class=" timesheet-hours">SHW OT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shwotTotalHours)" @change="updateSHWOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -471,7 +471,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Working Holiday Night Differential Pay" for="" class=" timesheet-hours">SHW ND</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shwndTotalHours)" @change="updateSHWNDHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -479,7 +479,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Night Differential Overtime Pay" for="" class=" timesheet-hours">SHW NDOT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shwndotTotalHours)" @change="updateSHWNDOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -490,7 +490,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Rest Day Pay" for="" class=" timesheet-hours">RHRD</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhrdTotalHours)" @change="updateRHRDHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -498,7 +498,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Rest Day Overtime Pay" for="" class=" timesheet-hours">RHRD OT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhrdotTotalHours)" @change="updateRHRDOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -506,7 +506,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Rest Day Night Differential Pay" for="" class=" timesheet-hours">RHRD ND</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhrdndTotalHours)" @change="updateRHRDNDHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -514,7 +514,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Regular Holiday Rest Day Night Differential Overtime Pay" for="" class=" timesheet-hours">RHRD NDOT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.rhrdndotTotalHours)" @change="updateRHRDNDOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -525,7 +525,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Rest Day Pay" for="" class=" timesheet-hours">SHRD</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shrdTotalHours)" @change="updateSHRDHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -533,7 +533,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Rest Day Overtime Pay" for="" class=" timesheet-hours">SHRD OT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shrdotTotalHours)" @change="updateSHRDOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -541,7 +541,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Rest Day Night Differential Pay" for="" class=" timesheet-hours">SHRD ND</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shrdndTotalHours)" @change="updateSHRDNDHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -549,7 +549,7 @@
                             <div class="mx-1 b-radius-5 border">
                             <label title="Special Holiday Rest Day Night Differential Overtime Pay" for="" class=" timesheet-hours">SHRD NDOT</label><br>
                             <div class="placeholder" data-placeholder="H">
-                                <input onkeypress="validate()" type="text" class="form-control-special-2">
+                                <input onkeypress="validate()" type="text" class="form-control-special-2" :value="formatPrice(payroll.shrdndotTotalHours)" @change="updateSHRDNDOTHOURS" @focus="$event.target.select()">
                             </div>
                             </div>
                         </div>
@@ -799,6 +799,42 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="px-4 border mb-2 box-shadow-medium">
+                    <div class="row py-2">
+                        <div class="col">
+                            <span class="gray font-size-14 font-bold">Bonus Pay</span>
+                        </div>
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Bonus Name">
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="">Amount</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row pb-2">
+                        <div class="col">
+                            <button class="btn btn-warning">+ Add More Bonus</button>
+                            <button class="btn btn-danger">- Remove Bonus</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div>
                 <div class="sticky-top ml-3 box-shadow-medium border px-3">
@@ -841,6 +877,7 @@
                 </div>
             </div>
         </div>
+        <pre>[[$data]]</pre>
     </div>
 </div>
 {% endblock %}
@@ -851,6 +888,384 @@
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: "#app",
+
+        computed: {
+
+        },
+
+        watch: {
+
+        },
+
+        data: {
+            payroll: {
+                user: {
+                    first_name: null,
+                    last_name: null,
+                },
+                sssemployeededuction: {
+                    ee: 0,
+                    er: 0,
+                    sssContributionRate: {
+                        name: null,
+                        upperLimit: null,
+                        lowerLimit: null,
+                        ee: 0,
+                        er: 0,
+                    }
+                },
+                phicemployeededuction: {
+                    ee: 0,
+                    er: 0,
+                    phicContributionRate: {
+                        name: null,
+                        upperLimit: null,
+                        lowerLimit: null,
+                        rate: 0,
+                    }
+                },
+                pagibigemployeededuction: {
+                    amount: 0,
+                    pagibigContributionRate: {
+                        name: null,
+                        rate: 0,
+                    }
+                },
+                employeetaxdeduction: {
+                    amount: 0,
+                    incometaxtable: {
+                        name: null,
+                        lowerLimit: 0,
+                        upperLimit: 0,
+                        fixedDeduction: 0,
+                        percentDeduction: 0,
+                    }
+                },
+                deminimispay: [{
+                    name: null,
+                    amount: 0,
+                    taxable: null,
+                }],
+                bonuspay: [{
+                    name: null,
+                    amount: 0,
+                }],
+                year: null,
+                dateStart: null,
+                dateEnd: null,
+                dateGenerated: null,
+                dateApproved: null,
+
+                bh: 0,
+                ot: 0,
+                ut: 0,
+                nd: 0,
+                ndot: 0,
+                rd: 0,
+                rdot: 0,
+                rdnd: 0,
+                rdndot: 0,
+                rh: 0,
+                rhot: 0,
+                rhnd: 0,
+                rhndot: 0,
+                sh: 0,
+                shot: 0,
+                shnd: 0,
+                shndot: 0,
+                shw: 0,
+                shwot: 0,
+                shwnd: 0,
+                shwndot: 0,
+                rhrd: 0,
+                rhrdot: 0,
+                rhrdnd: 0,
+                rhrdndot: 0,
+                shrd: 0,
+                shrdot: 0,
+                shrdnd: 0,
+                shrdndot: 0,
+
+                bhTotalHours: 0,
+                otTotalHours: 0,
+                utTotalHours: 0,
+                ndTotalHours: 0,
+                ndotTotalHours: 0,
+                rdTotalHours: 0,
+                rdotTotalHours: 0,
+                rdndTotalHours: 0,
+                rdndotTotalHours: 0,
+                rhTotalHours: 0,
+                rhotTotalHours: 0,
+                rhndTotalHours: 0,
+                rhndotTotalHours: 0,
+                shTotalHours: 0,
+                shotTotalHours: 0,
+                shndTotalHours: 0,
+                shndotTotalHours: 0,
+                shwTotalHours: 0,
+                shwotTotalHours: 0,
+                shwndTotalHours: 0,
+                shwndotTotalHours: 0,
+                rhrdTotalHours: 0,
+                rhrdotTotalHours: 0,
+                rhrdndTotalHours: 0,
+                rhrdndotTotalHours: 0,
+                shrdTotalHours: 0,
+                shrdotTotalHours: 0,
+                shrdndTotalHours: 0,
+                shrdndotTotalHours: 0,
+
+                basicPay: 0,
+                holidayPay: 0,
+                grossPayBeforeBonus: 0,
+                grossPayAfterBonus: 0,
+                netPayBeforeTaxes: 0,
+                netPayAfterTaxes: 0,
+            }
+        },
+
+        methods: {
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            updateBH(event){
+                this.payroll.bh = event.target.value.trim()
+            },
+            updateOT(event){
+                this.payroll.ot = event.target.value.trim()
+            },
+            updateND(event){
+                this.payroll.nd = event.target.value.trim()
+            },
+            updateNDOT(event){
+                this.payroll.ndot = event.target.value.trim()
+            },
+            updateRD(event){
+                this.payroll.rd = event.target.value.trim()
+            },
+            updateRDOT(event){
+                this.payroll.rdot = event.target.value.trim()
+            },
+            updateRDND(event){
+                this.payroll.rdnd = event.target.value.trim()
+            },
+            updateRDNDOT(event){
+                this.payroll.rdndot = event.target.value.trim()
+            },
+            updateRH(event){
+                this.payroll.rh = event.target.value.trim()
+            },
+            updateRHOT(event){
+                this.payroll.rhot = event.target.value.trim()
+            },
+            updateRHND(event){
+                this.payroll.rhnd = event.target.value.trim()
+            },
+            updateRHNDOT(event){
+                this.payroll.rhndot = event.target.value.trim()
+            },
+            updateSH(event){
+                this.payroll.sh = event.target.value.trim()
+            },
+            updateSHOT(event){
+                this.payroll.shot = event.target.value.trim()
+            },
+            updateSHND(event){
+                this.payroll.shnd = event.target.value.trim()
+            },
+            updateSHNDOT(event){
+                this.payroll.shndot = event.target.value.trim()
+            },
+            updateSHW(event){
+                this.payroll.shw = event.target.value.trim()
+            },
+            updateSHWOT(event){
+                this.payroll.shwot = event.target.value.trim()
+            },
+            updateSHWND(event){
+                this.payroll.shwnd = event.target.value.trim()
+            },
+            updateSHWNDOT(event){
+                this.payroll.shwndot = event.target.value.trim()
+            },
+
+            updateRHRD(event){
+                this.payroll.rhrd = event.target.value.trim()
+            },
+            updateRHRDOT(event){
+                this.payroll.rhrdot = event.target.value.trim()
+            },
+            updateRHRDND(event){
+                this.payroll.rhrdnd = event.target.value.trim()
+            },
+            updateRHRDNDOT(event){
+                this.payroll.rhrdndot = event.target.value.trim()
+            },
+
+            updateSHRD(event){
+                this.payroll.shrd = event.target.value.trim()
+            },
+            updateSHRDOT(event){
+                this.payroll.shrdot = event.target.value.trim()
+            },
+            updateSHRDND(event){
+                this.payroll.shrdnd = event.target.value.trim()
+            },
+            updateSHRDNDOT(event){
+                this.payroll.shrdndot = event.target.value.trim()
+            },
+
+
+
+
+            updateBHHOURS(event){
+                this.payroll.bhTotalHours = event.target.value.trim()
+            },
+            updateOTHOURS(event){
+                this.payroll.otTotalHours = event.target.value.trim()
+            },
+            updateNDHOURS(event){
+                this.payroll.ndTotalHours = event.target.value.trim()
+            },
+            updateNDOTHOURS(event){
+                this.payroll.ndotTotalHours = event.target.value.trim()
+            },
+
+            updateRDHOURS(event){
+                this.payroll.rdTotalHours = event.target.value.trim()
+            },
+            updateRDOTHOURS(event){
+                this.payroll.rdotTotalHours = event.target.value.trim()
+            },
+            updateRDNDHOURS(event){
+                this.payroll.rdndTotalHours = event.target.value.trim()
+            },
+            updateRDNDOTHOURS(event){
+                this.payroll.rdndotTotalHours = event.target.value.trim()
+            },
+
+            updateRHHOURS(event){
+                this.payroll.rhTotalHours = event.target.value.trim()
+            },
+            updateRHOTHOURS(event){
+                this.payroll.rhotTotalHours = event.target.value.trim()
+            },
+            updateRHNDHOURS(event){
+                this.payroll.rhndTotalHours = event.target.value.trim()
+            },
+            updateRHNDOTHOURS(event){
+                this.payroll.rhndotTotalHours = event.target.value.trim()
+            },
+            updateSHHOURS(event){
+                this.payroll.shTotalHours = event.target.value.trim()
+            },
+            updateSHOTHOURS(event){
+                this.payroll.shotTotalHours = event.target.value.trim()
+            },
+            updateSHNDHOURS(event){
+                this.payroll.shndTotalHours = event.target.value.trim()
+            },
+            updateSHNDOTHOURS(event){
+                this.payroll.shndotTotalHours = event.target.value.trim()
+            },
+
+            updateSHWHOURS(event){
+                this.payroll.shwTotalHours = event.target.value.trim()
+            },
+            updateSHWOTHOURS(event){
+                this.payroll.shwotTotalHours = event.target.value.trim()
+            },
+            updateSHWNDHOURS(event){
+                this.payroll.shwndTotalHours = event.target.value.trim()
+            },
+            updateSHWNDOTHOURS(event){
+                this.payroll.shwndotTotalHours = event.target.value.trim()
+            },
+
+            updateRHRDHOURS(event){
+                this.payroll.rhrdTotalHours = event.target.value.trim()
+            },
+            updateRHRDOTHOURS(event){
+                this.payroll.rhrdotTotalHours = event.target.value.trim()
+            },
+            updateRHRDNDHOURS(event){
+                this.payroll.rhrdndTotalHours = event.target.value.trim()
+            },
+            updateRHRDNDOTHOURS(event){
+                this.payroll.rhrdndotTotalHours = event.target.value.trim()
+            },
+
+            updateSHRDHOURS(event){
+                this.payroll.shrdTotalHours = event.target.value.trim()
+            },
+            updateSHRDOTHOURS(event){
+                this.payroll.shrdotTotalHours = event.target.value.trim()
+            },
+            updateSHRDNDHOURS(event){
+                this.payroll.shrdndTotalHours = event.target.value.trim()
+            },
+            updateSHRDNDOTHOURS(event){
+                this.payroll.shrdndotTotalHours = event.target.value.trim()
+            }
+        },
+
+        mounted(){
+            let params = new URLSearchParams(location.search)
+            axios.get(`/api/payroll/${params.get('payroll_id')}`)
+            .then(res=>{
+                this.payroll=res.data
+            })
+            .catch(err=>{
+                Swal.fire({
+                    title: "Something went wrong.",
+                    html: err.message,
+                    icon: "error"
+                })
+            })
+        }
     })
 </script>
 
