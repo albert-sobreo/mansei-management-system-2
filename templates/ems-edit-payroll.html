@@ -566,48 +566,48 @@
 
                     <div class="row my-2 py-2 order-card b-radius-5">
                         <div class="col-12 pb-2">
-                            <label for="" class="gray">Basis | 2021 SSS Contribution Rate</label>
+                            <label for="" class="gray" v-if="payroll.sssemployeededuction">Basis | [[payroll.sssemployeededuction.sssContributionRate.name]]</label>
                         </div>
 
                         <div class="col">
                             <label for="" class="gray">Lower Range</label><br>
-                            <span class="font-bold">₱500.00</span>
+                            <span class="font-bold" v-if="payroll.sssemployeededuction">₱[[formatPrice(payroll.sssemployeededuction.sssContributionRate.lowerLimit)]]</span>
                         </div>
                         <div class="col">
                             <label for="" class="gray">Upper Range</label><br>
-                            <span class="font-bold">₱500.00</span>
+                            <span class="font-bold" v-if="payroll.sssemployeededuction">₱[[formatPrice(payroll.sssemployeededuction.sssContributionRate.upperLimit)]]</span>
                         </div>
                         <div class="col">
                             <label for="" class="gray">EE</label><br>
-                            <span class="font-bold">₱500.00</span>
+                            <span class="font-bold" v-if="payroll.sssemployeededuction">₱[[formatPrice(payroll.sssemployeededuction.sssContributionRate.ee)]]</span>
                         </div>
                         <div class="col">
                             <label for="" class="gray">ER</label><br>
-                            <span class="font-bold">₱500.00</span>
+                            <span class="font-bold" v-if="payroll.sssemployeededuction">₱[[formatPrice(payroll.sssemployeededuction.sssContributionRate.er)]]</span>
                         </div>
                     </div>
 
                     <div class="row py-2">
                         <div class="col">
-                            <div class="form-group">
+                            <div class="form-group" v-if="payroll.sssemployeededuction">
                                 <label for="">Employee Contribution</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter EE Contribution">
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter EE Contribution" v-model="payroll.sssemployeededuction.ee">
                                 </div>
                             </div>
                         </div>
 
                         <div class="col">
-                            <div class="form-group">
+                            <div class="form-group" v-if="payroll.sssemployeededuction">
                                 <label for="">Employer Contribution</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter ER Contribution">
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter ER Contribution" v-model="payroll.sssemployeededuction.er">
                                 </div>
                             </div>
                         </div>
@@ -624,44 +624,44 @@
 
                     <div class="row my-2 py-2 order-card-darker b-radius-5">
                         <div class="col-12 pb-2">
-                            <label for="" class="gray">Basis | 2021 PHIC Contribution Rate</label>
+                            <label for="" class="gray" v-if="payroll.phicemployeededuction">Basis | [[payroll.phicemployeededuction.name]]</label>
                         </div>
 
                         <div class="col">
                             <label for="" class="gray">Lower Range</label><br>
-                            <span class="font-bold">₱500.00</span>
+                            <span class="font-bold" v-if="payroll.phicemployeededuction">₱[[formatPrice(payroll.phicemployeededuction.phicContributionRate.lowerLimit)]]</span>
                         </div>
                         <div class="col">
                             <label for="" class="gray">Upper Range</label><br>
-                            <span class="font-bold">₱500.00</span>
+                            <span class="font-bold" v-if="payroll.phicemployeededuction">₱[[formatPrice(payroll.phicemployeededuction.phicContributionRate.upperLimit)]]</span>
                         </div>
                         <div class="col">
                             <label for="" class="gray">Rate</label><br>
-                            <span class="font-bold">5%</span>
+                            <span class="font-bold" v-if="payroll.phicemployeededuction">[[convertToPercent(payroll.phicemployeededuction.phicContributionRate.rate)]]%</span>
                         </div>
                     </div>
 
                     <div class="row py-2">
                         <div class="col">
-                            <div class="form-group">
+                            <div class="form-group" v-if="payroll.phicemployeededuction">
                                 <label for="">Employee Contribution</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter EE Contribution">
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter EE Contribution" v-model="payroll.phicemployeededuction.ee">
                                 </div>
                             </div>
                         </div>
 
                         <div class="col">
-                            <div class="form-group">
+                            <div class="form-group" v-if="payroll.phicemployeededuction">
                                 <label for="">Employer Contribution</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter ER Contribution">
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter ER Contribution" v-model="payroll.phicemployeededuction.er">
                                 </div>
                             </div>
                         </div>
@@ -678,24 +678,24 @@
 
                     <div class="row my-2 py-2 order-card b-radius-5">
                         <div class="col-12 pb-2">
-                            <label for="" class="gray">Basis | 2021 HDMF Contribution Rate</label>
+                            <label for="" class="gray" v-if="payroll.pagibigemployeededuction">Basis | [[payroll.pagibigemployeededuction.pagibigContributionRate.name]]</label>
                         </div>
 
                         <div class="col">
                             <label for="" class="gray">Fixed Amount</label><br>
-                            <span class="font-bold">₱100.00</span>
+                            <span class="font-bold" v-if="payroll.pagibigemployeededuction">₱[[formatPrice(payroll.pagibigemployeededuction.pagibigContributionRate.rate)]]</span>
                         </div>
                     </div>
 
                     <div class="row py-2">
                         <div class="col">
-                            <div class="form-group">
+                            <div class="form-group" v-if="payroll.pagibigemployeededuction">
                                 <label for="">Employee Contribution</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter EE Contribution">
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter EE Contribution" v-model="payroll.pagibigemployeededuction.amount">
                                 </div>
                             </div>
                         </div>
@@ -712,39 +712,39 @@
 
                     <div class="row my-2 py-2 order-card b-radius-5">
                         <div class="col-12 pb-2">
-                            <label for="" class="gray">Basis | 2021 Tax Table</label>
+                            <label for="" class="gray" v-if="payroll.employeetaxdeduction">Basis | [[payroll.employeetaxdeduction.incometaxtable.name]]</label>
                         </div>
 
                         <div class="col">
                             <label for="" class="gray">Lower Range</label><br>
-                            <span class="font-bold">₱1000.00</span>
+                            <span class="font-bold">₱[[formatPrice(payroll.employeetaxdeduction.incometaxtable.lowerLimit)]]</span>
                         </div>
 
                         <div class="col">
                             <label for="" class="gray">Upper Range</label><br>
-                            <span class="font-bold">₱2000.00</span>
+                            <span class="font-bold">₱[[formatPrice(payroll.employeetaxdeduction.incometaxtable.upperLimit)]]</span>
                         </div>
 
                         <div class="col">
                             <label for="" class="gray">Fixed Deduction</label><br>
-                            <span class="font-bold">₱500.00</span>
+                            <span class="font-bold">₱[[formatPrice(payroll.employeetaxdeduction.incometaxtable.fixedDeduction)]]</span>
                         </div>
                         
                         <div class="col">
                             <label for="" class="gray">Percent Deduction</label><br>
-                            <span class="font-bold">5%</span>
+                            <span class="font-bold">[[convertToPercent(payroll.employeetaxdeduction.incometaxtable.percentDeduction)]]%</span>
                         </div>
                     </div>
 
                     <div class="row py-2">
                         <div class="col">
-                            <div class="form-group">
+                            <div class="form-group" v-if="payroll.employeetaxdeduction">
                                 <label for="">Tax Deduction</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter Tax Contribution">
+                                    <input onkeypress="validate()" type="text" class="form-control box-shadow-off" placeholder="Enter Tax Contribution" v-model="payroll.employeetaxdeduction.amount">
                                 </div>
                             </div>
                         </div>
@@ -763,20 +763,22 @@
                         <div class="col-5">
                             <div class="form-group">
                                 <label for="">Name</label>
-                                <select name="" id="" class="form-control">
-                                    <option value="" selected disabled>Select Benefit</option>
-                                </select>
+                                <input list="deminimis" type="text" class="form-control" placeholder="Enter De Minimis Pay"  v-for="bonus in payroll.deminimispay" v-model="bonus.name">
+                                <datalist id="deminimis">
+                                    <option v-for="d in deminimis" :value="d.name">
+                                </datalist>
+
                             </div>
                         </div>
 
                         <div class="col-5">
                             <div class="form-group">
                                 <label for="">Amount</label>
-                                <div class="input-group">
+                                <div class="input-group"  v-for="bonus in payroll.deminimispay" >
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                    <input type="text" class="form-control box-shadow-off" placeholder="Enter Amount" onkeypress="validate()" v-model="bonus.amount">
                                 </div>
                             </div>
                         </div>
@@ -784,9 +786,10 @@
                         <div class="col-2">
                             <div class="form-group">
                                 <label for="">Taxable</label>
-                                <select name="" id="" class="form-control">
-                                    <option value="False">No</option>
-                                    <option value="True">Yes</option>
+                                <select name="" id="" class="form-control"  v-for="bonus in payroll.deminimispay" v-model="bonus.taxable">
+                                    <option value=false>No</option>
+                                    <option value=true v-if="bonus.taxable" selected>Yes</option>
+                                    <option value=true v-else>Yes</option>
                                 </select>
                             </div>
                         </div>
@@ -794,8 +797,8 @@
 
                     <div class="row pb-2">
                         <div class="col">
-                            <button class="btn btn-warning">+ Add More Benefits</button>
-                            <button class="btn btn-danger">- Remove Benefit</button>
+                            <button class="btn btn-warning" @click="pushBenefits()">+ Add More Benefits</button>
+                            <button class="btn btn-danger" @click="popBenefits()">- Remove Benefit</button>
                         </div>
                     </div>
                 </div>
@@ -811,18 +814,18 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Bonus Name">
+                                <input type="text" class="form-control" placeholder="Enter Bonus Name" v-for="bonus in payroll.bonuspay" :value="bonus.name">
                             </div>
                         </div>
 
                         <div class="col">
                             <div class="form-group">
                                 <label for="">Amount</label>
-                                <div class="input-group">
+                                <div class="input-group" v-for="bonus in payroll.bonuspay">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                    <input type="text" class="form-control box-shadow-off" onkeypress="validate()" v-model="bonus.amount">
                                 </div>
                             </div>
                         </div>
@@ -830,8 +833,8 @@
 
                     <div class="row pb-2">
                         <div class="col">
-                            <button class="btn btn-warning">+ Add More Bonus</button>
-                            <button class="btn btn-danger">- Remove Bonus</button>
+                            <button class="btn btn-warning" @click="pushBonus()">+ Add More Bonus</button>
+                            <button class="btn btn-danger" @click="popBonus()">- Remove Bonus</button>
                         </div>
                     </div>
                 </div>
@@ -841,37 +844,37 @@
                     <div class="row py-2">
                         <div class="col">
                             <label for="" class="gray">Basic Pay</label><br>
-                            <span class="font-bold font-size-14">₱23,000.00</span>
+                            <span class="font-bold font-size-14">₱[[formatPrice(payroll.basicPay)]]</span>
                         </div>
                     </div>
                     <div class="row pt-4 pb-1">
                         <div class="col">
                             <label for="" class="gray">Gross Pay Before Bonus</label><br>
-                            <span class="font-bold font-size-14">₱23,000.00</span>
+                            <span class="font-bold font-size-14">₱[[formatPrice(payroll.grossPayBeforeBonus)]]</span>
                         </div>
                     </div>
                     <div class="row pb-4 pt-1">
                         <div class="col">
                             <label for="" class="gray">Gross Pay After Bonus</label><br>
-                            <span class="font-bold font-size-14">₱23,000.00</span>
+                            <span class="font-bold font-size-14">₱[[formatPrice(payroll.grossPayAfterBonus)]]</span>
                         </div>
                     </div>
                     <div class="row pt-4 pb-1">
                         <div class="col">
                             <label for="" class="gray">Net Pay Before Tax</label><br>
-                            <span class="font-bold font-size-14">₱23,000.00</span>
+                            <span class="font-bold font-size-14">₱[[formatPrice(payroll.netPayBeforeTaxes)]]</span>
                         </div>
                     </div>
                     <div class="row pb-2 pt-1">
                         <div class="col">
                             <label for="" class="gray">Net Pay After Tax</label><br>
-                            <span class="font-bold font-size-14">₱23,000.00</span>
+                            <span class="font-bold font-size-14">₱[[formatPrice(payroll.netPayAfterTaxes)]]</span>
                         </div>
                     </div>
 
                     <div class="row py-2">
                         <div class="col">
-                            <button class="btn btn-primary col">Save</button>
+                            <button class="btn btn-primary col" @click="submit(payroll.id)">Save</button>
                         </div>
                     </div>
                 </div>
@@ -890,14 +893,233 @@
         el: "#app",
 
         computed: {
+            bh(){
+                return Number(this.payroll.bh)
+            },
+            ot(){
+                return Number(this.payroll.ot)
+            },
+            nd(){
+                return Number(this.payroll.nd)
+            },
+            ndot(){
+                return Number(this.payroll.ndot)
+            },
+            rd(){
+                return Number(this.payroll.rd)
+            },
+            rdot(){
+                return Number(this.payroll.rdot)
+            },
+            rdnd(){
+                return Number(this.payroll.rdnd)
+            },
+            rdndot(){
+                return Number(this.payroll.rdndot)
+            },
+            rh(){
+                return Number(this.payroll.rh)
+            },
+            rhot(){
+                return Number(this.payroll.rhot)
+            },
+            rhnd(){
+                return Number(this.payroll.rhnd)
+            },
+            rhndot(){
+                return Number(this.payroll.rhndot)
+            },
+            sh(){
+                return Number(this.payroll.sh)
+            },
+            shot(){
+                return Number(this.payroll.shot)
+            },
+            shnd(){
+                return Number(this.payroll.shnd)
+            },
+            shndot(){
+                return Number(this.payroll.shndot)
+            },
+            shw(){
+                return Number(this.payroll.shw)
+            },
+            shwot(){
+                return Number(this.payroll.shwot)
+            },
+            shwnd(){
+                return Number(this.payroll.shwnd)
+            },
+            shwndot(){
+                return Number(this.payroll.shwndot)
+            },
+            rhrd(){
+                return Number(this.payroll.rhrd)
+            },
+            rhrdot(){
+                return Number(this.payroll.rhrdot)
+            },
+            rhrdnd(){
+                return Number(this.payroll.rhrdnd)
+            },
+            rhrdndot(){
+                return Number(this.payroll.rhrdndot)
+            },
+            shrd(){
+                return Number(this.payroll.shrd)
+            },
+            shrdot(){
+                return Number(this.payroll.shrdot)
+            },
+            shrdnd(){
+                return Number(this.payroll.shrdnd)
+            },
+            shrdndot(){
+                return Number(this.payroll.shrdndot)
+            },
 
+
+
+            sssemployeededuction(){
+                return Number(this.payroll.sssemployeededuction.ee)
+            },
+            phicemployeededuction(){
+                return Number(this.payroll.phicemployeededuction.ee)
+            },
+            pagibigemployeededuction(){
+                return Number(this.payroll.pagibigemployeededuction.amount)
+            },
+            employeetaxdeduction(){
+                return Number(this.payroll.employeetaxdeduction.amount)
+            },
+            deminimispay(){
+                return this.payroll.deminimispay.map(item=> item.taxable?item.amount:0)
+            },
+            bonuspay(){
+                return this.payroll.bonuspay.map(item=>item.amount)
+            }
         },
 
         watch: {
+            bh(){
+                this.watchers()
+            },
+            ot(){
+                this.watchers()
+            },
+            ut(){
+                this.watchers()
+            },
+            nd(){
+                this.watchers()
+            },
+            ndot(){
+                this.watchers()
+            },
+            rd(){
+                this.watchers()
+            },
+            rdot(){
+                this.watchers()
+            },
+            rdnd(){
+                this.watchers()
+            },
+            rdndot(){
+                this.watchers()
+            },
+            rh(){
+                this.watchers()
+            },
+            rhot(){
+                this.watchers()
+            },
+            rhnd(){
+                this.watchers()
+            },
+            rhndot(){
+                this.watchers()
+            },
+            sh(){
+                this.watchers()
+            },
+            shot(){
+                this.watchers()
+            },
+            shnd(){
+                this.watchers()
+            },
+            shndot(){
+                this.watchers()
+            },
+            shw(){
+                this.watchers()
+            },
+            shwot(){
+                this.watchers()
+            },
+            shwnd(){
+                this.watchers()
+            },
+            shwndot(){
+                this.watchers()
+            },
+            rhrd(){
+                this.watchers()
+            },
+            rhrdot(){
+                this.watchers()
+            },
+            rhrdnd(){
+                this.watchers()
+            },
+            rhrdndot(){
+                this.watchers()
+            },
+            shrd(){
+                this.watchers()
+            },
+            shrdot(){
+                this.watchers()
+            },
+            shrdnd(){
+                this.watchers()
+            },
+            shrdndot(){
+                this.watchers()
+            },
 
+
+
+            sssemployeededuction(){
+                this.watchers()
+            },
+            phicemployeededuction(){
+                this.watchers()
+            },
+            pagibigemployeededuction(){
+                this.watchers()
+            },
+            employeetaxdeduction(){
+                this.watchers()
+            },
+            deminimispay(){
+                this.watchers()
+            },
+            bonuspay(){
+                this.watchers()
+            }
         },
 
         data: {
+            config: {
+				headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                }
+			},
+            deminimis: {
+
+            },
             payroll: {
                 user: {
                     first_name: null,
@@ -942,11 +1164,13 @@
                     }
                 },
                 deminimispay: [{
+                    id: null,
                     name: null,
                     amount: 0,
                     taxable: null,
                 }],
                 bonuspay: [{
+                    id: null,
                     name: null,
                     amount: 0,
                 }],
@@ -1026,6 +1250,58 @@
         },
 
         methods: {
+            watchers(){
+                this.payroll.basicPay = this.payroll.bh
+                this.payroll.grossPayBeforeBonus = 
+                    Number(this.payroll.basicPay) + 
+                    Number(this.payroll.ot) +
+                    Number(this.payroll.nd) +
+                    Number(this.payroll.ndot) +
+                    Number(this.payroll.rd) +
+                    Number(this.payroll.rdot) +
+                    Number(this.payroll.rdnd) +
+                    Number(this.payroll.rdndot) +
+                    Number(this.payroll.rh) +
+                    Number(this.payroll.rhot) +
+                    Number(this.payroll.rhnd) +
+                    Number(this.payroll.rhndot) +
+                    Number(this.payroll.sh) +
+                    Number(this.payroll.shot) +
+                    Number(this.payroll.shnd) +
+                    Number(this.payroll.shndot) +
+                    Number(this.payroll.shw) +
+                    Number(this.payroll.shwot) +
+                    Number(this.payroll.shwnd) +
+                    Number(this.payroll.shwndot) +
+                    Number(this.payroll.rhrd) +
+                    Number(this.payroll.rhrdot) +
+                    Number(this.payroll.rhrdnd) +
+                    Number(this.payroll.rhrdndot) +
+                    Number(this.payroll.shrd) +
+                    Number(this.payroll.shrdot) +
+                    Number(this.payroll.shrdnd) +
+                    Number(this.payroll.shrdndot) +
+                    Number(this.payroll.holidayPay)
+
+                this.payroll.grossPayAfterBonus = Number(this.payroll.grossPayBeforeBonus)  
+                this.payroll.deminimispay.forEach(item=>{
+                    console.log(item)
+                    if(item.taxable){
+                        this.payroll.grossPayAfterBonus += Number(item.amount)
+                    }
+                })
+                this.payroll.bonuspay.forEach(item=>{
+                    this.payroll.grossPayAfterBonus += Number(item.amount)
+                })
+                this.payroll.netPayBeforeTaxes = 
+                    Number(this.payroll.grossPayBeforeBonus) -
+                    Number(this.sssemployeededuction) - 
+                    Number(this.phicemployeededuction) - 
+                    Number(this.pagibigemployeededuction)
+                this.payroll.netPayAfterTaxes = 
+                    Number(this.payroll.netPayBeforeTaxes) - 
+                    Number(this.employeetaxdeduction)
+            },
             formatDate(value){
                 const months = [
                     'Jan',
@@ -1070,6 +1346,45 @@
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
             },
+
+            convertToPercent(val){
+                return (val*100).toFixed(2)
+            },
+
+            pushBenefits(){
+                this.payroll.deminimispay.push(
+                    {
+                        id: null,
+                        name: null,
+                        amount: 0,
+                        taxable: null,
+                    }
+                )
+            },
+            popBenefits(){
+                this.payroll.deminimispay.pop()
+            },
+
+            pushBonus(){
+                this.payroll.bonuspay.push(
+                    {
+                        id: null,
+                        name: null,
+                        amount: 0,
+                    }
+                )
+            },
+
+            popBonus(){
+                this.payroll.bonuspay.pop()
+            },
+
+
+
+
+
+
+
 
             updateBH(event){
                 this.payroll.bh = event.target.value.trim()
@@ -1249,6 +1564,35 @@
             },
             updateSHRDNDOTHOURS(event){
                 this.payroll.shrdndotTotalHours = event.target.value.trim()
+            },
+
+
+
+
+
+
+            submit(id){
+                
+                Swal.fire({
+                    confirmButtonText: 'I am sure.',
+                    showCancelButton: true,
+                    title: 'Save Payroll?',
+                    icon: 'warning',
+                    html: 'Are you sure you want to save this payroll?',
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">Saving Payroll . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
+                        axios.put(`/ems-edit-payroll-save/${id}/`, this.payroll, this.config)
+                        .then(res=>{
+                            res.data==0?location.href=`/ems-payroll/?year=${this.payroll.year}&period=semi&dateRange=${this.payroll.dateStart}%20${this.payroll.dateEnd}`:''
+                        })
+                    }
+                })
             }
         },
 
@@ -1256,6 +1600,7 @@
             let params = new URLSearchParams(location.search)
             axios.get(`/api/payroll/${params.get('payroll_id')}`)
             .then(res=>{
+                console.log(res.data)
                 this.payroll=res.data
             })
             .catch(err=>{
@@ -1265,6 +1610,9 @@
                     icon: "error"
                 })
             })
+
+            axios.get('/api/deminimis/')
+            .then(res=>this.deminimis = res.data)
         }
     })
 </script>

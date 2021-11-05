@@ -426,3 +426,13 @@ class PayrollAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PayrollSZ
     queryset = Payroll.objects.all()
+
+
+
+
+
+########## DE MINIMIS ##########
+class DeMinimisAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = DeMinimisSZ
+    queryset = DeMinimis.objects.all()

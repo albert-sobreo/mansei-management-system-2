@@ -55,7 +55,6 @@ class EMS_GeneratePayroll(APIView):
                 previousPayroll = user.payroll.get(dateEnd=previousDateEnd)
             except Exception as e:
                 print(e)
-                print('i was here')
                 previousPayroll = Payroll()
                 previousPayroll.basicPay = Decimal(0)
                 previousPayroll.grossPayBeforeBonus = Decimal(0)
@@ -336,4 +335,124 @@ class EMS_GeneratePayroll(APIView):
                     payroll.netPayAfterTaxes = payroll.netPayBeforeTaxes - taxDeducted
                 
             payroll.save()
+        return JsonResponse(0, safe=False)
+
+class EMS_EditPayrollSave(APIView):
+    def put(self, request, pk, format = None):
+
+        payroll = Payroll.objects.get(pk=pk)
+
+        edit = request.data
+
+        payroll.bh = edit['bh']
+        payroll.ot = edit['ot']
+        payroll.ut = edit['ut']
+        payroll.nd = edit['nd']
+        payroll.ndot = edit['ndot']
+        payroll.rd = edit['rd']
+        payroll.rdot = edit['rdot']
+        payroll.rdnd = edit['rdnd']
+        payroll.rdndot = edit['rdndot']
+        payroll.rh = edit['rh']
+        payroll.rhot = edit['rhot']
+        payroll.rhnd = edit['rhnd']
+        payroll.rhndot = edit['rhndot']
+        payroll.sh = edit['sh']
+        payroll.shot = edit['shot']
+        payroll.shnd = edit['shnd']
+        payroll.shndot = edit['shndot']
+        payroll.shw = edit['shw']
+        payroll.shwot = edit['shwot']
+        payroll.shwnd = edit['shwnd']
+        payroll.shwndot = edit['shwndot']
+        payroll.rhrd = edit['rhrd']
+        payroll.rhrdot = edit['rhrdot']
+        payroll.rhrdnd = edit['rhrdnd']
+        payroll.rhrdndot = edit['rhrdndot']
+        payroll.shrd = edit['shrd']
+        payroll.shrdot = edit['shrdot']
+        payroll.shrdnd = edit['shrdnd']
+        payroll.shrdndot = edit['shrdndot']
+        payroll.bhTotalHours = edit['bhTotalHours']
+        payroll.otTotalHours = edit['otTotalHours']
+        payroll.utTotalHours = edit['utTotalHours']
+        payroll.ndTotalHours = edit['ndTotalHours']
+        payroll.ndotTotalHours = edit['ndotTotalHours']
+        payroll.rdTotalHours = edit['rdTotalHours']
+        payroll.rdotTotalHours = edit['rdotTotalHours']
+        payroll.rdndTotalHours = edit['rdndTotalHours']
+        payroll.rdndotTotalHours = edit['rdndotTotalHours']
+        payroll.rhTotalHours = edit['rhTotalHours']
+        payroll.rhotTotalHours = edit['rhotTotalHours']
+        payroll.rhndTotalHours = edit['rhndTotalHours']
+        payroll.rhndotTotalHours = edit['rhndotTotalHours']
+        payroll.shTotalHours = edit['shTotalHours']
+        payroll.shotTotalHours = edit['shotTotalHours']
+        payroll.shndTotalHours = edit['shndTotalHours']
+        payroll.shndotTotalHours = edit['shndotTotalHours']
+        payroll.shwTotalHours = edit['shwTotalHours']
+        payroll.shwotTotalHours = edit['shwotTotalHours']
+        payroll.shwndTotalHours = edit['shwndTotalHours']
+        payroll.shwndotTotalHours = edit['shwndotTotalHours']
+        payroll.rhrdTotalHours = edit['rhrdTotalHours']
+        payroll.rhrdotTotalHours = edit['rhrdotTotalHours']
+        payroll.rhrdndTotalHours = edit['rhrdndTotalHours']
+        payroll.rhrdndotTotalHours = edit['rhrdndotTotalHours']
+        payroll.shrdTotalHours = edit['shrdTotalHours']
+        payroll.shrdotTotalHours = edit['shrdotTotalHours']
+        payroll.shrdndTotalHours = edit['shrdndTotalHours']
+        payroll.shrdndotTotalHours = edit['shrdndotTotalHours']
+        payroll.basicPay = edit['basicPay']
+        payroll.holidayPay = edit['holidayPay']
+        payroll.grossPayBeforeBonus = edit['grossPayBeforeBonus']
+        payroll.grossPayAfterBonus = edit['grossPayAfterBonus']
+        payroll.netPayBeforeTaxes = edit['netPayBeforeTaxes']
+        payroll.netPayAfterTaxes = edit['netPayAfterTaxes']
+
+        try:
+            payroll.sssemployeededuction.ee = edit['sssemployeededuction']['ee']
+            payroll.sssemployeededuction.er = edit['sssemployeededuction']['er']
+        except Exception as e:
+            print(e)
+
+        try:
+            payroll.phicemployeededuction.ee = edit['phicemployeededuction']['ee']
+            payroll.phicemployeededuction.er = edit['phicemployeededuction']['er']
+        except Exception as e:
+            print(e)
+
+        try:
+            payroll.pagibigemployeededuction.amount = edit['pagibigemployeededuction']['amount']
+        except Exception as e:
+            print(e)
+
+        try:
+            payroll.employeetaxdeduction.amount = edit['employeetaxdeduction']['amount']
+        except Exception as e:
+            print(e)
+
+        for bonus in edit['bonuspay']:
+            if payroll.bonuspay.filter(name=bonus['name']).exists():
+                payroll.bonuspay.amount = bonus['amount']
+            else:
+                bonusPay = BonusPay()
+                bonusPay.user = request.user
+                bonusPay.payroll = payroll
+                bonusPay.name = bonus['name']
+                bonusPay.amount = bonus['amount']
+        
+        for benefit in edit['deminimispay']:
+            if payroll.deminimispay.filter(name=benefit['name']).exists():
+                payroll.deminimispay.amount = benefit['amount']
+            else:
+                deminimisPay = DeMinimisPay()
+                deminimisPay.user = request.user
+                deminimisPay.payroll = payroll
+                deminimisPay.name = benefit['name']
+                deminimisPay.amount = benefit['amount']
+                deminimisPay.taxable = benefit['taxable']
+
+        payroll.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

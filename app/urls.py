@@ -117,6 +117,9 @@ router.register(r"payroll", views.PayrollAPI, 'payroll')
 ########## USER ##########
 router.register(r'user', views.UserAPI, 'user')
 
+########## DE MINIMIS ##########
+router.register(r'deminimis', views.DeMinimisAPI, 'user')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -326,5 +329,7 @@ urlpatterns = [
     path('import-phic/', login_required(views.ImportPHICContributions.as_view())),
     path('income-tax-deductions/', login_required(views.IncomeTaxDeductionProfile.as_view())),
     path('give-deminimis/', login_required(views.GiveDeMinimis.as_view())),
-    path('ems-edit-payroll/', login_required(views.EMS_EditPayrollView.as_view()))
+
+    path('ems-edit-payroll/', login_required(views.EMS_EditPayrollView.as_view())),
+    path('ems-edit-payroll-save/<int:pk>/', login_required(views.EMS_EditPayrollSave.as_view()))
 ]

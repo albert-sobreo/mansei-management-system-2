@@ -970,6 +970,7 @@ class DeMinimisPaySZ2(MS):
     class Meta:
         model = DeMinimisPay
         fields = [
+            'id',
             'name',
             'amount',
             'taxable',
@@ -979,6 +980,7 @@ class BonusPaySZ2(MS):
     class Meta:
         model = BonusPay
         fields = [
+            'id',
             'name',
             'amount',
         ]
@@ -996,3 +998,8 @@ class PayrollSZ(MS):
         model = Payroll
         fields = "__all__"
         depth = 1
+
+class DeMinimisSZ(MS):
+    class Meta:
+        model = DeMinimis
+        fields = "__all__"
