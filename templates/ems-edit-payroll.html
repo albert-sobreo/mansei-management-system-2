@@ -814,7 +814,7 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Bonus Name" v-for="bonus in payroll.bonuspay" :value="bonus.name">
+                                <input type="text" class="form-control" placeholder="Enter Bonus Name" v-for="bonus in payroll.bonuspay" v-model="bonus.name">
                             </div>
                         </div>
 
@@ -1300,7 +1300,8 @@
                     Number(this.pagibigemployeededuction)
                 this.payroll.netPayAfterTaxes = 
                     Number(this.payroll.netPayBeforeTaxes) - 
-                    Number(this.employeetaxdeduction)
+                    Number(this.employeetaxdeduction) +
+                    Number(Number(this.payroll.grossPayAfterBonus) - Number(this.payroll.grossPayBeforeBonus))
             },
             formatDate(value){
                 const months = [
@@ -1357,7 +1358,7 @@
                         id: null,
                         name: null,
                         amount: 0,
-                        taxable: null,
+                        taxable: false,
                     }
                 )
             },

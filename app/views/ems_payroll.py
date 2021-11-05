@@ -440,6 +440,7 @@ class EMS_EditPayrollSave(APIView):
                 bonusPay.payroll = payroll
                 bonusPay.name = bonus['name']
                 bonusPay.amount = bonus['amount']
+                bonusPay.save()
         
         for benefit in edit['deminimispay']:
             if payroll.deminimispay.filter(name=benefit['name']).exists():
@@ -451,6 +452,7 @@ class EMS_EditPayrollSave(APIView):
                 deminimisPay.name = benefit['name']
                 deminimisPay.amount = benefit['amount']
                 deminimisPay.taxable = benefit['taxable']
+                deminimisPay.save()
 
         payroll.save()
 
