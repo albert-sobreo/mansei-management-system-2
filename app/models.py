@@ -1189,8 +1189,10 @@ class Payroll(models.Model):
     dateStart = models.DateField(null=True, blank=True)
     dateEnd = models.DateField(null=True, blank=True)
     dateGenerated = models.DateField(null=True, blank=True)
+    approved = models.BooleanField(default=False)
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='payrollapprovedby')
     dateApproved = models.DateField(null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="payroll")
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="payrolluser")
 
     bh = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     ot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
@@ -1486,7 +1488,9 @@ class TaxableDeMinimisPay(models.Model):
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name + " --- " + self.name
 
-
+class Payslip(models.Model):
+    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name='payslip')
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="payslip")
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
@@ -1640,6 +1644,9 @@ class Branch(models.Model):
     sssEmployeeDeduction = models.ManyToManyField(SSSEmployeeDeduction, blank=True)
     phicEmployeeDeduction = models.ManyToManyField(PHICEmployeeDeduction, blank=True)
     pagibigEmployeeDeduction = models.ManyToManyField(PagibigEmployeeDeduction, blank=True)
+
+    #### PAYSLIP ####
+    payslip = models.ManyToManyField(Payslip, blank=True)
 
 
     def __str__(self):

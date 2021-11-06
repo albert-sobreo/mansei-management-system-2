@@ -6,7 +6,7 @@ from django.views import View
 from ..forms import *
 import sweetify
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, date
 import re
 from .journalAPI import jeAPI
 
@@ -120,3 +120,28 @@ class EMS_LeaveDisapproval(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class EMS_PayrollApproval(APIView):
+    def get(self, request):
+        y = request.GET['year']
+        dateRange = request.GET['dateRange']
+        dateStart = dateRange.split(' ')[0]
+        dateEnd = dateRange.split(' ')[1]
+        
+        payrolls = Payroll.objects.filter(branch = request.user.branch, year = y, dateStart = dateStart, dateEnd = dateEnd)
+
+        for payroll in payrolls:
+            payroll.approved = True
+            payroll.approvedBy = request.user
+            payroll.dateApproved = date.today()
+
+            payslip = Payslip()
+            payslip.payroll = payroll
+            payslip.user = payroll.user
+
+            payslip.save()
+            request.user.branch.payslip.add(payslip)
+            payroll.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return redirect('/ems-payroll/?year={}&period=semi&dateRange={}%20{}'.format(y, dateStart, dateEnd))

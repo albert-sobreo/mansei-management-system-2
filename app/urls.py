@@ -331,5 +331,6 @@ urlpatterns = [
     path('give-deminimis/', login_required(views.GiveDeMinimis.as_view())),
 
     path('ems-edit-payroll/', login_required(views.EMS_EditPayrollView.as_view())),
-    path('ems-edit-payroll-save/<int:pk>/', login_required(views.EMS_EditPayrollSave.as_view()))
+    path('ems-edit-payroll-save/<int:pk>/', login_required(views.EMS_EditPayrollSave.as_view())),
+    path('ems-payroll-approval/', login_required(views.EMS_PayrollApproval.as_view()))
 ]
