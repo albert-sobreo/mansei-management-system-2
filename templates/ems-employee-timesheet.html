@@ -26,7 +26,18 @@
         </div>
 
         <!-- PERIOD -->
-        <div class="d-flex align-items-center justify-content-end">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="" class="mx-1">Employee</label>
+                    <select class="form-control mx-1">
+                        <option value="" selected disabled>Select Employee</option>
+                        {% for employee in employees %}
+                        <option value="{{employee.pk}}">{{employee.first_name}} {{employee.last_name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
             <div class="form-inline">
                 <div class="form-group">
                     <label for="" class="mx-1">Period</label>

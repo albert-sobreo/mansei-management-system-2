@@ -30,7 +30,10 @@ class EMS_MyTimesheetView(View):
 
 class EMS_EmployeeTimesheetView(View):
     def get(self, request):
-        return render(request, 'ems-employee-timesheet.html')
+        context = {
+            'employees': request.user.branch.user.filter(payrollable=True)
+        }
+        return render(request, 'ems-employee-timesheet.html', context)
 
 
 class EMS_TimesheetTabularView(View):
