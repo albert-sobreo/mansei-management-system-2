@@ -26,31 +26,25 @@
         </div>
 
         <!-- PERIOD -->
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="form-inline">
-                <div class="form-group">
-                    <label for="" class="mx-1">Employee</label>
-                    <select class="form-control mx-1">
-                        <option value="" selected disabled>Select Employee</option>
-                    </select>
-                </div>
-            </div>
+        <div class="d-flex align-items-center justify-content-end">
             <div class="form-inline">
                 <div class="form-group">
                     <label for="" class="mx-1">Period</label>
-                    <select class="form-control mx-1">
+                    <select @change="setSemiMonthPeriod()" v-model="year" class="form-control mx-1">
                         <option value="" selected disabled>Select Year</option>
                         <option v-for="year in yearList" :value="year">[[year]]</option>
                     </select>
-                    <select class="form-control mx-1">
+                    <select v-model="period" class="form-control mx-1">
                         <option value="" selected disabled>Select Period</option>
-                        <option value="">Semi-Monthly</option>
+                        <option value="semi">Semi-Monthly</option>
                     </select>
-                    <select class="form-control mx-1">
+                    <select v-model="dateRange" class="form-control mx-1">
                         <option value="" selected disabled>Date Range</option>
-                        <option value="">March 10, 2021 - March 25, 2021</option>
+                        <template v-if="period == 'semi'">
+                            <option v-for="date in semiMonthPeriod" :value="date[0]+' '+date[1]">[[ date[2] ]] - [[ date[3] ]]</option>
+                        </template>
                     </select>
-                    <button class="mx-1 btn btn-warning btn-sm">
+                    <button @click="setDate()" class="mx-1 btn btn-warning btn-sm">
                         Set
                     </button>
                 </div>
@@ -177,13 +171,20 @@
 
 {% block scripts %}
 
+<script src="/static/js/semi-monthly.js"></script>
+
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: "#app",
 
         data: {
-            yearList: []
+            year: '',
+            period: '',
+            dateRange: '',
+            yearList: [],
+            semiMonthPeriod: '',
+            params: '',
         },
 
         methods: {
@@ -197,10 +198,55 @@
                         html: err.message
                     })
                 })
+            },
+            setSemiMonthPeriod(){
+                this.semiMonthPeriod = semi_months(this.year)
+            },
+            formatTime(value){
+                value = new Date(value)
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+            setDate(){
+                if (this.year && this.period && this.dateRange){
+                    location.href=`/ems-employee-timesheet/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`
+                } else {
+                    Swal.fire({
+                        title: "Fill up all the inputs.",
+                        icon: 'error',
+                    })
+                }
+            },
+            toggleHoursView(id){
+                hourID = document.getElementById(id)
+                if(hourID.style.display == "block"){
+                    hourID.style.display = 'none'
+                } else {
+                    hourID.style.display = 'block'
+                }
+            },
+            loadingModal(){
+                message = "Saving Changes"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
             }
+            
         },
         mounted(){
             this.onload()
+            let params = new URLSearchParams(location.search);
+            this.params = params.toString()
+            this.year = params.get('year') ? params.get('year') : ''
+            this.dateRange = params.get('dateRange') ? params.get('dateRange').replace('%', ' ') : ''
+            this.period = params.get('period') ? params.get('period') : ''
+            this.semiMonthPeriod = semi_months(this.year)
         }
     })
 </script>

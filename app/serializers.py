@@ -763,7 +763,11 @@ class PurchaseRequestSZ(serializers.ModelSerializer):
 class DTRSZ(serializers.ModelSerializer):
     class Meta:
         model = DTR
-        fields = '__all__'
+        fields = [
+            'dateTimeIn',
+            'dateTimeOut',
+            'date'
+        ]
 
 class UserWithDTRSZ(serializers.ModelSerializer):
     dtr = DTRSZ(read_only=True, many=True, context='what')

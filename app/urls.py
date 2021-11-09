@@ -120,6 +120,9 @@ router.register(r'user', views.UserAPI, 'user')
 ########## DE MINIMIS ##########
 router.register(r'deminimis', views.DeMinimisAPI, 'user')
 
+########## DTR ##########
+router.register(r'user-w-dtr', views.UserWithDTRAPI, 'user-w-dtr')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),

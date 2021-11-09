@@ -19,4 +19,7 @@ class EMS_MyDTRView(View):
 
 class EMS_EmployeeDTRView(View):
     def get(self, request):
-        return render(request, 'ems-employee-dtr.html')
+        context = {
+            'employees': request.user.branch.user.filter(payrollable=True)
+        }
+        return render(request, 'ems-employee-dtr.html', context)

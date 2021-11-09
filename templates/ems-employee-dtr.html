@@ -31,10 +31,17 @@
                 <th>Status Today</th>
             </thead>
             <tbody>
+                {% for employee in employees %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#modal">Mar Roxas</td>
-                    <td>Absent</td>
+                    <td @click="fetchUser('{{employee.pk}}')" class="link" data-toggle="modal" data-target="#modal">{{employee.first_name}} {{employee.last_name}}</td>
+                    {% now 'M j, Y' as current_date %}
+                    {% if employee.dtr.all.0.date|date:'M j, Y' == current_date %}
+                    <td>Present</td>
+                    {% else %}
+                    <td>Not Present</td>
+                    {% endif %}
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
 
@@ -49,12 +56,7 @@
                             <div class="col-6 my-3">
                                 <label for="" class="gray">Employee Name</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Mar Roxas</span>
-                            </div>
-                            <div class="col-6 my-3">
-                                <label for="" class="gray">Status</label>
-                                <br>
-                                <span class="font-size-14 font-bold">Absent</span>
+                                <span class="font-size-14 font-bold">[[modal.first_name]] [[modal.last_name]]</span>
                             </div>
                         </div>
 
@@ -67,17 +69,17 @@
 
                         <!-- DTR TABLE -->
                         <div class="row">
-                            <table class="table table-sm table-striped table-borderless">
+                            <table id="dtrTable" class="table table-sm table-striped table-borderless">
                                 <thead>
                                     <th><span class="font-bold gray">Date</span></th>
                                     <th><span class="font-bold gray">Time-In</span></th>
                                     <th><span class="font-bold gray">Time-Out</span></th>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>sample</td>
-                                        <td>sample</td>
-                                        <td>sample</td>
+                                    <tr v-for="dtr in modal.dtr.slice(0, 25)">
+                                        <td>[[formatDate(dtr.date)]]</td>
+                                        <td>[[formatTime(dtr.dateTimeIn)]]</td>
+                                        <td>[[formatTime(dtr.dateTimeOut)]]</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -86,8 +88,6 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 </div>
 
@@ -98,7 +98,142 @@
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
-        el: "#app"
+        el: "#app",
+        data: {
+            modal: {
+                first_name: null,
+                last_name: null,
+                iduser: null,
+                dtr: [{
+                    dateTimeIn: null,
+                    dateTimeOut: null,
+                    date: null,
+                }]
+            }
+        },
+
+        methods: {
+            fetchUser(id){
+                axios.get(`/api/user-w-dtr/${id}`)
+                .then(res=>{
+                    this.modal = res.data
+                })
+            },
+
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${month}. ${date}, ${year} - ${day}`
+
+                return formatted
+            },
+
+            formatTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${hour}:${minute} ${meridian}`
+
+                return formatted
+            }
+        }
     })
 </script>
 
