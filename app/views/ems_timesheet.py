@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from ..models import DTR, MerchandiseInventory, Warehouse, WarehouseItems
+from ..models import *
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
@@ -20,8 +20,8 @@ class EMS_MyTimesheetView(View):
         except Exception as e:
             print(e)
             y = datetime.now().year
-            dateStart = '{}-1-1'.format(y)
-            dateEnd = '{}-12-31'.format(y)
+            dateStart = '1970-1-1'
+            dateEnd = '1970-1-1'
         context = {
             'dtrs' : request.user.branch.dtr.filter(user=request.user, date__range=[dateStart, dateEnd]).order_by('-date')
         }
@@ -30,8 +30,23 @@ class EMS_MyTimesheetView(View):
 
 class EMS_EmployeeTimesheetView(View):
     def get(self, request):
+        try:
+            user = User.objects.get(pk=request.GET['user'])
+            y = request.GET['year']
+            dateRange = request.GET['dateRange']
+            dateStart = dateRange.split(' ')[0]
+            dateEnd = dateRange.split(' ')[1]
+        except Exception as e:
+            print(e)
+            user = request.user.branch.user.filter(payrollable=True).latest('pk')
+            y = datetime.now().year
+            dateStart = '{}-1-1'.format(y)
+            dateEnd = '{}-12-31'.format(y)
+            print(user, y, dateStart, dateEnd)
+        
         context = {
-            'employees': request.user.branch.user.filter(payrollable=True)
+            'employees': request.user.branch.user.filter(payrollable=True),
+            'dtrs': request.user.branch.dtr.filter(user=user, date__range=[dateStart, dateEnd]).order_by('-date')
         }
         return render(request, 'ems-employee-timesheet.html', context)
 
@@ -41,7 +56,7 @@ class EMS_TimesheetTabularView(View):
         return render(request, 'ems-timesheet-tabular.html')
 
 class EMS_EditTimesheetHours(View):
-    def post(self, request, pk, params):
+    def post(self, request, pk, fromPage, params):
         print(pk, params)
         for val, keys in request.POST.items():
             print(val, keys)
@@ -78,4 +93,7 @@ class EMS_EditTimesheetHours(View):
         dtr.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
-        return redirect("/ems-my-timesheet/?{}".format(params))
+        if fromPage == 0:
+            return redirect("/ems-my-timesheet/?{}".format(params))
+        elif fromPage == 1:
+            return redirect("/ems-employee-timesheet/?{}".format(params))

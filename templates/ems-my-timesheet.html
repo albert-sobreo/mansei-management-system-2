@@ -52,6 +52,11 @@
         </div>
 
         <!-- TIMESHEET -->
+        {% if not dtrs %}
+        <div class="d-flex justify-content-center align-items-center my-4 p-5 b-radius-15 box-shadow-medium">
+            <span class="font-size-16 font-bold">Set Period</span>
+        </div>
+        {% endif %}
         {% for dtr in dtrs %}
         <div class="row my-4 b-radius-15 box-shadow-medium">
             <div class="col-12 m-3">
@@ -105,7 +110,7 @@
                     </div>
                 </div>
 
-                <form :action="'/ems-edit-timesheet-hours/{{dtr.pk}}/' + params + '/'" method="POST" >{% csrf_token %}
+                <form :action="'/ems-edit-timesheet-hours/{{dtr.pk}}/0/' + params + '/'" method="POST" >{% csrf_token %}
                     <div id="hours{{dtr.pk}}" style="display: none;"> <!-- SHOW/HIDE THIS DIV-->
                         <!-- FIRST LINE -->
                         <div class="row px-3 mb-2">
@@ -306,7 +311,6 @@
             </div>
         </div>
         {% endfor %}
-        <pre>[[$data]]</pre>
 
     </div>
 </div>

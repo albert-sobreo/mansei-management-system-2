@@ -71,13 +71,13 @@
                         <div class="row">
                             <table id="dtrTable" class="table table-sm table-striped table-borderless">
                                 <thead>
-                                    <th><span class="font-bold gray">Date</span></th>
+                                    <th class="px-3"><span class="font-bold gray">Date</span></th>
                                     <th><span class="font-bold gray">Time-In</span></th>
                                     <th><span class="font-bold gray">Time-Out</span></th>
                                 </thead>
                                 <tbody>
                                     <tr v-for="dtr in modal.dtr.slice(0, 25)">
-                                        <td>[[formatDate(dtr.date)]]</td>
+                                        <td class="px-3">[[formatDate(dtr.date)]]</td>
                                         <td>[[formatTime(dtr.dateTimeIn)]]</td>
                                         <td>[[formatTime(dtr.dateTimeOut)]]</td>
                                     </tr>
@@ -118,6 +118,11 @@
                 .then(res=>{
                     this.modal = res.data
                 })
+            },
+
+            getDAY(value){
+                value = new Date(value)
+                return value.getDay()
             },
 
             formatDateTime(value){
