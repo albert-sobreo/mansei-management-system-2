@@ -14,6 +14,14 @@ class DeMinimisOfUserSZ(serializers.ModelSerializer):
 
 
 
+########## USER LEAVE ##########
+class UserLeaveSZ(MS):
+    class Meta:
+        model = UserLeave
+        fields = "__all__"
+
+
+
 
 
 ########## USER ###########
@@ -43,10 +51,38 @@ class UserNameIDRateSZZ(serializers.ModelSerializer):
 
 class UserNestedSZ(serializers.ModelSerializer):
     deminimisofuser = DeMinimisOfUserSZ(read_only=True, many=True)
+    userleave = UserLeaveSZ(read_only=True)
     class Meta:
         model = User
-        fields = "__all__"
-        depth = 1
+        fields = [
+            "address",
+            "authLevel",
+            "position",
+            "bloodType",
+            "image",
+            "idUser",
+            "status",
+            "rate",
+            "dob",
+            "sss",
+            "phic",
+            "hdmf",
+            "tin",
+            "dateEmployed",
+            "dateResigned",
+            "department",
+            "mobile",
+            "schedule",
+            "branch",
+            "payrollable",
+            "deminimisofuser",
+            "id",
+            "schedule",
+            "userleave",
+            "first_name",
+            "last_name",
+            "email",
+        ]
 
 
 

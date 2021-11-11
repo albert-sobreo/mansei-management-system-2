@@ -102,6 +102,40 @@ class EMS_LeaveApprovedView(View):
 class EMS_LeaveApproval(APIView):
     def put(self, request, pk):
         leave = LeaveRequest.objects.get(pk=pk)
+
+        try: 
+            request.user.userleave.all()
+            if leave.leaveType == "Vacation Leave":
+                if request.user.userleave.vLeave > 0:
+                    request.user.userleave.vLeave -= 1
+                    request.user.userleave.save()
+                else:
+                    sweetify.sweetalert(request, icon="error", title="Invalid", text="User doesn't have vacation leave remaining.", persistent="Dismiss")
+                    return JsonResponse(0, safe=False)
+            elif leave.leaveType == "Sick Leave":
+                if request.user.sLeave > 0:
+                    request.user.userleave.sLeave -= 1
+                    request.user.userleave.save()
+                else:
+                    sweetify.sweetalert(request, icon="error", title="Invalid", text="User doesn't have sick leave remaining.", persistent="Dismiss")
+                    return JsonResponse(0, safe=False)
+            # elif leave.leaveType == "Unpaid Leave":
+            #     if request.user.uLeave:
+            #         request.user.uLeave -= 1
+            #     else:
+            #         sweetify.sweetalert(request, icon="error", title="Invalid", text="User doesn't have unpaid leave remaining.", persistent="Dismiss")
+            #         return JsonResponse(0, safe=False)
+            elif leave.leaveType == "SILP":
+                if request.user.silp > 0:
+                    request.user.userleave.silp -= 1
+                    request.user.userleave.save()
+                else:
+                    sweetify.sweetalert(request, icon="error", title="Invalid", text="User doesn't have SILP remaining.", persistent="Dismiss")
+                    return JsonResponse(0, safe=False)
+        except Exception as e:
+            print(e)
+            sweetify.sweetalert(request, icon="error", title="Invalid", text="User's Leave has not been initialized yet. Go to Employees Tab to setup user's leave.", persistent="Dismiss")
+            return JsonResponse(0, safe=False)
         leave.approvedBy = request.user
         leave.datetimeApproved = datetime.now()
         leave.status = "Approved"

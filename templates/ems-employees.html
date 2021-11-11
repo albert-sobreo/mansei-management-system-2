@@ -102,15 +102,23 @@
                         <div class="row my-3 order-card py-2">
                             <div class="col-12">
                                 <label for="" class="gray">Leave</label>
+                                <span> <a data-toggle="modal" data-target="#editLeaveModal" href="#" @click="initEditLeave()">Edit Leave</a></span>
                             </div>
                             <div class="col font-medium">
                                 <div class="row">
-                                    <div class="col">Paid Leave Remaining</div>
-                                    <div class="col">5 Days</div>
+                                    <div class="col">Sick Leave Remaining</div>
+                                    <div class="col" v-if="modal.userleave">[[modal.userleave.sLeave]] Days</div>
+                                    <div class="col" v-else>Not yet initialized</div>
                                 </div>
                                 <div class="row">
-                                    <div class="col">Sick Leave Remaining</div>
-                                    <div class="col">2 Days</div>
+                                    <div class="col">Vacation Leave Remaining</div>
+                                    <div class="col" v-if="modal.userleave">[[modal.userleave.vLeave]] Days</div>
+                                    <div class="col" v-else>Not yet initialized</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">SILP Remaining</div>
+                                    <div class="col" v-if="modal.userleave">[[modal.userleave.silp]] Days</div>
+                                    <div class="col" v-else>Not yet initialized</div>
                                 </div>
                             </div>
                         </div>
@@ -179,6 +187,88 @@
                             <div class="col-3">
                                 <a type="button" class="link" data-toggle="modal" data-target="#benefitsModal" @click="initGiveBenefits()">Give Benefits</a>
                             </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT LEAVE MODAL -->
+        <div class="modal fade" id="editLeaveModal">
+            <div class="modal-dialog">
+                <div class="modal-content box-shadow-large b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Leave</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">ID No.</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[editLeave.idUser]]</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Employee</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[editLeave.first_name]] [[editLeave.last_name]]</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Position</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[editLeave.position]]</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Current Daily Rate</label>
+                                <br>
+                                <span class="font-size-14 font-bold">₱[[editLeave.rate]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 order-card py-3">
+                            <div class="col-12">
+                                <div class="row form-group">
+                                    <div class="col-4">
+                                        <label for="" class="col-form-label">Sick Leave</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input v-model="editLeave.sLeave" @focus="$event.target.select()" placeholder="Enter Days remaining" type="number" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-4">
+                                        <label for="" class="col-form-label">Vacation Leave</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input v-model="editLeave.vLeave" @focus="$event.target.select()" placeholder="Enter Days remaining" type="number" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-4">
+                                        <label for="" class="col-form-label">Unpaid Leave</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input v-model="editLeave.uLeave" @focus="$event.target.select()" placeholder="Enter Days remaining" type="number" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-4">
+                                        <label for="" class="col-form-label">SILP</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input v-model="editLeave.silp" @focus="$event.target.select()" placeholder="Enter Days remaining" type="number" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <button class="btn btn-primary col" @click="submitEditLeave()">Save</button>
+                            </div>
+
                         </div>
 
                     </div>
@@ -523,6 +613,19 @@
                     name: null,
                     amount: null,
                 }]
+            },
+
+            editLeave: {
+                user: null,
+                position: null,
+                idUser: null,
+                rate: null,
+                first_name: null,
+                last_name: null,
+                sLeave: 0,
+                uLeave: 0,
+                vLeave: 0,
+                silp: 0,
             }
         },
 
@@ -549,6 +652,34 @@
             initGiveBenefits(){
                 this.giveBenefits.user = this.modal.id
                 this.giveBenefits.username = this.modal.first_name + " " + this.modal.last_name
+            },
+
+            initEditLeave(){
+                this.editLeave.user = this.modal.id
+                this.editLeave.position = this.modal.position
+                this.editLeave.idUser = this.modal.idUser
+                this.editLeave.rate = this.modal.rate
+                this.editLeave.first_name = this.modal.first_name
+                this.editLeave.last_name = this.modal.last_name
+                if(this.modal.userleave){
+                    this.edit.editLeave.sLeave = this.modal.userleave.sLeave
+                    this.edit.editLeave.uLeave = this.modal.userleave.uLeave
+                    this.edit.editLeave.vLeave = this.modal.userleave.vLeave
+                    this.edit.editLeave.silp = this.modal.userleave.silp
+                }
+
+            },
+
+            submitEditLeave(){
+                axios.post('/ems-save-edit-leave/', this.editLeave, this.config)
+                .then(res=>res.data==0?location.reload():"")
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
             },
 
             submitGiveBenefits(){

@@ -16,7 +16,6 @@
             <div class="justify-content-center c-nav-links ems-nav">
                 <a href="/ems-my-timesheet/" class="mx-2">My Timesheet</a>
                 <a href="/ems-employee-timesheet/" class="active-ems mx-2">Employee Timesheet</a>
-                <a href="/ems-timesheet-tabular/" class="mx-2">Tabular</a>
             </div>
         </div>
 
@@ -408,7 +407,7 @@
             this.dateRange = params.get('dateRange') ? params.get('dateRange').replace('%', ' ') : ''
             this.period = params.get('period') ? params.get('period') : ''
             this.semiMonthPeriod = semi_months(this.year)
-            this.user = '{{dtrs.all.0.user.pk}}'
+            this.user = params.get('user')
         }
     })
 </script>

@@ -67,6 +67,16 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+class UserLeave(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userleave', null=True, blank=True)
+    sLeave = models.IntegerField(default=0) # sick leave
+    vLeave = models.IntegerField(default=0) # vacation leave
+    uLeave = models.IntegerField(default=0) # unpaid leave
+    silp = models.IntegerField(default=0) # service incentive leave w pay
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name
+
 class DeMinimisOfUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='deminimisofuser')
     name = models.CharField(max_length=255)

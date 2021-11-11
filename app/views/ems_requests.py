@@ -70,3 +70,28 @@ class EMS_LeaveRequestsView(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class EMS_SaveEditLeave(APIView):
+    def post(self, request):
+        data = request.data
+
+        user = User.objects.get(pk=data['user'])
+
+        try:
+            user.userleave.all()
+            user.userleave.sLeave = data['sLeave']
+            user.userleave.vLeave = data['vLeave']
+            user.userleave.silp = data['silp']
+            user.userleave.save()
+
+        except Exception as e:
+            print(e)
+            userLeave = UserLeave()
+            userLeave.user = user
+            userLeave.sLeave = data['sLeave']
+            userLeave.vLeave = data['vLeave']
+            userLeave.silp = data['silp']
+            userLeave.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
