@@ -150,13 +150,9 @@
                                 <label for="" class="gray">Raise History</label>
                             </div>
                             <div class="col font-medium">
-                                <div class="row">
-                                    <div class="col">April 25, 2021</div>
-                                    <div class="col">₱740/Day</div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">April 25, 2019</div>
-                                    <div class="col">₱850.00/Day</div>
+                                <div class="row" v-for="r in modal.raisse">
+                                    <div class="col">[[formatDate(r.date)]]</div>
+                                    <div class="col">₱[[r.newRate]]/Day</div>
                                 </div>
                             </div>
                         </div>
@@ -176,7 +172,7 @@
 
                         <div class="row mt-3">
                             <div class="col-3">
-                                <a type="button" class="link" data-toggle="modal" data-target="#promotionModal">Give Promotion</a>
+                                <a type="button" class="link" data-toggle="modal" data-target="#promotionModal" @click="initGivePromotion()">Give Promotion</a>
                             </div>
                             <div class="col-3">
                                 <a type="button" class="link" data-toggle="modal" data-target="#raiseModal" @click="initGiveRaise()">Give Raise</a>
@@ -292,22 +288,22 @@
                             <div class="col-6 my-2">
                                 <label for="" class="gray">ID No.</label>
                                 <br>
-                                <span class="font-size-14 font-bold">00331137</span>
+                                <span class="font-size-14 font-bold">[[givePromotion.idUser]]</span>
                             </div>
                             <div class="col-6 my-2">
                                 <label for="" class="gray">Employee</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Clark Kent</span>
+                                <span class="font-size-14 font-bold">[[givePromotion.first_name]] [[givePromotion.last_name]]</span>
                             </div>
                             <div class="col-6 my-2">
                                 <label for="" class="gray">Position</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Accountant</span>
+                                <span class="font-size-14 font-bold">[[givePromotion.position]]</span>
                             </div>
                             <div class="col-6 my-2">
                                 <label for="" class="gray">Current Daily Rate</label>
                                 <br>
-                                <span class="font-size-14 font-bold">₱580.00</span>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(givePromotion.rate)]]</span>
                             </div>
                         </div>
 
@@ -315,9 +311,11 @@
                             <div class="col-8 pr-1">
                                 <div class="form-group">
                                     <label for="">New Position</label>
-                                    <select name="" id="" class="form-control">
+                                    <select v-model="givePromotion.newPosition" name="" id="" class="form-control">
                                         <option value="" selected disabled>Select New Position</option>
-                                        <option value="">HR Admin</option>
+                                        {% for position in request.user.branch.position.all %}
+                                        <option value="{{position.name}}">{{position.name}}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>
@@ -328,13 +326,13 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
                                         </div>
-                                        <input type="text" class="form-control box-shadow-off" placeholder="Enter Amount" onkeypress="validate()">
+                                        <input v-model="givePromotion.newRate" type="text" class="form-control box-shadow-off" placeholder="Enter Amount" onkeypress="validate()">
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-12">
-                                <button class="btn btn-primary col">Give Promotion</button>
+                                <button class="btn btn-primary col" @click="submitGivePromotion()">Give Promotion</button>
                             </div>
 
                         </div>
@@ -598,6 +596,20 @@
             modal: {
 
             },
+
+            givePromotion:{
+                user: null,
+                position: null,
+                idUser: null,
+                rate: null,
+                first_name: null,
+                last_name: null,
+                rate: null,
+                newPosition: '',
+                newRate: null,
+
+            },
+
             giveBenefits: {
                 user: null, //pk
                 username: null,
@@ -656,6 +668,16 @@
                 })
             },
 
+            initGivePromotion(){
+                this.givePromotion.user = this.modal.id
+                this.givePromotion.position = this.modal.position
+                this.givePromotion.idUser = this.modal.idUser
+                this.givePromotion.rate = this.modal.rate
+                this.givePromotion.first_name = this.modal.first_name
+                this.givePromotion.last_name = this.modal.last_name
+                this.givePromotion.newRate = this.modal.rate
+            },
+
             popLineBenefits(){
                 this.giveBenefits.benefits.pop()
             },
@@ -673,10 +695,10 @@
                 this.editLeave.first_name = this.modal.first_name
                 this.editLeave.last_name = this.modal.last_name
                 if(this.modal.userleave){
-                    this.edit.editLeave.sLeave = this.modal.userleave.sLeave
-                    this.edit.editLeave.uLeave = this.modal.userleave.uLeave
-                    this.edit.editLeave.vLeave = this.modal.userleave.vLeave
-                    this.edit.editLeave.silp = this.modal.userleave.silp
+                    this.editLeave.sLeave = this.modal.userleave.sLeave
+                    this.editLeave.uLeave = this.modal.userleave.uLeave
+                    this.editLeave.vLeave = this.modal.userleave.vLeave
+                    this.editLeave.silp = this.modal.userleave.silp
                 }
 
             },
@@ -693,6 +715,31 @@
                 })
             },
 
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
+
             initGiveRaise(){
                 this.giveRaise.user = this.modal.id
                 this.giveRaise.position = this.modal.position
@@ -706,7 +753,7 @@
                 Swal.fire({
                     title: "Are you sure?",
                     icon: "warning",
-                    html: `Are you sure you want to give raise to ${this.modal.first_name} ${this.modal.last_name}`
+                    html: `Are you sure you want to give raise to ${this.modal.first_name} ${this.modal.last_name}?`
                 })
                 .then(result=>{
                     if(result.isConfirmed){
@@ -714,6 +761,15 @@
                         .then(res=>res.data==0?location.reload():'')
                     }
                 })
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
             },
 
             submitGiveBenefits(){
@@ -725,6 +781,20 @@
                         icon: 'error',
                         html: err.message
                     })
+                })
+            },
+
+            submitGivePromotion(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: "warning",
+                    html: `Are you sure you want to promote ${this.modal.first_name} ${this.modal.last_name}?`
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        axios.post('/ems-give-promotion/', this.givePromotion, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                    }
                 })
             }
         }

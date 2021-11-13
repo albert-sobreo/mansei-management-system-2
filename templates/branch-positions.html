@@ -1,0 +1,84 @@
+{% extends "base-template.html" %}
+{% block title %}Branch Positions{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-plain photo="/media/{{request.user.image}}"></navbar-plain>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links imps-nav">
+                <a href="/branches/" class="mx-2">Branches</a>
+                <a href="/branch-profile/" class="mx-2">Accounting</a>
+                <a href="/contribution-profile/" class="mx-2">Contribution Rates</a>
+                <a href="/income-tax-deductions/" class="mx-2">Income Tax Deductions</a>
+                <a href="/branch-positions/" class="active-imps mx-2">Branch Positions</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Branch Positions</span>
+        </div>
+
+        <!-- BRANCH POSITIONS -->
+        <div class="d-flex justify-content-center align-items-center flex-column">
+            <form action="/branch-positions/" method="POST" class="row mb-3 py-3 w-50 border box-shadow-medium b-radius-5"> {% csrf_token %}
+                <div class="col-12 pb-2">
+                    <label for="">Add New Position</label>
+                </div>
+                <div class="col-12 pb-2">
+                    <label for="">Position</label>
+                    <input name="position" type="text" class="form-control" placeholder="Enter Position Name">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary col">Add Position</button>
+                </div>
+            </form>
+
+            <div class="row mb-3 py-3 w-50 border box-shadow-medium b-radius-5">
+                <div class="col-12 pb-3">
+                    <label for="">Position</label>
+                </div>
+                {% for position in request.user.branch.position.all %}
+                <div class="col-6 mb-2">
+                    <span class="font-semibold">{{position.name}}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+
+        data: {
+
+        },
+
+        methods: {
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+        }
+    })
+</script>
+
+{% endblock %}

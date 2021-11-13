@@ -1503,10 +1503,16 @@ class Payslip(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="payslip")
 
 class Raise(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(User, related_name='raisse', on_delete=models.SET_NULL, null=True, blank=True)
     previousRate = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     newRate = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     date = models.DateField(blank=True, null=True)
+
+class Position(models.Model):
+    name = models.CharField(max_length=512)
+
+    def __str__(self):
+        return self.name
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
@@ -1666,6 +1672,9 @@ class Branch(models.Model):
 
     #### RAISE ####
     race = models.ManyToManyField(Raise, blank=True) # changed spelling because raise is a reserved word
+
+    #### BRANCH POSITIONS ####
+    position = models.ManyToManyField(Position, blank=True)
 
 
     def __str__(self):

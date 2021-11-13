@@ -49,9 +49,15 @@ class UserNameIDRateSZZ(serializers.ModelSerializer):
             'rate'
         ]
 
+class RaiseSZ(MS):
+    class Meta:
+        model = Raise
+        fields = '__all__'
+
 class UserNestedSZ(serializers.ModelSerializer):
     deminimisofuser = DeMinimisOfUserSZ(read_only=True, many=True)
     userleave = UserLeaveSZ(read_only=True)
+    raisse = RaiseSZ(read_only=True, many=True)
     class Meta:
         model = User
         fields = [
@@ -82,6 +88,7 @@ class UserNestedSZ(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
+            "raisse",
         ]
 
 

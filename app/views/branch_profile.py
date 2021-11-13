@@ -188,3 +188,19 @@ class IncomeTaxDeductionProfile(View):
 
         return redirect('/income-tax-deductions')
 
+class BranchPositions(View):
+    def get(self, request):
+        return render(request, 'branch-positions.html')
+
+    def post(self, request):
+        position = request.POST['position']
+
+        if position in Position.objects.all():
+            sweetify.sweetalert(request, icon="error", title='Error!', text="Position already exists.", persistent="Dismiss")
+            return redirect('/branch-positions/')
+        else:
+            p = Position()
+            p.name = position
+            p.save()
+            request.user.branch.position.add(p)
+            return redirect('/branch-positions/')

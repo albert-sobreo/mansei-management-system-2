@@ -85,3 +85,16 @@ class EMS_GiveRaise(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
         
+class EMS_GivePromotion(APIView):
+    def post(self, request):
+        data = request.data
+        if not data['newPosition'] or not data['newRate']:
+            sweetify.sweetalert(request, icon='error', title='Error!', text='Empty inputs'.format(data['newRate']), persistent='Dismiss')
+            return JsonResponse(0, safe=False)
+        user = User.objects.get(pk=data['user'])
+        user.position = data['newPosition']
+        user.rate = data['newRate']
+        user.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
