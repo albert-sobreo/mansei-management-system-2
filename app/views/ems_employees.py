@@ -8,8 +8,9 @@ import sweetify
 from decimal import Decimal
 import pandas as pd
 import json
-from datetime import datetime
+from datetime import datetime, date
 from ..models import*
+
 
 class EMS_EmployeesView(View):
     def get(self, request):
@@ -62,3 +63,25 @@ class AddDeMinimis(APIView):
             request.user.branch.deMinimisOfUser.add()
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class EMS_GiveRaise(APIView):
+    def post(self, request):
+        data = request.data
+        if not data['newRate']:
+            sweetify.sweetalert(request, icon='error', title='Error!', text='New Rate is {}'.format(data['newRate']), persistent='Dismiss')
+            return JsonResponse(0, safe=False)
+        user = User.objects.get(pk=data['user'])
+        r = Raise()
+        r.user = user
+        r.previousRate = r.user.rate
+        r.newRate = data['newRate']
+        r.date = date.today()
+        r.save()
+        request.user.branch.race.add(r)
+
+        user.rate = data['newRate']
+        user.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+        

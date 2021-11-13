@@ -1043,3 +1043,15 @@ class DeMinimisSZ(MS):
     class Meta:
         model = DeMinimis
         fields = "__all__"
+
+
+
+
+
+
+
+########## HOLIDAY ##########
+class HolidaySZ(MS):
+    class Meta:
+        model = Holiday
+        fields = "__all__"

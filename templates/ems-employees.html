@@ -179,7 +179,7 @@
                                 <a type="button" class="link" data-toggle="modal" data-target="#promotionModal">Give Promotion</a>
                             </div>
                             <div class="col-3">
-                                <a type="button" class="link" data-toggle="modal" data-target="#raiseModal">Give Raise</a>
+                                <a type="button" class="link" data-toggle="modal" data-target="#raiseModal" @click="initGiveRaise()">Give Raise</a>
                             </div>
                             <div class="col-3">
                                 <a type="button" class="link" data-toggle="modal" data-target="#bonusModal">Give Bonus</a>
@@ -334,7 +334,7 @@
                             </div>
 
                             <div class="col-12">
-                                <button class="btn btn-warning col">Give Promotion</button>
+                                <button class="btn btn-primary col">Give Promotion</button>
                             </div>
 
                         </div>
@@ -359,22 +359,22 @@
                             <div class="col-6 my-2">
                                 <label for="" class="gray">ID No.</label>
                                 <br>
-                                <span class="font-size-14 font-bold">00331137</span>
+                                <span class="font-size-14 font-bold">[[giveRaise.idUser]]</span>
                             </div>
                             <div class="col-6 my-2">
                                 <label for="" class="gray">Employee</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Clark Kent</span>
+                                <span class="font-size-14 font-bold">[[giveRaise.first_name]] [[giveRaise.last_name]]</span>
                             </div>
                             <div class="col-6 my-2">
                                 <label for="" class="gray">Position</label>
                                 <br>
-                                <span class="font-size-14 font-bold">Accountant</span>
+                                <span class="font-size-14 font-bold">[[giveRaise.position]]</span>
                             </div>
                             <div class="col-6 my-2">
                                 <label for="" class="gray">Current Daily Rate</label>
                                 <br>
-                                <span class="font-size-14 font-bold">₱580.00</span>
+                                <span class="font-size-14 font-bold">₱[[giveRaise.rate]]</span>
                             </div>
                         </div>
 
@@ -386,13 +386,13 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">₱</span>
                                         </div>
-                                        <input type="text" class="form-control box-shadow-off" placeholder="Enter Raise" onkeypress="validate()">
+                                        <input v-model="giveRaise.newRate" type="text" class="form-control box-shadow-off" placeholder="Enter Raise" onkeypress="validate()">
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-12">
-                                <button class="btn btn-warning col">Give Raise</button>
+                                <button class="btn btn-primary col" @click='submitGiveRaise()'>Give Raise</button>
                             </div>
 
                         </div>
@@ -615,6 +615,17 @@
                 }]
             },
 
+            giveRaise: {
+                user: null,
+                position: null,
+                idUser: null,
+                rate: null,
+                first_name: null,
+                last_name: null,
+                rate: null,
+                newRate: null
+            },
+
             editLeave: {
                 user: null,
                 position: null,
@@ -679,6 +690,29 @@
                         icon: 'error',
                         html: err.message
                     })
+                })
+            },
+
+            initGiveRaise(){
+                this.giveRaise.user = this.modal.id
+                this.giveRaise.position = this.modal.position
+                this.giveRaise.idUser = this.modal.idUser
+                this.giveRaise.rate = this.modal.rate
+                this.giveRaise.first_name = this.modal.first_name
+                this.giveRaise.last_name = this.modal.last_name
+            },
+
+            submitGiveRaise(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: "warning",
+                    html: `Are you sure you want to give raise to ${this.modal.first_name} ${this.modal.last_name}`
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        axios.post('/ems-give-raise/', this.giveRaise, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                    }
                 })
             },
 

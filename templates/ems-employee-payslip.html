@@ -63,7 +63,7 @@
 
         <!-- TABLE -->
         <!-- HOURS -->
-        <div class="row mb-2">
+        <div class="row mb-2 border box-shadow-medium b-radius-5">
             <!-- LVL 1 -->
             <div class="col my-3">
                 <label for="" class="gray">ID Number</label>
@@ -91,7 +91,7 @@
                 <span class="font-size-14 font-bold">{{payslips.payroll.dateStart}} - {{payslips.payroll.dateEnd}}</span>
             </div>
         </div>
-        <div class="row my-2 order-card">
+        <div class="row mb-2 border box-shadow-medium b-radius-5">
             <div class="col my-3">
                 <label for="" class="gray">Work Hours</label>
                 <div class="d-flex flex-column">
@@ -139,7 +139,7 @@
         </div>
 
         <!-- DAILY RATE -->
-        <div class="row my-2">
+        <div class="row mb-2 border box-shadow-medium b-radius-5">
             <div class="col my-3">
                 <label for="" class="gray">Daily Rate</label>
                 <br>
@@ -148,7 +148,7 @@
         </div>
 
         <!-- PAY -->
-        <div class="row my-2 order-card">
+        <div class="row mb-2 border box-shadow-medium b-radius-5">
             <div class="col my-3">
                 <label for="" class="gray">Work Pay</label>
                 <div class="d-flex flex-column">
@@ -196,7 +196,7 @@
         </div>
 
         <!-- BONUS AND DE MINIMIS -->
-        <div class="row my-2">
+        <div class="row mb-2 border box-shadow-medium b-radius-5">
             <div class="col my-3">
                 <label for="" class="gray">Bonus</label>
                 <div class="row">
@@ -232,7 +232,7 @@
         </div>
 
         <!-- DEDUCTIONS -->
-        <div class="row mt-2 mb-4 order-card">
+        <div class="row mb-2 border box-shadow-medium b-radius-5">
             <div class="col-12 mt-3">
                 <label for="" class="gray font-bold font-size-14">Deductions</label>
             </div>
@@ -276,7 +276,7 @@
             </div>
         </div>
 
-        <div class="row earnings py-3 mb-3">
+        <div class="row earnings py-3 mb-5 border box-shadow-medium b-radius-5">
             <div class="col">
                 <label for="" class="earnings-text">Basic Pay</label>
                 <br>
@@ -391,7 +391,7 @@
                 </div>
             </div>
         </div>
-
+        <pre>[[$data]]</pre>
     </div>
 </div>
 
@@ -483,7 +483,7 @@
             this.dateRange = params.get('dateRange') ? params.get('dateRange').replace('%', ' ') : ''
             this.period = params.get('period') ? params.get('period') : ''
             this.semiMonthPeriod = semi_months(this.year)
-            this.user = params.get('user')
+            this.user = params.get('user')?params.get('user'):''
         }
     })
 </script>

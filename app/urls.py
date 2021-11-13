@@ -123,6 +123,9 @@ router.register(r'deminimis', views.DeMinimisAPI, 'user')
 ########## DTR ##########
 router.register(r'user-w-dtr', views.UserWithDTRAPI, 'user-w-dtr')
 
+########## HOLIDAY ##########
+router.register(r"holiday", views.HolidayAPI, 'holiday')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -335,6 +338,8 @@ urlpatterns = [
 
     path('ems-edit-payroll/', login_required(views.EMS_EditPayrollView.as_view())),
     path('ems-edit-payroll-save/<int:pk>/', login_required(views.EMS_EditPayrollSave.as_view())),
-    path('ems-payroll-approval/', login_required(views.EMS_PayrollApproval.as_view())),
+    path('ems-payroll-approval-all/', login_required(views.EMS_PayrollApprovalAll.as_view())),
     path('ems-save-edit-leave/', login_required(views.EMS_SaveEditLeave.as_view())),
+    path('ems-give-raise/', login_required(views.EMS_GiveRaise.as_view())),
+    path('ems-save-edit-holiday/', login_required(views.EMS_SaveEditHoliday.as_view()))
 ]

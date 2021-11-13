@@ -43,7 +43,7 @@
             <tbody>
                 {% for h in holidays %}
                 <tr>
-                    <td>{{h.date}}</td>
+                    <td @click="initEditHoliday('{{h.pk}}')" data-toggle="modal" data-target="#editHolidayModal" class="link">{{h.date}}</td>
                     <td>{{h.description}}</td>
                     {% if h.type == 'rh' %}
                     <td>Regular Holiday</td>
@@ -57,6 +57,62 @@
 
             </tbody>
         </table>
+
+        <!-- EDIT HOLIDAY MODAL -->
+        <div class="modal fade" id="editHolidayModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body py-4">
+                        <div class="">
+                            <span class="modal-title">Edit Holiday</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="row my-3 order-card py-3">
+                            <div class="col-6 mb-2">
+                                <label for="" class="gray">Holiday Description</label><br>
+                                <span class="font-bold">[[editModal.description]]</span>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <label for="" class="gray">Holiday Type</label><br>
+                                <span class="font-bold" v-if="editModal.type=='shw'">Special Working Holiday</span>
+                                <span class="font-bold" v-if="editModal.type=='sh'">Special Non-Working Holiday</span>
+                                <span class="font-bold" v-if="editModal.type=='rh'">Regular Holiday</span>
+                            </div>
+                            <div class="col-6">
+                                <label for="" class="gray">Date</label><br>
+                                <span class="font-bold">[[formatDate(editModal.date)]]</span>
+                            </div>
+                        </div>
+                        <div class="row my-3">
+                            <div class="col-4 pr-1">
+                                <label for="">Date</label>
+                                <input v-model="editModal.newDate" type="date" class="form-control">
+                            </div>
+                            <div class="col px-1">
+                                <label for="">Description</label>
+                                <input v-model="editModal.newDescription" type="text" class="form-control" placeholder="Enter Holiday Name">
+                            </div>
+                            <div class="col pl-1">
+                                <label for="">Type</label>
+                                <select v-model="editModal.newType" name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Holiday Type</option>
+                                    <option value="sh">Special Non-working Holiday</option>
+                                    <option value="rh">Regular Holiday</option>
+                                    <option value="shw">Special Working Holiday</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button class="col btn btn-primary" @click="submitEditHoliday()">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- ADD MODAL 2 -->
         <div class="modal fade" id="addModal">
@@ -240,7 +296,17 @@
                 date: null,
                 description: null,
                 type: '',
-            }]
+            }],
+            editModal:{
+                id: null,
+                description: null,
+                type: null,
+                date: null,
+
+                newDescription: null,
+                newType: '',
+                newDate: null,
+            }
         },
 
         methods: {
@@ -254,6 +320,42 @@
                         html: err.message
                     })
                 })
+            },
+
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${day} - ${month}. ${date}, ${year}`
+
+                return formatted
             },
             
             submitHoliday(){
@@ -282,6 +384,24 @@
 
             popHoliday(){
                 this.addModal.pop()
+            },
+
+            initEditHoliday(id){
+                axios.get(`/api/holiday/${id}/`)
+                .then(res=>{
+                    this.editModal.id = res.data.id
+                    this.editModal.description = res.data.description
+                    this.editModal.type = res.data.type
+                    this.editModal.date = res.data.date
+                    this.editModal.newDescription = res.data.description
+                    this.editModal.newType = res.data.type
+                    this.editModal.newDate = res.data.date
+                })
+            },
+
+            submitEditHoliday(){
+                axios.post('/ems-save-edit-holiday/', this.editModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
             }
         },
         mounted(){

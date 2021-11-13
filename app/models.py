@@ -1188,7 +1188,7 @@ class CRPO(models.Model):
 class Holiday(models.Model):
     date = models.DateField()
     year = models.CharField(max_length=6)
-    description = models.TextField()
+    description = models.CharField(max_length=512)
     type = models.CharField(max_length=100)
 
     def __str__(self):
@@ -1502,6 +1502,12 @@ class Payslip(models.Model):
     payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name='payslip')
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="payslip")
 
+class Raise(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    previousRate = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    newRate = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
     rm = models.ForeignKey(AccountChild, related_name="branchdefaultrm", on_delete=models.CASCADE, null=True, blank=True)
@@ -1657,6 +1663,9 @@ class Branch(models.Model):
 
     #### PAYSLIP ####
     payslip = models.ManyToManyField(Payslip, blank=True)
+
+    #### RAISE ####
+    race = models.ManyToManyField(Raise, blank=True) # changed spelling because raise is a reserved word
 
 
     def __str__(self):

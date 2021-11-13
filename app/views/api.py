@@ -436,3 +436,13 @@ class DeMinimisAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = DeMinimisSZ
     queryset = DeMinimis.objects.all()
+
+
+
+
+
+########## HOLIDAY ##########
+class HolidayAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = HolidaySZ
+    queryset = Holiday.objects.all()

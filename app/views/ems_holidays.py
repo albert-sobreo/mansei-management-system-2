@@ -70,3 +70,20 @@ class EMS_ImportHolidays(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return redirect('/ems-holidays/')
+
+class EMS_SaveEditHoliday(APIView):
+    def post(self, request):
+        data = request.data
+        
+        print(data)
+
+        h = Holiday.objects.get(pk=data['id'])
+        h.date = data['newDate']
+        h.description = data['newDescription']
+        print(h.description)
+        h.type = data['newType']
+
+        h.save()
+        
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)

@@ -56,12 +56,14 @@
                 <th>Current Daily Rate</th>
             </thead>
             <tbody>
+                {% for raise in request.user.branch.race.all %}
                 <tr>
-                    <td>Mar. 12, 2021</td>
-                    <td>Clark Kent</td>
-                    <td>₱420.00</td>
-                    <td>₱580.00</td>
+                    <td>{{raise.date}}</td>
+                    <td>{{raise.user.first_name}} {{raise.user.last_name}}</td>
+                    <td>₱{{raise.previousRate}}</td>
+                    <td>₱{{raise.newRate}}</td>
                 </tr>
+                {% endfor %}
             </tbody>
 
         </table>

@@ -58,6 +58,7 @@
                 <th>Basic Pay</th>
                 <th>Gross Pay</th>
                 <th>Net Pay</th>
+                <th>Status</th>
             </thead>
             <tbody>
                 {% if not payrolls %}
@@ -76,6 +77,7 @@
                     <td>₱[[formatPrice('{{payroll.basicPay}}')]]</td>
                     <td>₱[[formatPrice('{{payroll.grossPayAfterBonus}}')]]</td>
                     <td class="font-bold font-size-14">₱[[formatPrice('{{payroll.netPayAfterTaxes}}')]]</td>
+                    <td>{% if payroll.approved%} <span class="text-success">Approved</span> {% else %} <span class="text-warning">Pending</span>{% endif %}</td>
                 </tr>
                 {% endfor %}
                 {% endif %}
@@ -559,14 +561,30 @@
                 }
             },
             approveAll(){
-                if (this.year && this.period && this.dateRange){
-                    location.href=`/ems-payroll-approval/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`
-                } else {
-                    Swal.fire({
-                        title: "Fill up all the inputs.",
-                        icon: 'error',
-                    })
-                }
+                Swal.fire({
+                    confirmButtonText: 'I am sure.',
+                    showCancelButton: true,
+                    title: 'Approve All Listed Payroll?',
+                    icon: 'warning',
+                    html: "Are you sure you want to approve all listed payroll for this time period?",
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">Approving Payroll . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
+                        if (this.year && this.period && this.dateRange){
+                            location.href=`/ems-payroll-approval-all/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`
+                        } else {
+                            Swal.fire({
+                                title: "Fill up all the inputs.",
+                                icon: 'error',
+                            })
+                        }
+                    }
+                })
             },
             confirmPayroll(){
                 if (this.year && this.period && this.dateRange){

@@ -155,7 +155,7 @@ class EMS_LeaveDisapproval(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
-class EMS_PayrollApproval(APIView):
+class EMS_PayrollApprovalAll(APIView):
     def get(self, request):
         y = request.GET['year']
         dateRange = request.GET['dateRange']
@@ -165,6 +165,8 @@ class EMS_PayrollApproval(APIView):
         payrolls = Payroll.objects.filter(branch = request.user.branch, year = y, dateStart = dateStart, dateEnd = dateEnd)
 
         for payroll in payrolls:
+            if payroll.approved:
+                continue
             payroll.approved = True
             payroll.approvedBy = request.user
             payroll.dateApproved = date.today()
