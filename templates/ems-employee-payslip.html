@@ -29,25 +29,32 @@
             <div class="form-inline">
                 <div class="form-group">
                     <label for="" class="mx-1">Employee</label>
-                    <select class="form-control mx-1">
-                        <option value="" selected disabled>Select Employee</option>
+                    <select v-model='user' class="form-control mx-1">
+                        <option value='' selected disabled>Select Employee</option>
+                        {% for employee in employees %}
+                        <option value="{{employee.pk}}">{{employee.first_name}} {{employee.last_name}}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
             <div class="form-inline">
                 <div class="form-group">
                     <label for="" class="mx-1">Period</label>
-                    <select class="form-control mx-1">
+                    <select @change="setSemiMonthPeriod()" v-model="year" class="form-control mx-1">
                         <option value="" selected disabled>Select Year</option>
                         <option v-for="year in yearList" :value="year">[[year]]</option>
                     </select>
-                    <select class="form-control mx-1">
+                    <select v-model="period" class="form-control mx-1">
                         <option value="" selected disabled>Select Period</option>
+                        <option value="semi">Semi-Monthly</option>
                     </select>
-                    <select class="form-control mx-1">
+                    <select v-model="dateRange" class="form-control mx-1">
                         <option value="" selected disabled>Date Range</option>
+                        <template v-if="period == 'semi'">
+                            <option v-for="date in semiMonthPeriod" :value="date[0]+' '+date[1]">[[ date[2] ]] - [[ date[3] ]]</option>
+                        </template>
                     </select>
-                    <button class="mx-1 btn btn-warning btn-sm">
+                    <button @click="setDate()" class="mx-1 btn btn-warning btn-sm">
                         Set
                     </button>
                 </div>
@@ -55,18 +62,237 @@
         </div>
 
         <!-- TABLE -->
-        <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
-            <thead class="gray">
-                <th>Date</th>
-                <th>Salary</th>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="link" data-toggle="modal" data-target="#modal">Mar. 11, 2021</td>
-                    <td>₱10,000.00</td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- HOURS -->
+        <div class="row mb-2">
+            <!-- LVL 1 -->
+            <div class="col my-3">
+                <label for="" class="gray">ID Number</label>
+                <br>
+                <span class="font-size-14 font-bold">{{payslips.user.idUser}}</span>
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">Employee Name</label>
+                <br>
+                <span class="font-size-14 font-bold">{{payslips.user.first_name}} {{payslips.user.last_name}}</span>
+            </div>
+            <!-- LVL 1 -->
+            <div class="col my-3">
+                <label for="" class="gray">Total Hours</label>
+                <br>
+                {% if payslips.payroll.bh %}
+                <span class="font-size-14 font-bold">{{payslips.payroll.bhTotalHours|add:payslips.payroll.otTotalHours}} Hours</span>
+                {% else %}
+                <span class="font-size-14 font-bold">0 Hours</span>
+                {% endif %}
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">Period</label>
+                <br>
+                <span class="font-size-14 font-bold">{{payslips.payroll.dateStart}} - {{payslips.payroll.dateEnd}}</span>
+            </div>
+        </div>
+        <div class="row my-2 order-card">
+            <div class="col my-3">
+                <label for="" class="gray">Work Hours</label>
+                <div class="d-flex flex-column">
+                    <span class="font-bold mt-1">{{payslips.payroll.bhTotalHours|floatformat:1}}H <span class="gray">BH</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rdTotalHours|floatformat:1}}H <span class="gray">RD</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rhTotalHours|floatformat:1}}H <span class="gray">RH</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.shTotalHours|floatformat:1}}H <span class="gray">SH</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rhrdTotalHours|floatformat:1}}H <span class="gray">RHRD</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.shrdTotalHours|floatformat:1}}H <span class="gray">SHRD</span></span>
+                </div>
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">OT Hours</label>
+                <div class="d-flex flex-column">
+                    <span class="font-bold mt-1">{{payslips.payroll.otTotalHours|floatformat:1}}H <span class="gray">OT</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rdotTotalHours|floatformat:1}}H <span class="gray">RD OT</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rhotTotalHours|floatformat:1}}H <span class="gray">RH OT</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.shotTotalHours|floatformat:1}}H <span class="gray">SH OT</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rhrdotTotalHours|floatformat:1}}H <span class="gray">RHRD OT</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.shrdotTotalHours|floatformat:1}}H <span class="gray">SHRD OT</span></span>
+                </div>
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">ND Hours</label>
+                <div class="d-flex flex-column">
+                    <span class="font-bold mt-1">{{payslips.payroll.ndTotalHours|floatformat:1}}H <span class="gray">ND</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rdndTotalHours|floatformat:1}}H <span class="gray">RD ND</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rhndTotalHours|floatformat:1}}H <span class="gray">RH ND</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.shndTotalHours|floatformat:1}}H <span class="gray">SH ND</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rhrdndTotalHours|floatformat:1}}H <span class="gray">RHRD ND</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.shrdndTotalHours|floatformat:1}}H <span class="gray">SHRD ND</span></span>
+                </div>
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">ND OT Hours</label>
+                <div class="d-flex flex-column">
+                    <span class="font-bold mt-1">{{payslips.payroll.ndotTotalHours|floatformat:1}}H <span class="gray">NDOT</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rdndotTotalHours|floatformat:1}}H <span class="gray">RD NDOT</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rhndotTotalHours|floatformat:1}}H <span class="gray">RH NDOT</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.shndotTotalHours|floatformat:1}}H <span class="gray">SH NDOT</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.rhrdndotTotalHours|floatformat:1}}H <span class="gray">RHRD NDOT</span></span>
+                    <span class="font-bold mt-1">{{payslips.payroll.shrdndotTotalHours|floatformat:1}}H <span class="gray">SHRD NDOT</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAILY RATE -->
+        <div class="row my-2">
+            <div class="col my-3">
+                <label for="" class="gray">Daily Rate</label>
+                <br>
+                <span class="font-bold font-size-14">₱0</span>
+            </div>
+        </div>
+
+        <!-- PAY -->
+        <div class="row my-2 order-card">
+            <div class="col my-3">
+                <label for="" class="gray">Work Pay</label>
+                <div class="d-flex flex-column">
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.bh}}')]] <span class="gray">BH</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rd}}')]] <span class="gray">RD</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rh}}')]] <span class="gray">RH</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.sh}}')]] <span class="gray">SH</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rhrd}}')]] <span class="gray">RHRD</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.shrd}}')]] <span class="gray">SHRD</span></span>
+                </div>
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">OT Pay</label>
+                <div class="d-flex flex-column">
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.ot}}')]] <span class="gray">OT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rdot}}')]] <span class="gray">RD OT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rhot}}')]] <span class="gray">RH OT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.shot}}')]] <span class="gray">SH OT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rhrdot}}')]] <span class="gray">RHRD OT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.shrdot}}')]] <span class="gray">SHRD OT</span></span>
+                </div>
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">ND Pay</label>
+                <div class="d-flex flex-column">
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.nd}}')]] <span class="gray">ND</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rdnd}}')]] <span class="gray">RD ND</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rhnd}}')]] <span class="gray">RH ND</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.shnd}}')]] <span class="gray">SH ND</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rhrdot}}')]] <span class="gray">RHRD OT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.shrdot}}')]] <span class="gray">SHRD OT</span></span>
+                </div>
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">ND OT Pay</label>
+                <div class="d-flex flex-column">
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.ndot}}')]] <span class="gray">NDOT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rdndot}}')]] <span class="gray">RD NDOT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rhndot}}')]] <span class="gray">RH NDOT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.shndot}}')]] <span class="gray">SH NDOT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.rhrdndot}}')]] <span class="gray">RHRD NDOT</span></span>
+                    <span class="font-bold mt-1">₱[[formatPrice('{{payslips.payroll.shrdndot}}')]] <span class="gray">SHRD NDOT</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BONUS AND DE MINIMIS -->
+        <div class="row my-2">
+            <div class="col my-3">
+                <label for="" class="gray">Bonus</label>
+                <div class="row">
+                    {% for bonus in payslips.payroll.bonuspay.all %}
+                    <div class="col-12">
+                        <span class="font-bold gray">{{bonus.name}}</span>
+                        <span class="font-semibold"> ₱[[formatPrice('{{bonus.amount}}')]]</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">De Minimis</label>
+                <div class="row">
+                    {% for deminimis in payslips.payroll.deminimispay.all %}
+                    <div class="col-12">
+                        <span class="font-bold gray">{{deminimis.name}}</span>
+                        <span class="font-semibold"> ₱[[formatPrice('{{deminimis.amount}}')]]</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">SILP to Cash</label>
+                <br>
+                <span class="font-size-14 font-bold">₱0.00</span>
+            </div>
+            <div class="col my-3">
+                <label for="" class="gray">Holiday Pay</label>
+                <br>
+                <span class="font-size-14 font-bold">₱[[formatPrice('{{payslips.payroll.holidayPay}}')]]</span>
+            </div>
+        </div>
+
+        <!-- DEDUCTIONS -->
+        <div class="row mt-2 mb-4 order-card">
+            <div class="col-12 mt-3">
+                <label for="" class="gray font-bold font-size-14">Deductions</label>
+            </div>
+            <!-- LVL 1 -->
+            <div class="col-3 my-3">
+                <label for="" class="gray">SSS</label>
+                <br>
+                <span class="font-bold font-size-14">₱[[formatPrice('{{payslips.payroll.sssemployeededuction.ee}}')]]</span>
+            </div>
+            <div class="col-3 my-3">
+                <label for="" class="gray">PHIC</label>
+                <br>
+                <span class="font-bold font-size-14">₱[[formatPrice('{{payslips.payroll.phicemployeededuction.ee}}')]]</span>
+            </div>
+            <div class="col-3 my-3">
+                <label for="" class="gray">Pag-Ibig</label>
+                <br>
+                <span class="font-bold font-size-14">₱[[formatPrice('{{payslips.payroll.pagibigemployeededuction.amount}}')]]</span>
+            </div>
+            <div class="col-3 my-3">
+                <label for="" class="gray">Tax Due</label>
+                <br>
+                <span class="font-bold font-size-14">₱[[formatPrice('{{payslips.payroll.employeetaxdeduction.amount}}')]]</span>
+            </div>
+
+            <!-- LVL 2 -->
+            <div class="col-3 my-3">
+                <label for="" class="gray">SSS Loans</label>
+                <br>
+                <span class="font-bold font-size-14">₱0.00</span>
+            </div>
+            <div class="col-3 my-3">
+                <label for="" class="gray">HDMF Loans</label>
+                <br>
+                <span class="font-bold font-size-14">₱0.00</span>
+            </div>
+            <div class="col-3 my-3">
+                <label for="" class="gray">Late/Undertime Deductions</label>
+                <br>
+                <span class="font-size-14 font-bold">₱0.00</span>
+            </div>
+        </div>
+
+        <div class="row earnings py-3 mb-3">
+            <div class="col">
+                <label for="" class="earnings-text">Basic Pay</label>
+                <br>
+                <span class="font-size-18 font-bold">₱[[formatPrice('{{payslips.payroll.basicPay}}')]]</span>
+            </div>
+            <div class="col">
+                <label for="" class="earnings-text">Gross Pay</label>
+                <br>
+                <span class="font-size-18 font-bold">₱[[formatPrice('{{payslips.payroll.grossPayAfterBonus}}')]]</span>
+            </div>
+            <div class="col">
+                <label for="" class="earnings-text">Net Pay</label>
+                <br>
+                <span class="font-size-18 font-bold">₱[[formatPrice('{{payslips.payroll.netPayAfterTaxes}}')]]</span>
+            </div>
+        </div>
 
         <!-- MODAL -->
         <div class="modal fade" id="modal">
@@ -173,16 +399,27 @@
 
 {% block scripts %}
 
+<script src="/static/js/semi-monthly.js"></script>
+
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: "#app",
         
         data: {
-            yearList: []
+            user: '',
+            year: '',
+            period: '',
+            dateRange: '',
+            yearList: [],
+            semiMonthPeriod: '',
+            params: '',
         },
 
         methods: {
+            setSemiMonthPeriod(){
+                this.semiMonthPeriod = semi_months(this.year)
+            },
             onload(){
                 axios.get('/year-api/')
                 .then(res=>this.yearList=res.data)
@@ -193,64 +430,62 @@
                         html: err.message
                     })
                 })
+            },
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+            formatTime(value){
+                value = new Date(value)
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+            setDate(){
+                if (this.year && this.period && this.dateRange){
+                    location.href=`/ems-employee-payslip/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}&user=${this.user}`
+                } else {
+                    Swal.fire({
+                        title: "Fill up all the inputs.",
+                        icon: 'error',
+                    })
+                }
+            },
+            toggleHoursView(id){
+                hourID = document.getElementById(id)
+                if(hourID.style.display == "block"){
+                    hourID.style.display = 'none'
+                } else {
+                    hourID.style.display = 'block'
+                }
+            },
+            loadingModal(){
+                message = "Saving Changes"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
             }
         },
         mounted(){
             this.onload()
+            let params = new URLSearchParams(location.search);
+            this.params = params.toString()
+            this.year = params.get('year') ? params.get('year') : ''
+            this.dateRange = params.get('dateRange') ? params.get('dateRange').replace('%', ' ') : ''
+            this.period = params.get('period') ? params.get('period') : ''
+            this.semiMonthPeriod = semi_months(this.year)
+            this.user = params.get('user')
         }
     })
-</script>
-
-<script>
-    $(document).ready(function() {
-        $.fn.dataTable.moment( 'MMMM D, YYYY' );
-        $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
-        $('#table').DataTable({
-            language: { search: '', searchPlaceholder: 'Search'},
-            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
-            "<'row'<'col-sm-12'tr>>" +
-            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-
-            buttons: {
-                buttons: [
-                {
-                    text: '<i class="fas fa-file-excel"></i>',
-                    className: 'btn text-success btn-table',
-                    titleAttr: 'Export Excel',
-                    extend: 'excel'
-                },
-                {
-                    text: '<i class="fas fa-file-csv"></i>',
-                    className: 'btn text-warning btn-table',
-                    titleAttr: 'Export CSV',
-                    extend: 'csv'
-                },
-                {
-                    text: '<i class="fas fa-print"></i>',
-                    className: 'btn btn-table',
-                    titleAttr: 'Print',
-                    extend: 'print'
-                },
-                ],
-                dom: {
-                    button: {
-                        className: 'btn'
-                    }
-                }
-            },
-            "initComplete": function(){
-                $("#loader-container").hide()
-                $("#loader").hide()
-                $('#table').show()
-            },
-        
-        });
-    });
-    $('option').mousedown(function(e) {
-        e.preventDefault();
-        $(this).prop('selected', !$(this).prop('selected'));
-        return false;
-    });
 </script>
 
 {% endblock %}
