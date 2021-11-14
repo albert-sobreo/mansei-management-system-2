@@ -78,19 +78,19 @@ class EMS_SaveEditLeave(APIView):
         user = User.objects.get(pk=data['user'])
 
         try:
-            user.userleave.all()
-            user.userleave.sLeave = data['sLeave']
-            user.userleave.vLeave = data['vLeave']
-            user.userleave.silp = data['silp']
+            user.userleave
+            user.userleave.sLeave = data['sLeave'] if data['sLeave'] >= 0 else 0
+            user.userleave.vLeave = data['vLeave'] if data['vLeave'] >= 0 else 0
+            user.userleave.silp = data['silp'] if data['silp'] >= 0 else 0
             user.userleave.save()
 
         except Exception as e:
             print(e)
             userLeave = UserLeave()
             userLeave.user = user
-            userLeave.sLeave = data['sLeave']
-            userLeave.vLeave = data['vLeave']
-            userLeave.silp = data['silp']
+            userLeave.sLeave = data['sLeave'] if data['sLeave'] >= 0 else 0
+            userLeave.vLeave = data['vLeave'] if data['vLeave'] >= 0 else 0
+            userLeave.silp = data['silp'] if data['silp'] >= 0 else 0
             userLeave.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')

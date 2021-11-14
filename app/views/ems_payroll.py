@@ -219,6 +219,8 @@ class EMS_GeneratePayroll(APIView):
                 
             #### END ####
 
+            taxableBenefit = 0
+            untaxableBenefit = 0
             
             for benefitOfUser in user.deminimisofuser.all():
                 if benefitOfUser.amount > DeMinimis.objects.get(name=benefitOfUser.name).limit:
@@ -231,6 +233,7 @@ class EMS_GeneratePayroll(APIView):
                     taxedBenefit.save()
                     request.user.branch.deMinimisPay.add(taxedBenefit)
                     payroll.grossPayAfterBonus += taxedBenefit.amount
+                    taxableBenefit += taxedBenefit.amount
 
                     benefitPay = DeMinimisPay()
                     benefitPay.user = request.user
@@ -240,6 +243,8 @@ class EMS_GeneratePayroll(APIView):
                     benefitPay.taxable = False
                     benefitPay.save()
                     request.user.branch.deMinimisPay.add(benefitPay)
+                    payroll.grossPayAfterBonus += benefitPay.amount
+                    untaxableBenefit += benefitPay.amount
 
                 else:
                     benefitPay = DeMinimisPay()
@@ -250,6 +255,8 @@ class EMS_GeneratePayroll(APIView):
                     benefitPay.taxable = False
                     benefitPay.save()
                     request.user.branch.deMinimisPay.add(benefitPay)
+                    payroll.grossPayAfterBonus += benefitPay.amount
+                    untaxableBenefit += benefitPay.amount
 
             #### INITIALIZE MONTHY PAYS #####
             monthlyBasicPay = previousPayroll.basicPay + payroll.basicPay
@@ -329,6 +336,8 @@ class EMS_GeneratePayroll(APIView):
 
             taxDeductedObj = EmployeeTaxDeduction()
 
+            payroll.netPayBeforeTaxes += taxableBenefit
+
             for tax in incomeTaxTable:
                 taxDeducted = 0
                 if tax.lowerLimit < (payroll.netPayBeforeTaxes) <= tax.upperLimit:
@@ -341,6 +350,8 @@ class EMS_GeneratePayroll(APIView):
                     taxDeductedObj.save()
 
                     payroll.netPayAfterTaxes = payroll.netPayBeforeTaxes - taxDeducted
+
+            payroll.netPayAfterTaxes += untaxableBenefit
                 
             payroll.save()
         return JsonResponse(0, safe=False)
