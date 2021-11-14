@@ -227,7 +227,7 @@ class EMS_GeneratePayroll(APIView):
                     taxedBenefit = DeMinimisPay()
                     taxedBenefit.user = request.user
                     taxedBenefit.payroll = payroll
-                    taxedBenefit.name = "Excess " + benefitOfUser.name
+                    taxedBenefit.name = "Taxable " + benefitOfUser.name
                     taxedBenefit.amount = benefitOfUser.amount - DeMinimis.objects.get(name=benefitOfUser.name).limit
                     taxedBenefit.taxable = True
                     taxedBenefit.save()
