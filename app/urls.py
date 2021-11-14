@@ -344,5 +344,8 @@ urlpatterns = [
     path('ems-save-edit-holiday/', login_required(views.EMS_SaveEditHoliday.as_view())),
     path('branch-positions/', login_required(views.BranchPositions.as_view())),
     path('ems-give-promotion/', login_required(views.EMS_GivePromotion.as_view())),
-    path('ems-deduction-sss/', login_required(views.EMS_SSSDeductionView.as_view()))
+    path('ems-deduction-sss/', login_required(views.EMS_SSSDeductionView.as_view())),
+    path('ems-deduction-phic/', login_required(views.EMS_PHICDeductionView.as_view())),
+    path('ems-deduction-hdmf/', login_required(views.EMS_HDMFDeduction.as_view())),
+    path('ems-deduction-taxes/', login_required(views.EMS_TaxDeduction.as_view()))
 ]

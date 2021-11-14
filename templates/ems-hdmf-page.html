@@ -1,0 +1,289 @@
+{% extends "base-template.html" %}
+{% block title %}EMS | HDMF Deductions{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-ems active="nav-deductions" photo="/static/media/{{request.user.image}}"></navbar-ems>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- NAV 2 -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links ems-nav">
+                <a href="/ems-deduction-sss/" class="mx-2">SSS</a>
+                <a href="/ems-deduction-phic/" class="mx-2">PHIC</a>
+                <a href="/ems-deduction-hdmf/" class="active-ems mx-2">HDMF</a>
+                <a href="/ems-deduction-taxes/" class="mx-2">Taxes</a>
+            </div>
+        </div>
+
+        <!-- TITLE -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Pag-Ibig Deductions</span>
+        </div>
+
+        <div class="d-flex align-items-center mb-3 justify-content-end">
+            <div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="" class="mx-1">Period</label>
+                        <select @change="setSemiMonthPeriod()" v-model="year" class="form-control mx-1">
+                            <option value="" selected disabled>Select Year</option>
+                            <option v-for="year in yearList" :value="year">[[year]]</option>
+                        </select>
+                        <select @change="setSemiMonthPeriod()" v-model="period" class="form-control mx-1">
+                            <option value="" selected disabled>Select Period</option>
+                            <!-- <option value="semi">Semi-Monthly</option> -->
+                            <option value="monthly">Monthly</option>
+                        </select>
+                        <select v-model="dateRange" class="form-control mx-1">
+                            <option value="" selected disabled>Date Range</option>
+                            <template v-if="period == 'semi'">
+                                <option v-for="date in semiMonthPeriod" :value="date[0]+' '+date[1]">[[ date[2] ]] - [[ date[3] ]]</option>
+                            </template>
+                            <template v-else-if="period=='monthly'">
+                                <option v-for="date in semiMonthPeriod" :value="date[0]+' '+date[1]">[[ date[2] ]] - [[ date[3] ]]</option>
+                            </template>
+                        </select>
+                        <button @click="setDate()" class="mx-1 btn btn-warning btn-sm">
+                            Set
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead class="gray">
+                <th>Employee</th>
+                <th>SSS Number</th>
+                <th>Daily Rate</th>
+                <th>Gross {{payrolls.all.0.previousPayroll.dateEnd}}</th>
+                <th>Gross {{payrolls.all.0.dateEnd}}</th>
+                <th>Total</th>
+                <th class="table-warning text-dark">Amount</th>
+            </thead>
+            <tbody>
+                {% for p in payrolls %}
+                <tr>
+                    <td>{{p.user.first_name}} {{p.user.last_name}}</td>
+                    <td>{{p.user.sss}}</td>
+                    <td>₱{{p.user.rate}}</td>
+                    <td>₱[[formatPrice('{{p.previousPayroll.grossPayBeforeBonus}}')]]</td>
+                    <td>₱[[formatPrice('{{p.grossPayBeforeBonus}}')]]</td>
+                    <td>₱[[formatPrice('{{p.previousPayroll.grossPayBeforeBonus|add:p.grossPayBeforeBonus}}')]]</td>
+                    <td class="table-warning">₱[[formatPrice('{{p.pagibigemployeededuction.amount}}')]]</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="/static/js/semi-monthly.js"></script>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            year: '',
+            period: '',
+            dateRange: '',
+            semiMonthPeriod: '',
+            yearList: [],
+        },
+
+        methods: {
+            onload(){
+                axios.get('/year-api/')
+                .then(res=>this.yearList=res.data)
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: "error",
+                        html: err.message
+                    })
+                })
+            },
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${day} - ${month}. ${date}, ${year}`
+
+                return formatted
+            },
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
+            
+            setSemiMonthPeriod(){
+                console.log(this.year)
+                if (this.period == 'semi'){
+                    this.semiMonthPeriod = semi_months(this.year)
+                }
+                else if(this.period == 'monthly'){
+                    console.log(this.year)
+                    this.semiMonthPeriod = months(this.year)
+                }
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            roundNumber1(value) {
+                let val = (value/1).toFixed(1).replace(',', '.')
+                return val
+            },
+
+            setDate(){
+                if (this.year && this.period && this.dateRange){
+                    location.href=`/ems-deduction-hdmf/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`
+                } else {
+                    Swal.fire({
+                        title: "Fill up all the inputs.",
+                        icon: 'error',
+                    })
+                }
+            },
+        }, 
+        mounted(){
+            this.onload()
+            let params = new URLSearchParams(location.search);
+            this.year = params.get('year') ? params.get('year') : ''
+            this.dateRange = params.get('dateRange') ? params.get('dateRange').replace('%', ' ') : ''
+            this.period = params.get('period') ? params.get('period') : ''
+            this.semiMonthPeriod = months(this.year)
+        }
+    })
+</script>
+
+<script>
+    $(document).ready(function() {
+        $.fn.dataTable.moment( 'MMMM D, YYYY' );
+        $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
+        $('#table').DataTable({
+            language: { search: '', searchPlaceholder: 'Search'},
+            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+
+            buttons: {
+                buttons: [
+                {
+                    text: '<i class="fas fa-file-excel"></i>',
+                    className: 'btn text-success btn-table',
+                    titleAttr: 'Export Excel',
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fas fa-file-csv"></i>',
+                    className: 'btn text-warning btn-table',
+                    titleAttr: 'Export CSV',
+                    extend: 'csv'
+                },
+                {
+                    text: '<i class="fas fa-print"></i>',
+                    className: 'btn btn-table',
+                    titleAttr: 'Print',
+                    extend: 'print'
+                },
+                ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
+                }
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            },
+        
+        });
+    });
+    $('option').mousedown(function(e) {
+        e.preventDefault();
+        $(this).prop('selected', !$(this).prop('selected'));
+        return false;
+    });
+</script>
+
+{% endblock %}
