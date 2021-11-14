@@ -31,13 +31,17 @@
                             <option value="" selected disabled>Select Year</option>
                             <option v-for="year in yearList" :value="year">[[year]]</option>
                         </select>
-                        <select v-model="period" class="form-control mx-1">
+                        <select @change="setSemiMonthPeriod()" v-model="period" class="form-control mx-1">
                             <option value="" selected disabled>Select Period</option>
                             <option value="semi">Semi-Monthly</option>
+                            <!-- <option value="monthly">Monthly</option> -->
                         </select>
                         <select v-model="dateRange" class="form-control mx-1">
                             <option value="" selected disabled>Date Range</option>
                             <template v-if="period == 'semi'">
+                                <option v-for="date in semiMonthPeriod" :value="date[0]+' '+date[1]">[[ date[2] ]] - [[ date[3] ]]</option>
+                            </template>
+                            <template v-else-if="period=='monthly'">
                                 <option v-for="date in semiMonthPeriod" :value="date[0]+' '+date[1]">[[ date[2] ]] - [[ date[3] ]]</option>
                             </template>
                         </select>
@@ -533,7 +537,14 @@
             },
             
             setSemiMonthPeriod(){
-                this.semiMonthPeriod = semi_months(this.year)
+                console.log(this.year)
+                if (this.period == 'semi'){
+                    this.semiMonthPeriod = semi_months(this.year)
+                }
+                else if(this.period == 'monthly'){
+                    console.log(this.year)
+                    this.semiMonthPeriod = months(this.year)
+                }
             },
 
             formatPrice(val){

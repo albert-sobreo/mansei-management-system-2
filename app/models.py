@@ -1202,7 +1202,8 @@ class Payroll(models.Model):
     approved = models.BooleanField(default=False)
     approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='payrollapprovedby')
     dateApproved = models.DateField(null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="payrolluser")
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="payroll")
+    previousPayroll = models.OneToOneField('self', related_name='previouspayroll', null=True, blank=True, on_delete=models.SET_NULL)
 
     bh = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     ot = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)

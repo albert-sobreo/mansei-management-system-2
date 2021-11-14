@@ -34,3 +34,25 @@ function semi_months(year){
     return dates
 
 }
+
+function months(year){
+    start = '26'
+    end = '25'
+
+    dates=[
+        [`${year-1}-12-${start}`, `${year}-1-${end}`, `Dec. ${start}, ${year-1}`, `Jan. ${end}, ${year}`],
+        [`${year}-1-${start}`, `${year}-2-${end}`, `Jan. ${start}, ${year}`, `Feb. ${end}, ${year}`],
+        [`${year}-2-${start}`, `${year}-3-${end}`, `Feb. ${start}, ${year}`, `Mar. ${end}, ${year}`],
+        [`${year}-3-${start}`, `${year}-4-${end}`, `Mar. ${start}, ${year}`, `Apr. ${end}, ${year}`],
+        [`${year}-4-${start}`, `${year}-5-${end}`, `Apr. ${start}, ${year}`, `May. ${end}, ${year}`],
+        [`${year}-5-${start}`, `${year}-6-${end}`, `May. ${start}, ${year}`, `Jun. ${end}, ${year}`],
+        [`${year}-6-${start}`, `${year}-7-${end}`, `Jun. ${start}, ${year}`, `Jul. ${end}, ${year}`],
+        [`${year}-7-${start}`, `${year}-8-${end}`, `Jul. ${start}, ${year}`, `Aug. ${end}, ${year}`],
+        [`${year}-8-${start}`, `${year}-9-${end}`, `Aug. ${start}, ${year}`, `Sep. ${end}, ${year}`],
+        [`${year}-9-${start}`, `${year}-10-${end}`, `Sep. ${start}, ${year}`, `Oct. ${end}, ${year}`],
+        [`${year}-10-${start}`, `${year}-11-${end}`, `Oct. ${start}, ${year}`, `Nov. ${end}, ${year}`],
+        [`${year}-11-${start}`, `${year}-12-${end}`, `Nov. ${start}, ${year}`, `Dec. ${end}, ${year}`],
+    ]
+
+    return dates
+}

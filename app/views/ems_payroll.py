@@ -61,14 +61,19 @@ class EMS_GeneratePayroll(APIView):
                 previousPayroll.grossPayAfterBonus = Decimal(0)
                 previousPayroll.netPayAfterTaxes = Decimal(0)
                 previousPayroll.netPayBeforeTaxes = Decimal(0)
-            if user.payroll.filter(dateStart=dateStart, dateEnd=dateEnd):
-                continue
+            try:
+                if user.payroll.filter(dateStart=dateStart, dateEnd=dateEnd):
+                    continue
+            except:
+                pass
             payroll = Payroll()
             payroll.year = year
             payroll.dateStart = dateStart
             payroll.dateEnd = dateEnd
             payroll.dateGenerated = datetime.date.today()
             payroll.user = user
+            if previousPayroll.dateGenerated:
+                payroll.previousPayroll = previousPayroll
             payroll.save()
             request.user.branch.payroll.add(payroll)
             rates = request.user.branch.ratesGroup.get(name='DOLE Standard')
@@ -187,7 +192,10 @@ class EMS_GeneratePayroll(APIView):
             payroll.grossPayBeforeBonus += payroll.holidayPay
             payroll.grossPayAfterBonus = payroll.grossPayBeforeBonus
 
-            allPayrollThisYear = user.payroll.filter(year=dateEnd.split('-')[2])
+            try: 
+                allPayrollThisYear = user.payroll.filter(year=dateEnd.split('-')[2])
+            except:
+                allPayrollThisYear = []
             
             totalBonus = Decimal(0)
             totalBonusThisPeriod = Decimal(0)

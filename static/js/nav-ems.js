@@ -42,6 +42,7 @@ Vue.component('navbar-ems', {
             <a href="/ems-my-timesheet/" class="mx-3" id="nav-timesheet">Timesheet</a>
             <a href="/ems-my-payslip/" class="mx-3" id="nav-payslip">Payslip</a>
             <a href="/ems-payroll/" class="mx-3" id="nav-payroll">Payroll</a>
+            <a href="/ems-deduction-sss/" class="mx-3" id="nav-deductions">Deductions</a>
             <a href="/ems-employees/" class="mx-3" id="nav-employees">Employees</a>
             <a href="/ems-holidays/" class="mx-3" id="nav-holidays">Holidays</a>
             <a href="/ems-overtime-request/" class="mx-3" id="nav-requests">Requests</a>

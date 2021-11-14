@@ -37,3 +37,4 @@ from .ems_employees import *
 from .ems_requests import *
 from .ems_approvals import *
 from .ems_api import *
+from .ems_deductions import *
