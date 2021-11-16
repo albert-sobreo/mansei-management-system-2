@@ -1276,6 +1276,24 @@ class Payroll(models.Model):
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name
 
+class Loans(models.Model):
+    user = models.ForeignKey(User, related_name='loans', on_delete=models.PROTECT, null=True, blank=True)
+    year = models.CharField(max_length=6, null=True, blank=True)
+    dateCreated = models.DateField(null=True, blank=True)
+    startOfAmortization = models.DateField(null=True, blank=True)
+    endOfAmortization = models.DateField(null=True, blank=True)
+    loanType = models.CharField(max_length=256, null=True, blank=True)
+    loanFrom = models.CharField(max_length=128, null=True, blank=True)
+    loanAmount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    serviceFee = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    serviceFeeRate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    netProceeds = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    interestAmount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    interestRate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    totalWithInterest = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    monthlyAmortization = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    fullyPaid = models.BooleanField(default=False)
 
 class DeMinimisPay(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="deminimispay")
@@ -1483,6 +1501,12 @@ class EmployeeTaxDeduction(models.Model):
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name + "   " + str(self.payroll.dateStart) + " --- " + str(self.payroll.dateEnd)
 
+class LoanDeduction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    payroll = models.ForeignKey(Payroll, related_name="loandeduction", on_delete=models.CASCADE, null=True, blank=True)
+    loan = models.ForeignKey(Loans, on_delete=models.CASCADE, related_name="loandeduction", null=True, blank=True)
+    amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+
 class DeMinimis(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
     limit = models.DecimalField(max_digits=6, decimal_places=0, null=True, blank=True)
@@ -1676,6 +1700,10 @@ class Branch(models.Model):
 
     #### BRANCH POSITIONS ####
     position = models.ManyToManyField(Position, blank=True)
+
+    #### LOANS ####
+    loans = models.ManyToManyField(Loans, blank=True)
+    loanDeduction = models.ManyToManyField(LoanDeduction, blank=True)
 
 
     def __str__(self):

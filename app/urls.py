@@ -346,6 +346,9 @@ urlpatterns = [
     path('ems-give-promotion/', login_required(views.EMS_GivePromotion.as_view())),
     path('ems-deduction-sss/', login_required(views.EMS_SSSDeductionView.as_view())),
     path('ems-deduction-phic/', login_required(views.EMS_PHICDeductionView.as_view())),
+
     path('ems-deduction-hdmf/', login_required(views.EMS_HDMFDeduction.as_view())),
-    path('ems-deduction-taxes/', login_required(views.EMS_TaxDeduction.as_view()))
+    path('ems-deduction-taxes/', login_required(views.EMS_TaxDeduction.as_view())),
+    path('ems-loans-sss/', login_required(views.EMS_SSSLoansView.as_view())),
+    path('ems-deduction-sss-loans/', login_required(views.EMS_SSSLoanDeduction.as_view()))
 ]

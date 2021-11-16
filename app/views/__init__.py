@@ -38,3 +38,4 @@ from .ems_requests import *
 from .ems_approvals import *
 from .ems_api import *
 from .ems_deductions import *
+from .ems_loans import *

@@ -1,0 +1,417 @@
+{% extends "base-template.html" %}
+{% block title %}EMS | SSS Loans{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-ems active="nav-loans" photo="/static/media/{{request.user.image}}"></navbar-ems>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- NAV 2 -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links ems-nav">
+                <a href="/ems-loans-sss/" class="active-ems mx-2">SSS</a>
+                <a href="/ems-loans-hdmf/" class="mx-2">HDMF</a>
+            </div>
+        </div>
+
+        <!-- TITLE -->
+
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">SSS Loans</span>
+        </div>
+
+        <div class="d-flex align-items-center mb-3 justify-content-between">
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="" class="mx-1">Employee</label>
+                    <select class="form-control mx-1" v-model="user">
+                        <option value="" selected disabled>Select Employee</option>
+                        {% for employee in employees %}
+                        <option value="{{employee.pk}}">{{employee.first_name}} {{employee.last_name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="" class="mx-1">Year</label>
+                    <select v-model="year" class="form-control mx-1">
+                        <option value="" selected disabled>Select Year</option>
+                        <option v-for="year in yearList" :value="year">[[year]]</option>
+                    </select>
+                    <button @click="setDate()" class="mx-1 btn btn-warning btn-sm">
+                        Set
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead class="gray">
+                <th>Start of Amortization</th>
+                <th>End of Amortization</th>
+                <th>Loan Type</th>
+                <th>Loan Amount</th>
+                <th>Service Fee</th>
+                <th>Net Proceeds</th>
+                <th>Interest Amount</th>
+                <th>Total W/ Interest</th>
+                <th>Amount Paid</th>
+                <th>Status</th>
+            </thead>
+
+            <tbody>
+                {% for loan in loans %}
+                <tr>
+                    <td class="link">{{loan.startOfAmortization}}</td>
+                    <td>{{loan.endOfAmortization}}</td>
+                    <td>{{loan.loanType}}</td>
+                    <td>₱[[formatPrice('{{loan.loanAmount}}')]]</td>
+                    <td>₱[[formatPrice('{{loan.serviceFee}}')]]</td>
+                    <td>₱[[formatPrice('{{loan.netProceeds}}')]]</td>
+                    <td>₱[[formatPrice('{{loan.interestAmount}}')]]</td>
+                    <td>₱[[formatPrice('{{loan.totalWithInterest}}')]]</td>
+                    <td>₱[[formatPrice('{{loan.amountPaid}}')]]</td>
+                    {% if loan.fullyPaid %}
+                    <td>Fully Paid</td>
+                    {% else %}
+                    <td>Not Fully Paid</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- CREATE LOAN MODAL -->
+        <div class="modal fade" id="createLoanModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15 pt-2">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Create Loan</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <!-- 1 -->
+                        <div class="row py-2">
+                            <div class="col-6">
+                                <label for="" class="gray">Employee Name</label><br>
+                                <span class="font-bold">[[createModal.user.first_name]] [[createModal.user.last_name]]</span>
+                            </div>
+                            <div class="col-6">
+                                <label for="" class="gray">SSS Number</label><br>
+                                <span class="font-bold">[[createModal.user.sss]]</span>
+                            </div>
+                        </div>
+                        <!-- 2 -->
+                        <div class="row py-2">
+                            <div class="col">
+                                <label for="" class="gray">Position</label><br>
+                                <span class="font-bold">[[createModal.user.position]]</span>
+                            </div>
+                        </div>
+                        <!-- 3 -->
+                        <div class="row py-2 order-card">
+                            <div class="col pr-1">
+                                <label for="">Loan Type</label>
+                                <input v-model="createModal.loanType" type="text" class="form-control" placeholder="Enter Loan Type">
+                            </div>
+                            <div class="col pl-1">
+                                <label for="">Loan Amount</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="createModal.loanAmount" placeholder="Enter Loan Amount" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 4 -->
+                        <div class="row py-2 order-card">
+                            <div class="col pr-1">
+                                <label for="">Service Fee Rate</label>
+                                <div class="input-group">
+                                    <input v-model="createModal.serviceFeeRate" placeholder="Enter Service Fee Rate" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col pl-1">
+                                <label for="">Service Fee</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="createModal.serviceFee" readonly type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 5 -->
+                        <div class="row py-2 order-card">
+                            <div class="col">
+                                <label for="">Net Proceeds</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="createModal.netProceeds" readonly type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 6 -->
+                        <div class="row py-2 order-card">
+                            <div class="col pr-1">
+                                <label for="">Interest Rate</label>
+                                <div class="input-group">
+                                    <input v-model="createModal.interestRate" placeholder="Enter Interest Rate" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col pl-1">
+                                <label for="">Interest Amount</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="createModal.interestAmount" readonly type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 7 -->
+                        <div class="row py-2 order-card mt-3">
+                            <div class="col pr-1">
+                                <label for="">Start of Amortization</label>
+                                <input v-model="createModal.startOfAmortization" type="date" class="form-control">
+                            </div>
+                            <div class="col pl-1">
+                                <label for="">End of Amortization</label>
+                                <input v-model="createModal.endOfAmortization" type="date" class="form-control">
+                            </div>
+                        </div>
+                        <!-- 8 -->
+                        <div class="row py-2 order-card">
+                            <div class="col">
+                                <label for="">Monthly Amortization</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="createModal.monthlyAmortization" readonly type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 9 -->
+                        <div class="row pt-2">
+                            <div class="col">
+                                <button class="btn btn-primary col">Create Loan</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <pre>[[$data]]</pre>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="/static/js/semi-monthly.js"></script>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            year: '',
+            yearList: [],
+            user: '',
+
+            createModal: {
+                user: {
+                    first_name: null,
+                    last_name: null,
+                    sss: null,
+                    position: null,
+                },
+                startOfAmortization: null,
+                endOfAmortization: null,
+                loanType: null,
+                loanAmount: null,
+                loanFrom: 'SSS',
+                loanAmount: null,
+                serviceFee: null,
+                serviceFeeRate: null,
+                netProceeds: null,
+                interestAmount: null,
+                interestRate: null,
+                totalWithInterest: null,
+                monthlyAmortization: null,
+            }
+        },
+
+        methods: {
+            onload(){
+                axios.get('/year-api/')
+                .then(res=>this.yearList=res.data)
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: "error",
+                        html: err.message
+                    })
+                })
+            },
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            roundNumber1(value) {
+                let val = (value/1).toFixed(1).replace(',', '.')
+                return val
+            },
+
+            setDate(){
+                if (this.year){
+                    location.href=`/ems-loans-sss/?year=${this.year}&user=${this.user}`
+                } else {
+                    Swal.fire({
+                        title: "Fill up all the inputs.",
+                        icon: 'error',
+                    })
+                }
+            },
+            initCreateModal(){
+                axios.get(`/api/user/${this.user}/`)
+                .then(res=>this.createModal.user=res.data)
+            }
+        },
+
+        mounted(){
+            this.onload()
+            let params = new URLSearchParams(location.search);
+            this.year = params.get('year') ? params.get('year') : ''
+            this.dateRange = params.get('dateRange') ? params.get('dateRange').replace('%', ' ') : ''
+            this.period = params.get('period') ? params.get('period') : ''
+            this.semiMonthPeriod = months(this.year)
+            this.user = params.get('user') ? params.get('user'):''
+        }
+    })
+</script>
+
+<script>
+    $(document).ready(function() {
+        $.fn.dataTable.moment( 'MMMM D, YYYY' );
+        $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
+        $('#table').DataTable({
+            language: { search: '', searchPlaceholder: 'Search'},
+            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+
+            buttons: {
+                buttons: [
+                {
+                    text: '<i class="fas fa-file-excel"></i>',
+                    className: 'btn text-success btn-table',
+                    titleAttr: 'Export Excel',
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fas fa-file-csv"></i>',
+                    className: 'btn text-warning btn-table',
+                    titleAttr: 'Export CSV',
+                    extend: 'csv'
+                },
+                {
+                    text: '<i class="fas fa-print"></i>',
+                    className: 'btn btn-table',
+                    titleAttr: 'Print',
+                    extend: 'print'
+                },
+                {
+                    text: 'Create Loan',
+                    className: 'btn btn-primary',
+                    titleAttr: "Create Loan",
+                    action: function(){
+                        $("#createLoanModal").modal('show')
+                        app.initCreateModal()
+                    }
+                }
+                ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
+                }
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            },
+        
+        });
+    });
+    $('option').mousedown(function(e) {
+        e.preventDefault();
+        $(this).prop('selected', !$(this).prop('selected'));
+        return false;
+    });
+</script>
+
+{% endblock %}

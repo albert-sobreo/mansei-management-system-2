@@ -1,5 +1,5 @@
 {% extends "base-template.html" %}
-{% block title %}EMS | HDMF Deductions{% endblock %}
+{% block title %}EMS | SSS Loan Deductions{% endblock %}
 
 {% block body %}
 
@@ -16,15 +16,15 @@
             <div class="justify-content-center c-nav-links ems-nav">
                 <a href="/ems-deduction-sss/" class="mx-2">SSS</a>
                 <a href="/ems-deduction-phic/" class="mx-2">PHIC</a>
-                <a href="/ems-deduction-hdmf/" class="active-ems mx-2">HDMF</a>
+                <a href="/ems-deduction-hdmf/" class="mx-2">HDMF</a>
                 <a href="/ems-deduction-taxes/" class="mx-2">Taxes</a>
-                <a href="/ems-deduction-sss-loans/" class="mx-2">SSS Loans</a>
+                <a href="/ems-deduction-sss-loans/" class="active-ems mx-2">SSS Loans</a>
             </div>
         </div>
 
         <!-- TITLE -->
         <div class="d-flex align-items-center mb-3">
-            <span class="font-size-18 font-bold mr-1">Pag-Ibig Deductions</span>
+            <span class="font-size-18 font-bold mr-1">SSS Loan Deductions</span>
         </div>
 
         <div class="d-flex align-items-center mb-3 justify-content-end">
@@ -78,7 +78,7 @@
                     <td>₱[[formatPrice('{{p.previousPayroll.grossPayBeforeBonus}}')]]</td>
                     <td>₱[[formatPrice('{{p.grossPayBeforeBonus}}')]]</td>
                     <td>₱[[formatPrice('{{p.previousPayroll.grossPayBeforeBonus|add:p.grossPayBeforeBonus}}')]]</td>
-                    <td class="table-warning">₱[[formatPrice('{{p.pagibigemployeededuction.amount}}')]]</td>
+                    <td class="table-warning">₱[[formatPrice('{{p.loandeduction.er}}')]]</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -215,7 +215,7 @@
 
             setDate(){
                 if (this.year && this.period && this.dateRange){
-                    location.href=`/ems-deduction-hdmf/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`
+                    location.href=`/ems-deduction-sss/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`
                 } else {
                     Swal.fire({
                         title: "Fill up all the inputs.",
