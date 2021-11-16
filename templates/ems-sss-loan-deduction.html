@@ -78,7 +78,13 @@
                     <td>₱[[formatPrice('{{p.previousPayroll.grossPayBeforeBonus}}')]]</td>
                     <td>₱[[formatPrice('{{p.grossPayBeforeBonus}}')]]</td>
                     <td>₱[[formatPrice('{{p.previousPayroll.grossPayBeforeBonus|add:p.grossPayBeforeBonus}}')]]</td>
-                    <td class="table-warning">₱[[formatPrice('{{p.loandeduction.er}}')]]</td>
+                    <td class="table-warning">
+                        {% for sss in p.loandeduction.all %}
+                        {% if sss.loan.loanFrom == 'SSS' %}
+                        <td>₱[[formatPrice('{{sss.amount}}')]]</td>
+                        {% endif %}
+                        {% endfor %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -215,7 +221,7 @@
 
             setDate(){
                 if (this.year && this.period && this.dateRange){
-                    location.href=`/ems-deduction-sss/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`
+                    location.href=`/ems-deduction-sss-loans/?year=${this.year}&period=${this.period}&dateRange=${this.dateRange}`
                 } else {
                     Swal.fire({
                         title: "Fill up all the inputs.",
