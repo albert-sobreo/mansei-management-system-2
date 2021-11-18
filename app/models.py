@@ -1292,7 +1292,7 @@ class Loans(models.Model):
     interestRate = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     totalWithInterest = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     monthlyAmortization = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
-    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True, default=0)
     fullyPaid = models.BooleanField(default=False)
 
 class DeMinimisPay(models.Model):

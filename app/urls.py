@@ -116,6 +116,7 @@ router.register(r"payroll", views.PayrollAPI, 'payroll')
 
 ########## USER ##########
 router.register(r'user', views.UserAPI, 'user')
+router.register(r'user2', views.UserAPI2, 'user2')
 
 ########## DE MINIMIS ##########
 router.register(r'deminimis', views.DeMinimisAPI, 'user')
@@ -350,5 +351,7 @@ urlpatterns = [
     path('ems-deduction-hdmf/', login_required(views.EMS_HDMFDeduction.as_view())),
     path('ems-deduction-taxes/', login_required(views.EMS_TaxDeduction.as_view())),
     path('ems-loans-sss/', login_required(views.EMS_SSSLoansView.as_view())),
-    path('ems-deduction-sss-loans/', login_required(views.EMS_SSSLoanDeduction.as_view()))
+    path('ems-deduction-sss-loans/', login_required(views.EMS_SSSLoanDeduction.as_view())),
+    path('ems-loan-create/', login_required(views.EMS_LoanCreate.as_view())),
+    path('ems-loans-hdmf/', login_required(views.EMS_HDMFLoansView.as_view()))
 ]

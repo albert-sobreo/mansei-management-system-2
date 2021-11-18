@@ -36,7 +36,10 @@ class UserNameOnlySZ(serializers.ModelSerializer):
         fields = [
             'first_name',
             'last_name',
-            'idUser'
+            'idUser',
+            'id',
+            'position',
+            'sss'
         ]
 
 class UserNameIDRateSZZ(serializers.ModelSerializer):

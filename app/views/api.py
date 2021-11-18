@@ -389,6 +389,12 @@ class UserAPI(viewsets.ModelViewSet):
     queryset = User.objects.all()
 
 
+class UserAPI2(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserNameOnlySZ
+    queryset = User.objects.all()
+
+
 
 
 

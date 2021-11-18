@@ -1,5 +1,5 @@
 {% extends "base-template.html" %}
-{% block title %}EMS | SSS Loans{% endblock %}
+{% block title %}EMS | HDMF Loans{% endblock %}
 
 {% block body %}
 
@@ -14,15 +14,15 @@
         <!-- NAV 2 -->
         <div class="d-flex font-semibold mb-2 justify-content-center">
             <div class="justify-content-center c-nav-links ems-nav">
-                <a href="/ems-loans-sss/" class="active-ems mx-2">SSS</a>
-                <a href="/ems-loans-hdmf/" class="mx-2">HDMF</a>
+                <a href="/ems-loans-sss/" class="mx-2">SSS</a>
+                <a href="/ems-loans-hdmf/" class="active-ems mx-2">HDMF</a>
             </div>
         </div>
 
         <!-- TITLE -->
 
         <div class="d-flex align-items-center mb-3">
-            <span class="font-size-18 font-bold mr-1">SSS Loans</span>
+            <span class="font-size-18 font-bold mr-1">HDMF Loans</span>
         </div>
 
         <div class="d-flex align-items-center mb-3 justify-content-between">
@@ -103,7 +103,8 @@
                         <div class="row py-2">
                             <div class="col-6">
                                 <label for="" class="gray">Employee Name</label><br>
-                                <span class="font-bold">[[createModal.user.first_name]] [[createModal.user.last_name]]</span>
+                                <span class="font-bold" v-if="createModal.user.id">[[createModal.user.first_name]] [[createModal.user.last_name]]</span>
+                                <span class="font-bold text-danger" v-else>Select an employee first</span>
                             </div>
                             <div class="col-6">
                                 <label for="" class="gray">SSS Number</label><br>
@@ -267,7 +268,7 @@
                 endOfAmortization: null,
                 loanType: null,
                 loanAmount: null,
-                loanFrom: 'SSS',
+                loanFrom: 'HDMF',
                 serviceFee: null,
                 serviceFeeRate: null,
                 netProceeds: null,
@@ -342,7 +343,7 @@
 
             setDate(){
                 if (this.year){
-                    location.href=`/ems-loans-sss/?year=${this.year}&user=${this.user}`
+                    location.href=`/ems-loans-hdmf/?year=${this.year}&user=${this.user}`
                 } else {
                     Swal.fire({
                         title: "Fill up all the inputs.",
@@ -356,7 +357,7 @@
             },
 
             submit(){
-                message = "Creating SSS Loan"
+                message = "Creating HDMF Loan"
                 Swal.fire({
                     showConfirmButton: false,
                     allowOutsideClick: false,
