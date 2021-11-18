@@ -265,6 +265,10 @@ class EMS_GeneratePayroll(APIView):
             
             ##### TO CHECK IF PAYROLL IS FOR SECOND PERIOD #####
             dateObj = datetime.datetime.strptime(payroll.dateEnd, '%Y-%m-%d')
+            if dateObj.day == 10:
+                pass
+                ##### LOAD DEDUCTIONS #####
+                
             if dateObj.day == 25:
 
                 ##### SSS #####
