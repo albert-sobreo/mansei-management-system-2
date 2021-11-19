@@ -105,9 +105,11 @@ class SaveDefaultAccounts(APIView):
             bdacct.cwit = None
 
         for item in items['cashInBank']:
+            bdacct.cashInBank.clear()
             bdacct.cashInBank.add(AccountChild.objects.get(pk=item))
 
         for item in items['advancesToSupplier']:
+            bdacct.advancesToSupplier.clear()
             bdacct.advancesToSupplier = AccountChild.objects.get(pk=item)
         
         bdacct.save()

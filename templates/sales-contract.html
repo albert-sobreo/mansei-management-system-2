@@ -180,7 +180,7 @@
                     <label>Sales Order</label>
                     <select @change="getSO(order.salesOrder)" v-model="order.salesOrder" class="form-control">
                         <option value="" selected disabled>Choose Sales Order</option>
-                        {% for item in request.user.branch.salesOrder.all %}
+                        {% for item in request.user.branch.salesOrder.all reversed %}
                         <option value="{{item.pk}}">{{item.code}}</option>
                         {% endfor %}
                     </select>
@@ -504,7 +504,7 @@
                     totalCost: null
                 }],
                 atc: [{
-                    code: '47',
+                    code: '',
                     amount: 0,
                     taxRate: 0,
                     amountWithheld: 0,
@@ -779,7 +779,6 @@
                         this.order.taxRate = '12'
                     }
                 })
-                
             },
 
             checkForm(e){
@@ -800,6 +799,17 @@
                         )
                         {
                             success1=true
+                        } else {
+                            success1 = false
+                            break
+                        }
+                    }
+                    for(var item of this.order.atc){
+                        if(
+                            item.code
+                        )
+                        {
+                            success1 = true
                         } else {
                             success1 = false
                             break
@@ -837,6 +847,12 @@
                     }
                     if(!item.totalCost){
                         this.errors.push('Total Cost Required at index: ' + String(index+1))
+                    }
+                })
+
+                this.order.atc.forEach((item, index)=>{
+                    if(!item.code){
+                        this.errors.push('ATC Required')
                     }
                 })
 

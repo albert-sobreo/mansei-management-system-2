@@ -1506,6 +1506,7 @@ class LoanDeduction(models.Model):
     payroll = models.ForeignKey(Payroll, related_name="loandeduction", on_delete=models.CASCADE, null=True, blank=True)
     loan = models.ForeignKey(Loans, on_delete=models.CASCADE, related_name="loandeduction", null=True, blank=True)
     amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    loanFrom = models.CharField(max_length=128, null=True, blank=True)
 
 class DeMinimis(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
@@ -1538,6 +1539,14 @@ class Position(models.Model):
 
     def __str__(self):
         return self.name
+
+class MonthlyExpense(models.Model):
+    year = models.CharField(max_length=6)
+    date = models.DateField()
+    amount = models.DecimalField(max_digits=20, decimal_places=5, default=0)
+
+    def __str__(self):
+        return str(self.date)
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
@@ -1704,6 +1713,9 @@ class Branch(models.Model):
     #### LOANS ####
     loans = models.ManyToManyField(Loans, blank=True)
     loanDeduction = models.ManyToManyField(LoanDeduction, blank=True)
+
+    #### MONTHLY EXPENSE ####
+    monthlyExpense = models.ManyToManyField(MonthlyExpense, blank=True)
 
 
     def __str__(self):

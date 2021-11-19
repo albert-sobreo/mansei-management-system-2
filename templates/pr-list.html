@@ -264,7 +264,6 @@
 
         methods: {
             viewPR(code){
-                console.log(code)
                 axios.get(`/api/purchase-request/${code}/`)
                 .then(res=>this.prModal=res.data)
             },

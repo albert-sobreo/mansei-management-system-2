@@ -41,7 +41,7 @@
 				<label>Purchase Order</label>
 				<select @change="getPO(purchaseOrder.po)" v-model="purchaseOrder.po" name="pr" class="form-control">
 					<option value="">None</option>
-					{% for po in pos %}
+					{% for po in pos reversed %}
 					<option value="{{po.id}}">{{po.code}}</option>
 					{% endfor %}
 				</select>

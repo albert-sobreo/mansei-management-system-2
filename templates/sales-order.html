@@ -179,7 +179,7 @@
                     <label><span>Quotations</span></label>
                     <select @change="getQQ(order.quotation)" v-model="order.quotation" class="form-control">
                         <option value="" selected disabled>Choose a Quotation</option>
-                        {% for item in quotations %}
+                        {% for item in quotations reversed %}
                         <option value="{{item.pk}}">{{item.code}}</option>
                         {% endfor %}
                     </select>
@@ -189,7 +189,7 @@
             <div class="row mt-2 mb-4">
                 <div class="col col-5 pr-2">
                     <label>Customer</label><button data-toggle="modal" data-target="#addCustomerModal" title="Add Customer" class="btn btn-warning btn-sm b-radius-5 ml-1 p-0 font-size-14" style="height: 18px; width: 18px">+</button>
-                    <select v-model="order.customer" class="form-control">
+                    <select @change="checkCRTE(order.customer)" v-model="order.customer" class="form-control">
                         <option value="" selected disabled>Choose Customer</option>
                         <option v-for="customer in customers" :value="customer.id">[[customer.name]]</option>
                     </select>
@@ -518,7 +518,7 @@
                     totalCost: null
                 }],
                 atc: [{
-                    code: '47',
+                    code: '',
                     amount: 0,
                     taxRate: 0,
                     amountWithheld: 0,
@@ -682,6 +682,19 @@
         },
 
         methods:{
+            checkCRTE(customer){
+                axios.get(`/api/customer/${customer}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    if (res.data.crte){
+                        this.order.taxType = 'VAT'
+                        this.order.taxRate = '0'
+                    } else {
+                        this.order.taxType = 'VAT'
+                        this.order.taxRate = '12'
+                    }
+                })
+            },
             submitAddCustomer(){
                 axios.post('/save-party/', this.addCustomerModal, this.config)
                 .then(res=>res.data==0?location.reload():'')
@@ -789,6 +802,17 @@
                             break
                         }
                     }
+                    for(var item of this.order.atc){
+                        if(
+                            item.code
+                        )
+                        {
+                            success1 = true
+                        } else {
+                            success1 = false
+                            break
+                        }
+                    }
                     if(success1){
                         this.submit()
                         return
@@ -821,6 +845,12 @@
                     }
                     if(!item.totalCost){
                         this.errors.push('Total Cost Required at index: ' + String(index+1))
+                    }
+                })
+
+                this.order.atc.forEach((item, index)=>{
+                    if(!item.code){
+                        this.errors.push('ATC Required')
                     }
                 })
 

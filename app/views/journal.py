@@ -68,7 +68,10 @@ class SaveJournal(APIView):
         j = Journal()
 
         j.code = journal['code']
-        j.journalDate = journal['date']
+        if journal['retroactive']:
+            j.journalDate = journal['retroactive']
+        else:
+            j.journalDate = journal['date']
         j.remarks = journal['remarks']
         j.datetimeCreated = datetime.now()
         j.createdBy = User.objects.get(pk=request.session.get('_auth_user_id'))

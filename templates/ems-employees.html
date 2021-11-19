@@ -161,6 +161,7 @@
                         <div class="row my-3 py-2">
                             <div class="col-12">
                                 <label for="" class="gray">Benefits Received Per Cut-off</label>
+                                <span> <a data-toggle="modal" data-target="#editBenefitsModal" href="#" @click="initEditBenefits()">Edit De Minimis Benefits</a></span>
                             </div>
                             <div class="col font-medium">
                                 <div class="row" v-for="benefits in modal.deminimisofuser">
@@ -185,6 +186,83 @@
                             </div>
                         </div>
 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT BENEFITS MODAL -->
+        <div class="modal fade" id="editBenefitsModal">
+            <div class="modal-dialog">
+                <div class="modal-content box-shadow-large b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit De Minimis Benefits</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">ID No.</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[editBenefits.idUser]]</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Employee</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[editBenefits.first_name]] [[editBenefits.last_name]]</span>
+                            </div>
+                            <div class="col-6 my-2">
+                                <label for="" class="gray">Position</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[editBenefits.position]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="">Benefit Name</label>
+                                    </div>
+                                </div>
+                                <div class="row" v-for="b in editBenefits.deminimisofuser">
+                                    <div class="col">
+                                        <input type="text" class="form-control" v-model="b.name">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="">Benefit Amount</label>
+                                    </div>
+                                </div>
+                                <div class="row" v-for="b in editBenefits.deminimisofuser">
+                                    <div class="col">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">₱</span>
+                                            </div>
+                                            <input type="text" class="form-control box-shadow-off" v-model="b.amount">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-2 mb-3">
+                            <div class="col">
+                                <button class="btn btn-warning" @click="addLineBenefits2()">+ Add More Benefits</button>
+                                <button class="btn btn-danger" @click="popLineBenefits2()">- Remove Benefit</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-primary col" @click="submitEditBenefits()">Save</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -649,6 +727,20 @@
                 uLeave: 0,
                 vLeave: 0,
                 silp: 0,
+            },
+            editBenefits: {
+                user: null,
+                position: null,
+                idUser: null,
+                rate: null,
+                first_name: null,
+                last_name: null,
+                deminimisofuser: [{
+                    id: null,
+                    name: null,
+                    amount: null,
+                }]
+                
             }
         },
 
@@ -660,12 +752,35 @@
                 })
             },
 
+            initEditBenefits(){
+                this.editBenefits.user = this.modal.id
+                this.editBenefits.position = this.modal.position
+                this.editBenefits.idUser = this.modal.idUser
+                this.editBenefits.rate = this.modal.rate
+                this.editBenefits.first_name = this.modal.first_name
+                this.editBenefits.last_name = this.modal.last_name
+                this.editBenefits.deminimisofuser = this.modal.deminimisofuser
+            },
+
             addLineBenefits(){
                 this.giveBenefits.benefits.push({
                     pk: '',
                     name: '',
                     amount: null,
                 })
+            },
+
+            addLineBenefits2(){
+                this.editBenefits.deminimisofuser.push({
+                    id: '',
+                    name: '',
+                    amount: null,
+                    user: null,
+                })
+            },
+
+            popLineBenefits2(){
+                this.editBenefits.deminimisofuser.pop()
             },
 
             initGivePromotion(){
@@ -705,6 +820,18 @@
 
             submitEditLeave(){
                 axios.post('/ems-save-edit-leave/', this.editLeave, this.config)
+                .then(res=>res.data==0?location.reload():"")
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            submitEditBenefits(){
+                axios.post('/ems-save-edit-benefits/', this.editBenefits, this.config)
                 .then(res=>res.data==0?location.reload():"")
                 .catch(err=>{
                     Swal.fire({

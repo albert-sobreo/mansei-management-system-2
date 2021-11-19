@@ -46,7 +46,7 @@
                     <select v-model="delivery.truck" class="form-control">
                         <option value="" selected disabled>Choose Truck</option>
                         {% for truck in truckAvailable %}
-                        <option value="{{truck.pk}}">{{truck.brand}} {{truck.model}}</option>
+                        <option value="{{truck.pk}}">{{truck.plate}} -- {{truck.brand}} {{truck.model}}</option>
                         {% endfor %}
                     </select>
                 </div>

@@ -223,12 +223,12 @@ class EMS_GeneratePayroll(APIView):
             untaxableBenefit = 0
             
             for benefitOfUser in user.deminimisofuser.all():
-                if benefitOfUser.amount > DeMinimis.objects.get(name=benefitOfUser.name).limit:
+                if benefitOfUser.amount > DeMinimis.objects.get(name__iexact=benefitOfUser.name).limit:
                     taxedBenefit = DeMinimisPay()
                     taxedBenefit.user = request.user
                     taxedBenefit.payroll = payroll
                     taxedBenefit.name = "Taxable " + benefitOfUser.name
-                    taxedBenefit.amount = benefitOfUser.amount - DeMinimis.objects.get(name=benefitOfUser.name).limit
+                    taxedBenefit.amount = benefitOfUser.amount - DeMinimis.objects.get(name__iexact=benefitOfUser.name).limit
                     taxedBenefit.taxable = True
                     taxedBenefit.save()
                     request.user.branch.deMinimisPay.add(taxedBenefit)
@@ -239,7 +239,7 @@ class EMS_GeneratePayroll(APIView):
                     benefitPay.user = request.user
                     benefitPay.payroll = payroll
                     benefitPay.name = benefitOfUser.name
-                    benefitPay.amount = DeMinimis.objects.get(name=benefitOfUser.name).limit
+                    benefitPay.amount = DeMinimis.objects.get(name__iexact=benefitOfUser.name).limit
                     benefitPay.taxable = False
                     benefitPay.save()
                     request.user.branch.deMinimisPay.add(benefitPay)
@@ -265,11 +265,49 @@ class EMS_GeneratePayroll(APIView):
             
             ##### TO CHECK IF PAYROLL IS FOR SECOND PERIOD #####
             dateObj = datetime.datetime.strptime(payroll.dateEnd, '%Y-%m-%d')
+            employeeLoan = 0
             if dateObj.day == 10:
-                pass
                 ##### LOAD DEDUCTIONS #####
+                firstPeriod = [
+                    1,2,3,4,5,6,7,8,9,10,26,27,28,29,30,31
+                ]
+                for loan in user.loans.all():
+                    if not loan.fullyPaid and loan.startOfAmortization <= datetime.date(int(dateEnd.split("-")[0]), int(dateEnd.split("-")[1]), int(dateEnd.split("-")[2])) and loan.startOfAmortization.day in firstPeriod:
+                        userLoan = LoanDeduction()
+                        userLoan.user = user
+                        userLoan.payroll = payroll
+                        userLoan.amount = loan.monthlyAmortization
+                        userLoan.loan = loan
+                        userLoan.loanFrom = loan.loanFrom
+                        loan.amountPaid += userLoan.amount
+                        if loan.amountPaid >= loan.totalWithInterest:
+                            loan.fullyPaid = True
+                        loan.save()
+                        userLoan.save()
+                        request.user.branch.loanDeduction.add(userLoan)
+                        employeeLoan += userLoan.amount
+                        
                 
             if dateObj.day == 25:
+                ##### LOAN DEDUCTION #####
+                secondPeriod = [
+                    11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
+                ]
+                for loan in user.loans.all():
+                    if not loan.fullyPaid and loan.startOfAmortization <= datetime.date(int(dateEnd.split("-")[0]), int(dateEnd.split("-")[1]), int(dateEnd.split("-")[2])) and loan.startOfAmortization in secondPeriod:
+                        userLoan = LoanDeduction()
+                        userLoan.user = user
+                        userLoan.payroll = payroll
+                        userLoan.amount = loan.monthlyAmortization
+                        userLoan.loan = loan
+                        userLoan.loanFrom = loan.loanFrom
+                        loan.amountPaid += userLoan.amount
+                        if loan.amountPaid >= loan.totalWithInterest:
+                            loan.fullyPaid = True
+                        loan.save()
+                        userLoan.save()
+                        request.user.branch.loanDeduction.add(userLoan)
+                        employeeLoan += userLoan.amount
 
                 ##### SSS #####
                 sss = SSSContributionRate.objects.all()
@@ -356,6 +394,7 @@ class EMS_GeneratePayroll(APIView):
                     payroll.netPayAfterTaxes = payroll.netPayBeforeTaxes - taxDeducted
 
             payroll.netPayAfterTaxes += untaxableBenefit
+            payroll.netPayAfterTaxes -= employeeLoan
                 
             payroll.save()
         return JsonResponse(0, safe=False)

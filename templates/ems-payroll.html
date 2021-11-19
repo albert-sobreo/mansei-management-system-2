@@ -293,14 +293,11 @@
 
                             <!-- LVL 2 -->
                             <div class="col-3 my-3">
-                                <label for="" class="gray">SSS Loans</label>
+                                <label for="" class="gray">Loans</label>
                                 <br>
-                                <span class="font-bold font-size-14">₱0.00</span>
-                            </div>
-                            <div class="col-3 my-3">
-                                <label for="" class="gray">HDMF Loans</label>
-                                <br>
-                                <span class="font-bold font-size-14">₱0.00</span>
+                                <div v-for="loan in modal.loandeduction">
+                                    <span class="font-bold gray">[[loan.loanFrom]]</span> &nbsp; <span class="font-bold">₱[[formatPrice(loan.amount)]]</span>
+                                </div>
                             </div>
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Late/Undertime Deductions</label>

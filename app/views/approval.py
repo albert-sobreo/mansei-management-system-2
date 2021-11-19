@@ -1295,19 +1295,6 @@ class DeliveriesApprovalAPI(APIView):
         deliveries = request.data
         d = Deliveries.objects.get(pk=pk)
 
-
-        d.datetimeApproved = datetime.now()
-
-        d.approvedBy = request.user
-        d.approved = True
-        d.truck.status = 'In-transit'
-        d.truck.driver = d.driver
-        d.driver.status = 'In-transit'
-        d.truck.currentDelivery = d.pk
-        d.truck.save()
-        d.driver.save()
-        d.save()
-
         
         for item in d.deliveryitemsgroup.all():
             if item.deliveryType == 'Sales Contract':
@@ -1324,7 +1311,7 @@ class DeliveriesApprovalAPI(APIView):
                             sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
                             return JsonResponse(0, safe=False)
                     else:
-                        if wi.salesWOSO(element.qty):
+                        if wi.salesWSO(element.qty):
                             wi.save2()
                         else:
                             sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
@@ -1333,6 +1320,18 @@ class DeliveriesApprovalAPI(APIView):
                     element.merchInventory.totalCost -= element.totalCost                
                     # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
                     element.merchInventory.save()
+        
+        d.datetimeApproved = datetime.now()
+
+        d.approvedBy = request.user
+        d.approved = True
+        d.truck.status = 'In-transit'
+        d.truck.driver = d.driver
+        d.driver.status = 'In-transit'
+        d.truck.currentDelivery = d.pk
+        d.truck.save()
+        d.driver.save()
+        d.save()
 
         j = Journal()
 

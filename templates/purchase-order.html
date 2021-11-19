@@ -178,7 +178,7 @@
                     <label>Purchase Request</label>
                     <select v-model="purchaseOrder.pr" @change="getPR(purchaseOrder.pr)" name="pr" class="form-control">
                         <option value="">None</option>
-                        {% for pr in prs %}
+                        {% for pr in prs reversed %}
                         <option value="{{pr.pk}}">{{pr.code}}</option>
                         {% endfor %}
                     </select>
@@ -188,7 +188,7 @@
             <div class="row mt-2 mb-4">
                 <div class="col col-4 pr-2">
                     <label>Vendor</label><button data-toggle="modal" data-target="#addVendorModal" title="Add Vendor" class="btn btn-warning btn-sm b-radius-5 ml-1 p-0 font-size-14" style="height: 18px; width: 18px">+</button>
-                    <select v-model="purchaseOrder.vendor" name="vendor" class="form-control">
+                    <select @change="checkCRTE(purchaseOrder.vendor)" v-model="purchaseOrder.vendor" name="vendor" class="form-control">
                         <option value="" selected disabled>Choose Vendor</option>
                         <option v-for="v in vendor" :value="v.id">[[v.name]]</option>
                     </select>
@@ -559,7 +559,7 @@
                     unitCtr: 0,
                 }],
                 atc: [{
-                    code: '47',
+                    code: '',
                     amount: 0,
                     taxRate: 0,
                     amountWithheld: 0,
@@ -661,6 +661,19 @@
         },
 
         methods:{
+            checkCRTE(customer){
+                axios.get(`/api/vendor/${customer}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    if (res.data.crte){
+                        this.purchaseOrder.taxType = 'VAT'
+                        this.purchaseOrder.taxRate = '0'
+                    } else {
+                        this.purchaseOrder.taxType = 'VAT'
+                        this.purchaseOrder.taxRate = '12'
+                    }
+                })
+            },
             cycleUnit(index){
                 len = this.units.length
                 this.purchaseOrder.items[index].unitCtr++
@@ -793,6 +806,17 @@
                             break
                         }
                     }
+                    for(var item of this.purchaseOrder.atc){
+                        if(
+                            item.code
+                        )
+                        {
+                            success1=true
+                        } else {
+                            success1=false
+                            break
+                        }
+                    }
                     if(success1){
                         this.submit()
                         return
@@ -825,6 +849,12 @@
                     }
                     if(!item.totalCost){
                         this.errors.push('Total Cost Required at index: ' + String(index+1))
+                    }
+                })
+
+                this.purchaseOrder.atc.forEach((item, index)=>{
+                    if(!item.code){
+                        this.errors.push('ATC Required')
                     }
                 })
 

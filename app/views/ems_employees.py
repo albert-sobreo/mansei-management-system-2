@@ -98,3 +98,22 @@ class EMS_GivePromotion(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class EMS_SaveEditBenefits(APIView):
+    def post(self, request):
+        data = request.data
+        user = User.objects.get(pk=data['user'])
+
+        for myBenefit in user.deminimisofuser.all():
+            myBenefit.delete()
+
+        for benefit in data['deminimisofuser']:
+            b = DeMinimisOfUser()
+            b.user = user
+            b.name = benefit['name']
+            b.amount = benefit['amount']
+            b.save()
+            request.user.branch.deMinimisOfUser.add(b)
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
