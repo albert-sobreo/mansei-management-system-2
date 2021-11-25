@@ -354,5 +354,6 @@ urlpatterns = [
     path('ems-deduction-sss-loans/', login_required(views.EMS_SSSLoanDeduction.as_view())),
     path('ems-loan-create/', login_required(views.EMS_LoanCreate.as_view())),
     path('ems-loans-hdmf/', login_required(views.EMS_HDMFLoansView.as_view())),
-    path('ems-save-edit-benefits/', login_required(views.EMS_SaveEditBenefits.as_view()))
+    path('ems-save-edit-benefits/', login_required(views.EMS_SaveEditBenefits.as_view())),
+    path('pps-planner/', login_required(views.PPS_ProjectPlannerView.as_view()))
 ]

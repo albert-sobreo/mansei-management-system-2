@@ -6,6 +6,7 @@ Vue.component('app-card', {
                 gasLogo: '/static/media/icons/GAS.svg',
                 impsLogo: '/static/media/icons/imps.svg',
                 emsLogo: '/static/media/icons/EMS.svg',
+                ppsLogo: '/static/media/icons/PPS.svg',
                 dashboardLogo: '/static/media/icons/Dashboard.svg',
             }
         }
@@ -23,6 +24,9 @@ Vue.component('app-card', {
         </div>
         <div onclick="location.href='/ems-my-dtr/'" class="flex flex-column app-card-links ems border align-items-center justify-content-center mt-3 py-3 px-4 b-radius-10">
             <img :src="this.const.emsLogo" alt="">
+        </div>
+        <div onclick="location.href='/pps-planner/'" class="flex flex-column app-card-links pps border align-items-center justify-content-center mt-3 py-3 px-4 b-radius-10">
+            <img :src="this.const.ppsLogo" alt="">
         </div>
     </div>
     `

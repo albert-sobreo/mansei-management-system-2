@@ -1,0 +1,207 @@
+{% extends "base-template.html" %}
+{% block title %}Project Planner{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-pps active="nav-planner" photo="/media/{{request.user.image}}"></navbar-pps>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- TITLE BODY -->
+    <div class="container">
+        <!-- TITLE -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Project Planner</span>
+        </div>
+    </div>
+    
+    <!-- MAIN BODY -->
+    <div class="container-fluid d-flex flex-row px-5">
+        <div id="pps-left-side d-flex flex-column">
+            <div class="mb-2">
+                <span class="font-bold font-size-18" style="color: rgba(0,0,0,0);">a</span>
+            </div>
+            <div class="py-2 px-3 w-250px pps-container-1 b-radius-15 box-shadow-medium border d-flex flex-column">
+                <div id="department" class="d-flex flex-column mb-3">
+                    <div id="dep-title-button" class="d-flex justify-content-between">
+                        <span class="font-bold font-size-14">Department</span>
+                        <button title="Add Department" class="btn btn-warning b-radius-circle p-0 d-flex align-items-center justify-content-center text-center" style="width: 24px;"><span class="font-size-14">+</span></button>
+                    </div>
+                    <div id="dept-select" class="row">
+                        <div class="col">
+                            <select name="" id="" class="form-control">
+                                <option value="" selected disabled>Select Department</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+    
+                <div id="project" class="d-flex flex-column">
+                    <div id="proj-title-button" class="d-flex justify-content-between">
+                        <span class="font-bold font-size-14">Projects</span>
+                        <button title="Add Projects" class="btn btn-warning b-radius-circle p-0 d-flex align-items-center justify-content-center text-center" style="width: 24px;"><span class="font-size-14">+</span></button>
+                    </div>
+                    <div id="proj-select" class="row mt-1">
+                        <div class="col">
+                            <div class="b-radius-5 box-shadow-medium" style="background-color:#F20D89; padding-top: 1px">
+                                <div class="b-radius-5 py-1 px-3" style="background-color: white;">
+                                    <span class="font-semibold">Production</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pps-right-side" class="ml-4 overflow-auto" style="max-width:100%">
+            <div class="mb-2 ml-3">
+                <span class="font-bold font-size-18">Admin</span>
+            </div>
+            <div id="stages-container" class="d-flex flex-nowrap ml-3">
+                <div class="">
+                    <div style="background-color: #0085FF; padding-top: 3px" class="mr-4 mb-4 w-250px pps-container-2 b-radius-15 b-radius-15 box-shadow-medium d-flex flex-column">
+                        <div class="py-2 px-3 b-radius-15 d-flex flex-column" style="background-color: white;">
+                            <div class="stage-top-container d-flex justify-content-between">
+                                <div class="stage-title d-flex align-items-center justify-content-center">
+                                    <div>
+                                        <span class="font-bold font-size-14">Ready</span>
+                                    </div>
+                                    &nbsp;
+                                    <div>
+                                        <span class="gray font-size-8"><i class="fas fa-pen"></i></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="stage-new-task" style="cursor: pointer;">
+                                    <span class="gray">+ New Task</span>
+                                </div>
+                            </div>
+
+                            <div class="task-container b-radius-10 box-shadow-small p-2 my-2">
+                                <div class="stage-mid-0-container d-flex">
+                                    <div>
+                                        <span class="gray">Jun. 20 - Jun. 21, 2021</span>
+                                    </div>
+                                </div>
+                                <div class="stage-mid-1-container d-flex justify-content-between">
+                                    <div class="task-title">
+                                        <span class="font-semibold">Research Topics</span>
+                                    </div>
+                                    <div class="task-edit">
+                                        <span class="gray font-size-8"><i class="fas fa-pen"></i></span>
+                                    </div>
+                                </div>
+    
+                                <div class="stage-mid-2-container d-flex">
+                                    <div class="task-note">
+                                        <span>aasdf asdf asdf asdf asdf asdfa sdfa sdfas dfasd fasd fasd fasdf asdf asdf </span>
+                                    </div>
+                                </div>
+    
+                                <div class="stage-mid-3-container d-flex flex-column mt-2">
+                                    <a href="#assigneeCollapse" data-toggle="collapse"><span class="gray font-semibold">Assignees <i class="fas fa-caret-right"></i></span></a>
+                                    <div class="collapse" id="assigneeCollapse">
+                                        <div class="assignee-container d-flex flex-column">
+                                            <div class="assignee mt-1 d-flex align-items-center">
+                                                <div class="assignee-profile-pic mr-2">
+                                                    <img src="/static/media/{{request.user.image}}" class="assignee-profile-pic b-radius-circle border" alt="">
+                                                </div>
+                                                <div class="assignee-name">
+                                                    <span class="font-semibold">Clark Kent</span>
+                                                </div>
+                                            </div>
+                                            <div class="assignee mt-1 d-flex align-items-center">
+                                                <div class="assignee-profile-pic mr-2">
+                                                    <img src="/static/media/{{request.user.image}}" class="assignee-profile-pic b-radius-circle border" alt="">
+                                                </div>
+                                                <div class="assignee-name">
+                                                    <span class="font-semibold">Clark Kent</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <div class="stage-mid-3-container d-flex flex-column mt-2">
+                                    <a href="#actionCollapse" data-toggle="collapse"><span class="gray font-semibold">Actions <i class="fas fa-caret-right"></i></span></a>
+                                </div>
+                            </div>
+
+                            <div class="task-container b-radius-10 box-shadow-small p-2 my-2">
+                                <div class="stage-mid-0-container d-flex">
+                                    <div>
+                                        <span class="gray">Jun. 20 - Jun. 21, 2021</span>
+                                    </div>
+                                </div>
+                                <div class="stage-mid-1-container d-flex justify-content-between">
+                                    <div class="task-title">
+                                        <span class="font-semibold">Research Topics</span>
+                                    </div>
+                                    <div class="task-edit">
+                                        <span class="gray font-size-8"><i class="fas fa-pen"></i></span>
+                                    </div>
+                                </div>
+    
+                                <div class="stage-mid-2-container d-flex">
+                                    <div class="task-note">
+                                        <span>aasdf asdf asdf asdf asdf asdfa sdfa sdfas dfasd fasd fasd fasdf asdf asdf </span>
+                                    </div>
+                                </div>
+    
+                                <div class="stage-mid-3-container d-flex flex-column mt-2">
+                                    <a href="#assigneeCollapse" data-toggle="collapse"><span class="gray font-semibold">Assignees <i class="fas fa-caret-right"></i></span></a>
+                                    <div class="collapse" id="assigneeCollapse">
+                                        <div class="assignee-container d-flex flex-column">
+                                            <div class="assignee mt-1 d-flex align-items-center">
+                                                <div class="assignee-profile-pic mr-2">
+                                                    <img src="/static/media/{{request.user.image}}" class="assignee-profile-pic b-radius-circle border" alt="">
+                                                </div>
+                                                <div class="assignee-name">
+                                                    <span class="font-semibold">Clark Kent</span>
+                                                </div>
+                                            </div>
+                                            <div class="assignee mt-1 d-flex align-items-center">
+                                                <div class="assignee-profile-pic mr-2">
+                                                    <img src="/static/media/{{request.user.image}}" class="assignee-profile-pic b-radius-circle border" alt="">
+                                                </div>
+                                                <div class="assignee-name">
+                                                    <span class="font-semibold">Clark Kent</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                <div class="stage-mid-3-container d-flex flex-column mt-2">
+                                    <a href="#actionCollapse" data-toggle="collapse"><span class="gray font-semibold">Actions <i class="fas fa-caret-right"></i></span></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="mr-4 mb-4 py-2 px-3 w-250px pps-container-1 b-radius-15 d-flex flex-column justify-content-center align-items-center add-new-stage">
+                        <span class="font-bold font-size-16">+ New Stage</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app"
+    })
+</script>
+
+{% endblock %}
