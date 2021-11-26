@@ -21,13 +21,64 @@
     <div class="container-fluid d-flex flex-row px-5">
         <div id="pps-left-side d-flex flex-column">
             <div class="mb-2">
-                <span class="font-bold font-size-18" style="color: rgba(0,0,0,0);">a</span>
+                <span class="font-bold font-size-18 noselect" style="color: rgba(0,0,0,0);">a</span>
             </div>
-            <div class="py-2 px-3 w-250px pps-container-1 b-radius-15 box-shadow-medium border d-flex flex-column">
+
+            <!-- DETAILS -->
+            <div style="background:linear-gradient(#F20D89, white); padding-top: 3px" class="w-250px pps-container-1 b-radius-15 box-shadow-medium d-flex flex-column">
+                <div class="py-2 px-3 b-radius-15" style="background-color: white">
+                    <div class="d-flex flex-row align-items-center mb-2">
+                        <span class="font-bold font-size-18 gray">Details</span>
+                    </div>
+
+                    <div class="d-flex flex-column mb-3">
+                        <div class="d-flex flex-row justify-content-between align-items-center">
+                            <span class="font-semibold gray">Department</span>
+
+                            <span data-toggle="modal" data-target="#editDepartmentModal" class="gray font-size-8 link" title="Edit Department"><i class="fas fa-pen"></i></span>
+                        </div>
+                        <div>
+                            <span class="font-bold font-size-14">Management</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column mb-3">
+                        <div class="d-flex flex-row justify-content-between align-items-center">
+                            <span class="font-semibold gray">Project</span>
+                            
+                            <span data-toggle="modal" data-target="#editProjectModal" class="gray font-size-8 link" title="Edit Project"><i class="fas fa-pen"></i></span>
+                        </div>
+                        <div>
+                            <span class="font-bold font-size-14">Admin</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column mb-3">
+                        <div>
+                            <span class="font-semibold gray">Project Period</span>
+                        </div>
+                        <div>
+                            <span class="font-bold font-size-14">Jun. 21 - Jun. 29, 2021</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column mb-3">
+                        <div>
+                            <span class="font-semibold gray">Project Leader</span>
+                        </div>
+                        <div>
+                            <span class="font-bold font-size-14">Clark Kent</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEPARTMENT PROJECT SELECT -->
+            <div class=" mt-3 py-2 px-3 w-250px pps-container-1 b-radius-15 box-shadow-medium border d-flex flex-column">
                 <div id="department" class="d-flex flex-column mb-3">
                     <div id="dep-title-button" class="d-flex justify-content-between">
-                        <span class="font-bold font-size-14">Department</span>
-                        <button title="Add Department" class="btn btn-warning b-radius-circle p-0 d-flex align-items-center justify-content-center text-center" style="width: 24px;"><span class="font-size-14">+</span></button>
+                        <span class="font-bold font-size-18">Department</span>
+                        <button data-toggle="modal" data-target="#addDepartmentModal" title="Add Department" class="btn btn-warning b-radius-circle p-0 d-flex align-items-center justify-content-center text-center" style="width: 24px;"><span class="font-size-14">+</span></button>
                     </div>
                     <div id="dept-select" class="row">
                         <div class="col">
@@ -40,12 +91,12 @@
     
                 <div id="project" class="d-flex flex-column">
                     <div id="proj-title-button" class="d-flex justify-content-between">
-                        <span class="font-bold font-size-14">Projects</span>
-                        <button title="Add Projects" class="btn btn-warning b-radius-circle p-0 d-flex align-items-center justify-content-center text-center" style="width: 24px;"><span class="font-size-14">+</span></button>
+                        <span class="font-bold font-size-18">Projects</span>
+                        <button data-toggle="modal" data-target="#addProjectModal" title="Add Projects" class="btn btn-warning b-radius-circle p-0 d-flex align-items-center justify-content-center text-center" style="width: 24px;"><span class="font-size-14">+</span></button>
                     </div>
                     <div id="proj-select" class="row mt-1">
-                        <div class="col">
-                            <div class="b-radius-5 box-shadow-medium" style="background-color:#F20D89; padding-top: 1px">
+                        <div class="col-12 mb-2">
+                            <div class="b-radius-5 box-shadow-medium project-button" style="background:linear-gradient(#F20D89, white); padding-top: 2px">
                                 <div class="b-radius-5 py-1 px-3" style="background-color: white;">
                                     <span class="font-semibold">Production</span>
                                 </div>
@@ -56,13 +107,13 @@
             </div>
         </div>
 
-        <div id="pps-right-side" class="ml-4 overflow-auto" style="max-width:100%">
+        <div id="pps-right-side" class="ml-5 overflow-auto" style="max-width:100%">
             <div class="mb-2 ml-3">
                 <span class="font-bold font-size-18">Admin</span>
             </div>
             <div id="stages-container" class="d-flex flex-nowrap ml-3">
                 <div class="">
-                    <div style="background-color: #0085FF; padding-top: 3px" class="mr-4 mb-4 w-250px pps-container-2 b-radius-15 b-radius-15 box-shadow-medium d-flex flex-column">
+                    <div style="background:linear-gradient(#0085FF, white); padding-top: 3px" class="mr-4 mb-4 w-250px pps-container-2 b-radius-15 b-radius-15 box-shadow-medium d-flex flex-column">
                         <div class="py-2 px-3 b-radius-15 d-flex flex-column" style="background-color: white;">
                             <div class="stage-top-container d-flex justify-content-between">
                                 <div class="stage-title d-flex align-items-center justify-content-center">
@@ -70,28 +121,28 @@
                                         <span class="font-bold font-size-14">Ready</span>
                                     </div>
                                     &nbsp;
-                                    <div>
-                                        <span class="gray font-size-8"><i class="fas fa-pen"></i></span>
+                                    <div data-toggle="modal" data-target="#editStageModal">
+                                        <span class="gray font-size-8 link"><i class="fas fa-pen"></i></span>
                                     </div>
                                 </div>
                                 
-                                <div class="stage-new-task" style="cursor: pointer;">
-                                    <span class="gray">+ New Task</span>
+                                <div data-toggle="modal" data-target="#addTaskModal" class="stage-new-task">
+                                    <span class="gray link">+ New Task</span>
                                 </div>
                             </div>
 
                             <div class="task-container b-radius-10 box-shadow-small p-2 my-2">
-                                <div class="stage-mid-0-container d-flex">
+                                <div class="stage-mid-0-container d-flex justify-content-between">
                                     <div>
                                         <span class="gray">Jun. 20 - Jun. 21, 2021</span>
                                     </div>
+                                    <div class="task-edit" data-toggle="modal" data-target="#editTaskModal">
+                                        <span class="gray font-size-8 link"><i class="fas fa-pen"></i></span>
+                                    </div>
                                 </div>
-                                <div class="stage-mid-1-container d-flex justify-content-between">
+                                <div class="stage-mid-1-container d-flex">
                                     <div class="task-title">
                                         <span class="font-semibold">Research Topics</span>
-                                    </div>
-                                    <div class="task-edit">
-                                        <span class="gray font-size-8"><i class="fas fa-pen"></i></span>
                                     </div>
                                 </div>
     
@@ -123,17 +174,17 @@
                             </div>
 
                             <div class="task-container b-radius-10 box-shadow-small p-2 my-2">
-                                <div class="stage-mid-0-container d-flex">
+                                <div class="stage-mid-0-container d-flex justify-content-between">
                                     <div>
                                         <span class="gray">Jun. 20 - Jun. 21, 2021</span>
                                     </div>
+                                    <div class="task-edit">
+                                        <span class="gray font-size-8 link"><i class="fas fa-pen"></i></span>
+                                    </div>
                                 </div>
-                                <div class="stage-mid-1-container d-flex justify-content-between">
+                                <div class="stage-mid-1-container d-flex">
                                     <div class="task-title">
                                         <span class="font-semibold">Research Topics</span>
-                                    </div>
-                                    <div class="task-edit">
-                                        <span class="gray font-size-8"><i class="fas fa-pen"></i></span>
                                     </div>
                                 </div>
     
@@ -168,8 +219,414 @@
                 </div>
 
                 <div>
-                    <div class="mr-4 mb-4 py-2 px-3 w-250px pps-container-1 b-radius-15 d-flex flex-column justify-content-center align-items-center add-new-stage">
+                    <div data-toggle="modal" data-target="#addStageModal" class="mr-4 mb-4 py-2 px-3 w-250px pps-container-1 b-radius-15 d-flex flex-column justify-content-center align-items-center add-new-stage">
                         <span class="font-bold font-size-16">+ New Stage</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD DEPARTMENT MODAL -->
+        <div class="modal fade" id="addDepartmentModal">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add Department</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Department Name">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <button class="btn btn-primary col">Add Department</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD PROJECT MODAL -->
+        <div class="modal fade" id="addProjectModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add Project</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Project Name">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col pr-1">
+                                <label for="">Date Start</label>
+                                <input type="date" class="form-control">
+                            </div>
+                            <div class="col pl-1">
+                                <label for="">Date End</label>
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Project Leader</label>
+                                <select name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Project Leader</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Department</label>
+                                <select name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Department</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Accent Color</label>
+                                <input type="color" class="form-control form-control-color" value="#aeaeae">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <button class="btn btn-primary col">Add Project</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD STAGE MODAL -->
+        <div class="modal fade" id="addStageModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add Stage</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Stage Name">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Accent Color</label>
+                                <input type="color" class="form-control form-control-color" value="#aeaeae">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <button class="btn btn-primary col">Add Stage</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD TASK MODAL -->
+        <div class="modal fade" id="addTaskModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add Task</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Task Name">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col-6 pr-1">
+                                <label for="">Datetime Start</label>
+                                <input type="datetime-local" class="form-control">
+                            </div>
+                            <div class="col-6 pl-1">
+                                <label for="">Datetime End</label>
+                                <input type="datetime-local" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Notes/Description</label>
+                                <textarea name="" id="" cols="30" rows="5" class="form-control" placeholder="Enter Notes or Description"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Assignees</label>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <select name="" id="" class="form-control">
+                                            <option value="" selected disabled>Clark Kent</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <select name="" id="" class="form-control">
+                                            <option value="" selected disabled>Clark Kent</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-1">
+                                    <div class="col">
+                                        <button class="btn btn-warning">+ Add</button>
+                                        <button class="btn btn-danger">- Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <button class="btn btn-primary col">Add Task</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT STAGE MODAL -->
+        <div class="modal fade" id="editStageModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Stage</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Stage Name">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Accent Color</label>
+                                <input type="color" class="form-control form-control-color" value="#aeaeae">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <button class="btn btn-primary col">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT TASK MODAL -->
+        <div class="modal fade" id="editTaskModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Task</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Task Name">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col-6 pr-1">
+                                <label for="">Datetime Start</label>
+                                <input type="datetime-local" class="form-control">
+                            </div>
+                            <div class="col-6 pl-1">
+                                <label for="">Datetime End</label>
+                                <input type="datetime-local" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Notes/Description</label>
+                                <textarea name="" id="" cols="30" rows="5" class="form-control" placeholder="Enter Notes or Description"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Assignees</label>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <select name="" id="" class="form-control">
+                                            <option value="" selected disabled>Clark Kent</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <select name="" id="" class="form-control">
+                                            <option value="" selected disabled>Clark Kent</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-1">
+                                    <div class="col">
+                                        <button class="btn btn-warning">+ Add</button>
+                                        <button class="btn btn-danger">- Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <button class="btn btn-primary col">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT DEPARTMENT MODAL -->
+        <div class="modal fade" id="editDepartmentModal">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Department</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Department Name">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <button class="btn btn-primary col">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT PROJECT MODAL -->
+        <div class="modal fade" id="editProjectModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Project</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Project Name">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col pr-1">
+                                <label for="">Date Start</label>
+                                <input type="date" class="form-control">
+                            </div>
+                            <div class="col pl-1">
+                                <label for="">Date End</label>
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Project Leader</label>
+                                <select name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Project Leader</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Department</label>
+                                <select name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Department</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Accent Color</label>
+                                <input type="color" class="form-control form-control-color" value="#aeaeae">
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <button class="btn btn-primary col">Save Changes</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -184,7 +641,118 @@
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
-        el: "#app"
+        el: "#app",
+
+        data: {
+            config: {
+                headers:{
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+
+            departmentSelect: [{
+
+            }],
+
+            projectSelect: [{
+
+            }],
+
+            projectPlan: {
+                name: null,
+                dateStart: null,
+                dateEnd: null,
+                dateCreated: null,
+                dateCompleted: null,
+                projectLeader: null,
+                department: null,
+                accentColor: null,
+                projectstage: [{
+                    name: null,
+                    accentColor: null,
+                    accentColor: [{
+                        name: null,
+                        datetimeStart: null,
+                        datetimeEnd: null,
+                        notes: null,
+                        projectStage: [{
+                            user: {
+                                first_name: null,
+                                last_name: null,
+                            }
+                        }]
+                    }]
+                }]
+            },
+
+            addDepartment: {
+                name: null,
+            },
+
+            addProject: {
+                name: null,
+                dateStart: null,
+                dateEnd: null,
+                projectLeader: null, //ID
+                department: null, //ID
+                accentColor: null,
+            },
+
+            addStage: {
+                name: null,
+                accentColor: null,
+            },
+
+            addTask: {
+                name: null,
+                datetimeStart: null,
+                datetimeEnd: null,
+                notes: null,
+                assignees: [{
+                    id: null,
+                    first_name: null,
+                    last_name: null,
+                }]
+            },
+
+            editStage: {
+                name: null,
+                accentColor: null,
+            },
+
+            editTask: {
+                name: null,
+                datetimeStart: null,
+                datetimeEnd: null,
+                notes: null,
+                assignees: [{
+                    id: null,
+                    first_name: null,
+                    last_name: null,
+                }]
+            },
+
+            editDepartment: {
+                name: null,
+            },
+
+            editProject: {
+                name: null,
+                dateStart: null,
+                dateEnd: null,
+                projectLeader: null, //ID
+                department: null, //ID
+                accentColor: null,
+            }
+        },
+
+        methods: {
+
+        },
+
+        mounted(){
+
+        }
     })
 </script>
 

@@ -1548,6 +1548,50 @@ class MonthlyExpense(models.Model):
     def __str__(self):
         return str(self.date)
 
+class ProjectDepartment(models.Model):
+    name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
+
+class ProjectPlan(models.Model):
+    name = models.CharField(max_length=255)
+    dateStart = models.DateField(null=True, blank=True)
+    dateEnd = models.DateField(null=True, blank=True)
+    dateCreated = models.DateField(null=True, blank=True)
+    dateCompleted = models.DateField(null=True, blank=True)
+    projectLeader = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='projectplan')
+    department = models.ForeignKey(ProjectDepartment, on_delete=models.CASCADE, null=True, blank=True, related_name="projectplan")
+    accentColor = models.CharField(max_length=12, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class ProjectStage(models.Model):
+    name = models.CharField(max_length=255)
+    accentColor = models.CharField(max_length=12, null=True, blank=True)
+    projectPlan = models.ForeignKey(ProjectPlan, on_delete=models.CASCADE, null=True, blank=True, related_name="projectstage")
+
+    def __str__(self):
+        return self.name
+
+class ProjectTask(models.Model):
+    name = models.CharField(max_length=255)
+    datetimeStart = models.DateTimeField(null=True, blank=True)
+    datetimeEnd = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+    projectStage = models.ForeignKey(ProjectStage, null=True, blank=True, on_delete=models.CASCADE, related_name="projecttask")
+
+    def __str__(self):
+        return self.add_to_class
+
+class ProjectAssignee(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="projectassignee")
+    projectTask = models.ForeignKey(ProjectTask, on_delete=models.CASCADE, null=True, blank=True, related_name="projectassignee")
+
+    def __str__(self):
+        return self.projectTask.name + " --- " + self.user.first_name + " " + self.user.last_name
+
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
     rm = models.ForeignKey(AccountChild, related_name="branchdefaultrm", on_delete=models.CASCADE, null=True, blank=True)
@@ -1717,6 +1761,12 @@ class Branch(models.Model):
     #### MONTHLY EXPENSE ####
     monthlyExpense = models.ManyToManyField(MonthlyExpense, blank=True)
 
+    #### PROJECT PLANNER ####
+    projectDepartment = models.ManyToManyField(ProjectDepartment, blank=True)
+    projectPlan = models.ManyToManyField(ProjectPlan, blank=True)
+    projectStage = models.ManyToManyField(ProjectStage, blank=True)
+    projectTask = models.ManyToManyField(ProjectTask, blank=True)
+    projectAssignee = models.ManyToManyField(ProjectAssignee, blank=True)
 
     def __str__(self):
         return self.name

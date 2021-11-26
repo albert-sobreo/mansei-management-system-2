@@ -1236,3 +1236,27 @@ select.form-control{
     transition: cubic-bezier(.45,.3,.32,.99) .15s;
     color: #D9177F !important;
 }
+
+.pointer{
+    cursor: pointer;
+}
+
+.form-control-color{
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.form-control-color::-webkit-color-swatch{
+    border: none;
+    border-radius: 3px;
+}
+
+.project-button{
+    cursor: pointer;
+    transition: .1s;
+}
+
+.project-button:hover{
+    color: var(--pps-magenta-text);
+    transition: .1s;
+}
