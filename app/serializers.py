@@ -39,7 +39,8 @@ class UserNameOnlySZ(serializers.ModelSerializer):
             'idUser',
             'id',
             'position',
-            'sss'
+            'sss',
+            'image'
         ]
 
 class UserNameIDRateSZZ(serializers.ModelSerializer):
@@ -1070,4 +1071,63 @@ class DeMinimisSZ(MS):
 class HolidaySZ(MS):
     class Meta:
         model = Holiday
+        fields = "__all__"
+
+
+
+
+
+
+
+########## PROJECT PLANNING ##########
+class ProjectAssigneeSZ(MS):
+    user = UserNameOnlySZ(read_only=True)
+    class Meta:
+        model = ProjectAssignee
+        fields = "__all__"
+
+class ProjectTaskSZ(MS):
+    class Meta:
+        model = ProjectTask
+        fields = "__all__"
+
+class ProjectTaskNestedSZ(MS):
+    projectassignee = ProjectAssigneeSZ(many=True, read_only=True)
+    class Meta:
+        model = ProjectTask
+        fields = "__all__"
+
+class ProjectStageSZ(MS):
+    class Meta:
+        model = ProjectStage
+        fields = "__all__"
+
+class ProjectStageNestedSZ(MS):
+    projecttask = ProjectTaskNestedSZ(many=True, read_only=True)
+    class Meta:
+        model = ProjectStage
+        fields = "__all__"
+
+class ProjectPlanSZ(MS):
+    class Meta:
+        model = ProjectPlan
+        fields = "__all__"
+        
+class ProjectPlanNestedSZ(MS):
+    projectstage = ProjectStageNestedSZ(many=True, read_only=True)
+    projectLeader = UserNameOnlySZ(read_only=True)
+    class Meta:
+        model = ProjectPlan
+        fields = "__all__"
+
+class ProjectDepartmentSZ(MS):
+    projectplan = ProjectPlanSZ(many=True, read_only=True)
+    class Meta:
+        model = ProjectDepartment
+        fields = "__all__"
+
+class ProjectDepartmentNestedSZ(MS):
+    projectplan = ProjectPlanNestedSZ(many=True, read_only=True)
+    class Meta:
+        model = ProjectDepartment
         fields = "__all__"

@@ -8,6 +8,8 @@ from rest_framework.views import APIView
 from ..models import *
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.fields import CurrentUserDefault
+from rest_framework.response import Response
+from rest_framework.decorators import action
 
 ########## CHART OF ACCOUNTS ##########
 class AccountGroupAPI(viewsets.ModelViewSet):
@@ -452,3 +454,65 @@ class HolidayAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = HolidaySZ
     queryset = Holiday.objects.all()
+
+
+
+
+
+########## PROJECT PLANNING ##########
+class ProjectAssigneeAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectAssigneeSZ
+    queryset = ProjectAssignee.objects.all()
+
+class ProjectTaskAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectTaskSZ
+    queryset = ProjectTask.objects.all()
+
+class ProjectTaskNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectTaskNestedSZ
+    queryset = ProjectTask.objects.all()
+
+class ProjectStageAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectStageSZ
+    queryset = ProjectStage.objects.all()
+
+class ProjectStageNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectStageNestedSZ
+    queryset = ProjectStage.objects.all()
+
+class ProjectPlanAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectPlanSZ
+    queryset = ProjectPlan.objects.all()
+
+class ProjectPlanNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectPlanNestedSZ
+    queryset = ProjectPlan.objects.all()
+
+class ProjectDepartmentAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectDepartmentSZ
+    queryset = ProjectDepartment.objects.all()
+
+    @action(detail=False, methods=['get'])
+    def filterByBranch(self, request):
+        queryset = ProjectDepartment.objects.filter(branch=request.user.branch)
+        serializer = ProjectDepartmentSZ(queryset, many=True)
+        return Response(serializer.data)
+
+class ProjectDepartmentNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProjectDepartmentNestedSZ
+    queryset = ProjectDepartment.objects.all()
+
+    @action(detail=False, methods=['get'])
+    def filterByBranch(self, request):
+        queryset = ProjectDepartment.objects.filter(branch=request.user.branch)
+        serializer = ProjectDepartmentNestedSZ(queryset, many=True)
+        return Response(serializer.data)

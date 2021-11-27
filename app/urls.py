@@ -127,6 +127,17 @@ router.register(r'user-w-dtr', views.UserWithDTRAPI, 'user-w-dtr')
 ########## HOLIDAY ##########
 router.register(r"holiday", views.HolidayAPI, 'holiday')
 
+########## PROJECT PLANNING ##########
+router.register(r"project-assignee", views.ProjectAssigneeAPI, "project-assignee")
+router.register(r"project-task", views.ProjectTaskAPI, "project-task")
+router.register(r"project-task-nested", views.ProjectTaskNestedAPI, "project-task-nested")
+router.register(r"project-stage", views.ProjectStageAPI, "project-stage")
+router.register(r"project-stage-nested", views.ProjectStageNestedAPI, "project-stage-nested")
+router.register(r"project-plan", views.ProjectPlanAPI, "project-plan")
+router.register(r"project-plan-nested", views.ProjectPlanNestedAPI, "project-plan-nested")
+router.register(r"project-department", views.ProjectDepartmentAPI, "project-department")
+router.register(r"project-department-nested", views.ProjectDepartmentNestedAPI, "project-department-nested")
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),

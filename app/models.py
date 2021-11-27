@@ -1583,7 +1583,7 @@ class ProjectTask(models.Model):
     projectStage = models.ForeignKey(ProjectStage, null=True, blank=True, on_delete=models.CASCADE, related_name="projecttask")
 
     def __str__(self):
-        return self.add_to_class
+        return self.name
 
 class ProjectAssignee(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="projectassignee")

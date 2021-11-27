@@ -21,10 +21,10 @@
     <div class="container-fluid d-flex flex-row px-5">
         <div id="pps-left-side d-flex flex-column">
             <!-- DETAILS -->
-            <div style="background:linear-gradient(#F20D89, white); padding-top: 3px" class="w-250px pps-container-1 b-radius-15 box-shadow-medium d-flex flex-column">
+            <div :style="`background:linear-gradient(` + projectPlan.accentColor + `, white); padding-top: 3px`" class="w-250px pps-container-1 b-radius-15 box-shadow-medium d-flex flex-column">
                 <div class="py-2 px-3 b-radius-15" style="background-color: white">
                     <div class="d-flex flex-row align-items-center mb-2">
-                        <span class="font-bold font-size-18 gray">Details</span>
+                        <span class="font-bold font-size-18">Details</span>
                     </div>
 
                     <div class="d-flex flex-column mb-3">
@@ -34,7 +34,7 @@
                             <span data-toggle="modal" data-target="#editDepartmentModal" class="gray font-size-8 link" title="Edit Department"><i class="fas fa-pen"></i></span>
                         </div>
                         <div>
-                            <span class="font-bold font-size-14">Management</span>
+                            <span class="font-bold font-size-14">[[getSelectedDepartment(projectPlan.department)]]</span>
                         </div>
                     </div>
 
@@ -45,7 +45,7 @@
                             <span data-toggle="modal" data-target="#editProjectModal" class="gray font-size-8 link" title="Edit Project"><i class="fas fa-pen"></i></span>
                         </div>
                         <div>
-                            <span class="font-bold font-size-14">Admin</span>
+                            <span class="font-bold font-size-14">[[projectPlan.name]]</span>
                         </div>
                     </div>
 
@@ -54,7 +54,7 @@
                             <span class="font-semibold gray">Project Period</span>
                         </div>
                         <div>
-                            <span class="font-bold font-size-14">Jun. 21 - Jun. 29, 2021</span>
+                            <span class="font-bold font-size-14" v-if="projectPlan.name">[[formatDate2(projectPlan.dateStart)]] - [[formatDate1(projectPlan.dateEnd)]]</span>
                         </div>
                     </div>
 
@@ -63,7 +63,7 @@
                             <span class="font-semibold gray">Project Leader</span>
                         </div>
                         <div>
-                            <span class="font-bold font-size-14">Clark Kent</span>
+                            <span class="font-bold font-size-14">[[projectPlan.projectLeader.first_name]] [[projectPlan.projectLeader.last_name]]</span>
                         </div>
                     </div>
                 </div>
@@ -78,8 +78,9 @@
                     </div>
                     <div id="dept-select" class="row">
                         <div class="col">
-                            <select name="" id="" class="form-control">
+                            <select @change="fetchProjectSelect()" v-model="selectedDepartment" name="" id="" class="form-control">
                                 <option value="" selected disabled>Select Department</option>
+                                <option v-for="d in departmentSelect" :value="d.id">[[d.name]]</option>
                             </select>
                         </div>
                     </div>
@@ -91,10 +92,10 @@
                         <button data-toggle="modal" data-target="#addProjectModal" title="Add Projects" class="btn btn-warning b-radius-circle p-0 d-flex align-items-center justify-content-center text-center" style="width: 24px;"><span class="font-size-14">+</span></button>
                     </div>
                     <div id="proj-select" class="row mt-1">
-                        <div class="col-12 mb-2">
-                            <div class="b-radius-5 box-shadow-medium project-button" style="background:linear-gradient(#F20D89, white); padding-top: 2px">
+                        <div v-if="projectSelect" class="col-12 mb-2" v-for="p in projectSelect" :onmouseover="'this.style.color=`' + p.accentColor + '`'" onmouseleave="this.style.color=`#000000`" @click="fetchProjectPlan(p.id)">
+                            <div class="b-radius-5 box-shadow-medium project-button" :style="'background:linear-gradient(' + p.accentColor + ', white); padding-top: 2px'">
                                 <div class="b-radius-5 py-1 px-3" style="background-color: white;">
-                                    <span class="font-semibold">Production</span>
+                                    <span class="font-semibold">[[p.name]]</span>
                                 </div>
                             </div>
                         </div>
@@ -105,13 +106,13 @@
 
         <div id="pps-right-side" class="ml-5 overflow-auto" style="max-width:100%">
             <div id="stages-container" class="d-flex flex-nowrap ml-3">
-                <div class="">
-                    <div style="background:linear-gradient(#0085FF, white); padding-top: 3px" class="mr-4 mb-4 w-250px pps-container-2 b-radius-15 b-radius-15 box-shadow-medium d-flex flex-column">
+                <div class=""  v-for="stage in projectPlan.projectstage" v-if="projectPlan.name">
+                    <div :style="`background:linear-gradient(` + stage.accentColor + `, white); padding-top: 3px`" class="mr-4 mb-4 w-250px pps-container-2 b-radius-15 b-radius-15 box-shadow-medium d-flex flex-column">
                         <div class="py-2 px-3 b-radius-15 d-flex flex-column" style="background-color: white;">
                             <div class="stage-top-container d-flex justify-content-between">
                                 <div class="stage-title d-flex align-items-center justify-content-center">
                                     <div>
-                                        <span class="font-bold font-size-14">Ready</span>
+                                        <span class="font-bold font-size-14">[[stage.name]]</span>
                                     </div>
                                     &nbsp;
                                     <div data-toggle="modal" data-target="#editStageModal">
@@ -124,10 +125,10 @@
                                 </div>
                             </div>
 
-                            <div class="task-container b-radius-10 box-shadow-small p-2 my-2">
+                            <div class="task-container b-radius-10 box-shadow-small p-2 my-2" v-for="task in stage.projecttask">
                                 <div class="stage-mid-0-container d-flex justify-content-between">
                                     <div>
-                                        <span class="gray">Jun. 20 - Jun. 21, 2021</span>
+                                        <span class="gray font-size-12" :title="`Period: ` + formatDateTime2(task.datetimeStart) + ' to ' + formatDateTime2(task.datetimeEnd)"><i class="far fa-calendar-alt"></i></span>
                                     </div>
                                     <div class="task-edit" data-toggle="modal" data-target="#editTaskModal">
                                         <span class="gray font-size-8 link"><i class="fas fa-pen"></i></span>
@@ -135,68 +136,26 @@
                                 </div>
                                 <div class="stage-mid-1-container d-flex">
                                     <div class="task-title">
-                                        <span class="font-semibold">Research Topics</span>
+                                        <span class="font-semibold">[[task.name]]</span>
                                     </div>
                                 </div>
     
                                 <div class="stage-mid-2-container d-flex">
                                     <div class="task-note">
-                                        <span>Sample Text </span>
+                                        <span>[[task.notes]]</span>
                                     </div>
                                 </div>
     
                                 <div class="stage-mid-3-container d-flex flex-column mt-2">
-                                    <a href="#assigneeCollapse" data-toggle="collapse"><span class="gray font-semibold">Assignees <i class="fas fa-caret-right"></i></span></a>
-                                    <div class="collapse" id="assigneeCollapse">
+                                    <a :href="`#assigneeCollapse` + task.id" data-toggle="collapse"><span class="gray font-semibold">Assignees <i class="fas fa-caret-right"></i></span></a>
+                                    <div class="collapse" :id="`assigneeCollapse` + task.id">
                                         <div class="assignee-container d-flex flex-column">
-                                            <div class="assignee mt-1 d-flex align-items-center">
+                                            <div class="assignee mt-1 d-flex align-items-center" v-for="assignee in task.projectassignee">
                                                 <div class="assignee-profile-pic mr-2">
-                                                    <img src="/static/media/{{request.user.image}}" class="assignee-profile-pic b-radius-circle border" alt="">
+                                                    <img :src="assignee.user.image" class="assignee-profile-pic b-radius-circle border" alt="">
                                                 </div>
                                                 <div class="assignee-name">
-                                                    <span class="font-semibold">Clark Kent</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-    
-                                <div class="stage-mid-3-container d-flex flex-column mt-2">
-                                    <a href="#actionCollapse" data-toggle="collapse"><span class="gray font-semibold">Actions <i class="fas fa-caret-right"></i></span></a>
-                                </div>
-                            </div>
-
-                            <div class="task-container b-radius-10 box-shadow-small p-2 my-2">
-                                <div class="stage-mid-0-container d-flex justify-content-between">
-                                    <div>
-                                        <span class="gray">Jun. 20 - Jun. 21, 2021</span>
-                                    </div>
-                                    <div class="task-edit">
-                                        <span class="gray font-size-8 link"><i class="fas fa-pen"></i></span>
-                                    </div>
-                                </div>
-                                <div class="stage-mid-1-container d-flex">
-                                    <div class="task-title">
-                                        <span class="font-semibold">Research Topics</span>
-                                    </div>
-                                </div>
-    
-                                <div class="stage-mid-2-container d-flex">
-                                    <div class="task-note">
-                                        <span>Sample Text </span>
-                                    </div>
-                                </div>
-    
-                                <div class="stage-mid-3-container d-flex flex-column mt-2">
-                                    <a href="#assigneeCollapse" data-toggle="collapse"><span class="gray font-semibold">Assignees <i class="fas fa-caret-right"></i></span></a>
-                                    <div class="collapse" id="assigneeCollapse">
-                                        <div class="assignee-container d-flex flex-column">
-                                            <div class="assignee mt-1 d-flex align-items-center">
-                                                <div class="assignee-profile-pic mr-2">
-                                                    <img src="/static/media/{{request.user.image}}" class="assignee-profile-pic b-radius-circle border" alt="">
-                                                </div>
-                                                <div class="assignee-name">
-                                                    <span class="font-semibold">Clark Kent</span>
+                                                    <span class="font-semibold">[[assignee.user.first_name]] [[assignee.user.last_name]]</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -448,9 +407,12 @@
                             </div>
                         </div>
 
-                        <div class="row my-2">
-                            <div class="col">
+                        <div class="row mt-2">
+                            <div class="col pr-1">
                                 <button class="btn btn-primary col">Save Changes</button>
+                            </div>
+                            <div class="col pl-1">
+                                <button class="btn btn-danger col">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -521,9 +483,12 @@
                             </div>
                         </div>
 
-                        <div class="row my-2">
-                            <div class="col">
+                        <div class="row mt-2">
+                            <div class="col pr-1">
                                 <button class="btn btn-primary col">Save Changes</button>
+                            </div>
+                            <div class="col pl-1">
+                                <button class="btn btn-danger col">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -550,9 +515,12 @@
                             </div>
                         </div>
 
-                        <div class="row my-2">
-                            <div class="col">
+                        <div class="row mt-2">
+                            <div class="col pr-1">
                                 <button class="btn btn-primary col">Save Changes</button>
+                            </div>
+                            <div class="col pl-1">
+                                <button class="btn btn-danger col">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -615,9 +583,12 @@
                             </div>
                         </div>
 
-                        <div class="row my-2">
-                            <div class="col">
+                        <div class="row mt-2">
+                            <div class="col pr-1">
                                 <button class="btn btn-primary col">Save Changes</button>
+                            </div>
+                            <div class="col pl-1">
+                                <button class="btn btn-danger col">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -625,6 +596,8 @@
             </div>
         </div>
     </div>
+
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -647,9 +620,11 @@
 
             }],
 
-            projectSelect: [{
+            selectedDepartment: '',
 
-            }],
+            projectSelect: null,
+
+            selectedProject: '',
 
             projectPlan: {
                 name: null,
@@ -657,18 +632,21 @@
                 dateEnd: null,
                 dateCreated: null,
                 dateCompleted: null,
-                projectLeader: null,
+                projectLeader: {
+                    first_name: null,
+                    last_name: null,
+                },
                 department: null,
                 accentColor: null,
                 projectstage: [{
                     name: null,
                     accentColor: null,
-                    accentColor: [{
+                    projecttask: [{
                         name: null,
                         datetimeStart: null,
                         datetimeEnd: null,
                         notes: null,
-                        projectStage: [{
+                        projectassignee: [{
                             user: {
                                 first_name: null,
                                 last_name: null,
@@ -740,11 +718,187 @@
         },
 
         methods: {
+            getSelectedDepartment(id){
+                if(this.projectPlan.name){
+                    return this.departmentSelect.find((i)=>{
+                        return i.id == id
+                    }).name
+                }
+            },
 
+            fetchProjectSelect(){
+                this.projectSelect = this.departmentSelect.find((i)=>{
+                    return i.id == this.selectedDepartment
+                }).projectplan
+
+                this.projectPlan = {
+                    name: null,
+                    dateStart: null,
+                    dateEnd: null,
+                    dateCreated: null,
+                    dateCompleted: null,
+                    projectLeader: {
+                        first_name: null,
+                        last_name: null,
+                    },
+                    department: null,
+                    accentColor: null,
+                    projectstage: [{
+                        name: null,
+                        accentColor: null,
+                        projecttask: [{
+                            name: null,
+                            datetimeStart: null,
+                            datetimeEnd: null,
+                            notes: null,
+                            projectassignee: [{
+                                user: {
+                                    first_name: null,
+                                    last_name: null,
+                                }
+                            }]
+                        }]
+                    }]
+                }
+            },
+
+            fetchProjectPlan(id){
+                axios.get(`/api/project-plan-nested/${id}/`)
+                .then(res=>this.projectPlan = res.data)
+            },
+
+            formatDateTime1(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+
+            formatDateTime2(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+
+            formatDate2(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                formatted = `${month}. ${date}`
+
+                return formatted
+            },
+
+            formatDate1(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
         },
 
         mounted(){
-
+            axios.get("/api/project-department/filterByBranch/")
+            .then(res=>this.departmentSelect = res.data)
         }
     })
 </script>

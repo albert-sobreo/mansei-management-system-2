@@ -1256,7 +1256,3 @@ select.form-control{
     transition: .1s;
 }
 
-.project-button:hover{
-    color: var(--pps-magenta-text);
-    transition: .1s;
-}
