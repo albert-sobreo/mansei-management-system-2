@@ -21,7 +21,7 @@
     <div class="container-fluid d-flex flex-row px-5">
         <div id="pps-left-side d-flex flex-column">
             <!-- DETAILS -->
-            <div :style="`background:linear-gradient(` + projectPlan.accentColor + `, white); padding-top: 3px`" class="w-250px pps-container-1 b-radius-15 box-shadow-medium d-flex flex-column">
+            <div v-if="projectPlan.id" :style="`background:linear-gradient(` + projectPlan.accentColor + `, white); padding-top: 3px`" class="w-250px pps-container-1 b-radius-15 box-shadow-medium d-flex flex-column">
                 <div class="py-2 px-3 b-radius-15" style="background-color: white">
                     <div class="d-flex flex-row align-items-center mb-2">
                         <span class="font-bold font-size-18">Details</span>
@@ -31,7 +31,7 @@
                         <div class="d-flex flex-row justify-content-between align-items-center">
                             <span class="font-semibold gray">Department</span>
 
-                            <span data-toggle="modal" data-target="#editDepartmentModal" class="gray font-size-8 link" title="Edit Department"><i class="fas fa-pen"></i></span>
+                            <span @click="initEditDepartment(projectPlan.department)" data-toggle="modal" data-target="#editDepartmentModal" class="gray font-size-8 link" title="Edit Department"><i class="fas fa-pen"></i></span>
                         </div>
                         <div>
                             <span class="font-bold font-size-14">[[getSelectedDepartment(projectPlan.department)]]</span>
@@ -42,7 +42,7 @@
                         <div class="d-flex flex-row justify-content-between align-items-center">
                             <span class="font-semibold gray">Project</span>
                             
-                            <span data-toggle="modal" data-target="#editProjectModal" class="gray font-size-8 link" title="Edit Project"><i class="fas fa-pen"></i></span>
+                            <span @click="initEditProject()" data-toggle="modal" data-target="#editProjectModal" class="gray font-size-8 link" title="Edit Project"><i class="fas fa-pen"></i></span>
                         </div>
                         <div>
                             <span class="font-bold font-size-14">[[projectPlan.name]]</span>
@@ -115,12 +115,12 @@
                                         <span class="font-bold font-size-14">[[stage.name]]</span>
                                     </div>
                                     &nbsp;
-                                    <div data-toggle="modal" data-target="#editStageModal">
+                                    <div @click="initEditStage(stage.id)" data-toggle="modal" data-target="#editStageModal">
                                         <span class="gray font-size-8 link"><i class="fas fa-pen"></i></span>
                                     </div>
                                 </div>
                                 
-                                <div data-toggle="modal" data-target="#addTaskModal" class="stage-new-task">
+                                <div @click="initAddTask(stage.id)" data-toggle="modal" data-target="#addTaskModal" class="stage-new-task">
                                     <span class="gray link">+ New Task</span>
                                 </div>
                             </div>
@@ -130,7 +130,7 @@
                                     <div>
                                         <span class="gray font-size-12" :title="`Period: ` + formatDateTime2(task.datetimeStart) + ' to ' + formatDateTime2(task.datetimeEnd)"><i class="far fa-calendar-alt"></i></span>
                                     </div>
-                                    <div class="task-edit" data-toggle="modal" data-target="#editTaskModal">
+                                    <div @click="initEditTask(stage.id, task.id)" class="task-edit" data-toggle="modal" data-target="#editTaskModal">
                                         <span class="gray font-size-8 link"><i class="fas fa-pen"></i></span>
                                     </div>
                                 </div>
@@ -170,8 +170,8 @@
                     </div>
                 </div>
 
-                <div>
-                    <div data-toggle="modal" data-target="#addStageModal" class="mr-4 mb-4 py-2 px-3 w-250px pps-container-1 b-radius-15 d-flex flex-column justify-content-center align-items-center add-new-stage">
+                <div v-if="projectPlan.id">
+                    <div @click="initAddStage()" data-toggle="modal" data-target="#addStageModal" class="mr-4 mb-4 py-2 px-3 w-250px pps-container-1 b-radius-15 d-flex flex-column justify-content-center align-items-center add-new-stage">
                         <span class="font-bold font-size-16">+ New Stage</span>
                     </div>
                 </div>
@@ -193,13 +193,13 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Department Name">
+                                <input v-model="addDepartment.name" type="text" class="form-control" placeholder="Enter Department Name">
                             </div>
                         </div>
 
-                        <div class="row my-2">
+                        <div class="row mt-4">
                             <div class="col">
-                                <button class="btn btn-primary col">Add Department</button>
+                                <button @click="submitAddDepartment()" class="btn btn-primary col">Add Department</button>
                             </div>
                         </div>
                     </div>
@@ -222,26 +222,27 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Project Name">
+                                <input v-model="addProject.name" type="text" class="form-control" placeholder="Enter Project Name">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col pr-1">
                                 <label for="">Date Start</label>
-                                <input type="date" class="form-control">
+                                <input v-model="addProject.dateStart" type="date" class="form-control">
                             </div>
                             <div class="col pl-1">
                                 <label for="">Date End</label>
-                                <input type="date" class="form-control">
+                                <input v-model="addProject.dateEnd" type="date" class="form-control">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Project Leader</label>
-                                <select name="" id="" class="form-control">
+                                <select v-model="addProject.projectLeader" name="" id="" class="form-control">
                                     <option value="" selected disabled>Select Project Leader</option>
+                                    <option v-for="a in assigneeSelect" :value="a.id">[[a.first_name]] [[a.last_name]]</option>
                                 </select>
                             </div>
                         </div>
@@ -249,8 +250,9 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Department</label>
-                                <select name="" id="" class="form-control">
+                                <select v-model="addProject.department" name="" id="" class="form-control">
                                     <option value="" selected disabled>Select Department</option>
+                                    <option v-for="d in departmentSelect" :value="d.id">[[d.name]]</option>
                                 </select>
                             </div>
                         </div>
@@ -258,13 +260,13 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Accent Color</label>
-                                <input type="color" class="form-control form-control-color" value="#aeaeae">
+                                <input v-model="addProject.accentColor" type="color" class="form-control form-control-color" value="#aeaeae">
                             </div>
                         </div>
 
-                        <div class="row my-2">
+                        <div class="row mt-5">
                             <div class="col">
-                                <button class="btn btn-primary col">Add Project</button>
+                                <button @click="submitAddProject()" class="btn btn-primary col">Add Project</button>
                             </div>
                         </div>
                     </div>
@@ -287,20 +289,20 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Stage Name">
+                                <input v-model="addStage.name" type="text" class="form-control" placeholder="Enter Stage Name">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Accent Color</label>
-                                <input type="color" class="form-control form-control-color" value="#aeaeae">
+                                <input v-model="addStage.accentColor" type="color" class="form-control form-control-color" value="#aeaeae">
                             </div>
                         </div>
 
-                        <div class="row my-2">
+                        <div class="row mt-5">
                             <div class="col">
-                                <button class="btn btn-primary col">Add Stage</button>
+                                <button @click="submitAddStage" class="btn btn-primary col">Add Stage</button>
                             </div>
                         </div>
                     </div>
@@ -323,25 +325,25 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Task Name">
+                                <input v-model="addTask.name" type="text" class="form-control" placeholder="Enter Task Name">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col-6 pr-1">
                                 <label for="">Datetime Start</label>
-                                <input type="datetime-local" class="form-control">
+                                <input v-model="addTask.datetimeStart" type="datetime-local" class="form-control">
                             </div>
                             <div class="col-6 pl-1">
                                 <label for="">Datetime End</label>
-                                <input type="datetime-local" class="form-control">
+                                <input v-model="addTask.datetimeEnd" type="datetime-local" class="form-control">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Notes/Description</label>
-                                <textarea name="" id="" cols="30" rows="5" class="form-control" placeholder="Enter Notes or Description"></textarea>
+                                <textarea v-model="addTask.notes" name="" id="" cols="30" rows="5" class="form-control" placeholder="Enter Notes or Description"></textarea>
                             </div>
                         </div>
 
@@ -350,30 +352,25 @@
                                 <label for="">Assignees</label>
                                 <div class="row">
                                     <div class="col-12">
-                                        <select name="" id="" class="form-control">
-                                            <option value="" selected disabled>Clark Kent</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <select name="" id="" class="form-control">
-                                            <option value="" selected disabled>Clark Kent</option>
+                                        <select v-for="(item,index) in addTask.assignees" v-model="item.id" name="" id="" class="form-control">
+                                            <option value="" selected disabled>Select an Assignee</option>
+                                            <option v-for="a in assigneeSelect" :value="a.id">[[a.first_name]] [[a.last_name]]</option>
                                         </select>
                                     </div>
                                 </div>
                                 
                                 <div class="row mt-1">
                                     <div class="col">
-                                        <button class="btn btn-warning">+ Add</button>
-                                        <button class="btn btn-danger">- Remove</button>
+                                        <button @click="pushTask()" class="btn btn-warning">+ Add</button>
+                                        <button @click="popTask()" class="btn btn-danger">- Remove</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row my-2">
+                        <div class="row mt-5">
                             <div class="col">
-                                <button class="btn btn-primary col">Add Task</button>
+                                <button @click="submitAddTask()" class="btn btn-primary col">Add Task</button>
                             </div>
                         </div>
                     </div>
@@ -396,23 +393,23 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Stage Name">
+                                <input v-model="editStage.name" type="text" class="form-control" placeholder="Enter Stage Name">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Accent Color</label>
-                                <input type="color" class="form-control form-control-color" value="#aeaeae">
+                                <input v-model="editStage.accentColor" type="color" class="form-control form-control-color" value="#aeaeae">
                             </div>
                         </div>
 
-                        <div class="row mt-2">
+                        <div class="row mt-5">
                             <div class="col pr-1">
-                                <button class="btn btn-primary col">Save Changes</button>
+                                <button @click="submitEditStage()" class="btn btn-primary col">Save Changes</button>
                             </div>
                             <div class="col pl-1">
-                                <button class="btn btn-danger col">Delete</button>
+                                <button @click="deleteEditStage()" class="btn btn-danger col">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -435,25 +432,25 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Task Name">
+                                <input v-model="editTask.name" type="text" class="form-control" placeholder="Enter Task Name">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col-6 pr-1">
                                 <label for="">Datetime Start</label>
-                                <input type="datetime-local" class="form-control">
+                                <input v-model="editTask.datetimeStart" type="datetime-local" class="form-control">
                             </div>
                             <div class="col-6 pl-1">
                                 <label for="">Datetime End</label>
-                                <input type="datetime-local" class="form-control">
+                                <input v-model="editTask.datetimeEnd" type="datetime-local" class="form-control">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Notes/Description</label>
-                                <textarea name="" id="" cols="30" rows="5" class="form-control" placeholder="Enter Notes or Description"></textarea>
+                                <textarea v-model="editTask.notes" name="" id="" cols="30" rows="5" class="form-control" placeholder="Enter Notes or Description"></textarea>
                             </div>
                         </div>
 
@@ -462,33 +459,28 @@
                                 <label for="">Assignees</label>
                                 <div class="row">
                                     <div class="col-12">
-                                        <select name="" id="" class="form-control">
-                                            <option value="" selected disabled>Clark Kent</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <select name="" id="" class="form-control">
-                                            <option value="" selected disabled>Clark Kent</option>
+                                        <select v-for="(item,index) in editTask.assignees" v-model="item.id" class="form-control">
+                                            <option value="" selected disabled>Select an Assignee</option>
+                                            <option v-for="a in assigneeSelect" :value="a.id">[[a.first_name]] [[a.last_name]]</option>
                                         </select>
                                     </div>
                                 </div>
                                 
                                 <div class="row mt-1">
                                     <div class="col">
-                                        <button class="btn btn-warning">+ Add</button>
-                                        <button class="btn btn-danger">- Remove</button>
+                                        <button @click="pushEditTask()" class="btn btn-warning">+ Add</button>
+                                        <button @click="popEditTask()" class="btn btn-danger">- Remove</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row mt-2">
+                        <div class="row mt-5">
                             <div class="col pr-1">
-                                <button class="btn btn-primary col">Save Changes</button>
+                                <button @click="submitEditTask()" class="btn btn-primary col">Save Changes</button>
                             </div>
                             <div class="col pl-1">
-                                <button class="btn btn-danger col">Delete</button>
+                                <button @click="deleteEditTask()" class="btn btn-danger col">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -511,13 +503,13 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Department Name">
+                                <input v-model="editDepartment.name" type="text" class="form-control" placeholder="Enter Department Name">
                             </div>
                         </div>
 
-                        <div class="row mt-2">
+                        <div class="row mt-5">
                             <div class="col pr-1">
-                                <button class="btn btn-primary col">Save Changes</button>
+                                <button @click="submitEditDepartment()" class="btn btn-primary col">Save Changes</button>
                             </div>
                             <div class="col pl-1">
                                 <button class="btn btn-danger col">Delete</button>
@@ -543,26 +535,27 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Name</label>
-                                <input type="text" class="form-control" placeholder="Enter Project Name">
+                                <input v-model="editProject.name" type="text" class="form-control" placeholder="Enter Project Name">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col pr-1">
                                 <label for="">Date Start</label>
-                                <input type="date" class="form-control">
+                                <input v-model="editProject.dateStart" type="date" class="form-control">
                             </div>
                             <div class="col pl-1">
                                 <label for="">Date End</label>
-                                <input type="date" class="form-control">
+                                <input v-model="editProject.dateEnd" type="date" class="form-control">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Project Leader</label>
-                                <select name="" id="" class="form-control">
+                                <select v-model="editProject.projectLeader" name="" id="" class="form-control">
                                     <option value="" selected disabled>Select Project Leader</option>
+                                    <option v-for="a in assigneeSelect" :value="a.id">[[a.first_name]] [[a.last_name]]</option>
                                 </select>
                             </div>
                         </div>
@@ -570,8 +563,9 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Department</label>
-                                <select name="" id="" class="form-control">
+                                <select v-model="editProject.department" name="" id="" class="form-control">
                                     <option value="" selected disabled>Select Department</option>
+                                    <option v-for="d in departmentSelect" :value="d.id">[[d.name]]</option>
                                 </select>
                             </div>
                         </div>
@@ -579,16 +573,16 @@
                         <div class="row my-2">
                             <div class="col">
                                 <label for="">Accent Color</label>
-                                <input type="color" class="form-control form-control-color" value="#aeaeae">
+                                <input v-model="editProject.accentColor" type="color" class="form-control form-control-color" value="#aeaeae">
                             </div>
                         </div>
 
                         <div class="row mt-2">
                             <div class="col pr-1">
-                                <button class="btn btn-primary col">Save Changes</button>
+                                <button @click="submitEditProject()" class="btn btn-primary col">Save Changes</button>
                             </div>
                             <div class="col pl-1">
-                                <button class="btn btn-danger col">Delete</button>
+                                <button @click="deleteEditProject()" class="btn btn-danger col">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -596,8 +590,6 @@
             </div>
         </div>
     </div>
-
-    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -637,10 +629,10 @@
                     last_name: null,
                 },
                 department: null,
-                accentColor: null,
+                accentColor: "#D9177F",
                 projectstage: [{
                     name: null,
-                    accentColor: null,
+                    accentColor: "#D9177F",
                     projecttask: [{
                         name: null,
                         datetimeStart: null,
@@ -664,15 +656,22 @@
                 name: null,
                 dateStart: null,
                 dateEnd: null,
-                projectLeader: null, //ID
-                department: null, //ID
-                accentColor: null,
+                projectLeader: '', //ID
+                department: '', //ID
+                accentColor: "#D9177F",
             },
 
             addStage: {
                 name: null,
-                accentColor: null,
+                accentColor: "#D9177F",
+                project: ''
             },
+
+            assigneeSelect: [{
+                first_name: null,
+                last_name: null,
+                id: null,
+            }],
 
             addTask: {
                 name: null,
@@ -680,15 +679,15 @@
                 datetimeEnd: null,
                 notes: null,
                 assignees: [{
-                    id: null,
-                    first_name: null,
-                    last_name: null,
-                }]
+                    id: ''
+                }],
+                stage: null,
             },
 
             editStage: {
                 name: null,
-                accentColor: null,
+                accentColor: "#D9177F",
+                project: null,
             },
 
             editTask: {
@@ -697,10 +696,9 @@
                 datetimeEnd: null,
                 notes: null,
                 assignees: [{
-                    id: null,
-                    first_name: null,
-                    last_name: null,
-                }]
+                    id: '',
+                }],
+                stage: null
             },
 
             editDepartment: {
@@ -711,13 +709,20 @@
                 name: null,
                 dateStart: null,
                 dateEnd: null,
-                projectLeader: null, //ID
-                department: null, //ID
-                accentColor: null,
+                projectLeader: '', //ID
+                department: '', //ID
+                accentColor: "#D9177F",
             }
         },
 
         methods: {
+            async onLoad(){
+                await axios.get("/api/project-department/filterByBranch/")
+                .then(res=>this.departmentSelect = res.data)
+    
+                await axios.get('/api/assignee/filterByBranch/')
+                .then(res=>this.assigneeSelect = res.data)  
+            },
             getSelectedDepartment(id){
                 if(this.projectPlan.name){
                     return this.departmentSelect.find((i)=>{
@@ -742,10 +747,10 @@
                         last_name: null,
                     },
                     department: null,
-                    accentColor: null,
+                    accentColor: "#D9177F",
                     projectstage: [{
                         name: null,
-                        accentColor: null,
+                        accentColor: "#D9177F",
                         projecttask: [{
                             name: null,
                             datetimeStart: null,
@@ -894,11 +899,625 @@
 
                 return formatted
             },
+
+            pushTask(){
+                this.addTask.assignees.push({
+                    id: '',
+                })
+            },
+
+            popTask(){
+                this.addTask.assignees.pop()
+            },
+
+            pushEditTask(){
+                this.editTask.assignees.push({
+                    id: '',
+                })
+            },
+
+            popEditTask(){
+                this.editTask.assignees.pop()
+            },
+
+            resetDepartmentSelect(){
+                this.departmentSelect = [{
+
+                }]
+            },
+
+            resetSelectedDepartment(){
+                this.selectedDepartment = ''
+            },
+
+            resetProjectSelect(){
+                this.projectSelect = null
+            },
+
+            resetSelectedProject(){
+                this.selectedProject = ''
+            },
+
+            resetProjectPlan(){
+                this.projectPlan = {
+                    name: null,
+                    dateStart: null,
+                    dateEnd: null,
+                    dateCreated: null,
+                    dateCompleted: null,
+                    projectLeader: {
+                        first_name: null,
+                        last_name: null,
+                    },
+                    department: null,
+                    accentColor: "#D9177F",
+                    projectstage: [{
+                        name: null,
+                        accentColor: "#D9177F",
+                        projecttask: [{
+                            name: null,
+                            datetimeStart: null,
+                            datetimeEnd: null,
+                            notes: null,
+                            projectassignee: [{
+                                user: {
+                                    first_name: null,
+                                    last_name: null,
+                                }
+                            }]
+                        }]
+                    }]
+                }
+            },
+
+            resetAddDepartment(){
+                this.addDepartment = {
+                    name: null,
+                }
+            },
+
+            resetAddProject(){
+                this.addProject = {
+                    name: null,
+                    dateStart: null,
+                    dateEnd: null,
+                    projectLeader: '', //ID
+                    department: '', //ID
+                    accentColor: "#D9177F",
+                }
+            },
+
+            resetAddStage(){
+                this.addStage = {
+                    name: null,
+                    accentColor: "#D9177F",
+                    project: ''
+                }
+            },
+
+            resetAssigneeSelect(){
+                this.assigneeSelect = [{
+                    first_name: null,
+                    last_name: null,
+                    id: null,
+                }]
+            },
+
+            resetAddTask(){
+                this.addTask = {
+                    name: null,
+                    datetimeStart: null,
+                    datetimeEnd: null,
+                    notes: null,
+                    assignees: [{
+                        id: ''
+                    }],
+                    stage: null,
+                }
+            },
+
+            resetEditStage(){
+                this.editStage = {
+                    name: null,
+                    accentColor: "#D9177F",
+                    project: null,
+                }
+            },
+
+            resetEditTask(){
+                this.editTask = {
+                    name: null,
+                    datetimeStart: null,
+                    datetimeEnd: null,
+                    notes: null,
+                    assignees: [{
+                        id: '',
+                    }],
+                    stage: null
+                }
+            },
+
+            resetEditDepartment(){
+                this.editDepartment = {
+                    name: null,
+                }
+            },
+
+            resetEditProject(){
+                this.editProject = {
+                    name: null,
+                    dateStart: null,
+                    dateEnd: null,
+                    projectLeader: '', //ID
+                    department: '', //ID
+                    accentColor: "#D9177F",
+                }
+            },
+
+            submitAddDepartment(){
+                message = "Adding Deparment"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.post('/pps-add-department/', this.addDepartment, this.config)
+                .then(res=>{
+                    Swal.close()
+                    if(res.data == 0){
+                        this.onLoad()
+                        this.resetAddDepartment()
+                        $('#addDepartmentModal').modal('hide')
+                        Swal.fire({
+                            title: 'Success!',
+                            icon: 'success'
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.close()
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            submitAddProject(){
+                message = "Adding Deparment"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+
+                axios.post('/pps-add-project/', this.addProject, this.config)
+                .then(res=>{
+                    Swal.close()
+                    if(res.data == 0){
+                        this.onLoad()
+                        .then(res=>{
+                            try {
+                                this.fetchProjectSelect()
+                            }
+                            catch(err){
+                                console.log(err.message)
+                            }
+                        })
+                        $("#addProjectModal").modal('hide')
+                        this.resetAddProject()
+                        
+                        Swal.fire({
+                            title: 'Success!',
+                            icon: 'success'
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.close()
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            initAddStage(){
+                this.addStage.project = this.projectPlan.id
+            },
+
+            submitAddStage(){
+                message = "Adding Stage"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.post('/pps-add-stage/', this.addStage, this.config)
+                .then(res=>{
+                    Swal.close()
+                    if(res.data == 0){
+                        this.onLoad()
+                        .then(res=>{
+                            this.fetchProjectPlan(this.projectPlan.id)
+                        })
+                        $("#addStageModal").modal('hide')
+                        this.resetAddStage()
+
+                        Swal.fire({
+                            title: 'Success!',
+                            icon: 'success'
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.close()
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            initAddTask(id){
+                this.addTask.stage = id
+            },
+            
+            submitAddTask(){
+                message = "Adding Task"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.post('/pps-add-task/', this.addTask, this.config)
+                .then(res=>{
+                    Swal.close()
+                    if(res.data == 0){
+                        this.onLoad()
+                        .then(res=>{
+                            this.fetchProjectPlan(this.projectPlan.id)
+                            $("#addTaskModal").modal('hide')
+                            this.resetAddTask()
+
+                            Swal.fire({
+                                title: 'Success!',
+                                icon: 'success'
+                            })
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.close()
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            initEditStage(id){
+                var s = this.projectPlan.projectstage.find((i)=>{
+                    return i.id == id
+                })
+                this.editStage.id = s.id
+                this.editStage.name = s.name
+                this.editStage.accentColor = s.accentColor
+                this.editStage.project = s.projectPlan
+            },
+
+            submitEditStage(){
+                message = "Saving Changes"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+
+                axios.post('/pps-save-edit-stage/', this.editStage, this.config)
+                .then(res=>{
+                    Swal.close()
+                    if(res.data == 0){
+                        this.onLoad()
+                        .then(res=>{
+                            this.fetchProjectPlan(this.projectPlan.id)
+                        })
+                        $("#editStageModal").modal('hide')
+                        this.resetEditStage()
+
+                        Swal.fire({
+                            title: 'Success!',
+                            icon: 'success'
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.close()
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            deleteEditStage(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: "warning",
+                    html: "Are you sure you want to delete this stage? This action cannot be undone.",
+                    showConfirmButton: true,
+                    confirmButtonText: 'I am sure.',
+                    showCancelButton: true,
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        message = "Deleting Stage"
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
+                        axios.post('/pps-delete-stage/', this.editStage, this.config)
+                        .then(res=>{
+                            Swal.close()
+                            if(res.data == 0){
+                                this.onLoad()
+                                .then(res=>{
+                                    this.fetchProjectPlan(this.projectPlan.id)
+                                })
+                                $("#editStageModal").modal('hide')
+                                this.resetEditStage()
+        
+                                Swal.fire({
+                                    title: 'Success!',
+                                    icon: 'success'
+                                })
+                            }
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.close()
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            initEditTask(sID, tID){
+                var s = this.projectPlan.projectstage.find((i)=>{
+                    return i.id == sID
+                })
+
+                var t = s.projecttask.find(i=>{
+                    return i.id == tID
+                })
+
+                this.editTask.name = t.name
+                this.editTask.id = t.id
+                this.editTask.datetimeStart = t.datetimeStart
+                this.editTask.datetimeEnd = t.datetimeEnd
+                this.editTask.notes = t.notes
+                this.editTask.assignees = t.projectassignee.map(el=>{
+                    return el.user
+                })
+            },
+
+            submitEditTask(){
+                message = "Saving Changes"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+
+                axios.post('/pps-save-edit-task/', this.editTask, this.config)
+                .then(res=>{
+                    Swal.close()
+                    if(res.data == 0){
+                        this.onLoad()
+                        .then(res=>{
+                            this.fetchProjectPlan(this.projectPlan.id)
+                            $("#editTaskModal").modal('hide')
+                            this.resetEditTask()
+
+                            Swal.fire({
+                                title: 'Success!',
+                                icon: 'success'
+                            })
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.close()
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            deleteEditTask(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: "warning",
+                    html: "Are you sure you want to delete this task? This action cannot be undone.",
+                    showConfirmButton: true,
+                    confirmButtonText: 'I am sure.',
+                    showCancelButton: true,
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        message = "Deleting Task"
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
+                        axios.post('/pps-delete-task/', this.editTask, this.config)
+                        .then(res=>{
+                            Swal.close()
+                            if(res.data == 0){
+                                this.onLoad()
+                                .then(res=>{
+                                    this.fetchProjectPlan(this.projectPlan.id)
+                                })
+                                $("#editTaskModal").modal('hide')
+                                this.resetEditTask()
+                                Swal.fire({
+                                    title: 'Success!',
+                                    icon: 'success'
+                                })
+                            }
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.close()
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            initEditDepartment(id){
+                this.editDepartment.name = this.departmentSelect.find(i=>{
+                    return i.id == id
+                }).name
+
+                this.editDepartment.id = id
+            },
+
+            submitEditDepartment(){
+                message = "Saving Changes"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+
+                axios.post('/pps-save-edit-department/', this.editDepartment, this.config)
+                .then(res=>{
+                    if(res.data == 0){
+                        this.onLoad()
+                        this.resetEditDepartment()
+                        $("#editDepartmentModal").modal("hide")
+                        Swal.fire({
+                            title: 'Success!',
+                            icon: 'success'
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.close()
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            initEditProject(){
+                this.editProject.name = this.projectPlan.name
+                this.editProject.dateStart = this.projectPlan.dateStart
+                this.editProject.dateEnd = this.projectPlan.dateEnd
+                this.editProject.projectLeader = this.projectPlan.projectLeader.id
+                this.editProject.department = this.projectPlan.department
+                this.editProject.accentColor = this.projectPlan.accentColor
+                this.editProject.id = this.projectPlan.id
+            },
+
+            submitEditProject(){
+                message = "Saving Changes"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+
+                axios.post('/pps-save-edit-project/', this.editProject, this.config)
+                .then(res=>{
+                    Swal.close()
+                    if(res.data == 0){
+                        this.onLoad()
+                        .then(res=>{
+                            try {
+                                this.fetchProjectSelect()
+                            }
+                            catch(err){
+                                console.log(err.message)
+                            }
+                        })
+                        $("#editProjectModal").modal('hide')
+                        this.resetEditProject()
+                        
+                        Swal.fire({
+                            title: 'Success!',
+                            icon: 'success'
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.close()
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            deleteEditProject(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: "warning",
+                    html: "Are you sure you want to delete this project? This action cannot be undone.",
+                    showConfirmButton: true,
+                    confirmButtonText: 'I am sure.',
+                    showCancelButton: true,
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        message = "Deleting Project"
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
+                        axios.post('/pps-delete-project/', this.editProject, this.config)
+                        .then(res=>{
+                            Swal.close()
+                            if(res.data == 0){
+                                this.onLoad()
+                                this.resetProjectPlan()
+                                this.resetProjectSelect()
+                                $("#editProjectModal").modal('hide')
+                                this.resetEditProject()
+        
+                                Swal.fire({
+                                    title: 'Success!',
+                                    icon: 'success'
+                                })
+                            }
+                        })
+                    }
+                })
+            }
         },
 
         mounted(){
-            axios.get("/api/project-department/filterByBranch/")
-            .then(res=>this.departmentSelect = res.data)
+            this.onLoad()
         }
     })
 </script>

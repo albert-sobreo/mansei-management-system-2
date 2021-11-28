@@ -516,3 +516,12 @@ class ProjectDepartmentNestedAPI(viewsets.ModelViewSet):
         queryset = ProjectDepartment.objects.filter(branch=request.user.branch)
         serializer = ProjectDepartmentNestedSZ(queryset, many=True)
         return Response(serializer.data)
+
+class AssigneeAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['get'])
+    def filterByBranch(self, request):
+        queryset = User.objects.filter(branch=request.user.branch)
+        serializer = UserNameOnlySZ(queryset, many=True)
+        return Response(serializer.data)

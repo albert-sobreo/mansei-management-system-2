@@ -137,6 +137,7 @@ router.register(r"project-plan", views.ProjectPlanAPI, "project-plan")
 router.register(r"project-plan-nested", views.ProjectPlanNestedAPI, "project-plan-nested")
 router.register(r"project-department", views.ProjectDepartmentAPI, "project-department")
 router.register(r"project-department-nested", views.ProjectDepartmentNestedAPI, "project-department-nested")
+router.register(r"assignee", views.AssigneeAPI, 'assignee')
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -366,5 +367,17 @@ urlpatterns = [
     path('ems-loan-create/', login_required(views.EMS_LoanCreate.as_view())),
     path('ems-loans-hdmf/', login_required(views.EMS_HDMFLoansView.as_view())),
     path('ems-save-edit-benefits/', login_required(views.EMS_SaveEditBenefits.as_view())),
-    path('pps-planner/', login_required(views.PPS_ProjectPlannerView.as_view()))
+    path('pps-planner/', login_required(views.PPS_ProjectPlannerView.as_view())),
+    path('pps-add-department/', login_required(views.PPS_AddDepartment.as_view())),
+    path('pps-add-project/', login_required(views.PPS_AddProject.as_view())),
+
+    path('pps-add-stage/', login_required(views.PPS_AddStage.as_view())),
+    path('pps-add-task/', login_required(views.PPS_AddTask.as_view())),
+    path('pps-save-edit-stage/', login_required(views.PPS_SaveEditStage.as_view())),
+    path('pps-delete-stage/', login_required(views.PPS_DeleteEditStage.as_view())),
+    path('pps-save-edit-task/', login_required(views.PPS_SaveEditTask.as_view())),
+    path('pps-delete-task/', login_required(views.PPS_DeleteEditTask.as_view())),
+    path('pps-save-edit-department/', login_required(views.PPS_SaveEditDepartment.as_view())),
+    path('pps-save-edit-project/', login_required(views.PPS_SaveEditProject.as_view())),
+    path('pps-delete-project/', login_required(views.PPS_DeleteEditProject.as_view()))
 ]
