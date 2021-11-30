@@ -103,6 +103,62 @@ class SaveDefaultAccounts(APIView):
         except Exception as e:
             print(e)
             bdacct.cwit = None
+        try:
+            bdacct.salariesExpense = AccountChild.objects.get(pk=items['salariesExpense'])
+        except Exception as e:
+            print(e)
+            bdacct.salariesExpense = None
+        try:
+            bdacct.monthPay13 = AccountChild.objects.get(pk=items['monthPay13'])
+        except Exception as e:
+            print(e)
+            bdacct.monthPay13 = None
+        try:
+            bdacct.deminimisBenefit = AccountChild.objects.get(pk=items['deminimisBenefit'])
+        except Exception as e:
+            print(e)
+            bdacct.deminimisBenefit = None
+        try:
+            bdacct.hdmfShare = AccountChild.objects.get(pk=items['hdmfShare'])
+        except Exception as e:
+            print(e)
+            bdacct.hdmfShare = None
+        try:
+            bdacct.phicERShare = AccountChild.objects.get(pk=items['phicERShare'])
+        except Exception as e:
+            print(e)
+            bdacct.phicERShare = None
+        try:
+            bdacct.sssERShare = AccountChild.objects.get(pk=items['sssERShare'])
+        except Exception as e:
+            print(e)
+            bdacct.sssERShare = None
+        try:
+            bdacct.salariesPayable = AccountChild.objects.get(pk=items['salariesPayable'])
+        except Exception as e:
+            print(e)
+            bdacct.salariesPayable = None
+        try:
+            bdacct.sssPayable = AccountChild.objects.get(pk=items['sssPayable'])
+        except Exception as e:
+            print(e)
+            bdacct.sssPayable = None
+        try:
+            bdacct.phicPayable = AccountChild.objects.get(pk=items['phicPayable'])
+        except Exception as e:
+            print(e)
+            bdacct.phicPayable = None
+        try:
+            bdacct.hdmfPayable = AccountChild.objects.get(pk=items['hdmfPayable'])
+        except Exception as e:
+            print(e)
+            bdacct.hdmfPayable = None
+        try:
+            bdacct.withholdingTaxPayable = AccountChild.objects.get(pk=items['withholdingTaxPayable'])
+        except Exception as e:
+            print(e)
+            bdacct.withholdingTaxPayable = None
+
 
         for item in items['cashInBank']:
             bdacct.cashInBank.clear()
@@ -111,6 +167,7 @@ class SaveDefaultAccounts(APIView):
         for item in items['advancesToSupplier']:
             bdacct.advancesToSupplier.clear()
             bdacct.advancesToSupplier = AccountChild.objects.get(pk=item)
+
         
         bdacct.save()
         

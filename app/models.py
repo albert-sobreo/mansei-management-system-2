@@ -1613,6 +1613,17 @@ class BranchDefaultChildAccount(models.Model):
     costOfSales = models.ForeignKey(AccountChild, related_name="branchcostofsales", on_delete=models.CASCADE, blank = True, null = True)
     otherIncome = models.ForeignKey(AccountChild, related_name="branchotherincome", on_delete=models.CASCADE, blank = True, null = True)
     cwit = models.ForeignKey(AccountChild, related_name="branchcwit", on_delete=models.CASCADE, blank = True, null = True)
+    salariesExpense = models.ForeignKey(AccountChild, related_name="branchsalariesexpense", on_delete=models.CASCADE, blank = True, null = True)
+    monthPay13 = models.ForeignKey(AccountChild, related_name="branchmonthpay13", on_delete=models.CASCADE, blank = True, null = True)
+    deminimisBenefit = models.ForeignKey(AccountChild, related_name="branchdeminimisbenefit", on_delete=models.CASCADE, blank = True, null = True)
+    hdmfShare = models.ForeignKey(AccountChild, related_name="branchhdmfshare", on_delete=models.CASCADE, blank = True, null = True)
+    phicERShare = models.ForeignKey(AccountChild, related_name="branchphicershare", on_delete=models.CASCADE, blank = True, null = True)
+    sssERShare = models.ForeignKey(AccountChild, related_name="branchsssershare", on_delete=models.CASCADE, blank = True, null = True)
+    salariesPayable = models.ForeignKey(AccountChild, related_name="branchsalariespayable", on_delete=models.CASCADE, blank = True, null = True)
+    sssPayable = models.ForeignKey(AccountChild, related_name="branchssspayable", on_delete=models.CASCADE, blank = True, null = True)
+    phicPayable = models.ForeignKey(AccountChild, related_name="branchphicpayable", on_delete=models.CASCADE, blank = True, null = True)
+    hdmfPayable = models.ForeignKey(AccountChild, related_name="branchhdmfpayable", on_delete=models.CASCADE, blank = True, null = True)
+    withholdingTaxPayable = models.ForeignKey(AccountChild, related_name="branchwithholdingtaxpayable", on_delete=models.CASCADE, blank = True, null = True)
 
 class BranchProfile(models.Model):
     branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.CASCADE, null=True, blank=True)
