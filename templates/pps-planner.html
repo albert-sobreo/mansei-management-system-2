@@ -7,7 +7,7 @@
     <!-- NAV BAR -->
     <navbar-pps active="nav-planner" photo="/media/{{request.user.image}}"></navbar-pps>
     <app-card></app-card>
-    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
 
     <!-- TITLE BODY -->
     <div class="container">
@@ -152,7 +152,7 @@
                                         <div class="assignee-container d-flex flex-column">
                                             <div class="assignee mt-1 d-flex align-items-center" v-for="assignee in task.projectassignee">
                                                 <div class="assignee-profile-pic mr-2">
-                                                    <img :src="assignee.user.image" class="assignee-profile-pic b-radius-circle border" alt="">
+                                                    <img :src="assignee.user.image" class="assignee-profile-pic b-radius-circle border" alt="" style="object-fit: cover;">
                                                 </div>
                                                 <div class="assignee-name">
                                                     <span class="font-semibold">[[assignee.user.first_name]] [[assignee.user.last_name]]</span>

@@ -525,3 +525,4 @@ class AssigneeAPI(viewsets.ModelViewSet):
         queryset = User.objects.filter(branch=request.user.branch)
         serializer = UserNameOnlySZ(queryset, many=True)
         return Response(serializer.data)
+

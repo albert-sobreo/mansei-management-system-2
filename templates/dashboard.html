@@ -8,7 +8,7 @@
     <div class="profile mx-3 position-absolute" onclick="toggleProfile()" style="top: 10px; right: 81px;">
         <img src="/static/media/{{request.user.image}}" alt="" height="20" class="profile-border b-radius-circle" id="profileToggler">
     </div>
-    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <profile-card branch="{{request.user.branch.name}}" branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
     <app-card></app-card>
     <div class="container" style="height: 90vh;">
         <div class="d-flex d-row align-items-center justify-content-center h-100">

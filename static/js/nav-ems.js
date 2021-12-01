@@ -1,7 +1,8 @@
 Vue.component('navbar-ems', {
     delimiters: ['[[', ']]'],
     props: [
-        'active'
+        'active',
+        'photo'
     ],
     data(){
         return{

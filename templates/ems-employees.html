@@ -7,7 +7,7 @@
     <!-- NAV BAR -->
     <navbar-ems active="nav-employees" photo="/static/media/{{request.user.image}}"></navbar-ems>
     <app-card></app-card>
-    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
 
     <!-- MAIN BODY -->
     <div class="container">
@@ -77,7 +77,7 @@
                                 </div>
                             </div>
                             <div class="col">
-                                <img src="/static/media/profile-pictures/person.png" class="border b-radius-5" alt="" height="100%" width="100%">
+                                <img :src="modal.image" class="border b-radius-5" alt="" height="100%" width="100%">
                             </div>
                         </div>
 

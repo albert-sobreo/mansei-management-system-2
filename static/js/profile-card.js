@@ -16,13 +16,13 @@ Vue.component('profile-card', {
                 <img class="profile-border b-radius-circle" :src="photo" alt="" height="40" width="40" style="object-fit:cover">
             </div>
             <div class="profile-my-name mt-1 text-center">
-                <span>[[this.first_name]]  [[this.last_name]]</span>
-            </div>
-            <div class="profile-my-position">
-                <span>[[this.position]]</span>
+                <span class="font-semibold">[[this.first_name]]  [[this.last_name]]</span>
             </div>
             <div>
                 <span>[[this.branch]]</span>
+            </div>
+            <div class="profile-my-position">
+                <span>[[this.position]]</span>
             </div>
         </div>
         <div class="mt-2 flex flex-row profile-card-container logout py-2 px-4 b-radius-5 justify-content-center align-items-center " onclick="location.href='/my-profile/'">

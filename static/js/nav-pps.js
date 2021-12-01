@@ -1,7 +1,8 @@
 Vue.component('navbar-pps', {
     delimiters: ['[[', ']]'],
     props: [
-        'active'
+        'active',
+        'photo'
     ],
     data(){
         return{

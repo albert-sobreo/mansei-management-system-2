@@ -13,7 +13,10 @@ class LedgerView(View):
         
         except:
             startDate = now.today().replace(day=1)
-            nextMonth = now.today().replace(month=startDate.month+1, day=1)
+            try:
+                nextMonth = now.today().replace(month=startDate.month+1, day=1)
+            except:
+                nextMonth = now.today().replace(month=1, day=1)
             endDate = nextMonth - timedelta(days=1)
 
         context = {

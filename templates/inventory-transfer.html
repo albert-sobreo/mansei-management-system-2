@@ -8,7 +8,7 @@
         <!-- NAVIGATION BAR -->
         <navbar-imps active="nav-transfer" photo="/media/{{request.user.image}}"></navbar-imps>
         <app-card></app-card>
-        <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+        <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
         <!-- END NAVIGATION -->
 
 
