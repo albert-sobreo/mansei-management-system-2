@@ -66,7 +66,7 @@ Vue.component('navbar-ems', {
                 <img :src="this.const.bellIcon" alt="" height="20" class="notification-bell" id="notificationToggler">
             </div>
             <div class="profile mx-3" onclick="toggleProfile()">
-                <img :src="this.const.hrefProfile" alt="" height="20" class="profile-border b-radius-circle" id="profileToggler">
+            <img :src="this.photo" alt="" height="20" width="20" class="profile-border b-radius-circle" id="profileToggler" style="object-fit:cover;">
             </div>
         </div>
     </div>

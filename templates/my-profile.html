@@ -1,0 +1,562 @@
+{% extends "base-template.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVBAR -->
+    <navbar-plain name="My Profile" photo="/media/{{request.user.image}}"></navbar-plain>
+    <app-card></app-card>
+    <profile-card first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <div class="d-flex justify-content-center">
+            <!-- PROFILE CONTAINER -->
+            <div class="d-flex flex-column p-4 b-radius-15 box-shadow-medium w-50">
+                <!-- PERSONAL INFORMATION -->
+                <div>
+                    <!-- TITLE -->
+                    <div class="d-flex align-items-end mb-2">
+                        <span class="font-bold font-size-18" style="line-height: 18px;">Personal Information</span>
+                        &nbsp;
+                        <span @click="initEditPersonalModal()" data-toggle="modal" data-target="#editPersonalModal" class="link font-size-12" style="line-height: 14px;">Edit Personal Information</span>
+                    </div>
+                    <!-- IMAGE AND NAME -->
+                    <div class="d-flex align-items center mb-4">
+                        <!-- IMAGE -->
+                        <div class="mr-4 border b-radius-circle" style="position: relative;">
+                            <img data-toggle="modal" data-target="#editProfilePicture" class="border b-radius-circle pointer" src="/media/{{request.user.image}}" height="100" width="100" alt="" style="object-fit: cover;">
+                        </div>
+                        <!-- NAME AND USERNAME -->
+                        <div class="d-flex flex-column justify-content-between">
+                            <div>
+                                <label class="gray" for="">Name</label><br>
+                                <span class="font-size-18 font-bold">{{request.user.first_name}} {{request.user.last_name}}</span>
+                            </div>
+                            <div>
+                                <label for="" class="gray">Username</label><br>
+                                <span class="font-size-18 font-bold">{{request.user.username}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ADDRESS -->
+                    <div class="mb-3">
+                        <label for="" class="gray">Address</label><br>
+                        <span class="font-bold">{{request.user.address}}</span>
+                    </div>
+                    <!-- MOBILE AND DATE OF BIRTH -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="" class="gray">Mobile No.</label><br>
+                            <span class="font-bold">{{request.user.mobile}}</span>
+                        </div>
+                        <div class="col">
+                            <label for="" class="gray">Date of Birth</label><br>
+                            <span class="font-bold">{{request.user.dob}}</span>
+                        </div>
+                    </div>
+                    <!-- HR -->
+                    <div class="mb-3">
+                        <hr>
+                    </div>
+                </div>
+                <!-- EMPLOYEE DETAILS -->
+                <div>
+                    <!-- TITLE -->
+                    <div class="d-flex align-items-end mb-2">
+                        <span class="font-bold font-size-18" style="line-height: 18px;">Employee Information</span>
+                        &nbsp;
+                        <span data-toggle="modal" data-target="#editEmployeeModal" @click="initEditEmployeeModal()" class="link font-size-12" style="line-height: 14px;">Edit Employee Information</span>
+                    </div>
+                    <!-- ID AND TIN -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="" class="gray">ID Number</label><br>
+                            <span class="font-bold">{{request.user.idUser}}</span>
+                        </div>
+                        <div class="col">
+                            <label for="" class="gray">TIN</label><br>
+                            <span class="font-bold">{{request.user.tin}}</span>
+                        </div>
+                    </div>
+                    <!-- SSS AND PHIC -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="" class="gray">SSS</label><br>    
+                            <span class="font-bold">{{request.user.sss}}</span>
+                        </div>
+                        <div class="col">
+                            <label for="" class="gray">PhilHealth</label><br>
+                            <span class="font-bold">{{request.user.phic}}</span>
+                        </div>
+                    </div>
+                    <!-- PAG-IBIG AND BRANCH -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="" class="gray">Pag-Ibig</label><br>
+                            <span class="font-bold">{{request.user.hdmf}}</span>
+                        </div>
+                        <div class="col">
+                            <label for="" class="gray">Branch</label><br>
+                            <span class="font-bold">{{request.user.branch.name}}</span>
+                        </div>
+                    </div>
+                    <!-- HR -->
+                    <div class="mb-3">
+                        <hr>
+                    </div>
+                </div>
+                <!-- EMAIL & PASSWORD -->
+                <div>
+                    <!-- TITLE -->
+                    <div class="d-flex align-items-end mb-2">
+                        <span class="font-bold font-size-18" style="line-height: 18px;">Email & Password</span>
+                        &nbsp;
+                        <span @click="initChangeEmail()" data-toggle="modal" data-target="#changeEmailModal" class="link font-size-12" style="line-height: 14px;">Change Email</span>
+                        &nbsp;
+                        &nbsp;
+                        <span data-toggle="modal" data-target="#changePasswordModal" class="link font-size-12" style="line-height: 14px">Change Password</span>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="" class="gray">Email</label><br>
+                            <span class="font-bold">{{request.user.email}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT PROFILE PICTURE -->
+        <div class="modal fade" id="editProfilePicture">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Profile Picture</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="row" v-if="editProfilePicture.profilePictureUrl">
+                            <!-- PHOTO -->
+                            <div class="col-12 text-center">
+                                <img :src="editProfilePicture.profilePictureUrl" height="100px" width="100px" alt="" class="b-radius-circle box-shadow-small" style="object-fit: cover;">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="font-size-16 gray text-center" for="">
+                                        <label class="link" for="profilePicture" title="Attach a Photo">+ Add Photo</i></label>
+                                        <input ref="profilePicture" @change="photoHandler()" id="profilePicture" type="file" style="display: none;">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button @click="submitEditProfilePicture()" class="btn btn-primary col">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT PERSONAL INFO MODAL -->
+        <div class="modal fade" id="editPersonalModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Personal Information</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label for="">Username</label>
+                                <input v-model="editPersonalInfo.username" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col pr-1">
+                                <label for="">First Name</label>
+                                <input v-model="editPersonalInfo.first_name" type="text" class="form-control">
+                            </div>
+                            <div class="col pl-1">
+                                <label for="">Last Name</label>
+                                <input v-model="editPersonalInfo.last_name" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col">
+                                <hr>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label for="">Address</label>
+                                <input v-model="editPersonalInfo.address" type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col pr-1">
+                                <label for="">Mobile No.</label>
+                                <input v-model="editPersonalInfo.mobile" type="text" class="form-control">
+                            </div>
+                            <div class="col pl-1">
+                                <label for="">Date of Birth</label>
+                                <input v-model="editPersonalInfo.dob" type="date" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mb-1">
+                            <div class="col">
+                                <hr>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button @click="submitEditPersonalModal()" class="btn btn-primary col">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT EMPLOYEE INFO MODAL -->
+        <div class="modal fade" id="editEmployeeModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Employee Information</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="">ID Number</label>
+                                <input type="text" class="form-control" v-model="editEmployeeInfo.idUser">
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col">
+                                <hr>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="">TIN</label>
+                                <input type="text" class="form-control" v-model="editEmployeeInfo.tin">
+                            </div>
+                            <div class="col">
+                                <label for="">SSS</label>
+                                <input type="text" class="form-control" v-model="editEmployeeInfo.sss">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="">PhilHealth</label>
+                                <input type="text" class="form-control" v-model="editEmployeeInfo.phic">
+                            </div>
+                            <div class="col">
+                                <label for="">Pag-Ibig</label>
+                                <input type="text" class="form-control" v-model="editEmployeeInfo.hdmf">
+                            </div>
+                        </div>
+
+                        <div class="row mb-1">
+                            <div class="col">
+                                <hr>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button @click="submitEditEmployeeModal()" class="btn btn-primary col">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHANGE PASSWORD MODAL -->
+        <div class="modal fade" id="changePasswordModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Employee Information</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <label for="">Enter New Password</label>
+                                <input v-model="changePassword.password" type="password" class="form-control" autocomplete="false">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label for="">Confirm New Password</label>
+                                <input v-model="changePassword.confirm" type="password" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row" style="display: none;" id="confirm-text">
+                            <div class="col">
+                                <span class="text-success">Passwords matched</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-1">
+                            <div class="col">
+                                <hr>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <button @click="submitChangePassword()" id="changePasswordBtn" class="btn btn-primary col" disabled>Save New Password</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHANGE EMAIL MODAL -->
+        <div class="modal fade" id="changeEmailModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Employee Information</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <input v-model="changeEmail.email" type="email" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col">
+                                <hr>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button @click="submitChangeEmail()" class="btn btn-primary col">Save Email</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+        data: {
+            config: {
+				headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    "content-type": "multipart/form-data"
+                }
+			},
+
+            config2: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                }
+            },
+
+            user: {
+
+            },
+
+            editProfilePicture: {
+                profilePicture: null,
+                profilePictureUrl: null
+            },
+            
+            editPersonalInfo: {
+                first_name: null,
+                last_name: null,
+                username: null,
+                address: null,
+                mobile: null,
+                dob: null,
+            },
+
+            editEmployeeInfo: {
+                idUser: null,
+                tin: null,
+                sss: null,
+                phic: null,
+                hdmf: null,
+            },
+
+            changePassword: {
+                password: null,
+                confirm: null,
+            },
+
+            changeEmail: {
+                email: null,
+            }
+        },
+
+        computed:{
+            confirmPassword(){
+                return this.changePassword.confirm
+            },
+            password(){
+                return this.changePassword.password
+            }
+        },
+
+        watch: {
+            confirmPassword(){
+                if (this.password == this.confirmPassword){
+                    document.getElementById('confirm-text').style.display = 'block'
+                    document.getElementById("changePasswordBtn").disabled = false
+                } else {
+                    document.getElementById('confirm-text').style.display = 'none'
+                    document.getElementById('changePasswordBtn').disabled = true
+                }
+            },
+            password(){
+                if (this.password == this.confirmPassword){
+                    document.getElementById('confirm-text').style.display = 'block'
+                    document.getElementById("changePasswordBtn").disabled = false
+                } else {
+                    document.getElementById('confirm-text').style.display = 'none'
+                    document.getElementById('changePasswordBtn').disabled = true
+                }
+            }
+        },
+
+        methods: {
+            onload(){
+                axios.get(`/api/user/${ '{{request.user.id}}' }`)
+                .then(res=>{
+                    this.user = res.data
+                })
+            },
+            photoHandler(){
+                this.editProfilePicture.profilePicture = this.$refs.profilePicture.files[0];
+                this.editProfilePicture.profilePictureUrl = URL.createObjectURL(this.editProfilePicture.profilePicture);
+            },
+
+            submitEditProfilePicture(){
+                var formdata = new FormData()
+                formdata.append('profilePicture', this.editProfilePicture.profilePicture)
+
+                axios.post('/save-my-profile-picture/', formdata, this.config)
+                .then(res=>res.data==0?location.reload():"")
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            initEditPersonalModal(){
+                this.editPersonalInfo.username = this.user.username
+                this.editPersonalInfo.first_name = this.user.first_name
+                this.editPersonalInfo.last_name = this.user.last_name
+                this.editPersonalInfo.address = this.user.address
+                this.editPersonalInfo.mobile = this.user.mobile
+                this.editPersonalInfo.dob = this.user.dob
+            },
+
+            initEditEmployeeModal(){
+                this.editEmployeeInfo.idUser = this.user.idUser
+                this.editEmployeeInfo.tin = this.user.tin
+                this.editEmployeeInfo.sss = this.user.sss
+                this.editEmployeeInfo.phic = this.user.phic
+                this.editEmployeeInfo.hdmf = this.user.hdmf
+            },
+
+            initChangeEmail(){
+                this.changeEmail.email = this.user.email
+            },
+
+            submitEditPersonalModal(){
+                axios.post('/save-my-profile-personal-info/', this.editPersonalInfo, this.config2)
+                .then(res=>res.data==0?location.reload():"")
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            submitEditEmployeeModal(){
+                axios.post('/save-my-profile-employee-info/', this.editEmployeeInfo, this.config2)
+                .then(res=>res.data==0?location.reload():"")
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            submitChangePassword(){
+                axios.post('/save-my-profile-password/', this.changePassword, this.config2)
+                .then(res=>res.data==0?location.reload():"")
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            },
+
+            submitChangeEmail(){
+                axios.post('/save-my-profile-email/', this.changeEmail, this.config2)
+                .then(res=>res.data==0?location.reload():"")
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
+            }
+        },
+        mounted(){
+            this.onload()
+        }
+    })
+</script>
+
+{% endblock %}

@@ -1,7 +1,8 @@
 Vue.component('navbar-plain', {
     delimiters: ['[[', ']]'],
     props: [
-        'photo'
+        'photo',
+        'name'
     ],
     data(){
         return{
@@ -22,7 +23,7 @@ Vue.component('navbar-plain', {
     <div class="c-nav d-flex mb-3 font-bold" id="main-nav">
         <!-- LOGO CONTAINER -->
         <div class="c-nav-item justify-content-start">
-            <span>Branch Profile</span>
+            <span>[[name]]</span>
         </div>
 
         <!-- TABS CONTAINER -->
@@ -39,7 +40,7 @@ Vue.component('navbar-plain', {
                 <img :src="this.const.bellIcon" alt="" height="20" class="notification-bell" id="notificationToggler">
             </div>
             <div class="profile mx-3" onclick="toggleProfile()">
-                <img :src="this.photo" alt="" height="20" class="profile-border b-radius-circle" id="profileToggler">
+                <img :src="this.photo" alt="" height="20" width="20" class="profile-border b-radius-circle" id="profileToggler" style="object-fit:cover;">
             </div>
         </div>
     </div>

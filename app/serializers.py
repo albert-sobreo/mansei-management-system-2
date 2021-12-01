@@ -58,10 +58,19 @@ class RaiseSZ(MS):
         model = Raise
         fields = '__all__'
 
+class BranchSZ(MS):
+    class Meta:
+        model = Branch
+        fields = [
+            'name',
+            'id'
+        ]
+
 class UserNestedSZ(serializers.ModelSerializer):
     deminimisofuser = DeMinimisOfUserSZ(read_only=True, many=True)
     userleave = UserLeaveSZ(read_only=True)
     raisse = RaiseSZ(read_only=True, many=True)
+    branch = BranchSZ(read_only=True)
     class Meta:
         model = User
         fields = [
@@ -93,6 +102,7 @@ class UserNestedSZ(serializers.ModelSerializer):
             "last_name",
             "email",
             "raisse",
+            'username',
         ]
 
 

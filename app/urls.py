@@ -379,5 +379,12 @@ urlpatterns = [
     path('pps-delete-task/', login_required(views.PPS_DeleteEditTask.as_view())),
     path('pps-save-edit-department/', login_required(views.PPS_SaveEditDepartment.as_view())),
     path('pps-save-edit-project/', login_required(views.PPS_SaveEditProject.as_view())),
-    path('pps-delete-project/', login_required(views.PPS_DeleteEditProject.as_view()))
+    path('pps-delete-project/', login_required(views.PPS_DeleteEditProject.as_view())),
+    path('my-profile/', login_required(views.MyProfileView.as_view())),
+
+    path('save-my-profile-picture/', login_required(views.MyProfileSaveProfilePicture.as_view())),
+    path('save-my-profile-personal-info/', login_required(views.MyProfileSavePersonalInfo.as_view())),
+    path('save-my-profile-employee-info/', login_required(views.MyProfileSaveEmployeeInfo.as_view())),
+    path('save-my-profile-password/', login_required(views.MyProfileSavePassword.as_view())),
+    path('save-my-profile-email/', login_required(views.MyProfileSaveEmail.as_view()))
 ]

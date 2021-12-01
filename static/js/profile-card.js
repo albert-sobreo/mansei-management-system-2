@@ -13,7 +13,7 @@ Vue.component('profile-card', {
     <div class="profile-card b-radius-15 box-shadow-medium p-2 border" id="profileCard" style="display: none; z-index:1; width: 175px">
         <div class="flex flex-column profile-card-container py-2 px-4 b-radius-5 justify-content-center align-items-center">
             <div class="mb-2">
-                <img class="profile-border b-radius-circle" :src="photo" alt="" height="40" width="40">
+                <img class="profile-border b-radius-circle" :src="photo" alt="" height="40" width="40" style="object-fit:cover">
             </div>
             <div class="profile-my-name mt-1 text-center">
                 <span>[[this.first_name]]  [[this.last_name]]</span>
@@ -25,7 +25,7 @@ Vue.component('profile-card', {
                 <span>[[this.branch]]</span>
             </div>
         </div>
-        <div class="mt-2 flex flex-row profile-card-container logout py-2 px-4 b-radius-5 justify-content-center align-items-center " onclick="location.href='#'">
+        <div class="mt-2 flex flex-row profile-card-container logout py-2 px-4 b-radius-5 justify-content-center align-items-center " onclick="location.href='/my-profile/'">
             My Profile
         </div>
         <div class="mt-2 flex flex-row profile-card-container logout py-2 px-4 b-radius-5 justify-content-center align-items-center " onclick="location.href='/branches/'">

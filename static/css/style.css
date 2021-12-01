@@ -1256,3 +1256,6 @@ select.form-control{
     transition: .1s;
 }
 
+.overlay:hover{
+    opacity: .8;
+}
