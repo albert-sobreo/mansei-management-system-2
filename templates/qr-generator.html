@@ -1,0 +1,80 @@
+{% extends "base-template.html" %}
+{% block title %}QR Generator{% endblock %}
+
+{% block header_scripts %}
+
+<script src="/static/js/qr-gen.js"></script>
+
+{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVBAR -->
+    <navbar-plain name="QR Generator" photo="/media/{{request.user.image}}"></navbar-plain>
+    <app-card></app-card>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container w-25">
+        <div class="d-flex justify-content-center flex-column">
+            <div id="title" class="d-flex justify-content-center align-items-center">
+                <span class="font-extrabold font-size-32">QR Generator</span>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                <div id="qr" class="p-4 b-radius-15" style="border: 2px solid #eaeaea"></div>
+            </div>
+            <div class="row">
+                <div class="col text-center">
+                    <span class="font-size-10">Right-click on the QR Code to save as image.</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <input @input="generateQR()" id="input" type="text" class="form-control" placeholder="Enter Input">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+        data: {
+            qrcode: null
+        },
+        methods: {
+            onload(){
+                this.qrcode = new QRCode('qr', {
+                    text: "Hello World",
+                    width: 256,
+                    height: 256,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                })
+            },
+
+            generateQR(){
+                var input = document.getElementById('input').value;
+                if(input){
+                    this.qrcode.makeCode(`${input}`)
+                } else {
+                    this.qrcode.makeCode('')
+                }
+            }
+        },
+
+        mounted(){
+            this.onload()
+        }
+    })
+</script>
+
+{% endblock %}

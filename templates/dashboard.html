@@ -11,6 +11,9 @@
     <profile-card branch="{{request.user.branch.name}}" branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
     <app-card></app-card>
     <div class="container" style="height: 90vh;">
+        <div class="d-flex align-items-center justify-content-center">
+            <a class="link" href="/qr-generator/">Generate QR Code</a>
+        </div>
         <div class="d-flex d-row align-items-center justify-content-center h-100">
             <div onclick="location.href='/merchinventory/'" id="imps" class="mx-4 p-3 b-radius-15 w-25 h-25 d-flex align-items-center justify-content-center flex-column app-card-links imps">
                 <img src="/static/media/icons/imps.svg" alt="" height="75px">
