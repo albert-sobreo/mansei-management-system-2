@@ -424,9 +424,10 @@ class EMS_GeneratePayroll(APIView):
 
                     withholdingTax += taxDeducted
 
+            salariesPayable += payroll.netPayAfterTaxes 
             payroll.netPayAfterTaxes += untaxableBenefit
             payroll.netPayAfterTaxes -= employeeLoan
-                
+               
             payroll.save()
             
         j = Journal()
