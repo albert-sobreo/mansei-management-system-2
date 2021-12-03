@@ -423,30 +423,31 @@ class EMS_GeneratePayroll(APIView):
                     payroll.netPayAfterTaxes = payroll.netPayBeforeTaxes - taxDeducted
 
                     withholdingTax += taxDeducted
-
-            salariesPayable += payroll.netPayAfterTaxes 
+ 
             payroll.netPayAfterTaxes += untaxableBenefit
             payroll.netPayAfterTaxes -= employeeLoan
+            salariesPayable += payroll.netPayAfterTaxes
                
             payroll.save()
             
         j = Journal()
 
         j.code = str(year) + ": " + str(dateStart) + " - " + str(dateEnd)
-        j.datetimeCreated = datetime.now()
+        j.datetimeCreated = datetime.datetime.now()
         j.createdBy = request.user
-        j.journalDate = datetime.now()
+        j.journalDate = datetime.datetime.now()
         j.save()
         request.user.branch.journal.add(j)
         ########## DEBIT ##########
         jeAPI(request, j, "Debit", dChildAccount.salariesExpense, salariesExpense)
+        jeAPI(request, j, "Debit", dChildAccount.bonus, bonus)
         jeAPI(request, j, "Debit", dChildAccount.monthPay13,  monthPay13)
         jeAPI(request, j, "Debit", dChildAccount.deminimisBenefit, deminimis)
         jeAPI(request, j, "Debit", dChildAccount.hdmfShare, hdmfER)
         jeAPI(request, j, "Debit", dChildAccount.phicERShare, phicER)
         jeAPI(request, j, "Debit", dChildAccount.sssERShare, sssER)
         ########## CREDIT ##########
-        jeAPI(request, j, "Credit", dChildAccount.salariesPayable, salariesExpense)
+        jeAPI(request, j, "Credit", dChildAccount.salariesPayable, salariesPayable)
         jeAPI(request, j, "Credit", dChildAccount.sssPayable, sssPayable)
         jeAPI(request, j, "Credit", dChildAccount.phicPayable, phicPayable)
         jeAPI(request, j, "Credit", dChildAccount.hdmfPayable, hdmfPayable)

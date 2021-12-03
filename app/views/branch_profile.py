@@ -109,6 +109,11 @@ class SaveDefaultAccounts(APIView):
             print(e)
             bdacct.salariesExpense = None
         try:
+            bdacct.bonus = AccountChild.objects.get(pk=items['bonus'])
+        except Exception as e:
+            print(e)
+            bdacct.bonus = None
+        try:
             bdacct.monthPay13 = AccountChild.objects.get(pk=items['monthPay13'])
         except Exception as e:
             print(e)
