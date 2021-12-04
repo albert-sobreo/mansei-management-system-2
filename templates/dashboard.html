@@ -10,35 +10,63 @@
     </div>
     <profile-card branch="{{request.user.branch.name}}" branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
     <app-card></app-card>
-    <div class="container" style="height: 90vh;">
-        <div class="d-flex align-items-center justify-content-center">
-            <a class="link" href="/qr-generator/">Generate QR Code</a>
+    <div class="dashboard-container w-100 d-flex vh-100" >
+        <div id="sidebar" class="d-flex flex-column align-items-center w-20" style="background: #FCFCFA">
+            <div id="app-selector" class="d-flex flex-column align-items-center justify-content-center h-90">
+                <div onclick="location.href='/merchinventory/'" id="imps" class="mx-4 my-2 p-3 b-radius-15 dashboard-app d-flex align-items-center justify-content-center flex-column app-card-links imps">
+                    <img src="/static/media/icons/imps.svg" alt="" height="40px">
+                    <span class="text-center font-bold">Inventory Management and Planning System</span>
+                </div>
+                <div onclick="location.href='/journal/'" id="gas" class="mx-4 my-2 p-3 b-radius-15 dashboard-app d-flex align-items-center justify-content-center flex-column app-card-links gas">
+                    <img src="/static/media/icons/GAS.svg" alt="" height="40px">
+                    <span class="text-center font-bold">General Accounting<br> System</span>
+                </div>
+                <div onclick="location.href='/ems-my-dtr/'" id="ems" class="mx-4 my-2 p-3 b-radius-15 dashboard-app d-flex align-items-center justify-content-center flex-column app-card-links ems">
+                    <img src="/static/media/icons/EMS.svg" alt="" height="40px">
+                    <span class="text-center font-bold">Employee Management System</span>
+                </div>
+                <div onclick="location.href='/pps-planner/'" id="pps" class="mx-4 my-2 p-3 b-radius-15 dashboard-app d-flex align-items-center justify-content-center flex-column app-card-links pps">
+                    <img src="/static/media/icons/PPS.svg" alt="" height="40px">
+                    <span class="text-center font-bold">Project Planning<br> System</span>
+                </div>
+            </div>
+            <div class="d-flex align-items-center justify-content-center">
+                <a class="link" href="/qr-generator/">Generate QR Code</a>
+            </div>
         </div>
-        <div class="d-flex d-row align-items-center justify-content-center h-100">
-            <div onclick="location.href='/merchinventory/'" id="imps" class="mx-4 p-3 b-radius-15 w-25 h-25 d-flex align-items-center justify-content-center flex-column app-card-links imps">
-                <img src="/static/media/icons/imps.svg" alt="" height="75px">
-                <span class="text-center font-semibold">Inventory Management and Planning System</span>
-            </div>
-            <div onclick="location.href='/journal/'" id="gas" class="mx-4 p-3 b-radius-15 w-25 h-25 d-flex align-items-center justify-content-center flex-column app-card-links gas">
-                <img src="/static/media/icons/GAS.svg" alt="" height="75px">
-                <span class="text-center font-semibold">General Accounting System</span>
-            </div>
-            <div onclick="location.href='/ems-my-dtr/'" id="ems" class="mx-4 p-3 b-radius-15 w-25 h-25 d-flex align-items-center justify-content-center flex-column app-card-links ems">
-                <img src="/static/media/icons/EMS.svg" alt="" height="75px">
-                <span class="text-center font-semibold">Employee Management System</span>
-            </div>
-            <div onclick="location.href='/pps-planner/'" id="pps" class="mx-4 p-3 b-radius-15 w-25 h-25 d-flex align-items-center justify-content-center flex-column app-card-links pps">
-                <img src="/static/media/icons/PPS.svg" alt="" height="75px">
-                <span class="text-center font-semibold">Project Planning System</span>
-            </div>
-        </div>
+        <div class="d-flex w-100 dashboard-main" id="main-body">
+            <div class="d-flex h-100 px-4 py-3 flex-column" id="main-body-main">
+                <div id="dashboard-title" class="mb-3">
+                    {% if request.user.branch %}
+                    <span class="font-bold font-size-36">Welcome </span><span class="gray font-size-18 font-bold">to {{request.user.branch.name}}</span>
+                    {% else %}
+                    <span class="gray font-size-18 font-bold">not connected to a branch</span>
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                        <span>It seems your user profile is not connected to a Branch</span>
+                        <span><a href="#" data-toggle="modal" data-target="#branchModal">Click here</a> to create or select one.</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-column mb-2">
+                    <div class="label">
+                        <label for="" class="gray font-bold font-size-18">Overview</label>
+                    </div>
 
-        {% if not request.user.branch %}
-        <div class="d-flex flex-column align-items-center justify-content-center">
-            <span>It seems your user profile is not connected to a Branch</span>
-            <span><a href="#" data-toggle="modal" data-target="#branchModal">Click here</a> to create or select one.</span>
+                    <div class="d-flex d-flex-row">
+                        <div style="flex:1" class="border b-radius-10 box-shadow-medium p-2 mr-2">help</div>
+                        <div style="flex:1" class="border b-radius-10 box-shadow-medium p-2 mx-4">help</div>
+                        <div style="flex:1" class="border b-radius-10 box-shadow-medium p-2 ml-2">help</div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex h-100" id="main-body-right">
+                
+            </div>
         </div>
-        {% endif %}
+    </div>
+    <div class="container" style="height: 90vh;">
+
+        
 
         <!-- CREATE BRANCH OR CONNECT TO A BRANCH -->
         <div class="modal fade" id="branchModal">
