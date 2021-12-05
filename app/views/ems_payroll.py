@@ -215,6 +215,7 @@ class EMS_GeneratePayroll(APIView):
             
             totalBonus = Decimal(0)
             totalBonusThisPeriod = Decimal(0)
+            taxedbonus = Decimal(0)
 
             for bonuses in payroll.bonuspay.all():
                 payroll.grossPayAfterBonus += bonuses.amount
@@ -231,6 +232,7 @@ class EMS_GeneratePayroll(APIView):
                 else:
                     payroll.grossPayAfterBonus += totalBonusThisPeriod
                 payroll.netPayBeforeTaxes = payroll.grossPayAfterBonus
+                taxedbonus = (totalBonus + totalBonusThisPeriod - Decimal(90000))
             else:
                 payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
                 
