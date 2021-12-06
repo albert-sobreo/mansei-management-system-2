@@ -227,6 +227,10 @@ body{
     box-shadow: 0px 2px 10px rgba(0,0,0,0.20);
 }
 
+.box-shadow-small-2{
+    box-shadow: 0px 4px 28px rgba(0,0,0,0.15);
+}
+
 .text-shadow-small{
     text-shadow: 0px 2px 10px rgba(0,0,0,0.20);
 }
@@ -1304,4 +1308,56 @@ select.form-control{
 
 .flex-even {
     flex: 1;
+}
+
+.dash-green{
+    color: #28E324;
+}
+
+.dash-dark-green{
+    color: #7CD957;
+}
+
+.dash-yellow{
+    color: #E3AE24;
+}
+
+.dash-violet{
+    color: #5363F9;
+}
+
+.box-1{
+    flex: 1 0 0;
+    height: auto;
+}
+
+.box-1:after{
+    content: "";
+    display: block;
+    padding-top: 60%;
+}
+
+.box-2{
+    flex: 2 0 0;
+    height: auto;
+}
+
+.box-2:after{
+    content: "";
+    display: block;
+    padding-top: 20%;
+}
+
+.c-flex{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.dash-gray, .dash-grey{
+    background-color: #293339;
+    color: white;
+}
+
+.c-border-left{
+    border-left: 1px solid rgb(83, 83, 83);
 }

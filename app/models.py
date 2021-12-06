@@ -1612,6 +1612,7 @@ class BranchDefaultChildAccount(models.Model):
     sales = models.ForeignKey(AccountChild, related_name="branchsales", on_delete=models.CASCADE, blank = True, null = True)
     costOfSales = models.ForeignKey(AccountChild, related_name="branchcostofsales", on_delete=models.CASCADE, blank = True, null = True)
     otherIncome = models.ForeignKey(AccountChild, related_name="branchotherincome", on_delete=models.CASCADE, blank = True, null = True)
+    revenue = models.ForeignKey(AccountChild, related_name="branchrevenue", on_delete=models.CASCADE, blank = True, null = True)
     cwit = models.ForeignKey(AccountChild, related_name="branchcwit", on_delete=models.CASCADE, blank = True, null = True)
     salariesExpense = models.ForeignKey(AccountChild, related_name="branchsalariesexpense", on_delete=models.CASCADE, blank = True, null = True)
     bonus = models.ForeignKey(AccountChild, related_name="branchbonus", on_delete=models.CASCADE, blank = True, null = True)    

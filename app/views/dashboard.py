@@ -10,7 +10,8 @@ from decimal import Decimal
 class DashboardView(View):
     def get(self, request):
         context = {
-            'branches': Branch.objects.all()
+            'branches': Branch.objects.all(),
+            "revenue": request.user.branch.accountGroup.get(name__regex=r'[Rr]evenue')
         }
         return render(request, 'dashboard.html', context)
 
