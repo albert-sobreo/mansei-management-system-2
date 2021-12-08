@@ -171,3 +171,13 @@ class PPS_DeleteEditProject(APIView):
         sleep(1)
 
         return JsonResponse(0, safe=False)
+
+class MoveTaskToStage(APIView):
+    def post(self, request):
+        data = request.data
+
+        task = ProjectTask.objects.get(pk=data['taskID'])
+        task.projectStage = ProjectStage.objects.get(pk=data['stageID'])
+        task.save()
+
+        return JsonResponse(0, safe=False)

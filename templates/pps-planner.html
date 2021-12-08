@@ -163,7 +163,17 @@
                                 </div>
     
                                 <div class="stage-mid-3-container d-flex flex-column mt-2">
-                                    <a href="#actionCollapse" data-toggle="collapse"><span class="gray font-semibold">Actions <i class="fas fa-caret-right"></i></span></a>
+                                    <a :href="`#actionCollapse` + task.id" data-toggle="collapse"><span class="gray font-semibold">Actions <i class="fas fa-caret-right"></i></span></a>
+                                    <div class="collapse" :id="'actionCollapse' + task.id">
+                                        <div>
+                                            <label for="">Move Task to:</label>
+                                            <select v-model="task.movetostage" name="" id="" class="form-control">
+                                                <option value="" disabled selected>Select Stage</option>
+                                                <option v-for="stage in projectPlan.projectstage" :value="stage.id">[[stage.name]]</option>
+                                            </select>
+                                            <button class="btn btn-primary" @click="moveTaskToStage(task.id, task.movetostage)">Move</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -638,6 +648,7 @@
                         datetimeStart: null,
                         datetimeEnd: null,
                         notes: null,
+                        movetostage: '',
                         projectassignee: [{
                             user: {
                                 first_name: null,
@@ -1512,6 +1523,25 @@
                             }
                         })
                     }
+                })
+            },
+
+            moveTaskToStage(taskID, stageID){
+                axios.post('/move-task-to-stage/', {taskID: taskID, stageID: stageID}, this.config)
+                .then(res=>{
+                    if(res.data==0){
+                        this.onLoad()
+                        .then(res=>{
+                            this.fetchProjectPlan(this.projectPlan.id)
+                        })
+                    }
+                })
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: 'error',
+                        html: err.message
+                    })
                 })
             }
         },

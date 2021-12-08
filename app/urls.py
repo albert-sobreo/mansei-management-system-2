@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.urls import urlpatterns
 from django.urls import path, include
+
 from . import views
 from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
@@ -388,5 +389,6 @@ urlpatterns = [
     path('save-my-profile-password/', login_required(views.MyProfileSavePassword.as_view())),
     path('save-my-profile-email/', login_required(views.MyProfileSaveEmail.as_view())),
     path('qr-generator/', login_required(views.QRGeneratorView.as_view())),
-    path('total-bonus-of-user-for-current-year/', login_required(views.TotalBonusOfUserForCurrentYearAPI.as_view()))
+    path('total-bonus-of-user-for-current-year/', login_required(views.TotalBonusOfUserForCurrentYearAPI.as_view())),
+    path('move-task-to-stage/', login_required(views.MoveTaskToStage.as_view()))
 ]
