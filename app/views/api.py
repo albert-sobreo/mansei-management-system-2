@@ -526,3 +526,18 @@ class AssigneeAPI(viewsets.ModelViewSet):
         serializer = UserNameOnlySZ(queryset, many=True)
         return Response(serializer.data)
 
+class TotalBonusOfUserForCurrentYearAPI(APIView):
+    def post(self, request):
+        data = request.data
+        user = User.objects.get(pk=data['user'])
+
+        payroll = user.payroll.filter(year=data['year'])
+
+        totalBonusAmount = 0
+
+        for pay in payroll: 
+            for bonus in pay.bonuspay.all():
+                totalBonusAmount += bonus.amount
+
+        print(totalBonusAmount)
+        return JsonResponse(totalBonusAmount, safe=False)

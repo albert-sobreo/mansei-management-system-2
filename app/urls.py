@@ -387,5 +387,6 @@ urlpatterns = [
     path('save-my-profile-employee-info/', login_required(views.MyProfileSaveEmployeeInfo.as_view())),
     path('save-my-profile-password/', login_required(views.MyProfileSavePassword.as_view())),
     path('save-my-profile-email/', login_required(views.MyProfileSaveEmail.as_view())),
-    path('qr-generator/', login_required(views.QRGeneratorView.as_view()))
+    path('qr-generator/', login_required(views.QRGeneratorView.as_view())),
+    path('total-bonus-of-user-for-current-year/', login_required(views.TotalBonusOfUserForCurrentYearAPI.as_view()))
 ]

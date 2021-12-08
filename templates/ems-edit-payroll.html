@@ -985,22 +985,46 @@
 
 
             sssemployeededuction(){
-                return Number(this.payroll.sssemployeededuction.ee)
+                try{
+                    return Number(this.payroll.sssemployeededuction.ee)
+                } catch(err) {
+                    return 0
+                }
             },
             phicemployeededuction(){
-                return Number(this.payroll.phicemployeededuction.ee)
+                try{
+                    return Number(this.payroll.phicemployeededuction.ee)
+                } catch(err){
+                    return 0
+                }
             },
             pagibigemployeededuction(){
-                return Number(this.payroll.pagibigemployeededuction.amount)
+                try{
+                    return Number(this.payroll.pagibigemployeededuction.amount)
+                } catch(err){
+                    return 0
+                }
             },
             employeetaxdeduction(){
-                return Number(this.payroll.employeetaxdeduction.amount)
+                try{
+                    return Number(this.payroll.employeetaxdeduction.amount)
+                } catch(err){
+                    return 0
+                }
             },
             deminimispay(){
-                return this.payroll.deminimispay.map(item=> item.taxable?item.amount:0)
+                try{
+                    return this.payroll.deminimispay.map(item=> item.taxable?item.amount:0)
+                } catch(err){
+                    return 0
+                }
             },
             bonuspay(){
-                return this.payroll.bonuspay.map(item=>item.amount)
+                try{
+                    return this.payroll.bonuspay.map(item=>item.amount)
+                } catch(err){
+                    return 0
+                }
             }
         },
 
@@ -1121,6 +1145,9 @@
                     "X-CSRFToken": getCookie('csrftoken'),
                 }
 			},
+
+            yearTotalBonus: 0, //excludes bonuses for this period
+
             deminimis: {
 
             },
@@ -1128,6 +1155,7 @@
                 user: {
                     first_name: null,
                     last_name: null,
+                    id: null,
                 },
                 sssemployeededuction: {
                     ee: 0,
@@ -1294,14 +1322,18 @@
                         this.payroll.grossPayAfterBonus += Number(item.amount)
                     }
                 })
+
+                var totalBonusThisPeriod = 0
                 this.payroll.bonuspay.forEach(item=>{
                     this.payroll.grossPayAfterBonus += Number(item.amount)
                 })
+                
                 this.payroll.netPayBeforeTaxes = 
                     Number(this.payroll.grossPayBeforeBonus) -
                     Number(this.sssemployeededuction) - 
                     Number(this.phicemployeededuction) - 
                     Number(this.pagibigemployeededuction)
+
                 this.payroll.netPayAfterTaxes = 
                     Number(this.payroll.netPayBeforeTaxes) - 
                     Number(this.employeetaxdeduction) +
@@ -1608,6 +1640,12 @@
                 console.log(res.data)
                 this.payroll=res.data
             })
+            .then(res=>{
+                axios.post('/total-bonus-of-user-for-current-year/', {user: this.payroll.user.id, year: this.payroll.year}, this.config)
+                .then(res2=>{
+                    this.yearTotalBonus = res2.data
+                })
+            })
             .catch(err=>{
                 Swal.fire({
                     title: "Something went wrong.",
@@ -1618,6 +1656,8 @@
 
             axios.get('/api/deminimis/')
             .then(res=>this.deminimis = res.data)
+
+            
         }
     })
 </script>

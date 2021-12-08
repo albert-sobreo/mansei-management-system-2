@@ -67,6 +67,13 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+class Notepad(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='notepad')
+    notes = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.user.first_name + " " + self.user.last_name
+
 class UserLeave(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userleave', null=True, blank=True)
     sLeave = models.IntegerField(default=0) # sick leave

@@ -59,6 +59,7 @@ Vue.component('navbar-gas', {
             <a href="/customers/" class="mx-3" id="nav-customers">Customers</a>
             <a href="/vendors/" class="mx-3" id="nav-vendors">Vendors</a>
             <a href="/bank-recon/" class="mx-3" id="nav-bank-recon">Bank Reconciliation</a>
+            <a href="#" class="mx-3" id="nav-petty-cash">Petty Cash</a>
             <a href="/chart-of-accounts/" class="mx-3" id="nav-accounts">Chart of Accounts</a>
             <a href="/ppe/" class="mx-3" id="nav-ppe">PPE</a>
             <div class="btn-group mx-3">
