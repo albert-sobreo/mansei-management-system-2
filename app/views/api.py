@@ -580,7 +580,8 @@ class DashboardAPI(APIView):
 
         try:
             dashData["user"] = serializer.data
-        except:
+        except Exception as e:
+            print(e)
             dashData['user'] = None
 
         return JsonResponse(dashData, safe=False)
