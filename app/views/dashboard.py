@@ -15,6 +15,22 @@ class DashboardView(View):
         }
         return render(request, 'dashboard.html', context)
 
+class SaveNotepad(APIView):
+    def post(self, request):
+        data = request.data
+        user = User.objects.get(pk=data['userID'])
+        print(data)
+        try:
+            user.notepad.notes = data['notepad']
+            user.notepad.save()
+        except:
+            notepad = Notepad()
+            notepad.user = user
+            notepad.notes = data['notepad']
+            notepad.save()
+        
+        return JsonResponse(0, safe=False)
+
 class CreateBranchInDashboard(APIView):
     def post(self, request, format=None):
         branch = request.data

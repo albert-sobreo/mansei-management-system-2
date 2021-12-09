@@ -390,5 +390,7 @@ urlpatterns = [
     path('save-my-profile-email/', login_required(views.MyProfileSaveEmail.as_view())),
     path('qr-generator/', login_required(views.QRGeneratorView.as_view())),
     path('total-bonus-of-user-for-current-year/', login_required(views.TotalBonusOfUserForCurrentYearAPI.as_view())),
-    path('move-task-to-stage/', login_required(views.MoveTaskToStage.as_view()))
+    path('move-task-to-stage/', login_required(views.MoveTaskToStage.as_view())),
+    path('dashboard-data/', login_required(views.DashboardAPI.as_view())),
+    path('save-notepad/', login_required(views.SaveNotepad.as_view()))
 ]

@@ -3,6 +3,7 @@ from django.http.response import Http404, JsonResponse
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.decorators import permission_classes
+from rest_framework.serializers import Serializer
 from ..serializers import *
 from rest_framework.views import APIView
 from ..models import *
@@ -541,3 +542,45 @@ class TotalBonusOfUserForCurrentYearAPI(APIView):
 
         print(totalBonusAmount)
         return JsonResponse(totalBonusAmount, safe=False)
+
+class DashboardAPI(APIView):
+    def get(self, request):
+        data = request.data
+        serializer = UserDashboardSZ(request.user)
+
+        # dashData = {
+        #     "branchName": request.user.branch.name,
+        #     "merchAmount": request.user.branch.branchProfile.branchDefaultChildAccount.merchInventory.amount,
+        #     "salesAmount": request.user.branch.branchProfile.branchDefaultChildAccount.sales.amount,
+        #     "revAmount": request.user.branch.accountGroup.get(name__regex=r'[Rr]evenue').amount,
+        #     'user': serializer.data
+        # }
+
+        dashData = {}
+
+        try:
+            dashData['branchName'] = request.user.branch.name
+        except:
+            dashData['branchName'] = "Null"
+        
+        try:
+            dashData['merchAmount'] = request.user.branch.branchProfile.branchDefaultChildAccount.merchInventory.amount
+        except:
+            dashData['merchAmount'] = 0
+
+        try:
+            dashData["salesAmount"] = request.user.branch.branchProfile.branchDefaultChildAccount.sales.amount
+        except:
+            dashData["salesAmount"] = 0
+
+        try:
+            dashData["revAmount"] = request.user.branch.accountGroup.get(name__regex=r'[Rr]evenue').amount
+        except:
+            dashData["revAmount"] = 0
+
+        try:
+            dashData["user"] = serializer.data
+        except:
+            dashData['user'] = None
+
+        return JsonResponse(dashData, safe=False)

@@ -1141,3 +1141,25 @@ class ProjectDepartmentNestedSZ(MS):
     class Meta:
         model = ProjectDepartment
         fields = "__all__"
+
+
+
+
+
+
+########## DASHBOARD ##########
+class NotepadSZ(MS):
+    class Meta:
+        model = Notepad
+        fields = "__all__"
+
+class UserDashboardSZ(MS):
+    notepad = NotepadSZ(read_only=True)
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'id',
+            'notepad',
+        ]

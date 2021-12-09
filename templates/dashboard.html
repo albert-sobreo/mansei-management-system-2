@@ -38,7 +38,7 @@
             <div class="d-flex h-100 px-4 py-3 flex-column" id="main-body-main" style="max-height: 100vh; overflow: auto">
                 <div id="dashboard-title" class="mb-3">
                     {% if request.user.branch %}
-                    <span class="font-bold font-size-36">Welcome </span><span class="gray font-size-18 font-bold">to {{request.user.branch.name}}</span>
+                    <span class="font-bold font-size-36">Welcome </span><span class="gray font-size-18 font-bold">to [[dashData.branchName]]</span>
                     {% else %}
                     <span class="gray font-size-18 font-bold">not connected to a branch</span>
                     <div class="d-flex flex-column align-items-center justify-content-center">
@@ -59,7 +59,7 @@
                                     <img src="/static/media/icons/box.svg" alt="" height="auto" width="auto">
                                 </div>
                                 <div id="inv-value-container" class="d-flex flex-column justify-content-center">
-                                    <div id="inv-value"><span class="dash-green font-size-16 font-bold">₱[[formatPrice('{{request.user.branch.branchProfile.branchDefaultChildAccount.merchInventory.amount}}')]]</span></div>
+                                    <div id="inv-value"><span class="dash-green font-size-16 font-bold">₱[[formatPrice(dashData.merchAmount)]]</span></div>
                                     <div id="inv-label"><span class="font-size-12 font-bold gray">Inventory Value</span></div>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@
                                     <img src="/static/media/icons/sales.svg" alt="" height="auto" width="auto">
                                 </div>
                                 <div id="sales-value-container" class="d-flex flex-column justify-content-center">
-                                    <div id="inv-value"><span class="dash-yellow font-size-16 font-bold">₱[[formatPrice('{{request.user.branch.branchProfile.branchDefaultChildAccount.sales.amount}}')]]</span></div>
+                                    <div id="inv-value"><span class="dash-yellow font-size-16 font-bold">₱[[formatPrice(dashData.salesAmount)]]</span></div>
                                     <div id="inv-label"><span class="font-size-12 font-bold gray">Total Sales</span></div>
                                 </div>
                             </div>
@@ -81,7 +81,7 @@
                                     <img src="/static/media/icons/revenue.svg" alt="" height="auto" width="auto">
                                 </div>
                                 <div id="sales-value-container" class="d-flex flex-column justify-content-center">
-                                    <div id="inv-value"><span class="dash-violet font-size-16 font-bold">₱[[formatPrice('{{revenue.amount}}')]]</span></div>
+                                    <div id="inv-value"><span class="dash-violet font-size-16 font-bold">₱[[formatPrice(dashData.revAmount)]]</span></div>
                                     <div id="inv-label"><span class="font-size-12 font-bold gray">Total Revenue</span></div>
                                 </div>
                             </div>
@@ -170,16 +170,15 @@
                 <div class="d-flex flex-column mb-5">
                     <label for="" class="gray font-bold font-size-18">Notepad</label>
                     <div class="d-flex flex-column box-shadow-small-2 b-radius-10">
-                        <div class="b-tl-radius-10 b-tr-radius-10" id="note-titlebar" style="width: 100%; height: 20px; background: #FFDD65"></div>
-                        <div class="p-4 d-flex flex-column justify-content-center align-items-center">
-                            <img src="/static/media/icons/crane.svg" height="32px" alt="">
-                            <span class="font-bold">Under Development</span>
+                        <div class="b-tl-radius-10 b-tr-radius-10 d-flex align-items-center justify-content-end px-2" id="note-titlebar" style="width: 100%; height: 20px; background: #FFDD65">
+                            <i class="fas fa-check-circle text-success" id="notepad-success" style="opacity: 0; position: absolute"></i>
+                            <i class="fas fa-times-circle text-danger" id="notepad-error" style="opacity: 0; position: absolute"></i>
                         </div>
                         <div class="p-2">
-                            <textarea name="" id="" rows="5" style="width: 100%; border: none; background: none" placeholder="Enter Notes"></textarea>
+                            <textarea v-model="dashData.user.notepad.notes" name="" id="notepad" rows="5" style="width: 100%; border: none; background: none" placeholder="Enter Notes"></textarea>
                         </div>
                         <div class=" px-2 d-flex justify-content-end" style="height: 20px;">
-                            <a href="#" class="link font-size-10">Save</a>
+                            <span class="link font-size-10" @click="submitNotepad()">Save</span>
                         </div>
                     </div>
                 </div>
@@ -242,6 +241,7 @@
             </div>
         </div>
     </div>
+    <!-- <pre>[[$data]]</pre> -->
 </div>
 
 {% endblock %}
@@ -259,6 +259,21 @@
                 }
             },
 
+            dashData: {
+                branchName: null,
+                merchAmount: null,
+                salesAmount: null,
+                revAmount: null,
+                user: {
+                    first_name: null,
+                    last_name: null,
+                    id: null,
+                    notepad: {
+                        notes: null,
+                    },
+                }
+            },
+
             type: 'createBranch',
 
             create: {
@@ -271,6 +286,17 @@
         },
 
         methods: {
+            async onload(){
+                axios.get('/dashboard-data/')
+                .then(res=>{
+                    this.dashData = res.data
+                    if(!this.dashData.user.notepad){
+                        this.dashData.user.notepad = {
+                            notes: null
+                        }
+                    }
+                })
+            },
             createBranch(){
                 axios.post('/create-branch-in-dashboard/', this.create, this.config)
                 .then(res=>res.data==0?location.reload():'')
@@ -303,7 +329,27 @@
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
             },
+
+            submitNotepad(){
+                axios.post('/save-notepad/', {userID: this.dashData.user.id, notepad: this.dashData.user.notepad.notes}, this.config)
+                .then(res=>{
+                    if(res.data == 0){
+                        this.onload()
+                        $("#notepad-success").css('opacity', '1')
+                        $("#notepad-success").fadeTo(4000, 0)
+
+                    }
+                })
+                .catch(err=>{
+                    $("#notepad-error").css('opacity', '1')
+                    $("#notepad-error").fadeTo(4000, 0)
+                })
+            }
         },
+
+        mounted(){
+            this.onload()
+        }
     })
 </script>
 
