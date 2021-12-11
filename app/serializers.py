@@ -1162,4 +1162,11 @@ class UserDashboardSZ(MS):
             'last_name',
             'id',
             'notepad',
+            'authLevel',
         ]
+
+########## ANNOUNCEMENT ##########
+class AnnouncementSZ(MS):
+    class Meta:
+        model = Announcement
+        fields = "__all__"

@@ -157,12 +157,18 @@
 
                 <div class="d-flex flex-column mb-5">
                     <label for="" class="gray font-bold font-size-18">Announcements</label>
-                    <div class="d-flex flex-column box-shadow-small-2 b-radius-10 px-3 py-1">
-                        <!-- <span class="font-size-12 font-medium py-1">🎉 Happy Birthday to me!</span>
-                        <span class="font-size-12 font-medium py-1">👙 Beach Party Tomorrow!</span> -->
-                        <div class="p-4 d-flex flex-column justify-content-center align-items-center">
-                            <img src="/static/media/icons/crane.svg" height="32px" alt="">
-                            <span class="font-bold">Under Development</span>
+                    <div class="d-flex flex-column box-shadow-small-2 b-radius-10">
+                        <div class="b-tl-radius-10 b-tr-radius-10 d-flex align-items-center justify-content-end px-2 pt-1" id="note-titlebar" style="width: 100%; height: 20px;">
+                            <span data-toggle="modal" data-target="#createAnnouncementModal" class="link">+ Create Announcements</span>
+                        </div>
+                        <div class="d-flex flex-column px-3 py-1">
+                            <div v-for="announcement in dashData.announcements" class="d-flex justify-content-between align-items-center mb-1">
+                                <div>
+                                    <span class="font-size-14 font-bold">[[announcement.title]]</span><br>
+                                    <span class="font-size-12 font-medium py-1">[[announcement.contents]]</span>
+                                </div>
+                                <span @click="deleteAnnouncement(announcement.id)" class="link font-size-10 gray"><i class="fas fa-trash-alt"></i></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -184,6 +190,43 @@
                 </div>
             </div>
         </div>
+
+        <!-- CREATE ANNOUNCEMENTS -->
+        <div class="modal fade" id="createAnnouncementModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Create An Announcement</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Title</label>
+                                <input v-model="createAnnouncement.title" placeholder="Enter Announcement Title" type="text" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Content</label>
+                                <textarea v-model="createAnnouncement.contents" placeholder="Enter Announcement Content" name="" id="" cols="30" rows="3" class="form-control"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col">
+                                <button @click="submitAnnouncement()" class="btn btn-primary col">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- CREATE BRANCH OR CONNECT TO A BRANCH -->
         <div class="modal fade" id="branchModal">
             <div class="modal-dialog">
@@ -241,7 +284,7 @@
             </div>
         </div>
     </div>
-    <!-- <pre>[[$data]]</pre> -->
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -264,6 +307,7 @@
                 merchAmount: null,
                 salesAmount: null,
                 revAmount: null,
+                announcements: [],
                 user: {
                     first_name: null,
                     last_name: null,
@@ -278,6 +322,11 @@
 
             create: {
                 branchName: null,
+            },
+
+            createAnnouncement: {
+                title: null,
+                contents: null,
             },
 
             connect: {
@@ -296,6 +345,13 @@
                         }
                     }
                 })
+            },
+
+            resetCreateAnnouncement(){
+                this.createAnnouncement = {
+                    title: null,
+                    contents: null,
+                }
             },
             createBranch(){
                 axios.post('/create-branch-in-dashboard/', this.create, this.config)
@@ -343,6 +399,25 @@
                 .catch(err=>{
                     $("#notepad-error").css('opacity', '1')
                     $("#notepad-error").fadeTo(4000, 0)
+                })
+            },
+
+            submitAnnouncement(){
+                axios.post('/save-announcement/', this.createAnnouncement, this.config)
+                .then(res=>{
+                    if(res.data == 0){
+                        this.onload()
+                        this.resetCreateAnnouncement()
+                    }
+                })
+            },
+
+            deleteAnnouncement(aID){
+                axios.post('/delete-announcement/', {id: aID}, this.config)
+                .then(res=>{
+                    if(res.data == 0){
+                        this.onload()
+                    }
                 })
             }
         },

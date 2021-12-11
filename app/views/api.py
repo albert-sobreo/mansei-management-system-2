@@ -584,4 +584,10 @@ class DashboardAPI(APIView):
             print(e)
             dashData['user'] = None
 
+        try:
+            serializer = AnnouncementSZ(request.user.branch.branchannouncement, many=True)
+            dashData["announcements"] = serializer.data
+        except:
+            dashData["announcements"] = []
+
         return JsonResponse(dashData, safe=False)

@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from ..forms import *
 from ..models import *
 from decimal import Decimal
+from time import sleep
 
 class DashboardView(View):
     def get(self, request):
@@ -29,6 +30,26 @@ class SaveNotepad(APIView):
             notepad.notes = data['notepad']
             notepad.save()
         
+        return JsonResponse(0, safe=False)
+
+class SaveAnnouncement(APIView):
+    def post(self, request):
+        data = request.data
+        announce = Announcement()
+
+        announce.title = data['title']
+        announce.contents = data['contents']
+        announce.branch = request.user.branch
+
+        announce.save()
+
+        return JsonResponse(0, safe=False)
+
+class DeleteAnnouncement(APIView):
+    def post(self, request):
+        data= request.data
+        Announcement.objects.get(pk=data['id']).delete()
+
         return JsonResponse(0, safe=False)
 
 class CreateBranchInDashboard(APIView):

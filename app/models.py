@@ -39,7 +39,7 @@ class Schedule(models.Model):
 class User(AbstractUser):
     address = models.CharField(max_length=1024, null=True, blank=True)
     authLevel = models.CharField(max_length=50, null = True, blank = True)
-    position = models.CharField(max_length=20, null = True, blank = True)
+    position = models.CharField(max_length=20, null = True, blank = True) 
     bloodType = models.CharField(max_length=10, null=True, blank=True)
     image = models.ImageField(default='profile-pictures/person.png', upload_to='profile-pictures/', null = True, blank = True)
     idUser = models.CharField(max_length=50, null = True, blank = True)
@@ -1790,3 +1790,8 @@ class Branch(models.Model):
 
     def __str__(self):
         return self.name
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=255)
+    contents = models.TextField(null = True, blank=True)
+    branch = models.ForeignKey(Branch, related_name="branchannouncement", on_delete=models.CASCADE)
