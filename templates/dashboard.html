@@ -158,11 +158,11 @@
                 <div class="d-flex flex-column mb-5">
                     <label for="" class="gray font-bold font-size-18">Announcements</label>
                     <div class="d-flex flex-column box-shadow-small-2 b-radius-10">
-                        <div class="b-tl-radius-10 b-tr-radius-10 d-flex align-items-center justify-content-end px-2 pt-1" id="note-titlebar" style="width: 100%; height: 20px;">
+                        <div v-if="dashData.user.authLevel == 0 || dashData.user.authLevel == 1" class="b-tl-radius-10 b-tr-radius-10 d-flex align-items-center justify-content-end px-2 pt-1" id="note-titlebar" style="width: 100%; height: 20px;">
                             <span data-toggle="modal" data-target="#createAnnouncementModal" class="link">+ Create Announcements</span>
                         </div>
                         <div class="d-flex flex-column px-3 py-1">
-                            <div v-for="announcement in dashData.announcements" class="d-flex justify-content-between align-items-center mb-1">
+                            <div v-for="announcement in dashData.announcements" class="d-flex justify-content-between align-items-center my-1">
                                 <div>
                                     <span class="font-size-14 font-bold">[[announcement.title]]</span><br>
                                     <span class="font-size-12 font-medium py-1">[[announcement.contents]]</span>
