@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from ..models import *
-from django.http.response import JsonResponse
+from django.http.response import FileResponse, JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
 from ..forms import *
@@ -10,6 +10,9 @@ import pandas as pd
 import json
 import datetime
 from .journalAPI import jeAPI
+import io
+import xlsxwriter
+import string
 
 class EMS_PayrollView(View):
     def get(self, request):
@@ -578,3 +581,122 @@ class EMS_EditPayrollSave(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class GenerateAnnualizationView(APIView):
+    def get(self, request):
+        print(request.GET['year'])
+        if Annualization.objects.filter(year = request.GET['year']):
+            return redirect('/ems-payroll/')
+            
+        annual = Annualization()
+        buffer = io.BytesIO()
+        workbook = xlsxwriter.Workbook(buffer)
+        worksheet = workbook.add_worksheet()
+
+        #### ENTER FOR LOOP BELOW ####
+        # worksheet.write(row, col, data)
+        HEADERS = [
+            'Employees',
+            'Class',
+            '13th Month Pay and other Bonuses',
+            'Total Basic Pay',
+            'Total Holiday Pay',
+            'Total OT Pay',
+            'Total ND Pay',
+            'Total NDOT Pay',
+            'Total Hazard Pay',
+            'Total De Minimis Pay',
+            'Total SSS PHIC HDMF',
+            'Total Gross Pay',
+            'Total Non-Taxable',
+            'Total Withholding'
+        ]
+
+        row = 0
+        col = 0
+
+        for header in HEADERS:
+            worksheet.write(row, col, header)
+            worksheet.set_column(row, col, 20)
+            col += 1
+
+        employees = request.user.branch.user.all().exclude(authLevel='dtr')
+
+        for employee in employees:
+            row += 1
+            col = 0
+
+            bonus13th = Decimal(0)
+            data = {
+                'name': '',
+                'class': '',
+                'bonusand13th': Decimal(0),
+                'basic': Decimal(0),
+                'holiday': Decimal(0),
+                'ot': Decimal(0),
+                'nd': Decimal(0),
+                'ndot': Decimal(0),
+                'hazard': Decimal(0),
+                'deminimis': Decimal(0),
+                'deductions': Decimal(0),
+                'gross': Decimal(0),
+                'nontax': Decimal(0),
+                'withhold': Decimal(0)
+            }
+
+            data['name'] = employee.first_name + " " + employee.last_name
+
+            for payroll in employee.payroll.filter(year=request.GET['year']):
+                data['basic'] += payroll.basicPay
+                data['holiday'] += payroll.holidayPay + payroll.rh + payroll.sh + payroll.shw
+                data['ot'] += payroll.ot + payroll.rdot + payroll.rhot + payroll.shot + payroll.shwot + payroll.rhrdot + payroll.shrdot
+                data['nd'] += payroll.nd + payroll.rdnd + payroll.rhnd + payroll.shnd + payroll.shwnd + payroll.rhrdnd + payroll.shrdnd
+                data['ndot'] += payroll.ndot + payroll.rdndot + payroll.rhndot + payroll.shndot + payroll.shwndot + payroll.rhrdndot + payroll.shrdndot
+                data['gross'] += payroll.grossPayAfterBonus
+                
+                try:
+                    for bonus in payroll.bonuspay.all():
+                        data['bonusand13th'] += bonus.amount
+                except Exception as e:
+                    print(e)
+
+                try:
+                    for deminimis in payroll.deminimispay.all():
+                        data['deminimis'] += deminimis.amount
+                except Exception as e:
+                    print(e)
+
+                try:
+                    data['deductions'] += payroll.sssemployeededuction.ee
+                except Exception as e:
+                    print(e)
+
+                try:
+                    data['deductions'] += payroll.phicemployeededuction.ee
+                except Exception as e:
+                    print(e)
+                
+                try:
+                    data['deductions'] += payroll.pagibigemployeededuction.amount
+                except Exception as e:
+                    print(e)
+
+                try:
+                    data['withhold'] += payroll.employeetaxdeduction.amount
+                except Exception as e:
+                    print(e)
+
+                try:
+                    for bonus13 in employee.bonus13th.all():
+                        data['bonusand13th'] += bonus13.amount
+                except Exception as e:
+                    print(e)
+
+            for key, val in data.items():
+                worksheet.write(row, col, val)
+                col += 1
+            
+
+        workbook.close()
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename='Annualization.xlsx')

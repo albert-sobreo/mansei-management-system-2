@@ -1314,7 +1314,11 @@ class BonusPay(models.Model):
     payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name="bonuspay")
     name = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=20, decimal_places=2)
-    
+
+class Bonus13th(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="bonus13th")
+    year = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=20, decimal_places=2)
 
 class DayOff(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True, blank=True)
@@ -1599,6 +1603,11 @@ class ProjectAssignee(models.Model):
     def __str__(self):
         return self.projectTask.name + " --- " + self.user.first_name + " " + self.user.last_name
 
+class Annualization(models.Model):
+    excel = models.FileField(upload_to='files/')
+    name = models.CharField(max_length=50, null = True, blank = True)
+    year = models.CharField(max_length=50, null = True, blank = True)
+
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
     rm = models.ForeignKey(AccountChild, related_name="branchdefaultrm", on_delete=models.CASCADE, null=True, blank=True)
@@ -1788,6 +1797,9 @@ class Branch(models.Model):
     projectTask = models.ManyToManyField(ProjectTask, blank=True)
     projectAssignee = models.ManyToManyField(ProjectAssignee, blank=True)
 
+    #### ANNUALIZATION ####
+    annualization = models.ManyToManyField(Annualization, blank = True)
+
     def __str__(self):
         return self.name
 
@@ -1795,3 +1807,4 @@ class Announcement(models.Model):
     title = models.CharField(max_length=255)
     contents = models.TextField(null = True, blank=True)
     branch = models.ForeignKey(Branch, related_name="branchannouncement", on_delete=models.CASCADE)
+

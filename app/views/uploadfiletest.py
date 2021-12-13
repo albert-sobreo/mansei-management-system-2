@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from app.models import MerchandiseInventory, Warehouse
-from django.http.response import JsonResponse
+from django.http.response import FileResponse, JsonResponse
 from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
 from ..forms import *
@@ -18,3 +18,17 @@ class UploadView(View):
         t.file = request.FILES['file']
         t.save()
         return JsonResponse(0, safe=False)
+
+import io
+import xlsxwriter
+
+class ExcelReportAPI(View):
+    def get(self, request):
+        buffer = io.BytesIO()
+        workbook = xlsxwriter.Workbook(buffer)
+        worksheet = workbook.add_worksheet()
+        worksheet.write(0, 0, 'Some Data')
+        worksheet.write(0, 1, 'Some Data 2')
+        workbook.close()
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename='report.xlsx')

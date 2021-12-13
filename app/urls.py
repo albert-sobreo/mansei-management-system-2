@@ -393,6 +393,9 @@ urlpatterns = [
     path('move-task-to-stage/', login_required(views.MoveTaskToStage.as_view())),
     path('dashboard-data/', login_required(views.DashboardAPI.as_view())),
     path('save-notepad/', login_required(views.SaveNotepad.as_view())),
+
     path('save-announcement/', login_required(views.SaveAnnouncement.as_view())),
     path('delete-announcement/', login_required(views.DeleteAnnouncement.as_view())),
+    path('test-export/', login_required(views.ExcelReportAPI.as_view())),
+    path('annualization-export/', login_required(views.GenerateAnnualizationView.as_view()))
 ]
