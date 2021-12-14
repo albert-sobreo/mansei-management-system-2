@@ -397,6 +397,17 @@ class UserAPI2(viewsets.ModelViewSet):
     serializer_class = UserNameOnlySZ
     queryset = User.objects.all()
 
+class UserPayrollableAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserNameOnlySZ
+    queryset = User.objects.filter(payrollable=True)
+
+    @action(detail=False, methods=['get'])
+    def filterByBranch(self, request):
+        queryset = User.objects.filter(branch=request.user.branch, payrollable=True)
+        serializer = UserNameOnlySZ(queryset, many=True)
+        return Response(serializer.data)
+
 
 
 

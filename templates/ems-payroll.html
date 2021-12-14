@@ -21,6 +21,7 @@
             <div>
                 <button class="btn btn-primary mr-1" @click="confirmPayroll()">Generate Payroll</button>
                 <button class="btn btn-warning mx-1" @click="approveAll()">Approve All</button>
+                <button data-toggle="modal" data-target="#giveBonusModal" class="btn btn-secondary mx-1">Give Bonus</button>
                 <button class="btn btn-success ml-1" @click="generateAnnualization()">Annualization</button>
             </div>
 
@@ -88,6 +89,65 @@
                 {% endif %}
             </tbody>
         </table>
+
+        <!-- GIVE BONUS MODAL -->
+        <div class="modal fade" id="giveBonusModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Give Bonus</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="row mb-3" v-for="(bModal, ind) in giveBonusModal">
+                            <div class="col-12">
+                                <span class="font-size-14 font-bold">[[bModal.user.first_name]] [[bModal.user.last_name]]</span>
+                            </div>
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-6 pr-1">
+                                        <label class="gray font-semibold" for="">Bonus Name</label>
+                                    </div>
+                                    <div class="col-6 pl-1">
+                                        <label class="gray font-semibold" for="">Bonus Amount</label>
+                                    </div>
+                                    <template v-for="(bonus, index) in bModal.user.bonus">
+                                        <div class="col-6 pr-1">
+                                            <input v-model="bonus.name" placeholder="Enter Bonus Name" type="text" class="form-control">
+                                        </div>
+                                        <div class="col-6 pl-1">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">₱</span>
+                                                </div>
+                                                <input onkeypress="validate()" v-model="bonus.amount" placeholder="Enter Bonus Amount" type="text" class="form-control box-shadow-off">
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col mt-2">
+                                                <button class="btn btn-warning" @click="pushBonus(ind)">+</button>
+                                                <button class="btn btn-danger" @click="popBonus(ind)">-</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-primary col" @click="submitGiveBonus()">Save</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- PAYROLL MODAL -->
         <div class="modal fade" id="payrollModal">
@@ -330,6 +390,7 @@
             </div>
         </div>
     </div>
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -354,6 +415,18 @@
             dateRange: '',
             semiMonthPeriod: '',
             yearList: [],
+
+            giveBonusModal: [{
+                user:{
+                    id: null,
+                    first_name: null,
+                    last_name: null,
+                    bonus: [{
+                        name: null,
+                        amount: null,
+                    }]
+                }
+            }],
 
             modal: {
                 year: null,
@@ -451,7 +524,7 @@
         },
 
         methods: {
-            onload(){
+            async onload(){
                 axios.get('/year-api/')
                 .then(res=>this.yearList=res.data)
                 .catch(err=>{
@@ -461,7 +534,53 @@
                         html: err.message
                     })
                 })
+
+                axios.get('/api/user-payrollable/filterByBranch/')
+                .then(res=>{
+                    res.data.forEach((item,index)=>{
+                        if(index == 0){
+                            this.giveBonusModal[index].user.id = item.id
+                            this.giveBonusModal[index].user.first_name = item.first_name
+                            this.giveBonusModal[index].user.last_name = item.last_name
+                        } else {
+                            this.giveBonusModal.push({
+                                user: {
+                                    id: item.id,
+                                    first_name: item.first_name,
+                                    last_name: item.last_name,
+                                    bonus: [{
+                                        name: null,
+                                        amount: null,
+                                    }]
+                                }
+                            })
+                        }
+                        
+                    })
+                })
             },
+
+            pushBonus(index){
+                console.log('b0ss', index)
+                this.giveBonusModal[index].user.bonus.push(
+                    {
+                        name: null,
+                        amount: null,
+                    }
+                )
+            },
+
+            popBonus(index){
+                this.giveBonusModal[index].user.bonus.pop()
+            },
+
+            submitGiveBonus(){
+                axios.post('/add-bonus/', this.giveBonusModal, this.config)
+                .then(res=>{
+                    res.data==0?location.reload():''
+                })
+            },
+
             formatDate(value){
                 const months = [
                     'Jan',

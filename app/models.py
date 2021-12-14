@@ -1311,7 +1311,7 @@ class DeMinimisPay(models.Model):
 
 class BonusPay(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="bonuspay")
-    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name="bonuspay")
+    payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name="bonuspay", null=True, blank=True)
     name = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=20, decimal_places=2)
 

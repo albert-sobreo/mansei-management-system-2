@@ -220,24 +220,31 @@ class EMS_GeneratePayroll(APIView):
             totalBonusThisPeriod = Decimal(0)
             taxedbonus = Decimal(0)
 
+            for bonuspay in user.bonuspay.all():
+                if not bonuspay.payroll:
+                    bonuspay.payroll = payroll
+                    bonuspay.save()
+
             for bonuses in payroll.bonuspay.all():
                 payroll.grossPayAfterBonus += bonuses.amount
                 totalBonusThisPeriod += bonuses.amount
+            
             bonus += totalBonusThisPeriod
+            print('bonus ', bonus)
 
             for pay in allPayrollThisYear:
-                for bonus in pay.bonuspay:
-                    totalBonus += bonus.amount
-
-            if totalBonus >= Decimal(90000):
-                if totalBonus - totalBonusThisPeriod < Decimal(90000):
-                    payroll.grossPayAfterBonus += Decimal(90000) - (totalBonus - totalBonusThisPeriod)
-                else:
-                    payroll.grossPayAfterBonus += totalBonusThisPeriod
-                payroll.netPayBeforeTaxes = payroll.grossPayAfterBonus
-                taxedbonus = (totalBonus + totalBonusThisPeriod - Decimal(90000))
-            else:
-                payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
+                for b in pay.bonuspay.all():
+                    totalBonus += b.amount
+                    
+            # totalBonus += totalBonusThisPeriod
+            # if (totalBonus) >= Decimal(90000):
+            #     if totalBonus - totalBonusThisPeriod < Decimal(90000):
+            #         pass
+            #     else:
+            #         payroll.netPayBeforeTaxes = payroll.grossPayAfterBonus
+            #     taxedbonus = (totalBonus + totalBonusThisPeriod - Decimal(90000))
+            # else:
+            #     payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
                 
             #### END ####
 
@@ -417,6 +424,7 @@ class EMS_GeneratePayroll(APIView):
             for tax in incomeTaxTable:
                 taxDeducted = 0
                 if tax.lowerLimit < (payroll.netPayBeforeTaxes) <= tax.upperLimit:
+                    print(taxedbonus)
                     taxDeducted = ((((payroll.netPayBeforeTaxes) - tax.lowerLimit)) * tax.percentDeduction) + tax.fixedDeduction
 
                     taxDeductedObj.user = user
@@ -431,6 +439,7 @@ class EMS_GeneratePayroll(APIView):
  
             payroll.netPayAfterTaxes += untaxableBenefit
             payroll.netPayAfterTaxes -= employeeLoan
+            payroll.netPayAfterTaxes += payroll.grossPayAfterBonus - payroll.grossPayBeforeBonus
             salariesPayable += payroll.netPayAfterTaxes
                
             payroll.save()
@@ -700,3 +709,21 @@ class GenerateAnnualizationView(APIView):
         workbook.close()
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename='Annualization.xlsx')
+
+class PayrollAddBonus(APIView):
+    def post(self, request):
+
+        for data in request.data:
+            employee = User.objects.get(id = data['user']['id'])
+            for bonus in data['user']['bonus']:
+                bonusPay = BonusPay()
+                bonusPay.user = employee
+                bonusPay.name = bonus['name']
+                bonusPay.amount = bonus['amount']
+                bonusPay.save()
+                request.user.branch.bonusPay.add(bonusPay)
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+            
+            
