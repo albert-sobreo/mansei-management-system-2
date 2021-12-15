@@ -64,6 +64,7 @@ class EMS_GeneratePayroll(APIView):
         for user in users:
             holidays = Holiday.objects.filter(date__range=[dateStart, dateEnd], type='rh')
             holidays = list(holidays)
+            deminimis = Decimal(0)
             print(dateStart)
             x = dateStart.split('-')
             x[2] = str(int(x[2]) - 1)
@@ -211,10 +212,13 @@ class EMS_GeneratePayroll(APIView):
             salariesExpense += payroll.grossPayBeforeBonus
             payroll.grossPayAfterBonus = payroll.grossPayBeforeBonus
 
-            try: 
-                allPayrollThisYear = user.payroll.filter(year=dateEnd.split('-')[2])
-            except:
+            try:
+                allPayrollThisYear = user.payroll.filter(year=dateEnd.split('-')[0])
+            except Exception as e:
+                print(e)
                 allPayrollThisYear = []
+
+            print('all payroll', allPayrollThisYear)
             
             totalBonus = Decimal(0)
             totalBonusThisPeriod = Decimal(0)
@@ -235,16 +239,36 @@ class EMS_GeneratePayroll(APIView):
             for pay in allPayrollThisYear:
                 for b in pay.bonuspay.all():
                     totalBonus += b.amount
-                    
-            # totalBonus += totalBonusThisPeriod
-            # if (totalBonus) >= Decimal(90000):
-            #     if totalBonus - totalBonusThisPeriod < Decimal(90000):
-            #         pass
-            #     else:
-            #         payroll.netPayBeforeTaxes = payroll.grossPayAfterBonus
-            #     taxedbonus = (totalBonus + totalBonusThisPeriod - Decimal(90000))
-            # else:
-            #     payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
+
+            totalBonus += totalBonusThisPeriod
+            print(totalBonus, 'TotalBonus')
+            if (totalBonus) >= Decimal(90000):
+                if totalBonus - (totalBonusThisPeriod) < Decimal(90000):
+                    payroll.netPayBeforeTaxes = (payroll.grossPayBeforeBonus + (totalBonus - Decimal(90000)))
+                    payroll.netPayAfterTaxes += totalBonusThisPeriod - (totalBonus - Decimal(90000))
+                    print(payroll.netPayBeforeTaxes)
+                else:
+                    payroll.netPayBeforeTaxes = payroll.grossPayAfterBonus
+                    print(payroll.netPayBeforeTaxes)
+                taxedbonus = (totalBonus + totalBonusThisPeriod - Decimal(90000))
+            else:
+                payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
+
+            # SCENARIOS
+            # totalBonus = 92k
+            # currentBonus = 4k
+            # previousTotalBonus = 88k
+            
+            # if 92k - 4k < 90k
+            # if 96 - 4k < 90k
+
+            # totalBonus = 93k
+            # currentBonus = 5k
+            # previousBonus = 88k
+
+            # netpayBeforeTax = 93k - (totalBonus - 90k)
+            # netpayBeforeTax = grosspayBeforeTax + (totalBonus - 90k)
+            # netpayaftertax += (currentbonus - (totalbonus -90k))
                 
             #### END ####
 
@@ -433,13 +457,14 @@ class EMS_GeneratePayroll(APIView):
                     taxDeductedObj.incometaxtable = tax
                     taxDeductedObj.save()
 
-                    payroll.netPayAfterTaxes = payroll.netPayBeforeTaxes - taxDeducted
+                    payroll.netPayAfterTaxes += payroll.netPayBeforeTaxes - taxDeducted
 
                     withholdingTax += taxDeducted
  
             payroll.netPayAfterTaxes += untaxableBenefit
             payroll.netPayAfterTaxes -= employeeLoan
-            payroll.netPayAfterTaxes += payroll.grossPayAfterBonus - payroll.grossPayBeforeBonus
+            if totalBonus < Decimal(90000):
+                payroll.netPayAfterTaxes += payroll.grossPayAfterBonus - payroll.grossPayBeforeBonus - deminimis
             salariesPayable += payroll.netPayAfterTaxes
                
             payroll.save()
