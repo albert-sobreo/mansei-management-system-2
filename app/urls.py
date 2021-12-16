@@ -119,6 +119,7 @@ router.register(r"payroll", views.PayrollAPI, 'payroll')
 router.register(r'user', views.UserAPI, 'user')
 router.register(r'user2', views.UserAPI2, 'user2')
 router.register(r'user-payrollable', views.UserPayrollableAPI, 'user-payrollable')
+router.register(r'user-w-13', views.UserWith13thAPI, 'user-w-13')
 
 ########## DE MINIMIS ##########
 router.register(r'deminimis', views.DeMinimisAPI, 'user')
@@ -400,4 +401,7 @@ urlpatterns = [
     path('test-export/', login_required(views.ExcelReportAPI.as_view())),
     path('annualization-export/', login_required(views.GenerateAnnualizationView.as_view())),
     path('add-bonus/', login_required(views.PayrollAddBonus.as_view())),
+    path('generate-13th/', login_required(views.Give13thMonthPay.as_view())),
+    path('ems-13th/', login_required(views.EMS_13thMonthView.as_view())),
+    path('generate-13th-individual/', login_required(views.Give13thMonthPayIndividual.as_view()))
 ]

@@ -11,6 +11,13 @@
 
     <!-- MAIN BODY -->
     <div class="container">
+        <!-- NAV 2 -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links ems-nav">
+                <a href="/ems-payroll/" class="active-ems mx-2">Payroll</a>
+                <a href="/ems-13th/" class="mx-2">13th Month Pay</a>
+            </div>
+        </div>
         <!-- TITLE -->
         <div class="d-flex align-items-center mb-3">
             <span class="font-size-18 font-bold mr-1">Payroll</span>
@@ -19,10 +26,11 @@
         <!-- BUTTONS -->
         <div class="d-flex align-items-center mb-3 justify-content-between">
             <div>
-                <button class="btn btn-primary mr-1" @click="confirmPayroll()">Generate Payroll</button>
-                <button class="btn btn-warning mx-1" @click="approveAll()">Approve All</button>
-                <button data-toggle="modal" data-target="#giveBonusModal" class="btn btn-secondary mx-1">Give Bonus</button>
-                <button class="btn btn-success ml-1" @click="generateAnnualization()">Annualization</button>
+                <button class="btn btn-success" @click="confirmPayroll()">Generate Payroll</button>
+                <button class="btn btn-warning" @click="approveAll()">Approve All</button>
+                <button data-toggle="modal" data-target="#giveBonusModal" class="btn btn-ems">Give Bonus</button>
+                <button class="btn btn-ems" @click="generateAnnualization()">Annualization</button>
+                <button class="btn btn-ems" @click="generate13th()">Give 13th Month Pay</button>
             </div>
 
             <div>
@@ -753,7 +761,29 @@
             },
             generateAnnualization(){
                 location.href="/annualization-export?year="+String(this.year)
+            },
 
+            generate13th(){
+                Swal.fire({
+                    title: "Are your sure?",
+                    html: "Are you sure you want to generate 13th month pay?",
+                    icon: "warning",
+                    confirmButtonText: "I am sure.",
+                    showCancelButton: true
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        axios.post('/generate-13th/', {year: this.year}, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                        .catch(err=>{
+                            Swal.fire({
+                                title: "Something went wrong.",
+                                icon: "error",
+                                html: err.message
+                            })
+                        })
+                    }
+                })
             }
         },
         mounted(){

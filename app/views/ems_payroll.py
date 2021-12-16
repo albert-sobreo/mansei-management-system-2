@@ -328,6 +328,7 @@ class EMS_GeneratePayroll(APIView):
                 ]
                 for loan in user.loans.all():
                     if not loan.fullyPaid and loan.startOfAmortization <= datetime.date(int(dateEnd.split("-")[0]), int(dateEnd.split("-")[1]), int(dateEnd.split("-")[2])) and loan.startOfAmortization.day in firstPeriod:
+                        print('bigb0ss')
                         userLoan = LoanDeduction()
                         userLoan.user = user
                         userLoan.payroll = payroll
@@ -349,7 +350,8 @@ class EMS_GeneratePayroll(APIView):
                     11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
                 ]
                 for loan in user.loans.all():
-                    if not loan.fullyPaid and loan.startOfAmortization <= datetime.date(int(dateEnd.split("-")[0]), int(dateEnd.split("-")[1]), int(dateEnd.split("-")[2])) and loan.startOfAmortization in secondPeriod:
+                    if not loan.fullyPaid and loan.startOfAmortization <= datetime.date(int(dateEnd.split("-")[0]), int(dateEnd.split("-")[1]), int(dateEnd.split("-")[2])) and loan.startOfAmortization.day in secondPeriod:
+                        print('bigb0ss')
                         userLoan = LoanDeduction()
                         userLoan.user = user
                         userLoan.payroll = payroll
@@ -445,8 +447,8 @@ class EMS_GeneratePayroll(APIView):
 
             payroll.netPayBeforeTaxes += taxableBenefit
 
+            taxDeducted = 0
             for tax in incomeTaxTable:
-                taxDeducted = 0
                 if tax.lowerLimit < (payroll.netPayBeforeTaxes) <= tax.upperLimit:
                     print(taxedbonus)
                     taxDeducted = ((((payroll.netPayBeforeTaxes) - tax.lowerLimit)) * tax.percentDeduction) + tax.fixedDeduction
@@ -457,9 +459,12 @@ class EMS_GeneratePayroll(APIView):
                     taxDeductedObj.incometaxtable = tax
                     taxDeductedObj.save()
 
-                    payroll.netPayAfterTaxes += payroll.netPayBeforeTaxes - taxDeducted
+                    
 
                     withholdingTax += taxDeducted
+
+            print(payroll.netPayBeforeTaxes, 'netpaybeforetaxes')
+            payroll.netPayAfterTaxes += payroll.netPayBeforeTaxes - taxDeducted
  
             payroll.netPayAfterTaxes += untaxableBenefit
             payroll.netPayAfterTaxes -= employeeLoan
@@ -741,6 +746,8 @@ class PayrollAddBonus(APIView):
         for data in request.data:
             employee = User.objects.get(id = data['user']['id'])
             for bonus in data['user']['bonus']:
+                if not bonus['name'] or not bonus['amount']:
+                    continue
                 bonusPay = BonusPay()
                 bonusPay.user = employee
                 bonusPay.name = bonus['name']
@@ -751,4 +758,74 @@ class PayrollAddBonus(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
             
+
+class Give13thMonthPay(APIView):
+    def post(self, request):
+        """ THIS CODE IS GENERATE 13TH MONTH PAY 
+        STARTING FROM DEC 26 OF THE PREVIOUS YEAR 
+        TO CURRENT YEAR """
+
+        year = request.data['year']
+
+        users = request.user.branch.user.filter(payrollable = True)
+
+        usersW13thAlready = []
+
+        # LOOP ALL USERS OF THAT BRANCH
+        for user in users:
+            # INIT USERBASICPAY
+            userBasicPay = Decimal(0)
+
+            # LOOP ALL PAYROLL OF USER FOR THE WHOLE YEAR
+            for payroll in user.payroll.filter(year=year):
+                userBasicPay += payroll.basicPay
+
+            # CALCULATIONS OF 13TH MONTH PAY
+            if user.bonus13th.filter(year=year):
+                usersW13thAlready.append("{} {}".format(user.first_name, user.last_name))
+                continue
+            month13thPay = Decimal(userBasicPay/Decimal(12))
             
+            m13p = Bonus13th()
+            m13p.user = user
+            m13p.year = year
+            m13p.amount = month13thPay
+            m13p.save()
+            request.user.branch.bonus13th.add(m13p)
+        
+        if usersW13thAlready == []:
+            sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        else: 
+            sweetify.sweetalert(request, icon='success', title='Success!', text="Employees with 13th month pay already: \n\n {}".format(usersW13thAlready), persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+class Give13thMonthPayIndividual(APIView):
+    def post(self, request):
+        data = request.data
+        user = request.user.branch.user.get(pk=data['user'])
+        if user.bonus13th.filter(year=data['year']):
+            sweetify.sweetalert(request, icon='warning', title="", html='<b>User already has 13th month pay!</b>', persistent='Dismiss')
+            return JsonResponse(0, safe=False)
+
+        if data['year'] == '':
+            sweetify.sweetalert(request, icon='warning', title="",  html='<b>No Year Selected</b>', persistent='Dismiss')
+            return JsonResponse(0, safe=False)
+        
+
+        userBasicPay = Decimal(0)
+
+        # LOOP ALL PAYROLL OF USER FOR THE WHOLE YEAR
+        for payroll in user.payroll.filter(year=data['year']):
+            userBasicPay += payroll.basicPay
+
+        month13thPay = Decimal(userBasicPay/Decimal(12))
+            
+        m13p = Bonus13th()
+        m13p.user = user
+        m13p.year = data['year']
+        m13p.amount = month13thPay
+        m13p.save()
+        request.user.branch.bonus13th.add(m13p)
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)

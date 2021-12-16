@@ -1170,3 +1170,23 @@ class AnnouncementSZ(MS):
     class Meta:
         model = Announcement
         fields = "__all__"
+
+        
+
+
+########## BONUS 13th ###########
+class Bonus13thSZ(MS):
+    class Meta:
+        model = Bonus13th
+        fields = "__all__"
+
+class UserWith13thSZ(MS):
+    bonus13th =  Bonus13thSZ(read_only=True, many=True)
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'id',
+            'bonus13th'
+        ]

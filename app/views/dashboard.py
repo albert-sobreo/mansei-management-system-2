@@ -11,8 +11,7 @@ from time import sleep
 class DashboardView(View):
     def get(self, request):
         context = {
-            'branches': Branch.objects.all(),
-            "revenue": request.user.branch.accountGroup.get(name__regex=r'[Rr]evenue')
+            'branches': Branch.objects.all()
         }
         return render(request, 'dashboard.html', context)
 

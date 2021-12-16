@@ -1797,6 +1797,9 @@ class Branch(models.Model):
     projectTask = models.ManyToManyField(ProjectTask, blank=True)
     projectAssignee = models.ManyToManyField(ProjectAssignee, blank=True)
 
+    #### 13TH MONTH PAY ####
+    bonus13th = models.ManyToManyField(Bonus13th, blank=True)
+
     #### ANNUALIZATION ####
     annualization = models.ManyToManyField(Annualization, blank = True)
 

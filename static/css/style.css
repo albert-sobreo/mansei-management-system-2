@@ -1361,3 +1361,8 @@ select.form-control{
 .c-border-left{
     border-left: 1px solid rgb(83, 83, 83);
 }
+
+.btn-ems:hover{
+    box-shadow: 0px 0px 0px 2px var(--ems-green-text);;
+    transition: .25s;
+}

@@ -42,3 +42,4 @@ from .ems_loans import *
 from .pps_planner import *
 from .my_profile import *
 from .qr_generator import *
+from .ems_13th import *

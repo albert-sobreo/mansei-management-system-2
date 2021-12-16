@@ -1,0 +1,176 @@
+{% extends 'base-template.html' %}
+{% block title %} EMS | 13th Month Pay {% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-ems active="nav-payroll" photo="/static/media/{{request.user.image}}"></navbar-ems>
+    <app-card></app-card>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- NAV 2 -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links ems-nav">
+                <a href="/ems-payroll/" class="mx-2">Payroll</a>
+                <a href="/ems-13th/" class="active-ems mx-2">13th Month Pay</a>
+            </div>
+        </div>
+
+        <!-- TITLE -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">13th Month Pay</span>
+        </div>
+
+        <!-- TABLE -->
+        <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead class="gray">
+                <th>Employee</th>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td @click="fetchUser('{{user.id}}')" class="link" data-toggle="modal" data-target="#modal">{{user.first_name}} {{user.last_name}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- MODAL -->
+        <div class="modal fade" id="modal">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body pb-0">
+                        <!-- TOP CARD -->
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="" class="gray">Employee Name</label><br>
+                                <span class="font-bold font-size-14">[[modal.first_name]] [[modal.last_name]]</span>
+                            </div>
+                        </div>
+                        <!-- GIVE 13th MONTH -->
+                        <div class="row">
+                            <div class="col-12">
+                                <a data-toggle="collapse" href="#give13Collapse" class="link">Give 13th Month Pay</a>
+                            </div>
+                            <div class="col-12 collapse" id="give13Collapse">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-inline">
+                                            <select v-model="give13th.year" class="form-control mr-1">
+                                                <option value="" selected disabled>Select year</option>
+                                                <option v-for="year in yearList" :value="year">[[year]]</option>
+                                            </select>
+                                            <button @click="submitGive13th()" class="btn btn-primary">Give 13th Month Pay</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- TABLE -->
+                        <div class="row mb-0 pb-0">
+                            <table class="table table-sm table-striped table-borderless mb-0">
+                                <thead>
+                                    <th><span class="font-bold gray ml-2">Year</span></th>
+                                    <th><span class="font-bold gray">Amount</span></th>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="bonus in modal.bonus13th">
+                                        <td><span class="ml-2">[[bonus.year]]</span></td>
+                                        <td><span>₱[[formatPrice(bonus.amount)]]</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                }
+            },
+
+            yearList: [],
+            give13th: {
+                user: null, //id
+                year: '',
+            },
+            modal: {
+                first_name: null,
+                last_name: null,
+                id: null,
+                bonus13th: [{
+                    year: null,
+                    amount: null,
+                }]
+            }
+        },
+
+        methods: {
+            fetchUser(id){
+                axios.get(`/api/user-w-13/${id}/`)
+                .then(res=>{
+                    this.modal = res.data
+                    this.give13th.user = res.data.id
+                    console.log(this.give13th)
+                })
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            submitGive13th(){
+                Swal.fire({
+                    title: 'Are you sure?',
+                    icon: "warning",
+                    html: "Are you sure you want to give 13th month pay to this employee? <br><br> <b>This action cannot be undone.</b>",
+                    confirmButtonText: "I am sure.",
+                    showCancelButton: true,
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        axios.post('/generate-13th-individual/', this.give13th, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                        .catch(err=>{
+                            Swal.fire({
+                                title: "Something went wrong.",
+                                icon: "error",
+                                html: err.message
+                            })
+                        })
+                    }
+                })
+            }
+        },
+
+        mounted(){
+            axios.get('/year-api/')
+            .then(res=>this.yearList=res.data)
+        }
+    })
+</script>
+
+{% endblock %}

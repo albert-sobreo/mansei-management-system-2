@@ -408,6 +408,11 @@ class UserPayrollableAPI(viewsets.ModelViewSet):
         serializer = UserNameOnlySZ(queryset, many=True)
         return Response(serializer.data)
 
+class UserWith13thAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserWith13thSZ
+    queryset = User.objects.all()
+
 
 
 
