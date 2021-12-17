@@ -607,3 +607,14 @@ class DashboardAPI(APIView):
             dashData["announcements"] = []
 
         return JsonResponse(dashData, safe=False)
+
+
+
+
+
+
+########## BRANCH ##########
+class BranchListAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = BranchSZ
+    queryset = Branch.objects.all()

@@ -1,0 +1,623 @@
+{% extends "base-template.html" %}
+{% block title %}Admin | Dashboard{% endblock %}
+
+{% block body %}
+
+<div id="app" class="position-relative" v-cloak>
+    <!-- PROFILE -->
+    <div class="profile mx-3 position-absolute" onclick="toggleProfile()" style="top: 10px; right: 12px;">
+        <img src="/static/media/{{request.user.image}}" alt="" height="20" class="profile-border b-radius-circle" id="profileToggler">
+    </div>
+    <profile-card branch="{{request.user.branch.name}}" branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <div class="dashboard-container w-100 d-flex vh-100">
+        <div id="sidebar" class="position-relative d-flex flex-column align-items-center w-20" style="background: #222A2E">
+            <div id="sidebar-title" class="d-flex align-items-center justify-content-center mt-4 mb-2">
+                <span class="text-white font-bold">ADMINISTRATOR</span>
+            </div>
+            <div id="sidebar-branch-selector" class="row mb-4" style="width: 100%;">
+                <div class="col mx-4">
+                    <label for="" class="text-white">Branch</label>
+                    <select v-model="selectedBranch.branch" @change="changeUserBranch()" name="" id="" class="form-control" style="background-color: #434A4E; color: white">
+                        <option value="" selected disabled>Select Branch</option>
+                        <option v-for="branch in branchList" :value="branch.id">[[branch.name]]</option>
+                    </select>
+                </div>
+            </div>
+            <div id="app-selector" class="d-flex flex-column align-items-center h-75">
+                <div onclick="location.href='/merchinventory/'" id="imps" class="mx-4 my-2 p-3 b-radius-15 dashboard-app-admin d-flex align-items-center justify-content-center flex-column app-card-links imps">
+                    <img src="/static/media/icons/imps.svg" alt="" height="40px">
+                    <span class="text-center font-bold text-white">Inventory Management and Planning System</span>
+                </div>
+                <div onclick="location.href='/journal/'" id="gas" class="mx-4 my-2 p-3 b-radius-15 dashboard-app-admin d-flex align-items-center justify-content-center flex-column app-card-links gas">
+                    <img src="/static/media/icons/GAS.svg" alt="" height="40px">
+                    <span class="text-center font-bold text-white">General Accounting<br> System</span>
+                </div>
+                <div onclick="location.href='/ems-my-dtr/'" id="ems" class="mx-4 my-2 p-3 b-radius-15 dashboard-app-admin d-flex align-items-center justify-content-center flex-column app-card-links ems">
+                    <img src="/static/media/icons/EMS.svg" alt="" height="40px">
+                    <span class="text-center font-bold text-white">Employee Management System</span>
+                </div>
+                <div onclick="location.href='/pps-planner/'" id="pps" class="mx-4 my-2 p-3 b-radius-15 dashboard-app-admin d-flex align-items-center justify-content-center flex-column app-card-links pps">
+                    <img src="/static/media/icons/PPS.svg" alt="" height="40px">
+                    <span class="text-center font-bold text-white">Project Planning<br> System</span>
+                </div>
+            </div>
+            <div class="d-flex align-items-center justify-content-center">
+                <a class="link" href="/qr-generator/">Generate QR Code</a>
+            </div>
+            <div style="position: absolute; bottom: 10px; right: 10px">
+                <i class="fas fa-cog text-white font-size-14 link" title="Administrator Settings" data-toggle="modal" data-target="#adminSettingsModal"></i>
+            </div>
+        </div>
+
+        <div class="d-flex w-100 dashboard-main" id="main-body">
+            <div class="d-flex h-100 px-4 py-3 flex-column" id="main-body-main" style="max-height: 100vh; overflow: auto">
+                <div id="dashboard-title" class="mb-3">
+                    {% if request.user.branch %}
+                    <span class="font-bold font-size-36">Welcome </span><span class="gray font-size-18 font-bold">to [[dashData.branchName]]</span>
+                    {% else %}
+                    <span class="gray font-size-18 font-bold">not connected to a branch</span>
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                        <span>It seems your user profile is not connected to a Branch</span>
+                        <span><a href="#" data-toggle="modal" data-target="#branchModal">Click here</a> to create or select one.</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-column mb-5">
+                    <div class="label">
+                        <label for="" class="gray font-bold font-size-18">Overview</label>
+                    </div>
+
+                    <div class="d-flex d-flex-row">
+                        <div style="flex:1" >
+                            <div id="inv-container" class="mr-2 d-flex border b-radius-10 box-shadow-medium p-2">
+                                <div id="inv-icon" class="mr-2">
+                                    <img src="/static/media/icons/box.svg" alt="" height="auto" width="auto">
+                                </div>
+                                <div id="inv-value-container" class="d-flex flex-column justify-content-center">
+                                    <div id="inv-value"><span class="dash-green font-size-16 font-bold">₱[[formatPrice(dashData.merchAmount)]]</span></div>
+                                    <div id="inv-label"><span class="font-size-12 font-bold gray">Inventory Value</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="flex:1">
+                            <div id="sales-container" class="mx-2 d-flex border b-radius-10 box-shadow-medium p-2">
+                                <div id="sales-icon" class="mr-2">
+                                    <img src="/static/media/icons/sales.svg" alt="" height="auto" width="auto">
+                                </div>
+                                <div id="sales-value-container" class="d-flex flex-column justify-content-center">
+                                    <div id="inv-value"><span class="dash-yellow font-size-16 font-bold">₱[[formatPrice(dashData.salesAmount)]]</span></div>
+                                    <div id="inv-label"><span class="font-size-12 font-bold gray">Total Sales</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="flex:1">
+                            <div id="revenue-container" class="ml-2 d-flex border b-radius-10 box-shadow-medium p-2">
+                                <div id="sales-icon" class="mr-2">
+                                    <img src="/static/media/icons/revenue.svg" alt="" height="auto" width="auto">
+                                </div>
+                                <div id="sales-value-container" class="d-flex flex-column justify-content-center">
+                                    <div id="inv-value"><span class="dash-violet font-size-16 font-bold">₱[[formatPrice(dashData.revAmount)]]</span></div>
+                                    <div id="inv-label"><span class="font-size-12 font-bold gray">Total Revenue</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column mb-5">
+                    <div class="c-flex">
+                        <div class="box-2">
+                            <div class="label mr-2">
+                                <label for="" class="gray font-bold font-size-18">Petty Cash</label>
+                            </div>
+                            <div class="dash-gray d-flex border b-radius-10 box-shadow-medium mr-2 h-100 ">
+                                <div class="d-flex flex-column justify-content-between flex-even p-2">
+                                    <div>
+                                        <span class="font-size-14 font-bold">Petty Cash</span>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <div>
+                                            <span class="dash-dark-green font-bold font-size-18">₱[[formatPrice('12500')]] (sample)</span>
+                                        </div>
+                                        <div>
+                                            <span class="gray font-bold">Remaining</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column justify-content-between flex-even p-2 c-border-left">
+                                    <div>
+                                        <span class="font-size-14 font-bold">Latest Transaction</span>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <div>
+                                            <span class="dash-dark-green font-bold font-size-18">₱[[formatPrice('7500')]] (sample)</span>
+                                        </div>
+                                        <div>
+                                            <span class="gray font-bold">PO-2021-01-0001</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-1">
+                            <div class="label ml-2">
+                                <label for="" class="gray font-bold font-size-18">Expenses</label>
+                            </div>
+                            <div id="petty-cash" class="dash-gray d-flex border b-radius-10 box-shadow-medium p-2 ml-2 h-100 flex-column justify-content-between">
+                                <div>
+                                    <span class="font-size-14 font-bold">&nbsp;</span>
+                                </div>
+                                <div class="d-flex flex-column">
+                                    <div>
+                                        <span class="dash-dark-green font-bold font-size-18">₱[[formatPrice('19030')]] (sample)</span>
+                                    </div>
+                                    <div>
+                                        <span class="gray font-bold">Total Expenses Today</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column h-100 px-4 py-3" id="main-body-right" style="max-height: 100vh; overflow:auto">
+                <div class="d-flex flex-column mb-5" id="due-dates">
+                    <label for="" class="gray font-bold font-size-18">Due Dates</label>
+                    <div class="d-flex flex-column box-shadow-small-2 b-radius-10">
+                        <div class="p-4 d-flex flex-column justify-content-center align-items-center">
+                            <img src="/static/media/icons/crane.svg" height="32px" alt="">
+                            <span class="font-bold">Under Development</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column mb-5">
+                    <label for="" class="gray font-bold font-size-18">Announcements</label>
+                    <div class="d-flex flex-column box-shadow-small-2 b-radius-10">
+                        <div v-if="dashData.user.authLevel == 0 || dashData.user.authLevel == 1" class="b-tl-radius-10 b-tr-radius-10 d-flex align-items-center justify-content-end px-2 pt-1" id="note-titlebar" style="width: 100%; height: 20px;">
+                            <span data-toggle="modal" data-target="#createAnnouncementModal" class="link">+ Create Announcements</span>
+                        </div>
+                        <div class="d-flex flex-column px-3 py-1">
+                            <div v-for="announcement in dashData.announcements" class="d-flex justify-content-between align-items-center my-1">
+                                <div>
+                                    <span class="font-size-14 font-bold">[[announcement.title]]</span><br>
+                                    <span class="font-size-12 font-medium py-1">[[announcement.contents]]</span>
+                                </div>
+                                <span @click="deleteAnnouncement(announcement.id)" class="link font-size-10 gray"><i class="fas fa-trash-alt"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column mb-5">
+                    <label for="" class="gray font-bold font-size-18">Notepad</label>
+                    <div class="d-flex flex-column box-shadow-small-2 b-radius-10">
+                        <div class="b-tl-radius-10 b-tr-radius-10 d-flex align-items-center justify-content-end px-2" id="note-titlebar" style="width: 100%; height: 20px; background: #FFDD65">
+                            <i class="fas fa-check-circle text-success" id="notepad-success" style="opacity: 0; position: absolute"></i>
+                            <i class="fas fa-times-circle text-danger" id="notepad-error" style="opacity: 0; position: absolute"></i>
+                        </div>
+                        <div class="p-2">
+                            <textarea v-model="dashData.user.notepad.notes" name="" id="notepad" rows="5" style="width: 100%; border: none; background: none" placeholder="Enter Notes"></textarea>
+                        </div>
+                        <div class=" px-2 d-flex justify-content-end" style="height: 20px;">
+                            <span class="link font-size-10" @click="submitNotepad()">Save</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ADMINSTRATOR SETTINGS MODAL -->
+        <div class="modal fade" id="adminSettingsModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body p-4">
+                        <div class="mb-4">
+                            <span class="modal-title">Administrator Settings</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <span class="noselect admin-link" data-toggle="collapse" href="#adminCreateABranch">Create a Branch/Company   <i class="fas fa-caret-right"></i></span>
+                                <hr class="my-2">
+                            </div>
+                            <div class="col-12 collapse" id="adminCreateABranch">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="" class="gray">Branch Name</label>
+                                        <input v-model="create.branchName" type="text" placeholder="Enter Branch Name" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <button @click="createBranch2()" class="btn btn-primary mt-2">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <span class="noselect admin-link" data-toggle="collapse" href="#adminCreateUser">Create User Account   <i class="fas fa-caret-right"></i></span>
+                                <hr class="my-2">
+                            </div>
+                            <div class="col-12 collapse" id="adminCreateUser">
+                                <div class="row">
+                                    <div class="col"><span class="font-bold">Required</span></div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col pr-1">
+                                        <label for="" class="gray">Username</label>
+                                        <input type="text" placeholder="Enter Username" class="form-control">
+                                    </div>
+                                    <div class="col pl-1">
+                                        <label for="" class="gray">Password</label>
+                                        <input type="text" placeholder="Enter Password for this account" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col pr-1">
+                                        <label for="" class="gray">First Name</label>
+                                        <input type="text" placeholder="Enter First Name" class="form-control">
+                                    </div>
+                                    <div class="col pl-1">
+                                        <label for="" class="gray">Last Name</label>
+                                        <input type="text" placeholder="Enter Last Name" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <label for="" class="gray">Authorization Level</label>
+                                        <select name="" id="" class="form-control">
+                                            <option value="" selected disabled>Select Authorization Level</option>
+                                            <option value="0">0 - Top Level ---- Can see and control all branches</option>
+                                            <option value="1">1 - Branch Admin ---- Can see and control single branch</option>
+                                            <option value="2">2 - Branch Basic ---- Limited access on a single branch</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <label for="" class="gray">Branch <span class="font-size-10">&nbsp;(optional if Authorization Level is 0)</span></label>
+                                        <select name="" id="" class="form-control">
+                                            <option value="" selected disabled>Select Branch</option>
+                                            <option v-for="branch in branchList" :value="branch.id">[[branch.name]]</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="row mt-4">
+                                    <div class="col"><span class="font-bold">Optional</span></div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col pr-1">
+                                        <label for="" class="gray">ID Number</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                                            </div>
+                                            <input type="text" placeholder="Enter ID Number" class="form-control box-shadow-off">
+                                        </div>
+                                    </div>
+                                    <div class="col pl-1">
+                                        <label for="" class="gray">Position</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fab fa-black-tie"></i></span>
+                                            </div>
+                                            <input type="text" placeholder="Enter Position" class="form-control box-shadow-off">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <label for="" class="gray">Address</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-home"></i></span>
+                                            </div>
+                                            <input type="text" placeholder="Enter Address" class="form-control box-shadow-off">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col pr-1">
+                                        <label for="" class="gray">Email</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                            </div>
+                                            <input type="email" placeholder="Enter Email" class="form-control box-shadow-off">
+                                        </div>
+                                    </div>
+                                    <div class="col pl-1">
+                                        <label for="" class="gray">Mobile No.</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-mobile"></i></span>
+                                            </div>
+                                            <input type="text" placeholder="Enter Mobile No." class="form-control box-shadow-off">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col pr-1">
+                                        <label for="" class="gray">SSS No.</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">SSS</span>
+                                            </div>
+                                            <input type="text" placeholder="Enter SSS No." class="form-control box-shadow-off">
+                                        </div>
+                                    </div>
+                                    <div class="col px-1">
+                                        <label for="" class="gray">PHIC No.</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">PHIC</span>
+                                            </div>
+                                            <input type="text" placeholder="Enter Philhealth No." class="form-control box-shadow-off">
+                                        </div>
+                                    </div>
+                                    <div class="col pl-1">
+                                        <label for="" class="gray">HMDF No.</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">HDMF</span>
+                                            </div>
+                                            <input type="text" placeholder="Enter Pag-Ibig No." class="form-control box-shadow-off">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="col pr-1">
+                                        <label for="" class="gray">Date of Birth</label>
+                                        <input type="date" class="form-control">
+                                    </div>
+                                    <div class="col pl-1">
+                                        <label for="" class="gray">Blood Type</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-tint"></i></span>
+                                            </div>
+                                            <input type="text" placeholder="Enter Blood Type" class="form-control box-shadow-off">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <button class="btn btn-primary mt-2">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config: {
+                headers:{
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+
+            selectedBranch: {
+                branch: '',
+            },
+
+            branchList: [{
+                id: null,
+                name: null,
+            }],
+
+            dashData: {
+                branchName: null,
+                merchAmount: null,
+                salesAmount: null,
+                revAmount: null,
+                announcements: [],
+                user: {
+                    first_name: null,
+                    last_name: null,
+                    id: null,
+                    notepad: {
+                        notes: null,
+                    },
+                }
+            },
+
+            type: 'createBranch',
+
+            create: {
+                branchName: null,
+            },
+
+            createAnnouncement: {
+                title: null,
+                contents: null,
+            },
+
+            connect: {
+                branchID: '',
+            }
+        },
+
+        methods: {
+            async onload(){
+                axios.get('/dashboard-data/')
+                .then(res=>{
+                    this.dashData = res.data
+                    if(!this.dashData.user.notepad){
+                        this.dashData.user.notepad = {
+                            notes: null
+                        }
+                    }
+                })
+
+                axios.get('/api/branch-list/')
+                .then(res=>{
+                    this.branchList = res.data
+                })
+            },
+
+            resetCreate(){
+                this.create = {
+                    branchName: null,
+                }
+            },
+
+            changeUserBranch(){
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">Changing Branch . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.post('/admin-change-user-branch/', this.selectedBranch, this.config)
+                .then(res=>{
+                    if(res.data==0){
+                        this.onload()
+                        this.resetCreate()
+                        Swal.close()
+                    }
+                })
+            },
+
+            resetCreateAnnouncement(){
+                this.createAnnouncement = {
+                    title: null,
+                    contents: null,
+                }
+            },
+            createBranch(){
+                axios.post('/create-branch-in-dashboard/', this.create, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+
+            createBranch2(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: 'warning',
+                    html: 'Are you sure you want to create a branch?',
+                    confirmButtonText: "I am sure.",
+                    showCancelButton: true,
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        axios.post('/create-branch-in-dashboard/', this.create, this.config)
+                        .then(res=>{
+                            this.resetCreate()
+                            if(res.data==0){
+                                this.onload()
+                                Swal.fire({
+                                    title: "Success",
+                                    icon: 'success',
+                                    html: `Branch \'${this.create.branchName}\' successfully created.`
+                                })
+                            }
+                            else if (res.data==1){
+                                Swal.fire({
+                                    title: "Empty field.",
+                                    icon: "error",
+                                    html: "Please enter branch name."
+                                })
+                            }
+                        })
+                    }
+                })
+            },
+
+            connectBranch(){
+                axios.post('/connect-branch-in-dashboard/', this.connect, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+            changeModalContent(){
+                var body = {
+                    create: document.getElementById('createBranch'),
+                    connect: document.getElementById('connectToBranch'),
+                }
+    
+                if(this.type == "createBranch"){
+                    body.create.style.display = "block"
+                    body.connect.style.display = "none"
+                } else {
+                    body.create.style.display = "none"
+                    body.connect.style.display = "block"
+                }
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            submitNotepad(){
+                axios.post('/save-notepad/', {userID: this.dashData.user.id, notepad: this.dashData.user.notepad.notes}, this.config)
+                .then(res=>{
+                    if(res.data == 0){
+                        this.onload()
+                        $("#notepad-success").css('opacity', '1')
+                        $("#notepad-success").fadeTo(4000, 0)
+
+                    }
+                })
+                .catch(err=>{
+                    $("#notepad-error").css('opacity', '1')
+                    $("#notepad-error").fadeTo(4000, 0)
+                })
+            },
+
+            submitAnnouncement(){
+                axios.post('/save-announcement/', this.createAnnouncement, this.config)
+                .then(res=>{
+                    if(res.data == 0){
+                        this.onload()
+                        this.resetCreateAnnouncement()
+                    }
+                })
+            },
+
+            deleteAnnouncement(aID){
+                axios.post('/delete-announcement/', {id: aID}, this.config)
+                .then(res=>{
+                    if(res.data == 0){
+                        this.onload()
+                    }
+                })
+            }
+        },
+
+        mounted(){
+            this.onload()
+        }
+    })
+</script>
+
+{% endblock %}

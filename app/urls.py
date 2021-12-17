@@ -142,6 +142,9 @@ router.register(r"project-department", views.ProjectDepartmentAPI, "project-depa
 router.register(r"project-department-nested", views.ProjectDepartmentNestedAPI, "project-department-nested")
 router.register(r"assignee", views.AssigneeAPI, 'assignee')
 
+########## BRANCH LIST ##########
+router.register(r"branch-list", views.BranchListAPI, 'branch-list')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -403,5 +406,7 @@ urlpatterns = [
     path('add-bonus/', login_required(views.PayrollAddBonus.as_view())),
     path('generate-13th/', login_required(views.Give13thMonthPay.as_view())),
     path('ems-13th/', login_required(views.EMS_13thMonthView.as_view())),
-    path('generate-13th-individual/', login_required(views.Give13thMonthPayIndividual.as_view()))
+    path('generate-13th-individual/', login_required(views.Give13thMonthPayIndividual.as_view())),
+    path('admin-dashboard/', login_required(views.AdminDashboardView.as_view())),
+    path('admin-change-user-branch/', login_required(views.AdminChangeUserBranch.as_view()))
 ]

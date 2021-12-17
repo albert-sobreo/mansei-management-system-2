@@ -1190,3 +1190,16 @@ class UserWith13thSZ(MS):
             'id',
             'bonus13th'
         ]
+
+
+
+
+
+########## BRANCH ###########
+class BranchSZ(MS):
+    class Meta:
+        model = Branch
+        fields = [
+            'id',
+            'name',
+        ]

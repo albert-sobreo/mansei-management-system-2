@@ -10,10 +10,31 @@ from time import sleep
 
 class DashboardView(View):
     def get(self, request):
+        if request.user.authLevel == '0':
+            return redirect('/admin-dashboard/')
         context = {
             'branches': Branch.objects.all()
         }
         return render(request, 'dashboard.html', context)
+
+class AdminDashboardView(View):
+    def get(self, request):
+        context = {
+            'branches': Branch.objects.all()
+        }
+        return render(request, 'admin-dashboard.html', context)
+
+class AdminChangeUserBranch(APIView):
+    def post(self, request):
+        user = request.user
+        data = request.data
+
+        user.branch = Branch.objects.get(pk=data['branch'])
+        user.save()
+
+        sleep(.5)
+
+        return JsonResponse(0, safe=False)
 
 class SaveNotepad(APIView):
     def post(self, request):
@@ -54,6 +75,9 @@ class DeleteAnnouncement(APIView):
 class CreateBranchInDashboard(APIView):
     def post(self, request, format=None):
         branch = request.data
+
+        if not branch['branchName']:
+            return JsonResponse(1, safe=False)
 
         bdca = BranchDefaultChildAccount()
         bdca.save()

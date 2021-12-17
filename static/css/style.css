@@ -753,7 +753,7 @@ label{
 }
 
 .link:hover{
-    color: #40a5ee;
+    color: #40a5ee !important;
 }
 
 .link-danger{
@@ -1288,9 +1288,14 @@ select.form-control{
     opacity: .8;
 }
 
-.dashboard-app{
+.dashboard-app, .dashboard-app-admin{
     width: 80%;
     height: 18%;
+}
+
+.dashboard-app-admin{
+    height: 20% !important;
+    background: #434A4E;
 }
 
 .dashboard-main{
@@ -1365,4 +1370,9 @@ select.form-control{
 .btn-ems:hover{
     box-shadow: 0px 0px 0px 2px var(--ems-green-text);;
     transition: .25s;
+}
+
+.admin-link{
+    cursor: pointer;
+    font-weight: 600;
 }
