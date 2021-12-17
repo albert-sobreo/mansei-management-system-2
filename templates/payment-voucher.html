@@ -433,6 +433,7 @@
                                                 {% for item in request.user.branch.branchProfile.branchDefaultChildAccount.cashInBank.all%}
                                                 <option value="{{item.name}}">{{item.name}}</option>
                                                 {% endfor %}
+                                                <option value="{{request.user.branch.branchProfile.branchDefaultChildAccount.pettyCash.name}}">{{request.user.branch.branchProfile.branchDefaultChildAccount.pettyCash.name}}</option>
                                             </optgroup>
                                             <optgroup label="Cheque">
                                                 <option value="Cheque">Cheque</option>

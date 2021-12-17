@@ -538,6 +538,9 @@ class PVApprovalAPI(APIView):
                 if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                     jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, voucher.amountPaid)
                     jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.amountPaid)
+                elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                    jeAPI(request, j, 'Credit', dChildAccount.pettyCash, voucher.amountPaid)
+                    jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.amountPaid)
                 elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
                     jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
                     jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), voucher.amountPaid)
@@ -588,6 +591,9 @@ class PVApprovalAPI(APIView):
                 if voucher.paymentPeriod == 'Full Payment':
                     if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                         jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, voucher.amountPaid)
+                    
+                    elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                        jeAPI(request, j, 'Credit', dChildAccount.pettyCash, voucher.amountPaid)
 
                     elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
                         jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
@@ -597,6 +603,11 @@ class PVApprovalAPI(APIView):
                 elif voucher.paymentPeriod == 'Partial Payment':
                     if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                         jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+                        jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+
+                    elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                        jeAPI(request, j, 'Credit', dChildAccount.pettyCash, voucher.amountPaid)
 
                         jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
 
@@ -632,6 +643,8 @@ class PVApprovalAPI(APIView):
                 if voucher.paymentPeriod == 'Full Payment':
                     if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                         jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, voucher.amountPaid)
+                    elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                        jeAPI(request, j, 'Credit', dChildAccount.pettyCash, voucher.amountPaid)
 
                     elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
                         jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
@@ -641,6 +654,11 @@ class PVApprovalAPI(APIView):
                 elif voucher.paymentPeriod == 'Partial Payment':
                     if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                         jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+                        jeAPI(request, j, 'Credit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance - voucher.amountPaid))
+
+                    elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                        jeAPI(request, j, 'Credit', dChildAccount.pettyCash, voucher.amountPaid)
 
                         jeAPI(request, j, 'Credit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance - voucher.amountPaid))
 
@@ -711,6 +729,10 @@ class PVApprovalAPI(APIView):
                     if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                         jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, voucher.amountPaid)
 
+                        
+                    elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                        jeAPI(request, j, 'Credit', dChildAccount.pettyCash, voucher.amountPaid)
+
                     elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
                         jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
                     elif voucher.paymentMethod == "Cheque":
@@ -720,6 +742,11 @@ class PVApprovalAPI(APIView):
                     print('b0ss plis')
                     if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                         jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+                        jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+
+                    elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                        jeAPI(request, j, 'Credit', dChildAccount.pettyCash, voucher.amountPaid)
 
                         jeAPI(request, j, 'Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
 
@@ -792,6 +819,8 @@ class PVVoid(APIView):
                     ################# DEBIT SIDE #################
                     if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                         jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
+                    elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                        jeAPI(request, j, 'Debit', dChildAccount.pettyCash, voucher.amountPaid)
                     elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
                         jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
                     elif voucher.paymentMethod == "Cheque":
@@ -821,7 +850,8 @@ class PVVoid(APIView):
                     if voucher.paymentPeriod == 'Full Payment':
                         if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                             jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
-
+                        elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                            jeAPI(request, j, 'Debit', dChildAccount.pettyCash, voucher.amountPaid)
                         elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
                             jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
                         elif voucher.paymentMethod == "Cheque":
@@ -831,6 +861,11 @@ class PVVoid(APIView):
                         print('b0ss plis')
                         if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                             jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+                            jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+
+                        elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                            jeAPI(request, j, 'Debit', dChildAccount.pettyCash, voucher.amountPaid)
 
                             jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
 
@@ -872,7 +907,8 @@ class PVVoid(APIView):
                     if voucher.paymentPeriod == 'Full Payment':
                         if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                             jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
-
+                        elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                            jeAPI(request, j, 'Debit', dChildAccount.pettyCash, voucher.amountPaid)
                         elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
                             jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
                         elif voucher.paymentMethod == "Cheque":
@@ -882,6 +918,11 @@ class PVVoid(APIView):
                         # print('b0ss plis')
                         if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                             jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+                            jeAPI(request, j, 'Debit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance))
+
+                        elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                            jeAPI(request, j, 'Debit', dChildAccount.pettyCash, voucher.amountPaid)
 
                             jeAPI(request, j, 'Debit', voucher.inwardInventory.party.accountChild.get(name__regex=r"[Pp]ayable"), (voucher.inwardInventory.runningBalance))
 
@@ -940,7 +981,8 @@ class PVVoid(APIView):
                     if voucher.paymentPeriod == 'Full Payment':
                         if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                             jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
-
+                        elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                            jeAPI(request, j, 'Debit', dChildAccount.pettyCash, voucher.amountPaid)
                         elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
                             jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
                         elif voucher.paymentMethod == "Cheque":
@@ -950,6 +992,11 @@ class PVVoid(APIView):
                         print('b0ss plis')
                         if voucher.paymentMethod == dChildAccount.cashOnHand.name:
                             jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+                            jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+
+                        elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+                            jeAPI(request, j, 'Debit', dChildAccount.pettyCash, voucher.amountPaid)
 
                             jeAPI(request, j, 'Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
 
