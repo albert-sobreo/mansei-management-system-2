@@ -1,0 +1,227 @@
+{% extends 'base-template.html' %}
+{% block title %}Advancements{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-petty-cash" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAVIGATION -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/petty-cash/" class="mx-2">Petty Cash</a>
+                <a href="/gas-advancements/" class="active-gas mx-2">Advancements</a>
+                <a href="#" class="mx-2">Liquidation</a>
+            </div>
+        </div>
+
+        <!-- TITLE BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Cash Advancements</span>
+        </div>
+
+        <!-- TABLE -->
+        <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead class="thead-dark">
+                <th>Code</th>
+                <th>Amount</th>
+                <th>Requestor</th>
+                <th>Issuer</th>
+                <th>Reason</th>
+            </thead>
+            <tbody>
+                {% for adv in request.user.branch.advancementThruPettyCash.all %}
+                <tr>
+                    <td>{{adv.code}}</td>
+                    <td>₱[[formatPrice('{{adv.amount}}')]]</td>
+                    <td>{{adv.requestor.first_name}} {{adv.requestor.last_name}}</td>
+                    <td>{{adv.issuer.first_name}} {{adv.issuer.last_name}}</td>
+                    <td>{{adv.reason}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- CREATE ADVANCEMENT MODAL -->
+        <div class="modal fade" id="createAdvancementModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Create Advancement</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="">Advancement Code</label>
+                                <input v-model="createAdvancementModal.code" type="text" placeholder="Enter Code" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-2">
+                            <div class="col pr-1">
+                                <label for="">Requestor</label>
+                                <select v-model="createAdvancementModal.requestor" name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Requestor</option>
+                                    <option v-for="user in userList" :value="user.id">[[user.first_name]] [[user.last_name]]</option>
+                                </select>
+                            </div>
+                            <div class="col pl-1">
+                                <label for="">Amount Requested</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="createAdvancementModal.amount" placeholder="Enter Amount" type="text" onkeypress="validate()" class="form-control box-shadow-off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="">Reason</label>
+                                <textarea v-model="createAdvancementModal.reason" name="" id="" cols="30" rows="2" class="form-control" placeholder="Enter Reason for advancement"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <button @click="submitCreateAdvancement()" class="btn btn-primary col">Create Advancement</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                }
+            },
+
+            createAdvancementModal: {
+                code: "{{new_code}}",
+                requestor: '',
+                amount: 0,
+                reason: '',
+            },
+
+            userList: [{
+                id: null,
+                first_name: null,
+                last_name: null,
+            }],
+        },
+
+        methods: {
+            onload(){
+                axios.get('/api/user-payrollable/')
+                .then(res=>{
+                    this.userList = res.data
+                    console.log(this.userList)
+                })
+            },
+            submitCreateAdvancement(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: "warning",
+                    html: "Are you sure you want to create advancement?",
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        axios.post('/save-advancements/', this.createAdvancementModal, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                    }
+                })
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+        },
+
+        mounted(){
+            this.onload()
+        }
+    })
+</script>
+
+<script>
+    $(document).ready(function() {
+        $.fn.dataTable.moment( 'MMMM D, YYYY' );
+        $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
+        $('#table').DataTable({
+            language: { search: '', searchPlaceholder: 'Search'},
+            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            buttons: {
+                buttons: [
+                {
+                    text: 'Create Advancement',
+                    className: 'btn btn-warning',
+                    titleAttr: 'Create Advancement',
+                    action: function(){
+                        $('#createAdvancementModal').modal('show')
+                    }
+                },
+                {
+                    text: '<i class="fas fa-file-excel"></i>',
+                    className: 'btn text-success btn-table',
+                    titleAttr: 'Export Excel',
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fas fa-file-csv"></i>',
+                    className: 'btn text-warning btn-table',
+                    titleAttr: 'Export CSV',
+                    extend: 'csv'
+                },
+                {
+                    text: '<i class="fas fa-print"></i>',
+                    className: 'btn btn-table',
+                    titleAttr: 'Print',
+                    extend: 'print'
+                },
+            ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
+                }
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            }
+        });        
+    });
+</script>
+
+{% endblock %}

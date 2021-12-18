@@ -1191,7 +1191,11 @@ class UserWith13thSZ(MS):
             'bonus13th'
         ]
 
-
+########## PETTYCASH ###########
+class AdvancementSZ(MS):
+    class Meta:
+        model = AdvancementThruPettyCash
+        fields = "__all__"
 
 
 

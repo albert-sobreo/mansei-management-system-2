@@ -1,0 +1,201 @@
+{% extends 'base-template.html' %}
+{% block title %}Advancements{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-approvals" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAVIGATION -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/adv-nonapproved/" class="active-gas mx-2">Non-Approved</a>
+                <a href="/adv-approved/" class="mx-2">Approved</a>
+            </div>
+        </div>
+
+        <!-- TITLE BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Cash Advancements</span>
+        </div>
+
+        <!-- TABLE -->
+        <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead class="thead-dark">
+                <th>Code</th>
+                <th>Amount</th>
+                <th>Requestor</th>
+                <th>Issuer</th>
+                <th>Reason</th>
+            </thead>
+            <tbody>
+                {% for adv in advs %}
+                <tr>
+                    <td @click="fetchAdv('{{adv.id}}')" class="link" data-toggle="modal" data-target="#approvalModal">{{adv.code}}</td>
+                    <td>₱[[formatPrice('{{adv.amount}}')]]</td>
+                    <td>{{adv.requestor.first_name}} {{adv.requestor.last_name}}</td>
+                    <td>{{adv.issuer.first_name}} {{adv.issuer.last_name}}</td>
+                    <td>{{adv.reason}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- APPROVAL MODAL -->
+        <div class="modal fade" id="approvalModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label for="" class="gray">ID</label><br>
+                                <span>[[approvalModal.id]]</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <button @click="approve()" class="btn btn-primary col">Approve</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                }
+            },
+
+            approvalModal:{
+                id: null,
+            },
+
+            createAdvancementModal: {
+                code: "{{new_code}}",
+                requestor: '',
+                amount: 0,
+                reason: '',
+            },
+
+            userList: [{
+                id: null,
+                first_name: null,
+                last_name: null,
+            }],
+        },
+
+        methods: {
+            onload(){
+                axios.get('/api/user-payrollable/')
+                .then(res=>{
+                    this.userList = res.data
+                    console.log(this.userList)
+                })
+            },
+            submitCreateAdvancement(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: "warning",
+                    html: "Are you sure you want to create advancement?",
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        axios.post('/save-advancements/', this.createAdvancementModal, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                    }
+                })
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            fetchAdv(id){
+                axios.get(`/api/advancement/${id}/`)
+                .then(res=>{
+                    this.approvalModal = res.data
+                })
+            },
+
+            approve(){
+                axios.post('/adv-approval/', this.approvalModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            }
+        },
+
+        mounted(){
+            this.onload()
+        }
+    })
+</script>
+
+<script>
+    $(document).ready(function() {
+        $.fn.dataTable.moment( 'MMMM D, YYYY' );
+        $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
+        $('#table').DataTable({
+            language: { search: '', searchPlaceholder: 'Search'},
+            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            buttons: {
+                buttons: [
+                {
+                    text: '<i class="fas fa-file-excel"></i>',
+                    className: 'btn text-success btn-table',
+                    titleAttr: 'Export Excel',
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fas fa-file-csv"></i>',
+                    className: 'btn text-warning btn-table',
+                    titleAttr: 'Export CSV',
+                    extend: 'csv'
+                },
+                {
+                    text: '<i class="fas fa-print"></i>',
+                    className: 'btn btn-table',
+                    titleAttr: 'Print',
+                    extend: 'print'
+                },
+            ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
+                }
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            }
+        });        
+    });
+</script>
+
+{% endblock %}

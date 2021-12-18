@@ -1,0 +1,135 @@
+{% extends 'base-template.html' %}
+{% block title %} Petty Cash {% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-petty-cash" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAVIGATION -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/petty-cash/" class="active-gas mx-2">Petty Cash</a>
+                <a href="/gas-advancements/" class="mx-2">Advancements</a>
+                <a href="#" class="mx-2">Liquidation</a>
+            </div>
+        </div>
+
+        <!-- MAIN BODY -->
+        <div class="d-flex align-items-center justify-content-center" style="height:50vh;">
+            <div class="d-flex flex-column border w-50 p-4 b-radius-15 box-shadow-medium">
+                <div>
+                    <span class="font-size-24 font-bold">Petty Cash</span>
+                </div>
+                <div class="row mt-3">
+                    <div class="col d-flex flex-column">
+                        <span class="font-size-24 font-bold mb-0 dash-green">₱[[formatPrice('{{request.user.branch.branchProfile.branchDefaultChildAccount.pettyCash.amount}}')]]</span>
+                        <span class="mt-0 gray font-bold">Remaining Petty Cash Fund</span>
+                    </div>
+                    <div class="col d-flex flex-column">
+                        <span class="font-size-24 font-bold mb-0 dash-green">₱[[formatPrice('{{request.user.branch.pettyCashReplenish}}')]]</span>
+                        <span class="mt-0 gray font-bold">Default Petty Cash Fund</span>
+                        <a href="#editDefaultFund" data-toggle="collapse" class="font-size-10 link font-regular">Edit Default Fund</a>
+                        <div class="row collapse" id="editDefaultFund">
+                            <div class="col-12">
+                                <label for="">Default Petty Cash Fund</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="editDefaultFund.amount" type="text" placeholder="Enter Default Petty Cash Fund" onkeypress="validate()" class="form-control box-shadow-off">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button @click="submitEditDefault()" class="btn btn-primary col">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col">
+                        <a data-toggle="collapse" href="#replenish" class="link">Replenish Petty Cash</a>
+                    </div>
+                </div>
+
+                <div class="row collapse" id="replenish">
+                    <div class="col-12">
+                        <label for="">Choose Source</label>
+                        <select v-model="replenish.id" name="" id="" class="form-control">
+                            <option value="" selected disabled>Select Source</option>
+                            <option value="{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.id}}">{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}} --- ₱[[formatPrice('{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.amount}}')]]</option>
+                            {% for bank in request.user.branch.branchProfile.branchDefaultChildAccount.cashInBank.all %}
+                            <option value="{{bank.id}}">{{bank.name}} --- ₱[[formatPrice('{{bank.amount}}')]]</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <button @click="submitReplenish()" class="btn btn-primary col">Replenish Petty Cash</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                }
+            },
+
+            replenish:{
+                id: '',
+            },
+
+            editDefaultFund: {
+                amount: 0,
+            }
+        },
+
+        methods: {
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+            submitReplenish(){
+                axios.post('/replenish-petty-cash/', this.replenish, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+            submitEditDefault(){
+                axios.post('/save-edit-default-petty-cash-fund/', this.editDefaultFund, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+        }
+    })
+</script>
+
+{% endblock %}

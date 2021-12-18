@@ -130,6 +130,9 @@ router.register(r'user-w-dtr', views.UserWithDTRAPI, 'user-w-dtr')
 ########## HOLIDAY ##########
 router.register(r"holiday", views.HolidayAPI, 'holiday')
 
+########## PETTY CASH ##########
+router.register(r"advancement", views.AdvancementAPI, 'advancement')
+
 ########## PROJECT PLANNING ##########
 router.register(r"project-assignee", views.ProjectAssigneeAPI, "project-assignee")
 router.register(r"project-task", views.ProjectTaskAPI, "project-task")
@@ -408,5 +411,14 @@ urlpatterns = [
     path('ems-13th/', login_required(views.EMS_13thMonthView.as_view())),
     path('generate-13th-individual/', login_required(views.Give13thMonthPayIndividual.as_view())),
     path('admin-dashboard/', login_required(views.AdminDashboardView.as_view())),
-    path('admin-change-user-branch/', login_required(views.AdminChangeUserBranch.as_view()))
+    path('admin-change-user-branch/', login_required(views.AdminChangeUserBranch.as_view())),
+
+    path('gas-advancements/', login_required(views.GAS_AdvancementsView.as_view())),
+    path('save-advancements/', login_required(views.SaveAdvancement.as_view())),
+    path('adv-nonapproved/', login_required(views.ADVnonapproved.as_view())),
+    path('adv-approved/',login_required(views.ADVapproved.as_view())),
+    path('adv-approval/', login_required(views.ADVapprovalAPI.as_view())),
+    path('petty-cash/', login_required(views.PettyCashView.as_view())),
+    path('replenish-petty-cash/', login_required(views.PettyCashReplenish.as_view())),
+    path('save-edit-default-petty-cash-fund/', login_required(views.SaveDefaultPettyCash.as_view()))
 ]

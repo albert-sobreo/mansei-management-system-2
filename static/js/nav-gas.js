@@ -59,7 +59,7 @@ Vue.component('navbar-gas', {
             <a href="/customers/" class="mx-3" id="nav-customers">Customers</a>
             <a href="/vendors/" class="mx-3" id="nav-vendors">Vendors</a>
             <a href="/bank-recon/" class="mx-3" id="nav-bank-recon">Bank Reconciliation</a>
-            <a href="#" class="mx-3" id="nav-petty-cash">Petty Cash</a>
+            <a href="/petty-cash/" class="mx-3" id="nav-petty-cash">Petty Cash</a>
             <a href="/chart-of-accounts/" class="mx-3" id="nav-accounts">Chart of Accounts</a>
             <a href="/ppe/" class="mx-3" id="nav-ppe">PPE</a>
             <div class="btn-group mx-3">
@@ -76,6 +76,7 @@ Vue.component('navbar-gas', {
                     <a href="/sc-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Sales Contract</a>
                     <div class="dropdown-divider"></div>
                     <a href="/br-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Bank Reconciliation</a>
+                    <a href="/adv-nonapproved/" class="dropdown-item d-item-gas font-size-12 font-semibold">Advancements</a>
                 </div>
             </div>
         </div>

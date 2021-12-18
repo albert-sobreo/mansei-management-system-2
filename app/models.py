@@ -1608,6 +1608,17 @@ class Annualization(models.Model):
     name = models.CharField(max_length=50, null = True, blank = True)
     year = models.CharField(max_length=50, null = True, blank = True)
 
+class AdvancementThruPettyCash(models.Model):
+    code = models.CharField(max_length=50)
+    requestor = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="advancementthrupettycashrequestor")
+    issuer  = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="advancementthrupettycashissuer")
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True) 
+    datetimeCreated = models.DateTimeField()
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "advancementthrupettycashApprovedBy")
+    approved = models.BooleanField(null = True, default=False)
+    reason = models.TextField(null = True, blank=True)
+
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
     rm = models.ForeignKey(AccountChild, related_name="branchdefaultrm", on_delete=models.CASCADE, null=True, blank=True)
@@ -1649,6 +1660,8 @@ class BranchProfile(models.Model):
 # request.user.branch.accountChild.add()
 class Branch(models.Model):
     name = models.CharField(max_length=255)
+    ##### DEFAULT PETTY CASH REPLENISH #####
+    pettyCashReplenish =  models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True) 
     branchProfile = models.ForeignKey(BranchProfile, related_name='branch', on_delete=models.CASCADE, null=True, blank=True)
     ##### CHART OF ACCOUNTS #####
     accountGroup = models.ManyToManyField(AccountGroup, blank = True)
@@ -1802,6 +1815,10 @@ class Branch(models.Model):
 
     #### ANNUALIZATION ####
     annualization = models.ManyToManyField(Annualization, blank = True)
+
+    #### PETTY CASH ####
+    advancementThruPettyCash = models.ManyToManyField(AdvancementThruPettyCash, blank = True)
+    
 
     def __str__(self):
         return self.name

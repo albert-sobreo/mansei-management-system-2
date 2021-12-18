@@ -608,8 +608,11 @@ class DashboardAPI(APIView):
 
         return JsonResponse(dashData, safe=False)
 
-
-
+########## PETTY CASH ###########
+class AdvancementAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AdvancementSZ
+    queryset = AdvancementThruPettyCash.objects.all()
 
 
 
