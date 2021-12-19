@@ -1,0 +1,434 @@
+{% extends "base-template.html" %}
+{% block title %}Liquidation Form{% endblock %}
+
+{% block body %}
+
+<div id="app">
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-petty-cash" photo="/media/{{request.user.image}}"></navbar-gas>
+    <app-card></app-card>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAV -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/petty-cash/" class="mx-2">Petty Cash</a>
+                <a href="/gas-advancements/" class="mx-2">Advancements</a>
+                <a href="/liquidation-form/" class="active-gas mx-2">Liquidation</a>
+                <a href="/liquidation-list/" class="mx-2">Liquidation List</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Liquidation Form</span>
+        </div>
+
+        <!-- LIQUIDATION FORM -->
+        <div>
+            <div class="row">
+                <div class="col col-3 pr-2">
+                    <label for="">Reference</label>
+                    <input v-model="lqData.code" type="text" class="form-control" placeholder="Enter Code">
+                </div>
+                <div class="col col-3 px-2">
+                    <label for="">Transacted By</label>
+                    <select v-model="lqData.transactedBy" @change="fetchUserAdvancements(lqData.transactedBy)" name="" id="" class="form-control">
+                        <option value="" selected disabled>Select Employee</option>
+                        <option v-for="user in userList" :value="user.id">[[user.first_name]] [[user.last_name]]</option>
+                    </select>
+                </div>
+                <div class="col col-3 pl-2">
+                    <label for="">Advancement Used</label>
+                    <select v-model="lqData.advancement" name="" id="" class="form-control">
+                        <option value="" selected>None</option>
+                        <option v-for="adv in fetchedAdvancementsList" v-if="adv.id" :value="adv.id">[[adv.code]] --- ₱[[formatPrice(adv.amount)]]</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- PURCHASE ITEMS -->
+            <div class="container-extend pl-5 pr-0 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
+                <div class="row">
+                    <div class="col-2 px-1">
+                        <label for="" class="m-0">OR Number</label>
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="" class="m-0">Vendor/Supplier</label>
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="" class="m-0">Expense Type</label>
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="" class="m-0">Amount</label>
+                    </div>
+                    <div class="col-4 px-1">
+                        <label for="" class="m-0">Photo <span class="gray font-size-10">(scan of receipt)</span></label>
+                    </div>
+                </div>
+
+                <!-- V-FOR ITEMS -->
+                <div class="row align-items-center" v-for="(entry, index) in lqData.liquidationentries">
+                    <div class="col-2 px-1">
+                        <input v-model="entry.orNo" type="text" placeholder="Enter OR #" class="form-control">
+                    </div>
+                    <div class="col-2 px-1">
+                        <select v-model="entry.party" name="" id="" class="form-control">
+                            <option value="" selected disabled>Select Vendor/Supplier</option>
+                            {% for vendor in vendors %}
+                            <option value="{{vendor.id}}">{{vendor.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-2 px-1">
+                        <select v-model="entry.expense" name="" id="" class="form-control">
+                            <option value="" selected disabled>Select Expense Type</option>
+                            <optgroup label="{{operational.all.0.name}}" style="color: rgb(104, 104, 104)">
+                                {% for group in operational.all %}
+                                {% for sub in group.accountsubgroup.all %}
+                                <optgroup label="{{sub.name}}">
+                                    {% for child in sub.accountchild.all %}
+                                    <option value="{{child.id}}">{{child.name}}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                {% endfor %}
+                                {% endfor %}
+                            </optgroup>
+
+                            <optgroup label="{{administrative.all.0.name}}" style="color: rgb(104, 104, 104);">
+                                {% for group in administrative.all %}
+                                {% for sub in group.accountsubgroup.all %}
+                                <optgroup label="{{sub.name}}">
+                                    {% for child in sub.accountchild.all %}
+                                    <option value="{{child.id}}">{{child.name}}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                {% endfor %}
+                                {% endfor %}
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="col-2 px-1">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input v-model="entry.amount" onkeypress="validate()" type="text" placeholder="Enter Total Amount" class="form-control box-shadow-off">
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="row align-items-center">
+                            <span class="col-7 p-0 pl-3">
+                                <input ref="orPhoto" @change="photoHandler(index)" type="file" class="form-control-file">
+                            </span>
+                            <span @click="setChosenPhoto(index)" class="col-3 p-0">
+                                <span data-toggle="modal" data-target="#viewPhotoModal" class="link font-size-10">View Photo</span>
+                            </span>
+                            <span class="col-1 justify-items-end p-0">
+                                <i @click="removeLine(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ADD NEW LINE -->
+                <div class="row mt-2">
+                    <div class="col px-1">
+                        <button @click="pushLine()" class="btn btn-warning">+ Add New Line</button>
+                        <button @click="popLine()" class="btn btn-danger">- Remove A Line</button>
+                    </div>
+                </div>
+
+                <!-- TOTAL AMOUNT -->
+                <div class="row mt-4">
+                    <div class="col-3 px-1">
+                        <label for="" class="font-size-14 font-bold">Total Amount</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input :value="formatPrice(lqData.totalAmount)" readonly type="text" onkeypress="validate()" class="form-control box-shadow-off font-size-14 font-bold">
+                        </div>
+                    </div>
+
+                    <!-- CHANGE -->
+                    <div class="offset-4 col-2 px-1">
+                        <label for="" class="font-bold">Change</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input :value="formatPrice(lqData.change)" type="text" readonly class="form-control box-shadow-off">
+                        </div>
+                    </div>
+
+                    <!-- PAYABLES TO EMPLOYEE -->
+                    <div class="col-2 px-1">
+                        <label for="" class="font-bold">Payables to Employee</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input :value="formatPrice(lqData.payable)" type="text" readonly class="form-control box-shadow-off">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div @click="checkForm()" class="container-extend border container-extend btn-bottom">
+                Save
+            </div>
+
+            <!-- VIEW PHOTO MODAL -->
+            <div class="modal fade" id="viewPhotoModal">
+                <div class="modal-dialog">
+                    <div class="modal-content b-radius-15">
+                        <div class="body m-3">
+                            <img class="b-radius-10" :src="chosenPhotoURL" alt="" width="100%">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config: {
+				headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    "content-type": "multipart/form-data"
+                }
+			},
+
+            chosenPhotoURL: null,
+
+            lqData: {
+                code: '{{new_code}}',
+                transactedBy: '',
+                advancement: '',
+                totalAmount: 0,
+                change: 0,
+                payable: 0,
+                liquidationentries: [{
+                    orNo: null,
+                    expense: '',
+                    party: '',
+                    amount: null,
+                    photo: null,
+                    photoURL: null,
+                }]
+            },
+
+            userList: [{
+                id: null,
+                first_name: null,
+                last_name: null,
+            }],
+
+            fetchedAdvancementsList: [{
+                id: null,
+                code: null,
+                amount: null,
+            }],
+
+            errors: []
+        },
+
+        computed:{
+            totalAmount(){
+                return this.lqData.liquidationentries.map(item=>item.amount)
+            },
+
+            advancement(){
+                return this.lqData.advancement
+            },
+
+            transactedBy(){
+                return this.lqData.transactedBy
+            }
+        },
+
+        watch:{
+            totalAmount(){
+                this.watcher()
+            },
+
+            advancement(){
+                this.watcher()
+            },
+
+            transactedBy(){
+                this.watcher()
+            }
+        },
+
+        methods: {
+            watcher(){
+                total = this.totalAmount.reduce((a,b)=>Number(a)+Number(b),0)
+                this.lqData.totalAmount = total
+
+                if(this.lqData.transactedBy){
+                    if (this.lqData.advancement){
+                        var adv = this.fetchedAdvancementsList.find(item=>item.id == this.lqData.advancement)
+                        var x = Number(total) - Number(adv.amount)
+                        if (x <= 0){
+                            this.lqData.change = Number(x*-1)
+                            this.lqData.payable = Number(0)
+                        } else {
+                            this.lqData.payable = Number(x)
+                            this.lqData.change = Number(0)
+                        }
+                    } else {
+                        var x = Number(total) - 0
+                        if (x <= 0){
+                            this.lqData.change = Number(x*-1)
+                            this.lqData.payable = Number(0)
+                        } else {
+                            this.lqData.payable = Number(x)
+                            this.lqData.change = Number(0)
+                        }
+                    }
+                }
+            },
+
+            onload(){
+                axios.get('/api/user-payrollable/')
+                .then(res=>{
+                    this.userList = res.data
+                })
+            },
+            photoHandler(index){
+                console.log(this.$refs.orPhoto[index].files[0])
+                this.lqData.liquidationentries[index].photo = this.$refs.orPhoto[index].files[0]
+                this.lqData.liquidationentries[index].photoURL = URL.createObjectURL(this.lqData.liquidationentries[index].photo)
+                console.log(this.lqData.liquidationentries[index].photoURL)
+            },
+
+            saveLiquidation(){
+                var formData = new FormData()
+
+                this.lqData.liquidationentries.forEach((item, index)=>{
+                    formData.append(`orPhoto${index}`, item.photo)
+                })
+
+                var POSTDATA = JSON.stringify(this.lqData)
+                formData.append('POSTDATA', POSTDATA)
+
+                axios.post('/save-liquidation-form/', formData, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+
+            setChosenPhoto(index){
+                this.chosenPhotoURL = this.lqData.liquidationentries[index].photoURL
+            },
+
+            pushLine(){
+                this.lqData.liquidationentries.push({
+                    orNo: null,
+                    expense: '',
+                    party: '',
+                    amount: null,
+                    photo: null,
+                    photoURL: null,
+                })
+            },
+
+            fetchUserAdvancements(id){
+                axios.get(`/api/user-advancements/${id}/`)
+                .then(res=>{
+                    this.fetchedAdvancementsList = res.data.advancementthrupettycashrequestor
+                })
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        icon: "error",
+                        html: err.message
+                    })
+                })
+            },
+
+            popLine(){
+                this.lqData.liquidationentries.pop()
+            },
+
+            removeLine(index){
+                this.lqData.liquidationentries.splice(index, 1)
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            checkForm(){
+                var success = false
+                if(this.lqData.code){
+                    for (var item  of this.lqData.liquidationentries){
+                        if(
+                            item.orNo &&
+                            item.expense &&
+                            item.amount &&
+                            item.party
+                        )
+                        {
+                            success = true
+                        } else {
+                            success = false
+                            break
+                        }
+                    }
+                    if(success){
+                        this.saveLiquidation()
+                        return
+                    }
+                }
+                this.errors = []
+                success = true
+                if(!this.lqData.code){
+                    this.errors.push('Code Required')
+                }
+                this.lqData.liquidationentries.forEach((item,index)=>{
+                    if(!item.orNo){
+                        this.errors.push(`OR # Required at index: ${index+1}`)
+                    }
+                    if(!item.expense){
+                        this.errors.push(`Expense Account Required at index: ${index+1}`)
+                    }
+                    if(!item.party){
+                        this.errors.push(`Vendor Required at index: ${index+1}`)
+                    }
+                    if(!item.amount){
+                        this.errors.push(`Amount Required at index: ${index+1}`)
+                    }
+                })
+
+                Swal.fire({
+                    title: "Unfilled Inputs",
+                    html: this.errors.join('<br>'),
+                    icon: "warning"
+                })
+            }
+        },
+
+        mounted(){
+            this.onload()
+        }
+    })
+</script>
+
+{% endblock %}

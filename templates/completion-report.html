@@ -391,7 +391,7 @@
             damagePhotoHandler(){
                 this.cr.damagePhoto = this.$refs.damageFile.files[0]
                 this.damagePhotoUrl = URL.createObjectURL(this.cr.damagePhoto);
-                console.log(this.cr.damagePhoto)
+                console.log(this.$refs.damageFile.files[0])
             },
 
             checkForm(){

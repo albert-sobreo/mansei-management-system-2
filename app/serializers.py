@@ -1197,6 +1197,16 @@ class AdvancementSZ(MS):
         model = AdvancementThruPettyCash
         fields = "__all__"
 
+class UsersAdvancementsSZ(MS):
+    advancementthrupettycashrequestor = AdvancementSZ(read_only=True, many=True)
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'first_name',
+            'last_name',
+            'advancementthrupettycashrequestor'
+        ]
 
 
 ########## BRANCH ###########
@@ -1207,3 +1217,25 @@ class BranchSZ(MS):
             'id',
             'name',
         ]
+
+
+
+
+
+########## LIQUIDATION ##########
+class LiquidationEntriesSZ(MS):
+    expense = AccountChildSZ(read_only=True)
+    vendor = PartySZ(read_only=True)
+    class Meta:
+        model=LiquidationEntries
+        fields = '__all__'
+
+class LiquidationSZ(MS):
+    advancement = AdvancementSZ(read_only=True)
+    createdBy = UserNameOnlySZ(read_only=True)
+    transactedBy = UserNameOnlySZ(read_only=True)
+    approvedBy = UserNameOnlySZ(read_only=True)
+    liquidationentries = LiquidationEntriesSZ(read_only=True, many=True)
+    class Meta:
+        model = Liquidation
+        fields = "__all__"

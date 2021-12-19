@@ -132,6 +132,7 @@ router.register(r"holiday", views.HolidayAPI, 'holiday')
 
 ########## PETTY CASH ##########
 router.register(r"advancement", views.AdvancementAPI, 'advancement')
+router.register(r"user-advancements", views.UsersAdvancementsAPI, 'user-advancements')
 
 ########## PROJECT PLANNING ##########
 router.register(r"project-assignee", views.ProjectAssigneeAPI, "project-assignee")
@@ -147,6 +148,9 @@ router.register(r"assignee", views.AssigneeAPI, 'assignee')
 
 ########## BRANCH LIST ##########
 router.register(r"branch-list", views.BranchListAPI, 'branch-list')
+
+########## LIQUIDATION ##########
+router.register(r"liquidation", views.LiquidationAPI, 'liquidation')
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -420,5 +424,9 @@ urlpatterns = [
     path('adv-approval/', login_required(views.ADVapprovalAPI.as_view())),
     path('petty-cash/', login_required(views.PettyCashView.as_view())),
     path('replenish-petty-cash/', login_required(views.PettyCashReplenish.as_view())),
-    path('save-edit-default-petty-cash-fund/', login_required(views.SaveDefaultPettyCash.as_view()))
+    path('save-edit-default-petty-cash-fund/', login_required(views.SaveDefaultPettyCash.as_view())),
+    path('liquidation-form/', login_required(views.LiquidationView.as_view())),
+    path('save-liquidation-form/', login_required(views.SaveLiquidationForm.as_view())),
+
+    path('liquidation-list/', login_required(views.LiquidationListView.as_view()))
 ]

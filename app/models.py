@@ -1618,6 +1618,34 @@ class AdvancementThruPettyCash(models.Model):
     approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "advancementthrupettycashApprovedBy")
     approved = models.BooleanField(null = True, default=False)
     reason = models.TextField(null = True, blank=True)
+    closed = models.BooleanField(default=False)
+    balance = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+
+class Liquidation(models.Model):
+    code = models.CharField(max_length=50)
+    createdBy = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='liquidationcreatedby', null=True, blank=True)
+    transactedBy = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="liquidationtransactedby", null=True, blank=True)
+    advancement = models.ForeignKey(AdvancementThruPettyCash, on_delete=models.SET_NULL, related_name="liquidation", null=True, blank=True)
+    totalAmount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    change = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    payable = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    datetimeCreated = models.DateTimeField(null=True, blank=True)
+    approved = models.BooleanField(default=False)
+    approvedBy = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='liquidationapprovedby', null=True, blank=True)
+
+    def __str__(self):
+        return self.code
+
+class LiquidationEntries(models.Model):
+    liquidation = models.ForeignKey(Liquidation, on_delete=models.CASCADE, related_name="liquidationentries", null=True, blank=True)
+    orNo = models.CharField(max_length=50, null=True, blank=True)
+    expense = models.ForeignKey(AccountChild, on_delete=models.SET_NULL, null=True, blank=True, related_name="liquidationentries")
+    amount = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    photo = models.ImageField(upload_to='liquidation/', null = True, blank = True)
+    vendor = models.ForeignKey(Party, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.orNo
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
@@ -1818,6 +1846,10 @@ class Branch(models.Model):
 
     #### PETTY CASH ####
     advancementThruPettyCash = models.ManyToManyField(AdvancementThruPettyCash, blank = True)
+
+    #### LIQUIDATION ####
+    liquidation = models.ManyToManyField(Liquidation, blank=True)
+    liquidationEntries = models.ManyToManyField(LiquidationEntries, blank=True)
     
 
     def __str__(self):

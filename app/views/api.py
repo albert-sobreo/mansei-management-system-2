@@ -614,6 +614,11 @@ class AdvancementAPI(viewsets.ModelViewSet):
     serializer_class = AdvancementSZ
     queryset = AdvancementThruPettyCash.objects.all()
 
+class UsersAdvancementsAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UsersAdvancementsSZ
+    queryset = User.objects.all()
+
 
 
 ########## BRANCH ##########
@@ -621,3 +626,13 @@ class BranchListAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = BranchSZ
     queryset = Branch.objects.all()
+
+
+
+
+
+########## LIQUIDATION ##########
+class LiquidationAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = LiquidationSZ
+    queryset = Liquidation.objects.all()
