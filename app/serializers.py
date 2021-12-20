@@ -1193,6 +1193,9 @@ class UserWith13thSZ(MS):
 
 ########## PETTYCASH ###########
 class AdvancementSZ(MS):
+    issuer = UserNameOnlySZ(read_only=True)
+    requestor = UserNameOnlySZ(read_only=True)
+    approvedBy = UserNameOnlySZ(read_only=True)
     class Meta:
         model = AdvancementThruPettyCash
         fields = "__all__"

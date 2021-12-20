@@ -39,3 +39,19 @@ class ADVapprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class LQDapproved(View):
+    def get(self, request):
+        context = {
+            'lqds': request.user.branch.liquidation.filter(approved = True),
+        }
+
+        return render(request, 'lqd-approved.html', context)
+
+class LQDnonapproved(View):
+    def get(self, request):
+        context = {
+            'lqds': request.user.branch.liquidation.filter(approved = False),
+        }
+
+        return render(request, 'lqd-nonapproved.html', context)

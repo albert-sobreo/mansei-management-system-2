@@ -56,6 +56,7 @@ class SaveAdvancement(APIView):
         adv.code = request.data['code']
         adv.requestor = User.objects.get(pk=request.data['requestor'])
         adv.amount = request.data['amount']
+        adv.balance = adv.amount
         adv.datetimeCreated = datetime.datetime.now()
         adv.reason = request.data['reason']
 

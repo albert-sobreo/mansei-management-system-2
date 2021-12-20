@@ -428,5 +428,7 @@ urlpatterns = [
     path('liquidation-form/', login_required(views.LiquidationView.as_view())),
     path('save-liquidation-form/', login_required(views.SaveLiquidationForm.as_view())),
 
-    path('liquidation-list/', login_required(views.LiquidationListView.as_view()))
+    path('liquidation-list/', login_required(views.LiquidationListView.as_view())),
+    path('lqd-nonapproved/', login_required(views.LQDnonapproved.as_view())),
+    path('lqd-approved/', login_required(views.LQDapproved.as_view()))
 ]

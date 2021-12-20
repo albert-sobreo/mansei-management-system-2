@@ -38,7 +38,7 @@
             <tbody>
                 {% for adv in request.user.branch.advancementThruPettyCash.all %}
                 <tr>
-                    <td>{{adv.code}}</td>
+                    <td @click="fetchAdv('{{adv.id}}')" data-toggle="modal" data-target="#advModal" class="link">{{adv.code}}</td>
                     <td>₱[[formatPrice('{{adv.amount}}')]]</td>
                     <td>{{adv.requestor.first_name}} {{adv.requestor.last_name}}</td>
                     <td>{{adv.issuer.first_name}} {{adv.issuer.last_name}}</td>
@@ -47,6 +47,76 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- ADVANCEMENT MODAL -->
+        <div class="modal fade" id="advModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="row pt-3 pb-1 order-card">
+                            <div class="col">
+                                <label for="" class="gray">Reference No.</label><br>
+                                <span class="font-bold font-size-14">[[advModal.code]]</span>
+                            </div>
+                            <div class="col">
+                                <label for="" class="gray">Requestor</label><br>
+                                <span class="font-bold font-size-14">[[advModal.requestor.first_name]] [[advModal.requestor.last_name]]</span>
+                            </div>
+                        </div>
+                        <div class="row pt-1 pb-3 order-card">
+                            <div class="col">
+                                <label for="" class="gray">Issuer</label><br>
+                                <span class="font-bold font-size-14">[[advModal.issuer.first_name]] [[advModal.issuer.last_name]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row pt-3 pb-1">
+                            <div class="col">
+                                <label for="" class="gray">Date Time Created</label><br>
+                                <span class="font-bold font-size-14">[[formatDateTime(advModal.datetimeCreated)]]</span>
+                            </div>
+                            <div class="col">
+                                <label for="" class="gray">Status</label><br>
+                                <span class="font-bold font-size-14 approved" v-if="advModal.approved">Approved</span>
+                                <span class="font-bold font-size-14 pending" v-else>Pending</span>
+                            </div>
+                        </div>
+                        <div class="row pt-1 pb-3">
+                            <div class="col">
+                                <label for="" class="gray">Date Time Approved</label><br>
+                                <span class="font-bold font-size-14">[[formatDateTime(advModal.datetimeApproved)]]</span>
+                            </div>
+                            <div class="col">
+                                <label for="" class="gray">Approved By</label><br>
+                                <span class="font-bold font-size-14" v-if="advModal.approvedBy">[[advModal.approvedBy.first_name]] [[advModal.approvedBy.last_name]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row pt-3 pb-1 order-card">
+                            <div class="col">
+                                <label for="" class="gray">Amount of Advancement</label><br>
+                                <span class="font-bold font-size-14">₱[[formatPrice(advModal.amount)]]</span>
+                            </div>
+                            <div class="col">
+                                <label for="" class="gray">Amount Returned</label><br>
+                                <span class="font-bold font-size-14">₱[[formatPrice(advModal.amount - advModal.balance)]]</span>
+                            </div>
+                        </div>
+                        <div class="row pt-1 pb-3 order-card">
+                            <div class="col">
+                                <label for="" class="gray">Reason</label>
+                                <textarea readonly name="" id="" cols="30" rows="4" class="form-control">hello</textarea>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col">
+                                <span @click="fetchToReturn()" data-toggle="modal" data-target="#returnAdvModal" class="link">Return Advancement</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- CREATE ADVANCEMENT MODAL -->
         <div class="modal fade" id="createAdvancementModal">
@@ -101,6 +171,49 @@
                 </div>
             </div>
         </div>
+
+        <!-- RETURN ADV MODAL -->
+        <div class="modal fade" id="returnAdvModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Return Advancement</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <label for="" class="gray">Total Amount</label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(returnAdv.totalAmount)]]</span>
+                            </div>
+                            <div class="col">
+                                <label for="" class="gray">Balance</label><br>
+                                <span class="font-size-14 font-bold">₱[[formatPrice(returnAdv.balance)]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row my-2 py-2 order-card">
+                            <div class="col-12">
+                                <label for="">Return Amount</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input v-model="returnAdv.returnAmount" placeholder="Enter Amount" type="text" onkeypress="validate()" class="form-control box-shadow-off">
+                                </div>
+                                <span @click="returnAmount()" class="link">Return All Remaining</span>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <button class="btn btn-primary col">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -118,6 +231,36 @@
                 headers: {
                     "X-CSRFToken": getCookie('csrftoken'),
                 }
+            },
+
+            returnAdv: {
+                id: null,
+                returnAmount: null,
+                balance: null,
+                totalAmount: null,
+            },
+
+            advModal: {
+                code: null,
+                requestor: {
+                    first_name: null,
+                    last_name: null,
+                },
+                issuer: {
+                    first_name: null,
+                    last_name: null,
+                },
+                amount: null,
+                datetimeCreated: null,
+                datetimeApproved: null,
+                approvedBy: {
+                    first_name: null,
+                    last_name: null,
+                },
+                approved: null,
+                reason: null,
+                closed: null,
+                balance: null
             },
 
             createAdvancementModal: {
@@ -139,9 +282,74 @@
                 axios.get('/api/user-payrollable/')
                 .then(res=>{
                     this.userList = res.data
-                    console.log(this.userList)
                 })
             },
+
+            fetchToReturn(){
+                this.returnAdv.id = this.advModal.id
+                this.returnAdv.totalAmount = this.advModal.amount
+                this.returnAdv.balance = this.advModal.balance
+            },
+
+            returnAmount(){
+                this.returnAdv.returnAmount = this.returnAdv.balance
+            },
+
+            fetchAdv(id){
+                axios.get(`/api/advancement/${id}/`)
+                .then(res=>{
+                    this.advModal = res.data
+                })
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+
             submitCreateAdvancement(){
                 Swal.fire({
                     title: "Are you sure?",

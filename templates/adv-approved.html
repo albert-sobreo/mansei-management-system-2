@@ -36,7 +36,7 @@
             <tbody>
                 {% for adv in advs %}
                 <tr>
-                    <td>{{adv.code}}</td>
+                    <td @click="fetchAdv('{{adv.id}}')" data-toggle="modal" data-target="#advModal" class="link">{{adv.code}}</td>
                     <td>₱[[formatPrice('{{adv.amount}}')]]</td>
                     <td>{{adv.requestor.first_name}} {{adv.requestor.last_name}}</td>
                     <td>{{adv.issuer.first_name}} {{adv.issuer.last_name}}</td>
@@ -45,6 +45,72 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- ADVANCEMENT MODAL -->
+        <div class="modal fade" id="advModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="row pt-3 pb-1 order-card">
+                            <div class="col">
+                                <label for="" class="gray">Reference No.</label><br>
+                                <span class="font-bold font-size-14">[[advModal.code]]</span>
+                            </div>
+                            <div class="col">
+                                <label for="" class="gray">Requestor</label><br>
+                                <span class="font-bold font-size-14">[[advModal.requestor.first_name]] [[advModal.requestor.last_name]]</span>
+                            </div>
+                        </div>
+                        <div class="row pt-1 pb-3 order-card">
+                            <div class="col">
+                                <label for="" class="gray">Issuer</label><br>
+                                <span class="font-bold font-size-14">[[advModal.issuer.first_name]] [[advModal.issuer.last_name]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row pt-3 pb-1">
+                            <div class="col">
+                                <label for="" class="gray">Date Time Created</label><br>
+                                <span class="font-bold font-size-14">[[formatDateTime(advModal.datetimeCreated)]]</span>
+                            </div>
+                            <div class="col">
+                                <label for="" class="gray">Status</label><br>
+                                <span class="font-bold font-size-14 approved" v-if="advModal.approved">Approved</span>
+                                <span class="font-bold font-size-14 pending" v-else>Pending</span>
+                            </div>
+                        </div>
+                        <div class="row pt-1 pb-3">
+                            <div class="col">
+                                <label for="" class="gray">Date Time Approved</label><br>
+                                <span class="font-bold font-size-14">[[formatDateTime(advModal.datetimeApproved)]]</span>
+                            </div>
+                            <div class="col">
+                                <label for="" class="gray">Approved By</label><br>
+                                <span class="font-bold font-size-14" v-if="advModal.approvedBy">[[advModal.approvedBy.first_name]] [[advModal.approvedBy.last_name]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row pt-3 pb-1 order-card">
+                            <div class="col">
+                                <label for="" class="gray">Amount of Advancement</label><br>
+                                <span class="font-bold font-size-14">₱[[formatPrice(advModal.amount)]]</span>
+                            </div>
+                            <div class="col">
+                                <label for="" class="gray">Amount Returned</label><br>
+                                <span class="font-bold font-size-14">₱[[formatPrice(advModal.amount - advModal.balance)]]</span>
+                            </div>
+                        </div>
+                        <div class="row pt-1 pb-3 order-card">
+                            <div class="col">
+                                <label for="" class="gray">Reason</label>
+                                <textarea readonly name="" id="" cols="30" rows="4" class="form-control">hello</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -62,6 +128,36 @@
                 headers: {
                     "X-CSRFToken": getCookie('csrftoken'),
                 }
+            },
+
+            advModal: {
+                code: null,
+                requestor: {
+                    first_name: null,
+                    last_name: null,
+                },
+                issuer: {
+                    first_name: null,
+                    last_name: null,
+                },
+                amount: null,
+                datetimeCreated: null,
+                datetimeApproved: null,
+                approvedBy: {
+                    first_name: null,
+                    last_name: null,
+                },
+                approved: null,
+                reason: null,
+                closed: null,
+                balance: null
+            },
+
+            createAdvancementModal: {
+                code: "{{new_code}}",
+                requestor: '',
+                amount: 0,
+                reason: '',
             },
 
             createAdvancementModal: {
@@ -100,6 +196,45 @@
                 })
             },
 
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+
             formatPrice(val){
                 val = Number(val).toFixed(2)
                 var num = val.replace(/,/gi, "");
@@ -108,6 +243,18 @@
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
             },
+
+            fetchAdv(id){
+                axios.get(`/api/advancement/${id}/`)
+                .then(res=>{
+                    this.advModal = res.data
+                })
+            },
+
+            approve(){
+                axios.post('/adv-approval/', this.advModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            }
         },
 
         mounted(){
