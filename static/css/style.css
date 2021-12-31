@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap');
 
 :root{
     --imps-blue-text: #339de9;
@@ -84,6 +85,10 @@ html,body
 
 .oswald{
     font-family: 'Oswald', sans-serif;
+}
+
+.roboto-mono{
+    font-family: 'Roboto Mono', monospace;
 }
 
 body{
@@ -1222,33 +1227,6 @@ select.form-control{
     page-break-inside: avoid;
     -webkit-column-break-inside: avoid;
 }
-
-/* SCROLLBARS */
-
-/* width */
-::-webkit-scrollbar {
-    height: 7px;
-    width: 7px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 99px;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: rgb(214, 214, 214);
-    border-radius: 99px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: rgb(197, 197, 197);
-}
-
-/* SCROLLBAR END */
 
 .add-new-stage{
     cursor: pointer;

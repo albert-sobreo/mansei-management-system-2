@@ -138,7 +138,7 @@
 
                         <div class="mt-3 row">
                             <div class="col">
-                                <button class="btn btn-primary col">Approve</button>
+                                <button @click="approve()" class="btn btn-primary col">Approve</button>
                             </div>
                         </div>
                     </div>
@@ -170,6 +170,12 @@
         el: "#app",
 
         data: {
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                }
+            },
+
             chosenPhotoURL: null,
 
             modal:{
@@ -269,6 +275,12 @@
                     console.log(res.data)
                     this.modal = res.data
                 })
+            },
+
+            approve(){
+                console.log('b0ss')
+                axios.post('/lqd-approval/', this.modal, this.config)
+                .then(res=>res.data==0?location.reload():'')
             }
         }
     })
@@ -283,7 +295,7 @@
             dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
-            "order": [[ 0, "desc" ]],
+            order: [[ 0, "desc" ]],
             buttons: {
                 buttons: [
                 {

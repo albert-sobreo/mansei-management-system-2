@@ -71,7 +71,10 @@ class SaveAdvancement(APIView):
 
 class PettyCashView(View):
     def get(self, request):
-        return render(request, 'petty-cash.html')
+        context = {
+            'activeAdv': request.user.branch.advancementThruPettyCash.filter(closed=False, approved=True)
+        }
+        return render(request, 'petty-cash.html', context)
 
 class PettyCashReplenish(APIView):
     def post(self, request):
@@ -100,6 +103,21 @@ class SaveDefaultPettyCash(APIView):
     def post(self, request):
         request.user.branch.pettyCashReplenish = request.data['amount']
         request.user.branch.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+class ReturnAdvancement(APIView):
+    def post(self, request):
+        data = request.data
+
+        adv = AdvancementThruPettyCash.objects.get(pk=data['id'])
+
+        adv.balance -= Decimal(data['returnAmount'])
+        if adv.balance >= 0:
+            adv.closed = True
+        
+        adv.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

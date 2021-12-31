@@ -1,0 +1,332 @@
+{% extends 'base-template.html' %}
+{% block title %} 2307 {% endblock %}
+
+{% block body %}
+<style>
+    #app2{
+        background-image: url('/static/media/BIR/2307.png');
+        height: 13in;
+        width: 8.5in;
+        background-size: contain;
+    }
+
+    body::-webkit-scrollbar { width: 0 !important }
+</style>
+<div id="app">
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-forms" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <div class="container">
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/2307/" class="active-gas mx-3">2307</a>
+                <a href="#" class="mx-3">1702Q</a>
+                <a href="#" class="mx-3">1601-C</a>
+                <a href="#" class="mx-3">1601-EQ</a>
+                <a href="#" class="mx-3">2316</a>
+                <a href="/0619-E/" class="mx-3">0619-E</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUTTON TO SAVE AS PDF -->
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary" @click="generatePDF()">Save</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#editForm">Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal fade" id="editForm">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content b-radius-15">
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <span class="modal-title">Edit 2307</span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1">
+                            <label for="">Period From <span class="font-size-10 gray">format: mm dd yyyy</span></label>
+                            <input type="date" v-model="bir.periodFrom" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Period To <span class="font-size-10 gray">format: mm dd yyyy</span></label>
+                            <input type="date" v-model="bir.periodTo" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Payee Information</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Payee TIN</label>
+                            <input type="text" v-model="bir.payeeTIN" class="form-control" placeholder="Enter Payee's TIN">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Payee Name</label>
+                            <input type="text" v-model="bir.payeeName" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-10 pr-1">
+                            <label for="">Payee Registred Address</label>
+                            <input type="text" v-model="bir.payeeAddress" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">ZIP</label>
+                            <input type="text" v-model="bir.payeeZIP" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                       <div class="col">
+                           <span class="font-bold font-size-14 gray">Payor Information</span>
+                       </div>
+                    </div>
+                    <hr class="mt-0">
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Payor TIN</label>
+                            <input type="text" v-model="bir.payorTIN" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Payor Name</label>
+                            <input type="text" v-model="bir.payorName" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-10 pr-1">
+                            <label for="">Payor Registred Address</label>
+                            <input type="text" v-model="bir.payorAddress" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">ZIP</label>
+                            <input type="text" v-model="bir.payorZIP" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">List of Transactions</span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1">
+                            <label for="">Income Payments</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">ATC</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">1st Month of Quarter</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">2nd Month of Quarter</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">3rd Month of Quarter</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Total</label>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Tax Withheld for the Quarter</label>
+                        </div>
+                    </div>
+                    <div class="row" v-for="(w, index) in bir.details">
+                        <div class="col pr-1">
+                            <input type="text" v-model="w.subject" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="w.atcCode" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="w.first" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="w.second" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="w.third" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="w.total" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="w.taxWithheldForQuarter" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- THE FILE -->
+    <div class="d-flex justify-content-center container">
+        <div id="app2" class="roboto-mono font-bold font-size-14 position-relative">
+            <span class="position-absolute" style="top: 140px; left: 206px; letter-spacing: 4px;">[[formatDate(bir.periodFrom)]]</span>
+            <span class="position-absolute" style="top: 140px; left: 537px; letter-spacing: 4px;">[[formatDate(bir.periodTo)]]</span>
+
+            <!-- PAYEES INFO -->
+            <span class="position-absolute" style="top: 185px; left: 280px; letter-spacing: 9.1px;">[[bir.payeeTIN]]</span>
+            <span class="position-absolute" style="top: 220px; left: 50px; letter-spacing: 4px;">[[bir.payeeName]]</span>
+            <span class="position-absolute" style="top: 258px; left: 50px; letter-spacing: 0px;">[[bir.payeeAddress]]</span>
+            <span class="position-absolute" style="top: 258px; left: 727px; letter-spacing: 7px;">[[bir.payeeZIP]]</span>
+
+            <!-- PAYOR INFO -->
+            <span class="position-absolute" style="top: 339px; left: 280px; letter-spacing: 9.1px;">[[bir.payorTIN]]</span>
+            <span class="position-absolute" style="top: 374px; left: 50px; letter-spacing: 4px;">[[bir.payorName]]</span>
+            <span class="position-absolute" style="top: 412px; left: 50px; letter-spacing: 0px;">[[bir.payorAddress]]</span>
+            <span class="position-absolute" style="top: 412px; left: 727px; letter-spacing: 7px;">[[bir.payorZIP]]</span>
+
+            <!-- LIST OF TRANSACTIONS -->
+            <div v-for="(w, index) in bir.details">
+                <span class="position-absolute" v-bind:style="{ top: 487 + index*18 + 'px', left: '30px', letterSpacing: '1px' }">[[w.subject]]</span>
+                <span class="position-absolute" v-bind:style="{ top: 487 + index*18 + 'px', left: '240px', letterSpacing: '1px' }">[[w.atcCode]]</span>
+                <span class="position-absolute" v-bind:style="{ top: 487 + index*18 + 'px', left: '300px', letterSpacing: '1px' }">[[w.first]]</span>
+                <span class="position-absolute" v-bind:style="{ top: 487 + index*18 + 'px', left: '395px', letterSpacing: '1px' }">[[w.second]]</span>
+                <span class="position-absolute" v-bind:style="{ top: 487 + index*18 + 'px', left: '495px', letterSpacing: '1px' }">[[w.third]]</span>
+                <span class="position-absolute" v-bind:style="{ top: 487 + index*18 + 'px', left: '590px', letterSpacing: '1px' }">[[w.total]]</span>
+                <span class="position-absolute" v-bind:style="{ top: 487 + index*18 + 'px', left: '685px', letterSpacing: '1px' }">[[w.taxWithheldForQuarter]]</span>
+            </div>
+        </div>
+    </div>
+    <pre>[[$data]]</pre>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            bir: {
+                periodFrom: '2022-01-01',
+                periodTo: '2022-01-02',
+
+                payeeTIN: '777-123-927-0000',
+                payeeName: 'Mansei Tech Corp Phil',
+                payeeAddress: '#100 Boton St. Techno Park, Subic Bay Freeport Zone, Morong, Bataan',
+                payeeZIP: '2200',
+
+                payorTIN: '777-321-533-0000',
+                payorName: 'Clark Kent',
+                payorAddress: '#1002 Mindanao Ave., Quezon City, Metro Manila',
+                payorZIP: '1000',
+
+                details: [{
+                    subject: 'Income Payments',
+                    atcCode: 'W-111',
+                    first: 'First',
+                    second: 'Second',
+                    third: 'Third',
+                    total: 'Total',
+                    taxWithheldForQuarter: 'EWP'
+                },
+                {
+                    subject: 'Income Payments',
+                    atcCode: 'W-111',
+                    first: 'First',
+                    second: 'Second',
+                    third: 'Third',
+                    total: 'Total',
+                    taxWithheldForQuarter: 'EWP'
+                }]
+            }
+        },
+
+        methods: {
+            generatePDF(){
+                var element = document.getElementById('app2');
+                var opt = {
+                    margin:       0,
+                    filename:     'myfile.pdf',
+                    image:        { type: 'jpeg', quality: 1 },
+                    html2canvas:  { scale: 1 },
+                    jsPDF:        { unit: 'in', format: [8.5, 13], orientation: 'portrait' }
+                };
+
+                html2pdf().set(opt).from(element).save();
+            },
+
+            formatDate(value){
+                const months = [
+                    '01',
+                    '02',
+                    '03',
+                    '04',
+                    '05',
+                    '06',
+                    '07', 
+                    '08',
+                    '09',
+                    '10',
+                    '11',
+                    '12',
+                ]
+                value = new Date(value)
+                year = value.getFullYear()
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+                date = ('0' + String(value.getDate())).slice(-2)
+                formatted = `${month} ${date} ${year}`
+
+                return formatted
+            },
+        }
+    })
+</script>
+
+{% endblock %}

@@ -34,6 +34,7 @@
                 <th>Requestor</th>
                 <th>Issuer</th>
                 <th>Reason</th>
+                <th>Fully Returned</th>
             </thead>
             <tbody>
                 {% for adv in request.user.branch.advancementThruPettyCash.all %}
@@ -43,6 +44,11 @@
                     <td>{{adv.requestor.first_name}} {{adv.requestor.last_name}}</td>
                     <td>{{adv.issuer.first_name}} {{adv.issuer.last_name}}</td>
                     <td>{{adv.reason}}</td>
+                    {% if adv.closed %}
+                    <td><i class="fas fa-check dash-green"></i></td>
+                    {% else %}
+                    <td><i class="fas fa-times text-danger"></i></td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
@@ -105,7 +111,7 @@
                         <div class="row pt-1 pb-3 order-card">
                             <div class="col">
                                 <label for="" class="gray">Reason</label>
-                                <textarea readonly name="" id="" cols="30" rows="4" class="form-control">hello</textarea>
+                                <textarea readonly name="" id="" cols="30" rows="4" class="form-control">[[advModal.reason]]</textarea>
                             </div>
                         </div>
                         <div class="row mt-3">
@@ -207,7 +213,7 @@
                                 <span @click="returnAmount()" class="link">Return All Remaining</span>
                             </div>
                             <div class="col-12 mt-3">
-                                <button class="btn btn-primary col">Save</button>
+                                <button @click="saveReturnAdv()" class="btn btn-primary col">Save</button>
                             </div>
                         </div>
                     </div>
@@ -215,6 +221,7 @@
             </div>
         </div>
     </div>
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -266,7 +273,7 @@
             createAdvancementModal: {
                 code: "{{new_code}}",
                 requestor: '',
-                amount: 0,
+                amount: '',
                 reason: '',
             },
 
@@ -357,6 +364,12 @@
                     html: "Are you sure you want to create advancement?",
                 })
                 .then(result=>{
+                    message = "Creating Advancement"
+                    Swal.fire({
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                    })
                     if(result.isConfirmed){
                         axios.post('/save-advancements/', this.createAdvancementModal, this.config)
                         .then(res=>res.data==0?location.reload():'')
@@ -372,6 +385,11 @@
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
             },
+
+            saveReturnAdv(){
+                axios.post('/return-advancement/', this.returnAdv, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            }
         },
 
         mounted(){
@@ -389,6 +407,7 @@
             dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            order: [[ 0, "desc" ]],
             buttons: {
                 buttons: [
                 {

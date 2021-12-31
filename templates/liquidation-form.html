@@ -347,7 +347,7 @@
             fetchUserAdvancements(id){
                 axios.get(`/api/user-advancements/${id}/`)
                 .then(res=>{
-                    this.fetchedAdvancementsList = res.data.advancementthrupettycashrequestor
+                    this.fetchedAdvancementsList = res.data.advancementthrupettycashrequestor.filter(item => item.closed == false && item.approved == true)
                 })
                 .catch(err=>{
                     Swal.fire({

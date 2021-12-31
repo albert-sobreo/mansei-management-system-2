@@ -1,0 +1,563 @@
+{% extends 'base-template.html' %}
+{% block title %} 0619-E {% endblock %}
+
+{% block body %}
+<style>
+    #app2{
+        background-image: url('/static/media/BIR/0619-E.png');
+        height: 11in;
+        width: 8.5in;
+        background-size: contain;
+    }
+
+    body::-webkit-scrollbar { width: 0 !important }
+</style>
+<div id="app">
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-forms" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <div class="container">
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/2307/" class="mx-3">2307</a>
+                <a href="#" class="mx-3">1702Q</a>
+                <a href="#" class="mx-3">1601-C</a>
+                <a href="#" class="mx-3">1601-EQ</a>
+                <a href="#" class="mx-3">2316</a>
+                <a href="/0619-E/" class="active-gas mx-3">0619-E</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUTTON TO SAVE AS PDF -->
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary" @click="generatePDF()">Save</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#editForm">Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal fade" id="editForm">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content b-radius-15">
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <span class="modal-title">Edit 0619-E</span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1">
+                            <label for="">For the Month of</label>
+                            <input type="month" v-model="bir.L1" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Due Date</label>
+                            <input type="date" v-model="bir.L2" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Amended Form?</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.L3" value=true class="">
+                                <label for="">Yes</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.L3" value=false class="">
+                                <label for="">No</label>
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Any Taxes Withheld?</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.L4" value=true class="">
+                                <label for="">Yes</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.L4" value=false class="">
+                                <label for="">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part I - Background Information</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col-10 pr-1">
+                            <label for="">Taxpayer Identification Number</label>
+                            <input type="text" v-model="bir.L7" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <label for="">RDO Code</label>
+                            <input type="text" v-model="bir.L8" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Withholding Agent's Name</label>
+                            <input type="text" v-model="bir.L9" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-10 pr-1">
+                            <label for="">Registred Address</label>
+                            <input type="text" v-model="bir.L10" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <label for="">ZIP Code</label>
+                            <input type="text" v-model="bir.LA10" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8 pr-1">
+                            <label for="">Contact Number</label>
+                            <input type="tel" v-model="bir.L11" class="form-control">
+                        </div>
+                        <div class="col-4 pl-1">
+                            <label for="">Category of Withholding Agent</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.L12" value=true class="">
+                                <label for="">Private</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.L12" value=false class="">
+                                <label for="">Government</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Email Address</label>
+                            <input type="email" v-model="bir.L13" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part II - Tax Remittance</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Amount of Remittance</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.L14" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Less: Amount Remitted from Previously Filed Form, if this is an amended form</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.L15" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Net Amount of Remittance (Item 14 less Item 15)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.L16" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Add Penalties</label>
+                        </div>
+                    </div>
+
+                    <div class="row ml-4">
+                        <div class="col">
+                            <label for="">Surcharge</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.LA17" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row ml-4">
+                        <div class="col">
+                            <label for="">Interest</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.LB17" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row ml-4">
+                        <div class="col">
+                            <label for="">Compromise</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.LC17" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row ml-4">
+                        <div class="col">
+                            <label for="">Total Penalties</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.LD17" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Total Amount of Remittance</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.L18" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part III - Details of Payment</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <label for="">Particulars</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Drawee Bank/Agency</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Number</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Date</label>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Amount</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Cash/Bank Debit Memo</span>
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.L19.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.L19.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.L19.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.L19.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Check</span>
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.L20.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.L20.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.L20.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.L20.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Tax Debit Memo</span>
+                        </div>
+                        <div class="col px-1">
+                            
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.L21.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.L21.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.L21.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <input type="text" v-model="bir.L22.particulars" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.L22.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.L22.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.L22.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.L22.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- THE FILE -->
+    <div class="d-flex justify-content-center container">
+        <div id="app2" class="roboto-mono font-bold font-size-18 position-relative">
+            <!-- 01 --> <span class="position-absolute" style="top: 175px; left: 67px; letter-spacing: 8px;">[[ formatMonth(bir.L1) ]]</span>
+            <!-- 02 --> <span class="position-absolute" style="top: 175px; left: 200px; letter-spacing: 8px;">[[ formatDate(bir.L2) ]]</span>
+            <!-- 03 --> <span class="position-absolute" style="top: 175px; left: 368px; letter-spacing: 8px;" v-if="bir.L3"><i class="fas fa-check"></i></span>
+            <!-- 03 --> <span class="position-absolute" style="top: 175px; left: 425px; letter-spacing: 8px;" v-else><i class="fas fa-check"></i></span>
+            <!-- 04 --> <span class="position-absolute" style="top: 175px; left: 502px; letter-spacing: 8px;" v-if="bir.L4"><i class="fas fa-check"></i></span>
+            <!-- 04 --> <span class="position-absolute" style="top: 175px; left: 560px; letter-spacing: 8px;" v-else><i class="fas fa-check"></i></span>
+
+            <!-- 07 --> <span class="position-absolute" style="top: 219px; left: 294px; letter-spacing: .47em;">[[ bir.L7 ]]</span>
+            <!-- 08 --> <span class="position-absolute" style="top: 219px; left: 719px; letter-spacing: .46em;">[[ bir.L8 ]]</span>
+
+            <!-- 09 --> <span class="position-absolute" style="top: 258px; left: 28px; letter-spacing: .46em;">[[ bir.L9 ]]</span>
+            <!-- 10 --> <span class="position-absolute" style="top: 294px; left: 28px; letter-spacing: .46em; width: 760px">[[ bir.L10 ]]</span>
+            <!-- 11 --> <span class="position-absolute" style="top: 345px; left: 142px; letter-spacing: .46em;">[[ bir.L11 ]]</span>
+
+
+            <!-- 12 --> <span class="position-absolute" style="top: 345px; left: 594px; letter-spacing: .46em;" v-if="bir.L12"><i class="fas fa-check"></i></span>
+            <!-- 12 --> <span class="position-absolute" style="top: 345px; left: 688px; letter-spacing: .46em;" v-else><i class="fas fa-check"></i></span>
+
+            <!-- 13 --> <span class="position-absolute" style="top: 383px; left: 28px; letter-spacing: .46em;" >[[ bir.L13 ]]</span>
+
+            <!-- 14 --> <span class="position-absolute" style="top: 428px; right: 22px; letter-spacing: .46em;" >[[ bir.L14 ]]</span>
+            <!-- 15 --> <span class="position-absolute" style="top: 453px; right: 22px; letter-spacing: .46em;" >[[ bir.L15 ]]</span>
+            <!-- 16 --> <span class="position-absolute" style="top: 477px; right: 22px; letter-spacing: .46em;" >[[ bir.L16 ]]</span>
+
+            <!-- 17 --> <span class="position-absolute" style="top: 517px; right: 22px; letter-spacing: .46em;" >[[ bir.LA17 ]]</span>
+            <!-- 17 --> <span class="position-absolute" style="top: 541px; right: 22px; letter-spacing: .46em;" >[[ bir.LB17 ]]</span>
+            <!-- 17 --> <span class="position-absolute" style="top: 565px; right: 22px; letter-spacing: .46em;" >[[ bir.LC17 ]]</span>
+            <!-- 17 --> <span class="position-absolute" style="top: 589px; right: 22px; letter-spacing: .46em;" >[[ bir.LD17 ]]</span>
+
+            <!-- 18 --> <span class="position-absolute" style="top: 613px; right: 22px; letter-spacing: .46em;" >[[ bir.L18 ]]</span>
+
+            <!-- 19 --> <span class="position-absolute" style="top: 826px; left: 162px; letter-spacing: .46em;" >[[ bir.L19.agency ]]</span>
+            <!-- 19 --> <span class="position-absolute" style="top: 826px; left: 257px; letter-spacing: .46em;" >[[ bir.L19.number ]]</span>
+            <!-- 19 --> <span class="position-absolute" style="top: 826px; left: 372px; letter-spacing: .46em;" >[[ formatDate(bir.L19.date) ]]</span>
+            <!-- 19 --> <span class="position-absolute" style="top: 826px; right: 22px; letter-spacing: .46em;" >[[ bir.L19.amount ]]</span>
+
+            <!-- 20 --> <span class="position-absolute" style="top: 849px; left: 162px; letter-spacing: .46em;" >[[ bir.L20.agency ]]</span>
+            <!-- 20 --> <span class="position-absolute" style="top: 849px; left: 257px; letter-spacing: .46em;" >[[ bir.L20.number ]]</span>
+            <!-- 20 --> <span class="position-absolute" style="top: 849px; left: 372px; letter-spacing: .46em;" >[[ formatDate(bir.L20.date) ]]</span>
+            <!-- 20 --> <span class="position-absolute" style="top: 849px; right: 22px; letter-spacing: .46em;" >[[ bir.L20.amount ]]</span>
+
+            <!-- 21 --> <span class="position-absolute" style="top: 873px; left: 257px; letter-spacing: .46em;" >[[ bir.L21.number ]]</span>
+            <!-- 21 --> <span class="position-absolute" style="top: 873px; left: 372px; letter-spacing: .46em;" >[[ formatDate(bir.L21.date) ]]</span>
+            <!-- 21 --> <span class="position-absolute" style="top: 873px; right: 22px; letter-spacing: .46em;" >[[ bir.L21.amount ]]</span>
+
+            <!-- 22 --> <span class="position-absolute" style="top: 912px; left: 28px; letter-spacing: .46em;" >[[ bir.L22.particulars ]]</span>
+            <!-- 22 --> <span class="position-absolute" style="top: 912px; left: 162px; letter-spacing: .46em;" >[[ bir.L22.agency ]]</span>
+            <!-- 22 --> <span class="position-absolute" style="top: 912px; left: 257px; letter-spacing: .46em;" >[[ bir.L22.number ]]</span>
+            <!-- 22 --> <span class="position-absolute" style="top: 912px; left: 372px; letter-spacing: .46em;" >[[ formatDate(bir.L22.date) ]]</span>
+            <!-- 22 --> <span class="position-absolute" style="top: 912px; right: 22px; letter-spacing: .46em;" >[[ bir.L22.amount ]]</span>
+            
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            bir: {
+                L1: '2021-12',
+                L2: '2021-12-30',
+                L3: true,
+                L4: true,
+                L5: 'WME10',
+                L6: 'WE',
+                L7: '777-123-142-0000',
+                L8: '018',
+                L9: 'Mansei Tech Phil Corp',
+                L10: 'Boton St. Techno Park, Subic Bay Freeport Zone',
+                LA10: '2200',
+                L11: '09123459288',
+                L12: true,
+                L13: 'email@gmail.com',
+                L14: '18000.00',
+                L15: '18000.00',
+                L16: '18000.00',
+                LA17: '18000.00',
+                LB17: '18000.00',
+                LC17: '18000.00',
+                LD17: '18000.00',
+                L18: '18000.00',
+                L19: {
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                L20: {
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                L21: {
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                L22: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                }
+            }
+        },
+
+        methods: {
+            generatePDF(){
+                var element = document.getElementById('app2');
+                var opt = {
+                    margin:       0,
+                    filename:     'myfile.pdf',
+                    image:        { type: 'jpeg', quality: 1 },
+                    html2canvas:  { scale: 1 },
+                    jsPDF:        { unit: 'in', format: [8.5, 11], orientation: 'portrait' }
+                };
+
+                html2pdf().set(opt).from(element).save();
+            },
+
+            formatDate(value){
+                const months = [
+                    '01',
+                    '02',
+                    '03',
+                    '04',
+                    '05',
+                    '06',
+                    '07', 
+                    '08',
+                    '09',
+                    '10',
+                    '11',
+                    '12',
+                ]
+                value = new Date(value)
+                year = value.getFullYear()
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+                date = ('0' + String(value.getDate())).slice(-2)
+                formatted = `${month}${date}${year}`
+
+                return formatted
+            },
+
+            formatMonth(value){
+                const months = [
+                    '01',
+                    '02',
+                    '03',
+                    '04',
+                    '05',
+                    '06',
+                    '07', 
+                    '08',
+                    '09',
+                    '10',
+                    '11',
+                    '12',
+                ]
+                value = new Date(value)
+                year = value.getFullYear()
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+                formatted = `${month}${year}`
+
+                return formatted
+            },
+        }
+    })
+</script>
+
+{% endblock %}

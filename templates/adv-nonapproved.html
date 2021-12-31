@@ -103,13 +103,16 @@
                         <div class="row pt-1 pb-3 order-card">
                             <div class="col">
                                 <label for="" class="gray">Reason</label>
-                                <textarea readonly name="" id="" cols="30" rows="4" class="form-control">hello</textarea>
+                                <textarea readonly name="" id="" cols="30" rows="4" class="form-control">[[advModal.reason]]</textarea>
                             </div>
                         </div>
 
                         <div class="row mt-3">
-                            <div class="col">
+                            <div class="col pr-1">
                                 <button class="btn btn-primary col" @click="approve()">Approve</button>
+                            </div>
+                            <div class="col pl-1">
+                                <button class="btn btn-danger col" @click="deleteAdv()">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -258,7 +261,24 @@
             },
 
             approve(){
+                message = "Approving Advancement"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/adv-approval/', this.advModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+
+            deleteAdv(){
+                message = "Deleting Advancement"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.post('/delete-advancement/', this.advModal, this.config)
                 .then(res=>res.data==0?location.reload():'')
             }
         },

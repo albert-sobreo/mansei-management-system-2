@@ -101,7 +101,8 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <div>
-                                            <span class="dash-dark-green font-bold font-size-18">₱[[formatPrice('12500')]] (sample)</span>
+                                            <span class="dash-dark-green font-bold font-size-18 text-danger" v-if="dashData.pettyCash == 'exception'">Error</span>
+                                            <span class="dash-dark-green font-bold font-size-18" v-else>₱[[formatPrice(dashData.pettyCash)]]</span>
                                         </div>
                                         <div>
                                             <span class="gray font-bold">Remaining</span>
@@ -114,10 +115,10 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <div>
-                                            <span class="dash-dark-green font-bold font-size-18">₱[[formatPrice('7500')]] (sample)</span>
+                                            <span class="dash-dark-green font-bold font-size-18" v-if="dashData.po.code">₱[[formatPrice(dashData.po.amountTotal)]]</span>
                                         </div>
                                         <div>
-                                            <span class="gray font-bold">PO-2021-01-0001</span>
+                                            <span class="gray font-bold">[[dashData.po.code]]</span>
                                         </div>
                                     </div>
                                 </div>
@@ -133,7 +134,7 @@
                                 </div>
                                 <div class="d-flex flex-column">
                                     <div>
-                                        <span class="dash-dark-green font-bold font-size-18">₱[[formatPrice('19030')]] (sample)</span>
+                                        <span class="dash-dark-green font-bold font-size-18">₱[[formatPrice(dashData.totalExpenses)]]</span>
                                     </div>
                                     <div>
                                         <span class="gray font-bold">Total Expenses Today</span>
@@ -315,7 +316,13 @@
                     notepad: {
                         notes: null,
                     },
-                }
+                },
+                pettyCash: null,
+                po: {
+                    code: null,
+                    amountTotal: null,
+                },
+                totalExpenses: null,
             },
 
             type: 'createBranch',

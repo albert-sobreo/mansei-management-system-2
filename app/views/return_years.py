@@ -13,6 +13,6 @@ from datetime import datetime, date
 class ReturnYearsView(View):
     def get(self, request):
         yearNow = date.today().year
-        yearList = [i for i in range(yearNow, 1999, -1)]
+        yearList = [i for i in range(yearNow+1, 1999, -1)]
         
         return JsonResponse(yearList, safe=False)

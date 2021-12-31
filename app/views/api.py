@@ -1,3 +1,4 @@
+import datetime
 from django.db.models import query
 from django.http.response import Http404, JsonResponse
 from rest_framework import viewsets
@@ -11,6 +12,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.fields import CurrentUserDefault
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from decimal import Decimal
+import re
 
 ########## CHART OF ACCOUNTS ##########
 class AccountGroupAPI(viewsets.ModelViewSet):
@@ -605,6 +608,34 @@ class DashboardAPI(APIView):
             dashData["announcements"] = serializer.data
         except:
             dashData["announcements"] = []
+
+        try:
+            dashData['pettyCash'] = request.user.branch.branchProfile.branchDefaultChildAccount.pettyCash.amount
+        except Exception as e:
+            print(e)
+            dashData['pettyCash'] = 'exception'
+
+        try:
+            print(request.user.branch.purchaseOrder.latest('pk'))
+            serializer = PurchaseOrderSZ(request.user.branch.purchaseOrder.latest('pk'))
+            dashData['po'] = serializer.data
+        except Exception as e:
+            print(e)
+            dashData['po'] = None
+
+        try:
+            journals = request.user.branch.journal.filter(journalDate = datetime.date.today())
+            totalExpenses = Decimal(0)
+            for j in journals:
+                for je in j.journalentries.all():
+                    if re.search('[Ee]xpense', je.accountChild.accountSubGroup.accountGroup.name):
+                        if je.normally == 'Debit':
+                            totalExpenses += je.amount
+                        elif je.normally == 'Credit':
+                            totalExpenses -= je.amount
+            dashData['totalExpenses'] = totalExpenses
+        except Exception as e:
+            print(e)
 
         return JsonResponse(dashData, safe=False)
 

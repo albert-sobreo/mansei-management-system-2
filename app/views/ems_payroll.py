@@ -97,6 +97,9 @@ class EMS_GeneratePayroll(APIView):
             request.user.branch.payroll.add(payroll)
             rates = request.user.branch.ratesGroup.get(name='DOLE Standard')
 
+            # INIT FOR BASIC PAY #
+            bp = Decimal(0)
+
             for dtr in user.dtr.filter(date__range=[dateStart, dateEnd]):
                 if not dtr.payroll:
                     dtr.payroll = payroll
@@ -109,100 +112,155 @@ class EMS_GeneratePayroll(APIView):
                         except:
                             pass
 
-                    payroll.bh += dtr.bh * rates.bh * Decimal(user.rate/8)
-                    payroll.ot += dtr.ot * rates.ot * Decimal(user.rate/8)
-                    payroll.ut += dtr.ut * rates.ut * Decimal(user.rate/8)
-                    payroll.nd += dtr.nd * rates.nd * Decimal(user.rate/8)
-                    payroll.ndot += dtr.ndot * rates.ndot * Decimal(user.rate/8)
-                    payroll.rd += dtr.rd * rates.rd * Decimal(user.rate/8)
-                    payroll.rdot += dtr.rdot * rates.rdot * Decimal(user.rate/8)
-                    payroll.rdnd += dtr.rdnd * rates.rdnd * Decimal(user.rate/8)
-                    payroll.rdndot += dtr.rdndot * rates.rdndot * Decimal(user.rate/8)
-                    payroll.rh += dtr.rh * rates.rh * Decimal(user.rate/8)
-                    payroll.rhot += dtr.rhot * rates.rhot * Decimal(user.rate/8)
-                    payroll.rhnd += dtr.rhnd * rates.rhnd * Decimal(user.rate/8)
-                    payroll.rhndot += dtr.rhndot * rates.rhndot * Decimal(user.rate/8)
-                    payroll.sh += dtr.sh * rates.sh * Decimal(user.rate/8)
-                    payroll.shot += dtr.shot * rates.shot * Decimal(user.rate/8)
-                    payroll.shnd += dtr.shnd * rates.shnd * Decimal(user.rate/8)
-                    payroll.shndot += dtr.shndot * rates.shndot * Decimal(user.rate/8)
-                    payroll.shw += dtr.shw * rates.shw * Decimal(user.rate/8)
-                    payroll.shwot += dtr.shwot * rates.shwot * Decimal(user.rate/8)
-                    payroll.shwnd += dtr.shwnd * rates.shwnd * Decimal(user.rate/8)
-                    payroll.shwndot += dtr.shwndot * rates.shwndot * Decimal(user.rate/8)
-                    payroll.rhrd += dtr.rhrd * rates.rhrd * Decimal(user.rate/8)
-                    payroll.rhrdot += dtr.rhrdot * rates.rhrdot * Decimal(user.rate/8)
-                    payroll.rhrdnd += dtr.rhrdnd * rates.rhrdnd * Decimal(user.rate/8)
-                    payroll.rhrdndot += dtr.rhrdndot * rates.rhrdndot * Decimal(user.rate/8)
-                    payroll.shrd += dtr.shrd * rates.shrd * Decimal(user.rate/8)
-                    payroll.shrdot += dtr.shrdot * rates.shrdot * Decimal(user.rate/8)
-                    payroll.shrdnd += dtr.shrdnd * rates.shrdnd * Decimal(user.rate/8)
-                    payroll.shrdndot += dtr.shrdndot * rates.shrdndot * Decimal(user.rate/8)
+                    bp += dtr.bh * rates.bh * Decimal(user.rate/8)
 
-                    payroll.bhTotalHours += dtr.bh
-                    payroll.otTotalHours += dtr.ot
-                    payroll.utTotalHours += dtr.ut
-                    payroll.ndTotalHours += dtr.nd
-                    payroll.ndotTotalHours += dtr.ndot
-                    payroll.rdTotalHours += dtr.rd
-                    payroll.rdotTotalHours += dtr.rdot
-                    payroll.rdndTotalHours += dtr.rdnd
-                    payroll.rdndotTotalHours += dtr.rdndot
-                    payroll.rhTotalHours += dtr.rh
-                    payroll.rhotTotalHours += dtr.rhot
-                    payroll.rhndTotalHours += dtr.rhnd
-                    payroll.rhndotTotalHours += dtr.rhndot
-                    payroll.shTotalHours += dtr.sh
-                    payroll.shotTotalHours += dtr.shot
-                    payroll.shndTotalHours += dtr.shnd
-                    payroll.shndotTotalHours += dtr.shndot
-                    payroll.shwTotalHours += dtr.shw
-                    payroll.shwotTotalHours += dtr.shwot
-                    payroll.shwndTotalHours += dtr.shwnd
-                    payroll.shwndotTotalHours += dtr.shwndot
-                    payroll.rhrdTotalHours += dtr.rhrd
-                    payroll.rhrdotTotalHours += dtr.rhrdot
-                    payroll.rhrdndTotalHours += dtr.rhrdnd
-                    payroll.rhrdndotTotalHours += dtr.rhrdndot
-                    payroll.shrdTotalHours += dtr.shrd
-                    payroll.shrdotTotalHours += dtr.shrdot
-                    payroll.shrdndTotalHours += dtr.shrdnd
-                    payroll.shrdndotTotalHours += dtr.shrdndot
+                    if dtr.rh or dtr.sh or dtr.shw or dtr.rd or dtr.rhrd or dtr.shrd:
+                        payroll.rd += dtr.rd * rates.rd * Decimal(user.rate/8)
+                        payroll.rdot += dtr.rdot * rates.rdot * Decimal(user.rate/8)
+                        payroll.rdnd += dtr.rdnd * rates.rdnd * Decimal(user.rate/8)
+                        payroll.rdndot += dtr.rdndot * rates.rdndot * Decimal(user.rate/8)
+                        payroll.rh += dtr.rh * rates.rh * Decimal(user.rate/8)
+                        payroll.rhot += dtr.rhot * rates.rhot * Decimal(user.rate/8)
+                        payroll.rhnd += dtr.rhnd * rates.rhnd * Decimal(user.rate/8)
+                        payroll.rhndot += dtr.rhndot * rates.rhndot * Decimal(user.rate/8)
+                        payroll.sh += dtr.sh * rates.sh * Decimal(user.rate/8)
+                        payroll.shot += dtr.shot * rates.shot * Decimal(user.rate/8)
+                        payroll.shnd += dtr.shnd * rates.shnd * Decimal(user.rate/8)
+                        payroll.shndot += dtr.shndot * rates.shndot * Decimal(user.rate/8)
+                        payroll.shw += dtr.shw * rates.shw * Decimal(user.rate/8)
+                        payroll.shwot += dtr.shwot * rates.shwot * Decimal(user.rate/8)
+                        payroll.shwnd += dtr.shwnd * rates.shwnd * Decimal(user.rate/8)
+                        payroll.shwndot += dtr.shwndot * rates.shwndot * Decimal(user.rate/8)
+                        payroll.rhrd += dtr.rhrd * rates.rhrd * Decimal(user.rate/8)
+                        payroll.rhrdot += dtr.rhrdot * rates.rhrdot * Decimal(user.rate/8)
+                        payroll.rhrdnd += dtr.rhrdnd * rates.rhrdnd * Decimal(user.rate/8)
+                        payroll.rhrdndot += dtr.rhrdndot * rates.rhrdndot * Decimal(user.rate/8)
+                        payroll.shrd += dtr.shrd * rates.shrd * Decimal(user.rate/8)
+                        payroll.shrdot += dtr.shrdot * rates.shrdot * Decimal(user.rate/8)
+                        payroll.shrdnd += dtr.shrdnd * rates.shrdnd * Decimal(user.rate/8)
+                        payroll.shrdndot += dtr.shrdndot * rates.shrdndot * Decimal(user.rate/8)
+
+                        
+                        payroll.rdTotalHours += dtr.rd
+                        payroll.rdotTotalHours += dtr.rdot
+                        payroll.rdndTotalHours += dtr.rdnd
+                        payroll.rdndotTotalHours += dtr.rdndot
+                        payroll.rhTotalHours += dtr.rh
+                        payroll.rhotTotalHours += dtr.rhot
+                        payroll.rhndTotalHours += dtr.rhnd
+                        payroll.rhndotTotalHours += dtr.rhndot
+                        payroll.shTotalHours += dtr.sh
+                        payroll.shotTotalHours += dtr.shot
+                        payroll.shndTotalHours += dtr.shnd
+                        payroll.shndotTotalHours += dtr.shndot
+                        payroll.shwTotalHours += dtr.shw
+                        payroll.shwotTotalHours += dtr.shwot
+                        payroll.shwndTotalHours += dtr.shwnd
+                        payroll.shwndotTotalHours += dtr.shwndot
+                        payroll.rhrdTotalHours += dtr.rhrd
+                        payroll.rhrdotTotalHours += dtr.rhrdot
+                        payroll.rhrdndTotalHours += dtr.rhrdnd
+                        payroll.rhrdndotTotalHours += dtr.rhrdndot
+                        payroll.shrdTotalHours += dtr.shrd
+                        payroll.shrdotTotalHours += dtr.shrdot
+                        payroll.shrdndTotalHours += dtr.shrdnd
+                        payroll.shrdndotTotalHours += dtr.shrdndot
+                    else:
+                        payroll.bh += dtr.bh * rates.bh * Decimal(user.rate/8)
+                        payroll.ot += dtr.ot * rates.ot * Decimal(user.rate/8)
+                        payroll.ut += dtr.ut * rates.ut * Decimal(user.rate/8)
+                        payroll.nd += dtr.nd * rates.nd * Decimal(user.rate/8)
+                        payroll.ndot += dtr.ndot * rates.ndot * Decimal(user.rate/8)
+                        payroll.rd += dtr.rd * rates.rd * Decimal(user.rate/8)
+                        payroll.rdot += dtr.rdot * rates.rdot * Decimal(user.rate/8)
+                        payroll.rdnd += dtr.rdnd * rates.rdnd * Decimal(user.rate/8)
+                        payroll.rdndot += dtr.rdndot * rates.rdndot * Decimal(user.rate/8)
+                        payroll.rh += dtr.rh * rates.rh * Decimal(user.rate/8)
+                        payroll.rhot += dtr.rhot * rates.rhot * Decimal(user.rate/8)
+                        payroll.rhnd += dtr.rhnd * rates.rhnd * Decimal(user.rate/8)
+                        payroll.rhndot += dtr.rhndot * rates.rhndot * Decimal(user.rate/8)
+                        payroll.sh += dtr.sh * rates.sh * Decimal(user.rate/8)
+                        payroll.shot += dtr.shot * rates.shot * Decimal(user.rate/8)
+                        payroll.shnd += dtr.shnd * rates.shnd * Decimal(user.rate/8)
+                        payroll.shndot += dtr.shndot * rates.shndot * Decimal(user.rate/8)
+                        payroll.shw += dtr.shw * rates.shw * Decimal(user.rate/8)
+                        payroll.shwot += dtr.shwot * rates.shwot * Decimal(user.rate/8)
+                        payroll.shwnd += dtr.shwnd * rates.shwnd * Decimal(user.rate/8)
+                        payroll.shwndot += dtr.shwndot * rates.shwndot * Decimal(user.rate/8)
+                        payroll.rhrd += dtr.rhrd * rates.rhrd * Decimal(user.rate/8)
+                        payroll.rhrdot += dtr.rhrdot * rates.rhrdot * Decimal(user.rate/8)
+                        payroll.rhrdnd += dtr.rhrdnd * rates.rhrdnd * Decimal(user.rate/8)
+                        payroll.rhrdndot += dtr.rhrdndot * rates.rhrdndot * Decimal(user.rate/8)
+                        payroll.shrd += dtr.shrd * rates.shrd * Decimal(user.rate/8)
+                        payroll.shrdot += dtr.shrdot * rates.shrdot * Decimal(user.rate/8)
+                        payroll.shrdnd += dtr.shrdnd * rates.shrdnd * Decimal(user.rate/8)
+                        payroll.shrdndot += dtr.shrdndot * rates.shrdndot * Decimal(user.rate/8)
+
+                        payroll.bhTotalHours += dtr.bh
+                        payroll.otTotalHours += dtr.ot
+                        payroll.utTotalHours += dtr.ut
+                        payroll.ndTotalHours += dtr.nd
+                        payroll.ndotTotalHours += dtr.ndot
+                        payroll.rdTotalHours += dtr.rd
+                        payroll.rdotTotalHours += dtr.rdot
+                        payroll.rdndTotalHours += dtr.rdnd
+                        payroll.rdndotTotalHours += dtr.rdndot
+                        payroll.rhTotalHours += dtr.rh
+                        payroll.rhotTotalHours += dtr.rhot
+                        payroll.rhndTotalHours += dtr.rhnd
+                        payroll.rhndotTotalHours += dtr.rhndot
+                        payroll.shTotalHours += dtr.sh
+                        payroll.shotTotalHours += dtr.shot
+                        payroll.shndTotalHours += dtr.shnd
+                        payroll.shndotTotalHours += dtr.shndot
+                        payroll.shwTotalHours += dtr.shw
+                        payroll.shwotTotalHours += dtr.shwot
+                        payroll.shwndTotalHours += dtr.shwnd
+                        payroll.shwndotTotalHours += dtr.shwndot
+                        payroll.rhrdTotalHours += dtr.rhrd
+                        payroll.rhrdotTotalHours += dtr.rhrdot
+                        payroll.rhrdndTotalHours += dtr.rhrdnd
+                        payroll.rhrdndotTotalHours += dtr.rhrdndot
+                        payroll.shrdTotalHours += dtr.shrd
+                        payroll.shrdotTotalHours += dtr.shrdot
+                        payroll.shrdndTotalHours += dtr.shrdnd
+                        payroll.shrdndotTotalHours += dtr.shrdndot
                 
 
             payroll.holidayPay = (len(holidays)*user.rate)
 
-            payroll.basicPay = payroll.bh
+            payroll.basicPay = bp
+
             payroll.grossPayBeforeBonus = \
-                payroll.basicPay + \
-                payroll.ot + \
-                payroll.ut + \
-                payroll.nd + \
-                payroll.ndot + \
-                payroll.rd + \
-                payroll.rdot + \
-                payroll.rdnd + \
-                payroll.rdndot + \
-                payroll.rh + \
-                payroll.rhot + \
-                payroll.rhnd + \
-                payroll.rhndot + \
-                payroll.sh + \
-                payroll.shot + \
-                payroll.shnd + \
-                payroll.shndot + \
-                payroll.shw + \
-                payroll.shwot + \
-                payroll.shwnd + \
-                payroll.shwndot + \
-                payroll.rhrd + \
-                payroll.rhrdot + \
-                payroll.rhrdnd + \
-                payroll.rhrdndot + \
-                payroll.shrd + \
-                payroll.shrdot + \
-                payroll.shrdnd + \
-                payroll.shrdndot
+            payroll.bh + \
+            payroll.ot + \
+            payroll.ut + \
+            payroll.nd + \
+            payroll.ndot + \
+            payroll.rd + \
+            payroll.rdot + \
+            payroll.rdnd + \
+            payroll.rdndot + \
+            payroll.rh + \
+            payroll.rhot + \
+            payroll.rhnd + \
+            payroll.rhndot + \
+            payroll.sh + \
+            payroll.shot + \
+            payroll.shnd + \
+            payroll.shndot + \
+            payroll.shw + \
+            payroll.shwot + \
+            payroll.shwnd + \
+            payroll.shwndot + \
+            payroll.rhrd + \
+            payroll.rhrdot + \
+            payroll.rhrdnd + \
+            payroll.rhrdndot + \
+            payroll.shrd + \
+            payroll.shrdot + \
+            payroll.shrdnd + \
+            payroll.shrdndot
 
             # payroll.save()
 
@@ -239,10 +297,10 @@ class EMS_GeneratePayroll(APIView):
             for pay in allPayrollThisYear:
                 for b in pay.bonuspay.all():
                     totalBonus += b.amount
-
-            totalBonus += totalBonusThisPeriod
+                    
             print(totalBonus, 'TotalBonus')
-            if (totalBonus) >= Decimal(90000):
+            if (totalBonus) > Decimal(90000):
+                print('bonus1')
                 if totalBonus - (totalBonusThisPeriod) < Decimal(90000):
                     payroll.netPayBeforeTaxes = (payroll.grossPayBeforeBonus + (totalBonus - Decimal(90000)))
                     payroll.netPayAfterTaxes += totalBonusThisPeriod - (totalBonus - Decimal(90000))
@@ -252,6 +310,7 @@ class EMS_GeneratePayroll(APIView):
                     print(payroll.netPayBeforeTaxes)
                 taxedbonus = (totalBonus + totalBonusThisPeriod - Decimal(90000))
             else:
+                print('bonus2')
                 payroll.netPayBeforeTaxes = payroll.grossPayBeforeBonus
 
             # SCENARIOS
@@ -446,6 +505,8 @@ class EMS_GeneratePayroll(APIView):
             taxDeductedObj = EmployeeTaxDeduction()
 
             payroll.netPayBeforeTaxes += taxableBenefit
+
+            print('taxableBenefit', taxableBenefit)
 
             taxDeducted = 0
             for tax in incomeTaxTable:

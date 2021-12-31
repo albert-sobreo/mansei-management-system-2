@@ -1,4 +1,5 @@
 {% extends 'base-template.html' %}
+{% load mathfilters %}
 {% block title %} Petty Cash {% endblock %}
 
 {% block body %}
@@ -22,7 +23,7 @@
         </div>
 
         <!-- MAIN BODY -->
-        <div class="d-flex align-items-center justify-content-center" style="height:50vh;">
+        <div class="d-flex align-items-center justify-content-center pt-5">
             <div class="d-flex flex-column border w-50 p-4 b-radius-15 box-shadow-medium">
                 <div>
                     <span class="font-size-24 font-bold">Petty Cash</span>
@@ -74,6 +75,27 @@
                         <button @click="submitReplenish()" class="btn btn-primary col">Replenish Petty Cash</button>
                     </div>
                 </div>
+
+                <div class="row mt-3">
+                    <div class="col">
+                        <span class="font-bold">Active Advancements</span>
+                    </div>
+                </div>
+                {% for adv in activeAdv.all %}
+                <div class="row my-2">
+                    <div class="col-4">
+                        <span class="font-medium">{{adv.requestor.first_name}} {{adv.requestor.last_name}}</span>
+                    </div>
+                    <div class="col-4">
+                        <span class="font-bold text-success">₱[[formatPrice('{{adv.amount}}')]]</span><br>
+                        <span class="font-bold gray">Amount</span>
+                    </div>
+                    <div class="col-4">
+                        <span class="font-bold text-success">₱[[formatPrice('{{ adv.amount|sub:adv.balance }}')]]</span><br>
+                        <span class="font-bold gray">Amount Returned</span>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
