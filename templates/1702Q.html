@@ -1,0 +1,295 @@
+{% extends 'base-template.html' %}
+{% block title %} 1702-Q {% endblock %}
+
+{% block body %}
+<style>
+    #app2{
+        background-image: url('/static/media/BIR/1702Q-1.png');
+        height: 13in;
+        width: 8.5in;
+        background-size: contain;
+    }
+
+    #app3{
+        background-image: url('/static/media/BIR/1702Q-2.png');
+        height: 13in;
+        width: 8.5in;
+        background-size: contain;
+    }
+
+</style>
+<div id="app">
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-forms" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <div class="container">
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/2307/" class="mx-3">2307</a>
+                <a href="/1702-Q/" class="active-gas mx-3">1702Q</a>
+                <a href="/1601-C/" class="mx-3">1601-C</a>
+                <a href="#" class="mx-3">1601-EQ</a>
+                <a href="#" class="mx-3">2316</a>
+                <a href="/0619-E/" class="mx-3">0619-E</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUTTON TO SAVE AS PDF -->
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary" @click="generatePDF()">Save</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#editForm">Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal fade" id="editForm">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content b-radius-15">
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <span class="modal-title">Edit 1702-Q</span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIXEL -->
+    <div id="pixels" class="sticky-top"></div>
+
+    <!-- THE FILE -->
+    <div class="d-flex justify-content-center container">
+        <div id="form-container">
+            <div id="app2" class="roboto-mono font-bold font-size-18 position-relative">
+                <span class="position-absolute" style="top: 159px; left: 69px; letter-spacing: 8px;"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 159px; left: 145px; letter-spacing: 8px;"><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 193px; left: 50px; letter-spacing: .35em;">[[ getMonth(bir.l2) ]]</span>
+                <span class="position-absolute" style="top: 193px; left: 114px; letter-spacing: .35em;">[[ getYear(bir.l2) ]]</span>
+
+                <span class="position-absolute" style="top: 180px; left: 210px; letter-spacing: .35em;" v-if="bir.l3 == 1"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 180px; left: 247px; letter-spacing: .35em;" v-else-if="bir.l3 == 2"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 180px; left: 286px; letter-spacing: .35em;" v-else-if="bir.l3 == 3"><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 182px; left: 344px; letter-spacing: .35em;" v-if="bir.l4"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 182px; left: 402px; letter-spacing: .35em;" v-else><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute font-size-12" style="top: 192px; left: 480px; letter-spacing: 0em;">[[bir.l5.code]]</span>
+                <span class="position-absolute font-size-12" style="top: 192px; left: 548px; letter-spacing: 0em;">[[bir.l5.name]]</span>
+                <span class="position-absolute font-size-12" style="top: 192px; left: 752px; letter-spacing: 0em;">[[bir.l5.other]]</span>
+
+                <span class="position-absolute" style="top: 236px; left: 292px; letter-spacing: .52em;">[[bir.l6]]</span>
+                <span class="position-absolute" style="top: 236px; left: 716px; letter-spacing: .52em;">[[bir.l7]]</span>
+
+                <span class="position-absolute" style="top: 277px; left: 29px; letter-spacing: .52em; width: 763px">[[bir.l8]]</span>
+                <span class="position-absolute" style="top: 340px; left: 29px; letter-spacing: .52em; width: 763px">[[bir.l9]]</span>
+                <span class="position-absolute" style="top: 364px; left: 715px; letter-spacing: .52em; width: 763px">[[bir.l9A]]</span>
+
+                <span class="position-absolute" style="top: 404px; left: 29px; letter-spacing: .52em; width: 763px">[[bir.l10]]</span>
+                <span class="position-absolute" style="top: 404px; left: 251px; letter-spacing: .52em; width: 763px">[[bir.l11]]</span>
+
+                <span class="position-absolute" style="top: 430px; left: 184px; letter-spacing: .52em;"v-if="bir.l12 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 430px; left: 472px; letter-spacing: .52em;"v-else><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 454px; left: 241px; letter-spacing: .52em;"v-if="bir.l13 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 454px; left: 297px; letter-spacing: .52em;"v-else><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 457px; left: 414px; letter-spacing: .52em;">[[bir.l13A]]</span>
+
+                <span class="position-absolute" style="top: 504px; right: 20px; letter-spacing: .52em;">[[bir.l14]]</span>
+                <span class="position-absolute" style="top: 530px; right: 20px; letter-spacing: .52em;">[[bir.l15]]</span>
+                <span class="position-absolute" style="top: 556px; right: 20px; letter-spacing: .52em;">[[bir.l16]]</span>
+                <span class="position-absolute" style="top: 582px; right: 20px; letter-spacing: .52em;">[[bir.l17]]</span>
+                <span class="position-absolute" style="top: 608px; right: 20px; letter-spacing: .52em;">[[bir.l18]]</span>
+                <span class="position-absolute" style="top: 634px; right: 20px; letter-spacing: .52em;">[[bir.l19]]</span>
+                <span class="position-absolute" style="top: 660px; right: 20px; letter-spacing: .52em;">[[bir.l20]]</span>
+                <span class="position-absolute" style="top: 686px; right: 20px; letter-spacing: .52em;">[[bir.l21]]</span>
+                <span class="position-absolute" style="top: 712px; right: 20px; letter-spacing: .52em;">[[bir.l22]]</span>
+                <span class="position-absolute" style="top: 738px; right: 20px; letter-spacing: .52em;">[[bir.l23]]</span>
+                <span class="position-absolute" style="top: 764px; right: 20px; letter-spacing: .52em;">[[bir.l24]]</span>
+                <span class="position-absolute" style="top: 790px; right: 20px; letter-spacing: .52em;">[[bir.l25]]</span>
+
+                <span class="position-absolute" style="top: 899px; left: 716px; letter-spacing: .52em;">[[bir.l26]]</span>
+            </div>
+
+            <div id="app3" class="roboto-mono font-bold font-size-18 position-relative">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#app2").mousemove(function (e) {
+            var pX = e.offsetX;
+            var pY = e.offsetY;
+            $("#pixels").html("Y="+pY+"; X="+pX);
+        });
+    });
+</script>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            bir: {
+                l1: true,
+                l2: "2021-02",
+                l3: 1,
+                l4: true,
+                l5: {
+                    code: 'W019',
+                    name: "ATC CODE",
+                    other: null,
+                },
+                l6: '777-888-888',
+                l7: '019',
+                l8: 'MANSEI TECHNO PHILS CORP.',
+                l9: 'TEHCNO PARK SUBIC BAY',
+                l9A: '2222',
+                l10: '09990120129',
+                l11: 'email@gmail.com',
+                l12: true,
+                l13: true,
+                l13A: 'specify',
+                l14: '0',
+                l15: '0',
+                l16: '0',
+                l17: '0',
+                l18: '0',
+                l19: '0',
+                l20: '0',
+                l21: '0',
+                l22: '0',
+                l23: '0',
+                l24: '0',
+                l25: '0',
+                l26: '1',
+                l27: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '0.00',
+                },
+                l28: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                l29: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                l30: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                }
+            }
+        },
+
+        methods: {
+            generatePDF(){
+                var element = document.getElementById('app2');
+                var opt = {
+                    margin:       0,
+                    filename:     'myfile.pdf',
+                    image:        { type: 'jpeg', quality: 1 },
+                    html2canvas:  { scale: 1 },
+                    jsPDF:        { unit: 'in', format: [8.5, 13], orientation: 'portrait' }
+                };
+
+                html2pdf().set(opt).from(element).save();
+            },
+
+            formatDate(value){
+                const months = [
+                    '01',
+                    '02',
+                    '03',
+                    '04',
+                    '05',
+                    '06',
+                    '07', 
+                    '08',
+                    '09',
+                    '10',
+                    '11',
+                    '12',
+                ]
+                value = new Date(value)
+                year = value.getFullYear()
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+                date = ('0' + String(value.getDate())).slice(-2)
+                formatted = `${month}${date}${year}`
+
+                return formatted
+            },
+
+            getMonth(value){
+                value = new Date(value)
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+
+                return `${month}`
+            },
+
+            getYear(value){
+                value = new Date(value)
+                year = value.getFullYear()
+
+                return `${String(year).slice(-2)}`
+            },
+
+            formatMonth(value){
+                const months = [
+                    '01',
+                    '02',
+                    '03',
+                    '04',
+                    '05',
+                    '06',
+                    '07', 
+                    '08',
+                    '09',
+                    '10',
+                    '11',
+                    '12',
+                ]
+                value = new Date(value)
+                year = value.getFullYear()
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+                formatted = `${month}${year}`
+
+                return formatted
+            },
+        }
+    })
+</script>
+
+{% endblock %}

@@ -436,5 +436,6 @@ urlpatterns = [
     path('delete-advancement/', login_required(views.ADVDeleteAPI.as_view())),
     path('2307/', login_required(views.BIR2307View.as_view())),
     path('0619-E/', login_required(views.BIR0619EView.as_view())),
-    path('1601-C/', login_required(views.BIR1601CView.as_view()))
+    path('1601-C/', login_required(views.BIR1601CView.as_view())),
+    path('1702-Q/', login_required(views.BIR1702QView.as_view()))
 ]

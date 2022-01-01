@@ -22,3 +22,7 @@ class BIR0619EView(View):
 class BIR1601CView(View):
     def get(self, request):
         return render(request, '1601-C.html')
+
+class BIR1702QView(View):
+    def get(self, request):
+        return render(request, '1702Q.html')
