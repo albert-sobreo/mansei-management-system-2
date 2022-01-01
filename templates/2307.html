@@ -10,7 +10,6 @@
         background-size: contain;
     }
 
-    body::-webkit-scrollbar { width: 0 !important }
 </style>
 <div id="app">
     <!-- NAVIGATION BAR -->
@@ -23,7 +22,7 @@
             <div class="justify-content-center c-nav-links gas-nav">
                 <a href="/2307/" class="active-gas mx-3">2307</a>
                 <a href="#" class="mx-3">1702Q</a>
-                <a href="#" class="mx-3">1601-C</a>
+                <a href="/1601-C/" class="mx-3">1601-C</a>
                 <a href="#" class="mx-3">1601-EQ</a>
                 <a href="#" class="mx-3">2316</a>
                 <a href="/0619-E/" class="mx-3">0619-E</a>
@@ -211,8 +210,8 @@
     <!-- THE FILE -->
     <div class="d-flex justify-content-center container">
         <div id="app2" class="roboto-mono font-bold font-size-14 position-relative">
-            <span class="position-absolute" style="top: 140px; left: 206px; letter-spacing: 4px;">[[formatDate(bir.periodFrom)]]</span>
-            <span class="position-absolute" style="top: 140px; left: 537px; letter-spacing: 4px;">[[formatDate(bir.periodTo)]]</span>
+            <span class="position-absolute" style="top: 144px; left: 207px; letter-spacing: .65em;">[[formatDate(bir.periodFrom)]]</span>
+            <span class="position-absolute" style="top: 144px; left: 537px; letter-spacing: .65em;">[[formatDate(bir.periodTo)]]</span>
 
             <!-- PAYEES INFO -->
             <span class="position-absolute" style="top: 185px; left: 280px; letter-spacing: 9.1px;">[[bir.payeeTIN]]</span>
@@ -258,14 +257,14 @@
                 periodTo: '2022-01-02',
 
                 payeeTIN: '777-123-927-0000',
-                payeeName: 'Mansei Tech Corp Phil',
-                payeeAddress: '#100 Boton St. Techno Park, Subic Bay Freeport Zone, Morong, Bataan',
-                payeeZIP: '2200',
+                payeeName: 'Mansei Techno Phils Corp',
+                payeeAddress: 'Techno Park, Subic Bay Freeport Zone',
+                payeeZIP: '2222',
 
                 payorTIN: '777-321-533-0000',
                 payorName: 'Clark Kent',
                 payorAddress: '#1002 Mindanao Ave., Quezon City, Metro Manila',
-                payorZIP: '1000',
+                payorZIP: '0000',
 
                 details: [{
                     subject: 'Income Payments',
@@ -321,7 +320,7 @@
                 year = value.getFullYear()
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)
                 date = ('0' + String(value.getDate())).slice(-2)
-                formatted = `${month} ${date} ${year}`
+                formatted = `${month}${date}${year}`
 
                 return formatted
             },

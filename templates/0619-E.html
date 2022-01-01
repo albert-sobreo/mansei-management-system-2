@@ -10,7 +10,6 @@
         background-size: contain;
     }
 
-    body::-webkit-scrollbar { width: 0 !important }
 </style>
 <div id="app">
     <!-- NAVIGATION BAR -->
@@ -23,7 +22,7 @@
             <div class="justify-content-center c-nav-links gas-nav">
                 <a href="/2307/" class="mx-3">2307</a>
                 <a href="#" class="mx-3">1702Q</a>
-                <a href="#" class="mx-3">1601-C</a>
+                <a href="/1601-C/" class="mx-3">1601-C</a>
                 <a href="#" class="mx-3">1601-EQ</a>
                 <a href="#" class="mx-3">2316</a>
                 <a href="/0619-E/" class="active-gas mx-3">0619-E</a>
@@ -379,12 +378,12 @@
     <!-- THE FILE -->
     <div class="d-flex justify-content-center container">
         <div id="app2" class="roboto-mono font-bold font-size-18 position-relative">
-            <!-- 01 --> <span class="position-absolute" style="top: 175px; left: 67px; letter-spacing: 8px;">[[ formatMonth(bir.L1) ]]</span>
-            <!-- 02 --> <span class="position-absolute" style="top: 175px; left: 200px; letter-spacing: 8px;">[[ formatDate(bir.L2) ]]</span>
-            <!-- 03 --> <span class="position-absolute" style="top: 175px; left: 368px; letter-spacing: 8px;" v-if="bir.L3"><i class="fas fa-check"></i></span>
-            <!-- 03 --> <span class="position-absolute" style="top: 175px; left: 425px; letter-spacing: 8px;" v-else><i class="fas fa-check"></i></span>
-            <!-- 04 --> <span class="position-absolute" style="top: 175px; left: 502px; letter-spacing: 8px;" v-if="bir.L4"><i class="fas fa-check"></i></span>
-            <!-- 04 --> <span class="position-absolute" style="top: 175px; left: 560px; letter-spacing: 8px;" v-else><i class="fas fa-check"></i></span>
+            <!-- 01 --> <span class="position-absolute" style="top: 174px; left: 67px; letter-spacing: 8px;">[[ formatMonth(bir.L1) ]]</span>
+            <!-- 02 --> <span class="position-absolute" style="top: 174px; left: 200px; letter-spacing: 8px;">[[ formatDate(bir.L2) ]]</span>
+            <!-- 03 --> <span class="position-absolute" style="top: 174px; left: 370px; letter-spacing: 8px;" v-if="bir.L3 == true"><i class="fas fa-times"></i></span>
+            <!-- 03 --> <span class="position-absolute" style="top: 174px; left: 427px; letter-spacing: 8px;" v-else><i class="fas fa-times"></i></span>
+            <!-- 04 --> <span class="position-absolute" style="top: 174px; left: 504px; letter-spacing: 8px;" v-if="bir.L4 == true"><i class="fas fa-times"></i></span>
+            <!-- 04 --> <span class="position-absolute" style="top: 174px; left: 562px; letter-spacing: 8px;" v-else><i class="fas fa-times"></i></span>
 
             <!-- 07 --> <span class="position-absolute" style="top: 219px; left: 294px; letter-spacing: .47em;">[[ bir.L7 ]]</span>
             <!-- 08 --> <span class="position-absolute" style="top: 219px; left: 719px; letter-spacing: .46em;">[[ bir.L8 ]]</span>
@@ -394,8 +393,8 @@
             <!-- 11 --> <span class="position-absolute" style="top: 345px; left: 142px; letter-spacing: .46em;">[[ bir.L11 ]]</span>
 
 
-            <!-- 12 --> <span class="position-absolute" style="top: 345px; left: 594px; letter-spacing: .46em;" v-if="bir.L12"><i class="fas fa-check"></i></span>
-            <!-- 12 --> <span class="position-absolute" style="top: 345px; left: 688px; letter-spacing: .46em;" v-else><i class="fas fa-check"></i></span>
+            <!-- 12 --> <span class="position-absolute" style="top: 345px; left: 596px; letter-spacing: .46em;" v-if="bir.L12 == true"><i class="fas fa-times"></i></span>
+            <!-- 12 --> <span class="position-absolute" style="top: 345px; left: 690px; letter-spacing: .46em;" v-else><i class="fas fa-times"></i></span>
 
             <!-- 13 --> <span class="position-absolute" style="top: 383px; left: 28px; letter-spacing: .46em;" >[[ bir.L13 ]]</span>
 
@@ -455,9 +454,9 @@
                 L6: 'WE',
                 L7: '777-123-142-0000',
                 L8: '018',
-                L9: 'Mansei Tech Phil Corp',
-                L10: 'Boton St. Techno Park, Subic Bay Freeport Zone',
-                LA10: '2200',
+                L9: 'Mansei Techno Phils Corp',
+                L10: 'Techno Park, Subic Bay Freeport Zone',
+                LA10: '2222',
                 L11: '09123459288',
                 L12: true,
                 L13: 'email@gmail.com',

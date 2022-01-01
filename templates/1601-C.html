@@ -1,0 +1,1125 @@
+{% extends 'base-template.html' %}
+{% block title %} 1601-C {% endblock %}
+
+{% block body %}
+<style>
+    #app2{
+        background-image: url('/static/media/BIR/1601C-1.png');
+        height: 13in;
+        width: 8.5in;
+        background-size: contain;
+    }
+
+    #app3{
+        background-image: url('/static/media/BIR/1601C-2.png');
+        height: 13in;
+        width: 8.5in;
+        background-size: contain;
+    }
+</style>
+<div id="app">
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-forms" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <div class="container">
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/2307/" class="mx-3">2307</a>
+                <a href="#" class="mx-3">1702Q</a>
+                <a href="/1601-C/" class="active-gas mx-3">1601-C</a>
+                <a href="#" class="mx-3">1601-EQ</a>
+                <a href="#" class="mx-3">2316</a>
+                <a href="/0619-E/" class="mx-3">0619-E</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUTTON TO SAVE AS PDF -->
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary" @click="generatePDF()">Save</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#editForm">Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal fade" id="editForm">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content b-radius-15">
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <span class="modal-title">Edit 1601-C</span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1">
+                            <label for="">For the Month of</label>
+                            <input type="month" v-model="bir.l1" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Amended Form?</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.l2" value=true class="">
+                                <label for="">Yes</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.l2" value=false class="">
+                                <label for="">No</label>
+                            </div>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Any Taxes Withheld?</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.l3" value=true class="">
+                                <label for="">Yes</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.l3" value=false class="">
+                                <label for="">No</label>
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Number of Sheet/s Attached</label>
+                            <input type="number" v-model="bir.l4" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part I - Background Information</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col-10 pr-1">
+                            <label for="">Taxpayer Identification Number</label>
+                            <input type="text" v-model="bir.l6" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <label for="">RDO Code</label>
+                            <input type="text" v-model="bir.l7" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Withholding Agent's Name</label>
+                            <input type="text" v-model="bir.l8" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-10 pr-1">
+                            <label for="">Registred Address</label>
+                            <input type="text" v-model="bir.l9" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <label for="">ZIP Code</label>
+                            <input type="text" v-model="bir.l9A" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8 pr-1">
+                            <label for="">Contact Number</label>
+                            <input type="tel" v-model="bir.l10" class="form-control">
+                        </div>
+                        <div class="col-4 pl-1">
+                            <label for="">Category of Withholding Agent</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.l11" value=true class="">
+                                <label for="">Private</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.l11" value=false class="">
+                                <label for="">Government</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Email Address</label>
+                            <input type="email" v-model="bir.l12" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1">
+                            <label for="">Are there payees availing of tax relief under Special Law or Internation Tax Treaty?</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.l13" value=true class="">
+                                <label for="">Yes</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" v-model="bir.l13" value=false class="">
+                                <label for="">No</label>
+                            </div>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <label for="">Specify</label>
+                            <input type="text" v-model="bir.l13A" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part II - Computation of Tax</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">14 Total Amount of Compensation</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l14" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">15 Statutory Minimum Wage for Minimum Wage Earners (MWEs)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l15" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">16 Holiday Pay, Overtime Pay, Night Shift Differential Pay, Hazard Pay (for MWEs only)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l16" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">17 13th Month Pay and Other Benefits</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l17" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">18 De Minimis Benefits </label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l18" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">19 SSS, GSIS, PHIC, HDMF Mandatory Contributions & Union Dues (employee’s share only)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l19" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">20 Other Non-Taxable Compensation</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l20" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">21 Total Non-Taxable Compensation (Sum of Items 15 to 20)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l21" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">22 Total Taxable Compensation (Item 14 Less Item 21)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l22" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">23 Less: Taxable compensation not subject to withholding tax (for employees, other than MWEs, receiving P250,000 & below for the year</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l23" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">24 Net Taxable Compensation (Item 22 Less Item 23)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l24" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">25 Total Taxes Withheld</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l25" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">26 Add/(Less): Adjustment of Taxes Withheld from Previous Month/s (From Part IV-Schedule 1, Item 4)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l26" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">27 Taxes Withheld for Remittance (Sum of Items 25 and 26)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l27" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">28 Less: Tax Remitted in Return Previously Filed, if this is an amended return </label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l28" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">29 Other Remittances Made </label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l29" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">30 Total Tax Remittances Made (Sum of Items 28 and 29)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l30" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">31 Tax Still Due/(Over-remittance) (Item 27 Less Item 30)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l31" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">32 Surcharge</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l32" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">33 Interest</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l33" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">34 Compromise</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l34" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">35 Total Penalties (Sum of Items 32 to 34)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l35" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row my-2 bg-light">
+                        <div class="col-8 d-flex align-items-center">
+                            <label for="">36 TOTAL AMOUNT STILL DUE/(Over-remittance) (Sum of Items 31 and 35)</label>
+                        </div>
+                        <div class="col-4 d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l36" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part III - Details of Payment</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <label for="">Particulars</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Drawee Bank/Agency</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Number</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Date</label>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Amount</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Cash/Bank Debit Memo</span>
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l37.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l37.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l37.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l37.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Check</span>
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l38.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l38.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l38.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l38.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Tax Debit Memo</span>
+                        </div>
+                        <div class="col px-1">
+                            
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l39.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l39.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l39.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <input type="text" v-model="bir.l40.particulars" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l40.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l40.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l40.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l40.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part IV - Schedule</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col pr-1">
+                            <label for="">TIN</label>
+                            <input type="text" v-model="pg2.tin" class="form-control">
+                        </div>
+                        <div class="col-8 pl-1">
+                            <label for="">Withholding Agent's Name</label>
+                            <input type="text" v-model="pg2.name" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1">
+                            <label for="">Previous Month/s</label>
+                        </div>
+                        <div class="col-2 px-1">
+                            <label for="">Date Paid</label>
+                        </div>
+                        <div class="col-2 px-1">
+                            <label for="">Drawee Bank / Bank Code / Agency</label>
+                        </div>
+                        <div class="col-2 px-1">
+                            <label for="">Number</label>
+                        </div>
+                        <div class="col-2 pl-1">
+                            <label for="">Tax Paid</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1">
+                            <input type="month" v-model="pg2.k1.previousMonth" class="form-control">
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="date" v-model="pg2.k1.datePaid" class="form-control">
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" v-model="pg2.k1.agency" class="form-control">
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" v-model="pg2.k1.number" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.k1.taxPaid" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col pr-1">
+                            <input type="month" v-model="pg2.k2.previousMonth" class="form-control">
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="date" v-model="pg2.k2.datePaid" class="form-control">
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" v-model="pg2.k2.agency" class="form-control">
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" v-model="pg2.k2.number" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.k2.taxPaid" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1">
+                            <input type="month" v-model="pg2.k3.previousMonth" class="form-control">
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="date" v-model="pg2.k3.datePaid" class="form-control">
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" v-model="pg2.k3.agency" class="form-control">
+                        </div>
+                        <div class="col-2 px-1">
+                            <input type="text" v-model="pg2.k3.number" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.k3.taxPaid" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <label for="">Should Be Tax Due for the Month</label>
+                        </div>
+                        <div class="col">
+                            <label for="">Adjustments</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m1.taxDue" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m1.adjustments" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m2.taxDue" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m2.adjustments" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m3.taxDue" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m3.adjustments" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row d-flex align-items-center">
+                        <div class="col d-flex align-items-center">
+                            <span class="font-bold">Total Adjustment</span>
+                        </div>
+                        <div class="col d-flex align-items-center">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m3.adjustments" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIXEL -->
+
+    <div id="pixels" class="sticky-top"></div>
+
+    <!-- THE FILE -->
+    <div class="d-flex justify-content-center container">
+        <div id="form-container">
+            <div id="app2" class="roboto-mono font-bold font-size-18 position-relative">
+                <span class="position-absolute" style="top: 145px; left: 66px; letter-spacing: 8px;">[[ formatMonth(bir.l1) ]]</span>
+                <span class="position-absolute" style="top: 145px; left: 247px; letter-spacing: 8px;" v-if="bir.l2 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 145px; left: 311px; letter-spacing: 8px;" v-else><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 145px; left: 408px; letter-spacing: 8px;" v-if="bir.l3 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 145px; left: 462px; letter-spacing: 8px;" v-else><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 145px; left: 600px; letter-spacing: 8px;">[[bir.l4]]</span>
+
+                <span class="position-absolute" style="top: 186px; left: 315px; letter-spacing: .46em;">[[bir.l6]]</span>
+                <span class="position-absolute" style="top: 186px; left: 737px; letter-spacing: .46em;">[[bir.l7]]</span>
+
+                <span class="position-absolute" style="top: 222px; left: 28px; letter-spacing: .46em;">[[bir.l8]]</span>
+                <span class="position-absolute" style="top: 258px; left: 28px; letter-spacing: .46em;width: 761px">[[bir.l9]]</span>
+                <span class="position-absolute" style="top: 278px; left: 716px; letter-spacing: .46em;">[[bir.l9A]]</span>
+                <span class="position-absolute" style="top: 278px; left: 716px; letter-spacing: .46em;">[[bir.l9A]]</span>
+
+                <span class="position-absolute" style="top: 303px; left: 143px; letter-spacing: .46em;">[[bir.l10]]</span>
+                <span class="position-absolute" style="top: 303px; left: 599px; letter-spacing: .46em;" v-if="bir.l11 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 303px; left: 695px; letter-spacing: .46em;" v-else><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 323px; left: 143px; letter-spacing: .46em;">[[bir.l12]]</span>
+                <span class="position-absolute" style="top: 349px; left: 236px; letter-spacing: .46em;" v-if="bir.l13 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 349px; left: 294px; letter-spacing: .46em;" v-else><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 349px; left: 468px; letter-spacing: .46em;">[[bir.l13A]]</span>
+
+                <!-- PART II -->
+                <span class="position-absolute" style="top: 390px; right: 22px; letter-spacing: .46em;">[[bir.l14]]</span>
+                <span class="position-absolute" style="top: 425px; right: 22px; letter-spacing: .46em;">[[bir.l15]]</span>
+                <span class="position-absolute" style="top: 446px; right: 22px; letter-spacing: .46em;">[[bir.l16]]</span>
+                <span class="position-absolute" style="top: 467px; right: 22px; letter-spacing: .46em;">[[bir.l17]]</span>
+                <span class="position-absolute" style="top: 488px; right: 22px; letter-spacing: .46em;">[[bir.l18]]</span>
+                <span class="position-absolute" style="top: 510px; right: 22px; letter-spacing: .46em;">[[bir.l19]]</span>
+                <span class="position-absolute" style="top: 531px; right: 22px; letter-spacing: .46em;">[[bir.l20]]</span>
+                <span class="position-absolute" style="top: 552px; right: 22px; letter-spacing: .46em;">[[bir.l21]]</span>
+                <span class="position-absolute" style="top: 573px; right: 22px; letter-spacing: .46em;">[[bir.l22]]</span>
+                <span class="position-absolute" style="top: 595px; right: 22px; letter-spacing: .46em;">[[bir.l23]]</span>
+                <span class="position-absolute" style="top: 616px; right: 22px; letter-spacing: .46em;">[[bir.l24]]</span>
+                <span class="position-absolute" style="top: 637px; right: 22px; letter-spacing: .46em;">[[bir.l25]]</span>
+                <span class="position-absolute" style="top: 659px; right: 22px; letter-spacing: .46em;">[[bir.l26]]</span>
+                <span class="position-absolute" style="top: 680px; right: 22px; letter-spacing: .46em;">[[bir.l27]]</span>
+                <span class="position-absolute" style="top: 701px; right: 22px; letter-spacing: .46em;">[[bir.l28]]</span>
+                <span class="position-absolute" style="top: 722px; right: 22px; letter-spacing: .46em;">[[bir.l29]]</span>
+                <span class="position-absolute" style="top: 744px; right: 22px; letter-spacing: .46em;">[[bir.l30]]</span>
+                <span class="position-absolute" style="top: 766px; right: 22px; letter-spacing: .46em;">[[bir.l31]]</span>
+                <span class="position-absolute" style="top: 787px; right: 22px; letter-spacing: .46em;">[[bir.l32]]</span>
+                <span class="position-absolute" style="top: 808px; right: 22px; letter-spacing: .46em;">[[bir.l33]]</span>
+                <span class="position-absolute" style="top: 829px; right: 22px; letter-spacing: .46em;">[[bir.l34]]</span>
+                <span class="position-absolute" style="top: 851px; right: 22px; letter-spacing: .46em;">[[bir.l35]]</span>
+                <span class="position-absolute" style="top: 872px; right: 22px; letter-spacing: .46em;">[[bir.l36]]</span>
+
+                <!-- PART III -->
+                <span class="position-absolute" style="top: 1045px; left: 162px; letter-spacing: .46em;" >[[ bir.l37.agency ]]</span>
+                <span class="position-absolute" style="top: 1045px; left: 258px; letter-spacing: .46em;" >[[ bir.l37.number ]]</span>
+                <span class="position-absolute" style="top: 1045px; left: 372px; letter-spacing: .46em;" >[[ formatDate(bir.l37.date) ]]</span>
+                <span class="position-absolute" style="top: 1045px; right: 22px; letter-spacing: .46em;" >[[ bir.l37.amount ]]</span>
+
+                <span class="position-absolute" style="top: 1069px; left: 162px; letter-spacing: .46em;" >[[ bir.l38.agency ]]</span>
+                <span class="position-absolute" style="top: 1069px; left: 258px; letter-spacing: .46em;" >[[ bir.l38.number ]]</span>
+                <span class="position-absolute" style="top: 1069px; left: 372px; letter-spacing: .46em;" >[[ formatDate(bir.l38.date) ]]</span>
+                <span class="position-absolute" style="top: 1069px; right: 22px; letter-spacing: .46em;" >[[ bir.l38.amount ]]</span>
+                
+                <span class="position-absolute" style="top: 1095px; left: 258px; letter-spacing: .46em;" >[[ bir.l39.number ]]</span>
+                <span class="position-absolute" style="top: 1095px; left: 372px; letter-spacing: .46em;" >[[ formatDate(bir.l39.date) ]]</span>
+                <span class="position-absolute" style="top: 1095px; right: 22px; letter-spacing: .46em;" >[[ bir.l39.amount ]]</span>
+
+                <span class="position-absolute" style="top: 1132px; left: 27px; letter-spacing: .46em;" >[[ bir.l40.particulars ]]</span>
+                <span class="position-absolute" style="top: 1132px; left: 162px; letter-spacing: .46em;" >[[ bir.l40.agency ]]</span>
+                <span class="position-absolute" style="top: 1132px; left: 258px; letter-spacing: .46em;" >[[ bir.l40.number ]]</span>
+                <span class="position-absolute" style="top: 1132px; left: 372px; letter-spacing: .46em;" >[[ formatDate(bir.l40.date) ]]</span>
+                <span class="position-absolute" style="top: 1132px; right: 22px; letter-spacing: .46em;" >[[ bir.l40.amount ]]</span>
+            </div>
+            <div id="app3" class="roboto-mono font-bold font-size-18 position-relative">
+                <span class="position-absolute" style="top: 122px; left: 28px; letter-spacing: .46em;">[[ pg2.tin ]]</span>
+                <span class="position-absolute" style="top: 122px; left: 294px; letter-spacing: .46em;">[[ pg2.name ]]</span>
+
+                <!-- PART IV -->
+                <span class="position-absolute" style="top: 221px; left: 46px; letter-spacing: .46em;">[[ formatMonth(pg2.k1.previousMonth) ]]</span>
+                <span class="position-absolute" style="top: 221px; left: 160px; letter-spacing: .46em;">[[ formatDate(pg2.k1.datePaid) ]]</span>
+                <span class="position-absolute" style="top: 221px; left: 312px; letter-spacing: .46em;">[[ pg2.k1.agency ]]</span>
+                <span class="position-absolute" style="top: 221px; left: 408px; letter-spacing: .46em;">[[ pg2.k1.number ]]</span>
+                <span class="position-absolute" style="top: 221px; right: 23px; letter-spacing: .46em;">[[ pg2.k1.taxPaid ]]</span>
+
+                <span class="position-absolute" style="top: 243px; left: 46px; letter-spacing: .46em;">[[ formatMonth(pg2.k2.previousMonth) ]]</span>
+                <span class="position-absolute" style="top: 243px; left: 160px; letter-spacing: .46em;">[[ formatDate(pg2.k2.datePaid) ]]</span>
+                <span class="position-absolute" style="top: 243px; left: 312px; letter-spacing: .46em;">[[ pg2.k2.agency ]]</span>
+                <span class="position-absolute" style="top: 243px; left: 408px; letter-spacing: .46em;">[[ pg2.k2.number ]]</span>
+                <span class="position-absolute" style="top: 243px; right: 23px; letter-spacing: .46em;">[[ pg2.k2.taxPaid ]]</span>
+
+                <span class="position-absolute" style="top: 264px; left: 46px; letter-spacing: .46em;">[[ formatMonth(pg2.k3.previousMonth) ]]</span>
+                <span class="position-absolute" style="top: 264px; left: 160px; letter-spacing: .46em;">[[ formatDate(pg2.k3.datePaid) ]]</span>
+                <span class="position-absolute" style="top: 264px; left: 312px; letter-spacing: .46em;">[[ pg2.k3.agency ]]</span>
+                <span class="position-absolute" style="top: 264px; left: 408px; letter-spacing: .46em;">[[ pg2.k3.number ]]</span>
+                <span class="position-absolute" style="top: 264px; right: 23px; letter-spacing: .46em;">[[ pg2.k3.taxPaid ]]</span>
+
+                <span class="position-absolute" style="top: 315px; right: 424px; letter-spacing: .46em;">[[ pg2.m1.taxDue ]]</span>
+                <span class="position-absolute" style="top: 315px; right: 100px; letter-spacing: .46em;">[[ pg2.m1.adjustments ]]</span>
+
+                <span class="position-absolute" style="top: 336px; right: 424px; letter-spacing: .46em;">[[ pg2.m2.taxDue ]]</span>
+                <span class="position-absolute" style="top: 336px; right: 100px; letter-spacing: .46em;">[[ pg2.m2.adjustments ]]</span>
+
+                <span class="position-absolute" style="top: 358px; right: 424px; letter-spacing: .46em;">[[ pg2.m3.taxDue ]]</span>
+                <span class="position-absolute" style="top: 358px; right: 100px; letter-spacing: .46em;">[[ pg2.m3.adjustments ]]</span>
+
+                <span class="position-absolute" style="top: 380px; right: 100px; letter-spacing: .46em;">[[ pg2.m4.adjustments ]]</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#app3").mousemove(function (e) {
+            var pX = e.offsetX;
+            var pY = e.offsetY;
+            $("#pixels").html("Y="+pY+"; X="+pX);
+        });
+    });
+</script>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            bir: {
+                l1: "2021-12",
+                l2: true,
+                l3: true,
+                l4: '01',
+                l5: 'WW010',
+                l6: '777/123/123/0000',
+                l7: '018',
+                l8: 'MANSEI TECHNO PHILS CORP',
+                l9: 'TECHNO PARK, SUBIC BAY FREEPORT ZONE',
+                l9A: '2222',
+                l10: '09132922948',
+                l11: true,
+                l12: 'email@gmail.com',
+                l13: true,
+                l13A: 'specify',
+                l14: '10000.00',
+                l15: '10000.00',
+                l16: '10000.00',
+                l17: '10000.00',
+                l18: '10000.00',
+                l19: '10000.00',
+                l20: '10000.00',
+                l21: '10000.00',
+                l22: '10000.00',
+                l23: '10000.00',
+                l24: '10000.00',
+                l25: '10000.00',
+                l26: '10000.00',
+                l27: '10000.00',
+                l28: '10000.00',
+                l29: '10000.00',
+                l30: '10000.00',
+                l31: '10000.00',
+                l32: '10000.00',
+                l33: '10000.00',
+                l34: '10000.00',
+                l35: '10000.00',
+                l36: '10000.00',
+                l37: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                l38: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                l39: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                l40: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+            },
+
+            pg2: {
+                tin: '7770000000000',
+                name: 'Clark Kent',
+                k1: {
+                    previousMonth: '2021-01',
+                    datePaid: '2021-01-01',
+                    agency: '00101',
+                    number: '111234',
+                    taxPaid: '10000.00',
+                },
+                k2: {
+                    previousMonth: '2021-01',
+                    datePaid: '2021-01-01',
+                    agency: '00101',
+                    number: '111234',
+                    taxPaid: '10000.00',
+                },
+                k3: {
+                    previousMonth: '2021-01',
+                    datePaid: '2021-01-01',
+                    agency: '00101',
+                    number: '111234',
+                    taxPaid: '10000.00',
+                },
+
+                m1: {
+                    taxDue: '10000.00',
+                    adjustments: '10000.00',
+                },
+                m2: {
+                    taxDue: '10000.00',
+                    adjustments: '10000.00',
+                },
+                m3: {
+                    taxDue: '10000.00',
+                    adjustments: '10000.00',
+                },
+                m4: {
+                    adjustments: '10000.00',
+                },
+            }
+        },
+
+        methods: {
+            generatePDF(){
+                var element = document.getElementById('form-container');
+                var opt = {
+                    margin:       0,
+                    filename:     'myfile.pdf',
+                    image:        { type: 'jpeg', quality: 1 },
+                    html2canvas:  { scale: 1 },
+                    jsPDF:        { unit: 'in', format: [8.5, 13], orientation: 'portrait' },
+                };
+
+                html2pdf().set(opt).from(element).save();
+            },
+
+            formatDate(value){
+                const months = [
+                    '01',
+                    '02',
+                    '03',
+                    '04',
+                    '05',
+                    '06',
+                    '07', 
+                    '08',
+                    '09',
+                    '10',
+                    '11',
+                    '12',
+                ]
+                value = new Date(value)
+                year = value.getFullYear()
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+                date = ('0' + String(value.getDate())).slice(-2)
+                formatted = `${month}${date}${year}`
+
+                return formatted
+            },
+
+            formatMonth(value){
+                const months = [
+                    '01',
+                    '02',
+                    '03',
+                    '04',
+                    '05',
+                    '06',
+                    '07', 
+                    '08',
+                    '09',
+                    '10',
+                    '11',
+                    '12',
+                ]
+                value = new Date(value)
+                year = value.getFullYear()
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+                formatted = `${month}${year}`
+
+                return formatted
+            },
+        }
+    })
+</script>
+
+{% endblock %}
