@@ -45,19 +45,19 @@ class EMS_GeneratePayroll(APIView):
         dateStart = dateRange.split(' ')[0]
         dateEnd = dateRange.split(' ')[1]
 
-        salariesExpense = Decimal(0)
-        salariesPayable = Decimal(0)
-        bonus = Decimal(0)
-        monthPay13 = Decimal(0)
-        deminimis = Decimal(0)
-        hdmfER = Decimal(0)
-        phicER = Decimal(0)
-        sssER = Decimal(0)
-        sssPayable = Decimal(0)
-        phicPayable = Decimal(0)
-        hdmfPayable = Decimal(0)
-        withholdingTax = Decimal(0)
-        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+        # salariesExpense = Decimal(0)
+        # salariesPayable = Decimal(0)
+        # bonus = Decimal(0)
+        # monthPay13 = Decimal(0)
+        # deminimis = Decimal(0)
+        # hdmfER = Decimal(0)
+        # phicER = Decimal(0)
+        # sssER = Decimal(0)
+        # sssPayable = Decimal(0)
+        # phicPayable = Decimal(0)
+        # hdmfPayable = Decimal(0)
+        # withholdingTax = Decimal(0)
+        # dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         
 
@@ -267,8 +267,36 @@ class EMS_GeneratePayroll(APIView):
 
             #### SOME SPECIAL CODES ####
             payroll.grossPayBeforeBonus += payroll.holidayPay
-            salariesExpense += payroll.grossPayBeforeBonus
+            # salariesExpense += payroll.grossPayBeforeBonus
             payroll.grossPayAfterBonus = payroll.grossPayBeforeBonus
+
+            #### 13 MONTH PAY ####
+            usersW13thAlready = []
+            if payroll.dateEnd == "{}-12-25".format(year):
+                # INIT USERBASICPAY
+                userBasicPay = Decimal(0)
+    
+                # LOOP ALL PAYROLL OF USER FOR THE WHOLE YEAR
+                for pyroll in user.payroll.filter(year=year):
+                    userBasicPay += pyroll.basicPay
+    
+                # CALCULATIONS OF 13TH MONTH PAY
+                month13thPay = Decimal(userBasicPay/Decimal(12))
+                
+                m13p = Bonus13th()
+                m13p.user = user
+                m13p.year = year
+                m13p.amount = month13thPay
+                m13p.save()
+                request.user.branch.bonus13th.add(m13p)
+
+                bns = BonusPay()
+                bns.user = user
+                bns.payroll = payroll
+                bns.name = '13th Month Pay'
+                bns.amount = m13p.amount
+                bns.save()
+                request.user.branch.bonusPay.add(bns)
 
             try:
                 allPayrollThisYear = user.payroll.filter(year=dateEnd.split('-')[0])
@@ -291,8 +319,8 @@ class EMS_GeneratePayroll(APIView):
                 payroll.grossPayAfterBonus += bonuses.amount
                 totalBonusThisPeriod += bonuses.amount
             
-            bonus += totalBonusThisPeriod
-            print('bonus ', bonus)
+            # bonus += totalBonusThisPeriod
+            # print('bonus ', bonus)
 
             for pay in allPayrollThisYear:
                 for b in pay.bonuspay.all():
@@ -439,8 +467,8 @@ class EMS_GeneratePayroll(APIView):
                         request.user.branch.sssEmployeeDeduction.add(sssDeduction)
 
                         payroll.netPayBeforeTaxes -= sssDeduction.ee
-                        sssER += sssDeduction.er
-                        sssPayable += (sssDeduction.er + sssDeduction.ee)
+                        # sssER += sssDeduction.er
+                        # sssPayable += (sssDeduction.er + sssDeduction.ee)
 
                 ##### PHILHEALTH #####
                 phic = PHICContributionRate.objects.all()
@@ -455,8 +483,8 @@ class EMS_GeneratePayroll(APIView):
                         phicDeduction.save()
                         request.user.branch.phicEmployeeDeduction.add(phicDeduction)
                         payroll.netPayBeforeTaxes -= phicDeduction.ee
-                        phicER += phicDeduction.er
-                        phicPayable += (phicDeduction.er + phicDeduction.ee)
+                        # phicER += phicDeduction.er
+                        # phicPayable += (phicDeduction.er + phicDeduction.ee)
                     elif monthlyBasicPay > rates.upperLimit:
                         phicDeduction = PHICEmployeeDeduction()
                         phicDeduction.ee = (rates.rate/2)*rates.upperLimit
@@ -467,8 +495,8 @@ class EMS_GeneratePayroll(APIView):
                         phicDeduction.save()
                         request.user.branch.phicEmployeeDeduction.add(phicDeduction)
                         payroll.netPayBeforeTaxes -= phicDeduction.ee
-                        phicER += phicDeduction.er
-                        phicPayable += (phicDeduction.er + phicDeduction.ee)
+                        # phicER += phicDeduction.er
+                        # phicPayable += (phicDeduction.er + phicDeduction.ee)
                     elif monthlyBasicPay < rates.lowerLimit:
                         phicDeduction = PHICEmployeeDeduction()
                         phicDeduction.ee = (rates.rate/2)*rates.lowerLimit
@@ -479,8 +507,8 @@ class EMS_GeneratePayroll(APIView):
                         phicDeduction.save()
                         request.user.branch.phicEmployeeDeduction.add(phicDeduction)
                         payroll.netPayBeforeTaxes -= phicDeduction.ee
-                        phicER += phicDeduction.er
-                        phicPayable += (phicDeduction.er + phicDeduction.ee)
+                        # phicER += phicDeduction.er
+                        # phicPayable += (phicDeduction.er + phicDeduction.ee)
 
                 ##### PAGIBIG #####
                 pagibig = PagibigContributionRate.objects.latest('pk')
@@ -492,8 +520,8 @@ class EMS_GeneratePayroll(APIView):
                 payroll.netPayBeforeTaxes -= pagibigDeduction.amount
                 pagibigDeduction.save()
                 request.user.branch.pagibigEmployeeDeduction.add(pagibigDeduction)
-                hdmfER += pagibigDeduction.amount
-                hdmfPayable += (pagibigDeduction.amount*2)
+                # hdmfER += pagibigDeduction.amount
+                # hdmfPayable += (pagibigDeduction.amount*2)
                 
             monthlyGrossPayAfterBonus = previousPayroll.grossPayAfterBonus + payroll.grossPayAfterBonus
             monthlyNetPayBeforeTaxes = previousPayroll.netPayBeforeTaxes + payroll.netPayBeforeTaxes
@@ -522,7 +550,7 @@ class EMS_GeneratePayroll(APIView):
 
                     
 
-                    withholdingTax += taxDeducted
+                    # withholdingTax += taxDeducted
 
             print(payroll.netPayBeforeTaxes, 'netpaybeforetaxes')
             payroll.netPayAfterTaxes += payroll.netPayBeforeTaxes - taxDeducted
@@ -531,32 +559,9 @@ class EMS_GeneratePayroll(APIView):
             payroll.netPayAfterTaxes -= employeeLoan
             if totalBonus < Decimal(90000):
                 payroll.netPayAfterTaxes += payroll.grossPayAfterBonus - payroll.grossPayBeforeBonus - deminimis
-            salariesPayable += payroll.netPayAfterTaxes
+            # salariesPayable += payroll.netPayAfterTaxes
                
             payroll.save()
-            
-        j = Journal()
-
-        j.code = str(year) + ": " + str(dateStart) + " - " + str(dateEnd)
-        j.datetimeCreated = datetime.datetime.now()
-        j.createdBy = request.user
-        j.journalDate = datetime.datetime.now()
-        j.save()
-        request.user.branch.journal.add(j)
-        ########## DEBIT ##########
-        jeAPI(request, j, "Debit", dChildAccount.salariesExpense, salariesExpense)
-        jeAPI(request, j, "Debit", dChildAccount.bonus, bonus)
-        jeAPI(request, j, "Debit", dChildAccount.monthPay13,  monthPay13)
-        jeAPI(request, j, "Debit", dChildAccount.deminimisBenefit, deminimis)
-        jeAPI(request, j, "Debit", dChildAccount.hdmfShare, hdmfER)
-        jeAPI(request, j, "Debit", dChildAccount.phicERShare, phicER)
-        jeAPI(request, j, "Debit", dChildAccount.sssERShare, sssER)
-        ########## CREDIT ##########
-        jeAPI(request, j, "Credit", dChildAccount.salariesPayable, salariesPayable)
-        jeAPI(request, j, "Credit", dChildAccount.sssPayable, sssPayable)
-        jeAPI(request, j, "Credit", dChildAccount.phicPayable, phicPayable)
-        jeAPI(request, j, "Credit", dChildAccount.hdmfPayable, hdmfPayable)
-        jeAPI(request, j, "Credit", dChildAccount.withholdingTaxPayable, withholdingTax)
 
         return JsonResponse(0, safe=False)
 
