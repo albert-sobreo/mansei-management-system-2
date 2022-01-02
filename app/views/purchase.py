@@ -9,9 +9,12 @@ import sweetify
 from datetime import date as now
 from decimal import Decimal
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 class PurchaseOrderView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         user = request.user
 
@@ -42,10 +45,14 @@ class PurchaseOrderView(View):
 
 class POListView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'po-list.html')
 
 class SavePurchaseOrder(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         purchaseOrder = request.data
 
         po = PurchaseOrder()

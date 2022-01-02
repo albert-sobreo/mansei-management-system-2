@@ -9,9 +9,12 @@ from decimal import Decimal
 from datetime import datetime, date
 import re
 from .journalAPI import jeAPI
+from django.core.exceptions import PermissionDenied
 
 class EMS_SSSDeductionView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try:
             y = request.GET['year']
             dateRange = request.GET['dateRange']
@@ -29,6 +32,8 @@ class EMS_SSSDeductionView(View):
 
 class EMS_PHICDeductionView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try:
             y = request.GET['year']
             dateRange = request.GET['dateRange']
@@ -46,6 +51,8 @@ class EMS_PHICDeductionView(View):
 
 class EMS_HDMFDeduction(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try:
             y = request.GET['year']
             dateRange = request.GET['dateRange']
@@ -63,6 +70,8 @@ class EMS_HDMFDeduction(View):
 
 class EMS_TaxDeduction(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try:
             y = request.GET['year']
             dateRange = request.GET['dateRange']
@@ -80,6 +89,8 @@ class EMS_TaxDeduction(View):
 
 class EMS_SSSLoanDeduction(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try:
             y = request.GET['year']
             dateRange = request.GET['dateRange']

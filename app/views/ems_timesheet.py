@@ -9,6 +9,7 @@ from decimal import Decimal
 import pandas as pd
 import json
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 class EMS_MyTimesheetView(View):
     def get(self, request):
@@ -30,6 +31,8 @@ class EMS_MyTimesheetView(View):
 
 class EMS_EmployeeTimesheetView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try:
             user = User.objects.get(pk=request.GET['user'])
             y = request.GET['year']
@@ -53,10 +56,14 @@ class EMS_EmployeeTimesheetView(View):
 
 class EMS_TimesheetTabularView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'ems-timesheet-tabular.html')
 
 class EMS_EditTimesheetHours(View):
     def post(self, request, pk, fromPage, params):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         print(pk, params)
         for val, keys in request.POST.items():
             print(val, keys)

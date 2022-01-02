@@ -1,0 +1,13 @@
+2 - LOWEST:
+    EMS:
+        MY DTR
+        MY TIMESHEET
+        MY PAYSLIP
+        ALL REQUESTS
+    GAS:
+        PR
+1 - MID-STAFF:
+    ALL EXCEPT ADMIN AND APPROVALS
+0 - ADMIN:
+    ACCESS TO ALL
+dtr 

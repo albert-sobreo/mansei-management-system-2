@@ -4,9 +4,12 @@ from ..forms import *
 from ..models import *
 from datetime import date as now
 from datetime import timedelta
+from django.core.exceptions import PermissionDenied
 
 class LedgerView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try:
             startDate = request.GET['startDate']
             endDate = request.GET['endDate']

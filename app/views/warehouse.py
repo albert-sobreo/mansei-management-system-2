@@ -5,14 +5,19 @@ from django.shortcuts import redirect, render, HttpResponse
 from django.views import View
 from ..forms import *
 import sweetify
+from django.core.exceptions import PermissionDenied
 
 class WarehouseView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'warehouse.html')
 
 
 class AddWarehoseAPI(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         print(request.data)
         
         a = Warehouse()

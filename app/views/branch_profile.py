@@ -10,9 +10,12 @@ from decimal import Decimal
 import pandas as pd
 import json
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 class BranchProfileView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'sg': request.user.branch.subGroup.all()
         }
@@ -20,6 +23,8 @@ class BranchProfileView(View):
 
 class SaveDefaultAccounts(APIView):
     def put(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         items = request.data
         print(items['pettyCash'])
         bdacct = BranchDefaultChildAccount.objects.get(pk=items['id'])
@@ -181,10 +186,14 @@ class SaveDefaultAccounts(APIView):
 
 class BranchesView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         return render(request, 'branches.html')
 
 class PayrollContributionsView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             "sssTable": SSSContributionRate.objects.all(),
             "phicTable": PHICContributionRate.objects.all()
@@ -193,6 +202,8 @@ class PayrollContributionsView(View):
 
 class ImportSSSContributions(View):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         df = pd.read_excel(request.FILES['sss'])
         jsonDF = json.loads(df.to_json(orient='records'))
 
@@ -216,6 +227,8 @@ class ImportSSSContributions(View):
 
 class ImportPHICContributions(View):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         df = pd.read_excel(request.FILES['phic'])
         jsonDF = json.loads(df.to_json(orient='records'))
 
@@ -236,12 +249,16 @@ class ImportPHICContributions(View):
 
 class IncomeTaxDeductionProfile(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             "incomeTaxes": IncomeTaxTable.objects.all()
         }
         return render(request, 'branch-profile-income-tax-deductions.html', context)
 
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         for x in IncomeTaxTable.objects.all():
             x.name = request.POST['name{}'.format(x.pk)]
             x.lowerLimit = request.POST['lowerLimit{}'.format(x.pk)]
@@ -254,9 +271,13 @@ class IncomeTaxDeductionProfile(View):
 
 class BranchPositions(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         return render(request, 'branch-positions.html')
 
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         position = request.POST['position']
 
         if position in Position.objects.all():

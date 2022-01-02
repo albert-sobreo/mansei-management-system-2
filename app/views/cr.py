@@ -10,9 +10,13 @@ from datetime import date as now
 from decimal import Decimal
 from datetime import datetime
 import json
+from django.core.exceptions import PermissionDenied
 
 class CompletionReportView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+            
         user = request.user
 
         try:
@@ -39,6 +43,8 @@ class CompletionReportView(View):
         return render(request, 'completion-report.html', context)
 
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         print(request.FILES)
         print(request.POST)
         print(request.POST['postDATA'])
@@ -81,10 +87,14 @@ class CompletionReportView(View):
 
 class CRList(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'cr-list.html')
 
 class CRSuccessUpdate(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         cr = CompletionReport.objects.get(pk=pk)
         cr.successPhoto = request.FILES['successPhoto']
@@ -96,6 +106,8 @@ class CRSuccessUpdate(APIView):
 
 class CRIncompleteUpdate(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         
         crJson = request.data
 
@@ -109,6 +121,8 @@ class CRIncompleteUpdate(APIView):
 
 class CRTransactionUpdate(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         
         crJson = request.data
 
@@ -136,6 +150,8 @@ class CRTransactionUpdate(APIView):
 
 class CRCapitalize(APIView):
     def put(self, request, pk):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         cr = CompletionReport.objects.get(pk=pk)
         cr.ppe.bookValue += cr.totalCost
         NUMERATOR = cr.ppe.bookValue * cr.ppe.deprCycle

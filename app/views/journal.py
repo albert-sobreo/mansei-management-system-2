@@ -10,9 +10,12 @@ from datetime import date as now
 from datetime import datetime
 from datetime import timedelta
 from .journalAPI import jeAPI
+from django.core.exceptions import PermissionDenied
 
 class JournalView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            return redirect('/purchase-request/')
 
         user = request.user
 
@@ -60,6 +63,8 @@ class JournalView(View):
 
 class SaveJournal(APIView):
     def post(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         print(request.data)
 
         print(request.data['date'])

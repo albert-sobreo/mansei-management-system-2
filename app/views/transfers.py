@@ -8,9 +8,12 @@ from ..models import *
 import sweetify
 from datetime import date as now
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 class TransferView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         user = request.user
 
@@ -40,10 +43,14 @@ class TransferView(View):
 
 class TransferList(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'transfer-list.html')
 
 class SaveTransfer(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         transfer = request.data
 
         tr = Transfer()

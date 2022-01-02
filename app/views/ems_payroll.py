@@ -13,9 +13,12 @@ from .journalAPI import jeAPI
 import io
 import xlsxwriter
 import string
+from django.core.exceptions import PermissionDenied
 
 class EMS_PayrollView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try: 
             y = request.GET['year']
             dateRange = request.GET['dateRange']
@@ -33,10 +36,14 @@ class EMS_PayrollView(View):
 
 class EMS_EditPayrollView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'ems-edit-payroll.html')
 
 class EMS_GeneratePayroll(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         users = User.objects.filter(branch = request.user.branch, payrollable = True)
         year = request.data[0]
         period = request.data[1]
@@ -567,6 +574,8 @@ class EMS_GeneratePayroll(APIView):
 
 class EMS_EditPayrollSave(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         payroll = Payroll.objects.get(pk=pk)
 
@@ -689,6 +698,8 @@ class EMS_EditPayrollSave(APIView):
 
 class GenerateAnnualizationView(APIView):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         print(request.GET['year'])
         if Annualization.objects.filter(year = request.GET['year']):
             return redirect('/ems-payroll/')
@@ -808,6 +819,8 @@ class GenerateAnnualizationView(APIView):
 
 class PayrollAddBonus(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         for data in request.data:
             employee = User.objects.get(id = data['user']['id'])
@@ -827,6 +840,8 @@ class PayrollAddBonus(APIView):
 
 class Give13thMonthPay(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         """ THIS CODE IS GENERATE 13TH MONTH PAY 
         STARTING FROM DEC 26 OF THE PREVIOUS YEAR 
         TO CURRENT YEAR """
@@ -867,6 +882,8 @@ class Give13thMonthPay(APIView):
 
 class Give13thMonthPayIndividual(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
         user = request.user.branch.user.get(pk=data['user'])
         if user.bonus13th.filter(year=data['year']):

@@ -9,6 +9,7 @@ from decimal import Decimal
 import pandas as pd
 import json
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 class EMS_MyDTRView(View):
     def get(self, request):
@@ -19,6 +20,8 @@ class EMS_MyDTRView(View):
 
 class EMS_EmployeeDTRView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         context = {
             'employees': request.user.branch.user.filter(payrollable=True)
         }

@@ -13,9 +13,12 @@ from decimal import Decimal
 import datetime
 from .petty_cash_api import *
 from .journalAPI import *
+from django.core.exceptions import PermissionDenied
 
 class GAS_AdvancementsView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         user = request.user
 
         try:
@@ -46,6 +49,8 @@ class GAS_AdvancementsView(View):
 
 class SaveAdvancement(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         if not pCashChecker(request, request.data['amount']):
             sweetify.sweetalert(request, icon='warning', title='Petty Cash Fund is insufficient!', persistent='Dismiss')
@@ -71,6 +76,8 @@ class SaveAdvancement(APIView):
 
 class PettyCashView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         context = {
             'activeAdv': request.user.branch.advancementThruPettyCash.filter(closed=False, approved=True)
         }
@@ -78,6 +85,8 @@ class PettyCashView(View):
 
 class PettyCashReplenish(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         currentAmount = dChildAccount.pettyCash.amount
@@ -101,6 +110,8 @@ class PettyCashReplenish(APIView):
 
 class SaveDefaultPettyCash(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         request.user.branch.pettyCashReplenish = request.data['amount']
         request.user.branch.save()
 
@@ -109,6 +120,8 @@ class SaveDefaultPettyCash(APIView):
 
 class ReturnAdvancement(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
 
         adv = AdvancementThruPettyCash.objects.get(pk=data['id'])
@@ -121,3 +134,12 @@ class ReturnAdvancement(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class ReimbursementView(View):
+    def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+        context = {
+            'liquidation': request.user.branch.liquidation.filter(payable__gt=Decimal(0))
+        }
+        return render(request, 'reimbursement.html', context)

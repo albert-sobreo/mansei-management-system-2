@@ -8,12 +8,15 @@ from ..models import *
 import sweetify
 from datetime import date as now
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 class AdjustmentsView(View):
     def get(self, request, format=None):
 
         user = request.user
 
+        if user.authLevel == '2':
+            raise PermissionDenied()
         try:
             ad = user.branch.adjustments.latest('pk')
 
@@ -40,6 +43,8 @@ class AdjustmentsView(View):
 
 class AdjustmentList(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'ad-list.html')
 
 class SaveAdjustments(APIView):

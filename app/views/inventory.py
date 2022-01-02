@@ -9,13 +9,18 @@ from decimal import Decimal
 import pandas as pd
 import json
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 class MerchInventoryView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'merchinventory.html')
 
 class AddMerchInventoryAPI(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         print(request.data)
         
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
@@ -62,6 +67,8 @@ class AddMerchInventoryAPI(APIView):
 
 class ImportMerchandiseInventory(View):
     def post(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         df = pd.read_excel(request.FILES['excel'])
         jsonDF = json.loads(df.to_json(orient='records'))
         
@@ -129,6 +136,8 @@ class ImportMerchandiseInventory(View):
 
 class EditInventory(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         
         merch = MerchandiseInventory.objects.get(pk=pk)
 
@@ -150,11 +159,15 @@ class EditInventory(APIView):
 
 class OtherInventoryView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'otherinventory.html')
 
 
 class DeleteMerchInventory(APIView):
     def delete(self, request, pk):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         inv = MerchandiseInventory.objects.get(pk=pk)
         for item in inv.warehouseitems.all():
             item.delete()

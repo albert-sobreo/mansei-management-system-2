@@ -9,10 +9,13 @@ import sweetify
 from datetime import date as now
 from decimal import Decimal
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 ########## SALES CONTRACT ##########
 class SalesContractView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         user = request.user
 
@@ -43,10 +46,14 @@ class SalesContractView(View):
 
 class SCListView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'sc-list.html')
 
 class SaveSalesContract(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         salesContract = request.data
 
         sc = SalesContract()
@@ -135,6 +142,8 @@ class SaveSalesContract(APIView):
 ########## QUOTATIONS ##########
 class SalesQuotationsView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         user = request.user
 
@@ -164,10 +173,14 @@ class SalesQuotationsView(View):
 
 class QQListView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'qq-list.html')
 
 class SaveQuotations(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         quotes = request.data
 
         qq = Quotations()
@@ -244,6 +257,8 @@ class SaveQuotations(APIView):
 ########## SALES ORDER ##########
 class SalesOrderView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         
         try:
             so = request.user.branch.salesOrder.latest('pk')
@@ -274,10 +289,14 @@ class SalesOrderView(View):
 
 class SOListView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'so-list.html')
 
 class SaveSalesOrder(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         salesOrder = request.data
 
         so = SalesOrder()

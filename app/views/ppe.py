@@ -11,14 +11,19 @@ from decimal import Decimal
 import json
 import pandas as pd
 from dateutil.relativedelta import *
+from django.core.exceptions import PermissionDenied
 
 
 class PPEView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'ppe.html')
 
 class AddPPE(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         equipment = PPE()
         equipment.code = request.data['code']
@@ -49,6 +54,8 @@ class AddPPE(APIView):
 
 class ImportPPE(View):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         df = pd.read_excel(request.FILES['excel'])
         jsonDF = json.loads(df.to_json(orient='records'))
 
@@ -89,6 +96,8 @@ class ImportPPE(View):
 
 class EditPPE(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         equipment = PPE.objects.get(pk=pk)
 
@@ -108,10 +117,14 @@ class EditPPE(APIView):
 
 class LapsingView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'ppe-lapsing-schedule.html')
 
 class UpdateDepr(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         ppes = request.user.branch.ppe.all()
 
         currentDate = date.today()

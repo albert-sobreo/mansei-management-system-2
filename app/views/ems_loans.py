@@ -9,9 +9,12 @@ from decimal import Decimal
 import pandas as pd
 import json
 import datetime
+from django.core.exceptions import PermissionDenied
 
 class EMS_SSSLoansView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try:
             user = User.objects.get(pk=request.GET['user'])
             y = request.GET['year']
@@ -28,6 +31,8 @@ class EMS_SSSLoansView(View):
 
 class EMS_HDMFLoansView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try:
             user = User.objects.get(pk=request.GET['user'])
             y = request.GET['year']
@@ -44,6 +49,8 @@ class EMS_HDMFLoansView(View):
 
 class EMS_LoanCreate(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data =  request.data
         print(data)
 

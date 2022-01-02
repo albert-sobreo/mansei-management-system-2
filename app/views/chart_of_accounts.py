@@ -8,13 +8,18 @@ import sweetify
 import pandas as pd
 import json
 from decimal import Decimal
+from django.core.exceptions import PermissionDenied
 
 class ChartOfAccountsView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         return render(request, 'chart_of_accounts.html')
 
 class ImportChartOfAccounts(View):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         df = pd.read_excel(request.FILES['excel'])
         print(df.to_string())
         jsonDF = json.loads(df.to_json(orient='records'))
@@ -76,6 +81,8 @@ class ImportChartOfAccounts(View):
 
 class SaveAccountChild(APIView):
     def post(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         jsonChild = request.data
 
         accountChild = AccountChild()
@@ -99,6 +106,8 @@ class SaveAccountChild(APIView):
 
 class SaveAccountGroup(APIView):
     def post(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         jsonSubGroup = request.data
 
         subGroup = AccountSubGroup()
@@ -116,6 +125,8 @@ class SaveAccountGroup(APIView):
 
 class EditSubGroup(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         subGroup = AccountSubGroup.objects.get(pk=pk)
         edit = request.data
 
@@ -129,6 +140,8 @@ class EditSubGroup(APIView):
 
 class EditChildGroup(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         childAccount = AccountChild.objects.get(pk=pk)
         edit = request.data
 
@@ -148,14 +161,20 @@ class EditChildGroup(APIView):
 
 class SubGroupView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         return render(request, 'chart_of_accounts_sub_group.html')
 
 class GroupView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         return render(request, 'chart_of_accounts_group.html')
 
 class EditGroup(APIView):
     def put(self, request, pk):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         g = request.data
         group = AccountGroup.objects.get(pk=pk)
 

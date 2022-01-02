@@ -10,10 +10,12 @@ import pandas as pd
 import json
 from datetime import datetime, date
 from ..models import*
-
+from django.core.exceptions import PermissionDenied
 
 class EMS_EmployeesView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         context = {
             'employees': request.user.branch.user.all(),
             'deminimises': DeMinimis.objects.all(),
@@ -23,11 +25,15 @@ class EMS_EmployeesView(View):
 
 class EMS_RaiseHistoryView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'ems-raise-history.html')
 
 
 class AddBonus(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         
         for benefit in request.data['bonuses']:
             bonus = BonusOfUser()
@@ -41,6 +47,8 @@ class AddBonus(APIView):
 
 class GiveDeMinimis(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         for benefits in request.data['benefits']:
             dm = DeMinimisOfUser()
             dm.user = User.objects.get(pk=request.data['user'])
@@ -53,6 +61,8 @@ class GiveDeMinimis(APIView):
 
 class AddDeMinimis(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         for benefit in request.data['benefits']:
             dm = DeMinimisOfUser()
@@ -66,6 +76,8 @@ class AddDeMinimis(APIView):
 
 class EMS_GiveRaise(APIView):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         data = request.data
         if not data['newRate']:
             sweetify.sweetalert(request, icon='error', title='Error!', text='New Rate is {}'.format(data['newRate']), persistent='Dismiss')
@@ -87,6 +99,8 @@ class EMS_GiveRaise(APIView):
         
 class EMS_GivePromotion(APIView):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         data = request.data
         if not data['newPosition'] or not data['newRate']:
             sweetify.sweetalert(request, icon='error', title='Error!', text='Empty inputs'.format(data['newRate']), persistent='Dismiss')
@@ -101,6 +115,8 @@ class EMS_GivePromotion(APIView):
 
 class EMS_SaveEditBenefits(APIView):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         data = request.data
         user = User.objects.get(pk=data['user'])
 
