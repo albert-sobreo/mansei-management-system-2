@@ -161,7 +161,20 @@ class EMS_PayrollApprovalAll(APIView):
         dateRange = request.GET['dateRange']
         dateStart = dateRange.split(' ')[0]
         dateEnd = dateRange.split(' ')[1]
-        
+
+        salariesExpense = Decimal(0)
+        salariesPayable = Decimal(0)
+        bonus = Decimal(0)
+        deminimis = Decimal(0)
+        hdmfER = Decimal(0)
+        phicER = Decimal(0)
+        sssER = Decimal(0)
+        sssPayable = Decimal(0)
+        phicPayable = Decimal(0)
+        hdmfPayable = Decimal(0)
+        withholdingTax = Decimal(0)
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
         payrolls = Payroll.objects.filter(branch = request.user.branch, year = y, dateStart = dateStart, dateEnd = dateEnd)
 
         for payroll in payrolls:
@@ -170,6 +183,41 @@ class EMS_PayrollApprovalAll(APIView):
             payroll.approved = True
             payroll.approvedBy = request.user
             payroll.dateApproved = date.today()
+
+            salariesExpense += payroll.grossPayBeforeBonus
+            salariesPayable += payroll.netPayAfterTaxes
+            bonus += (payroll.grossPayAfterBonus - payroll.grossPayBeforeBonus)
+            for benefits in payroll.deminimispay.all():
+                deminimis += benefits.amount
+            hdmfER += payroll.pagibigemployeededuction.amount
+            phicER += payroll.phicemployeededuction.er
+            sssER += payroll.sssemployeededuction.er
+            sssPayable += (payroll.sssemployeededuction.er + payroll.sssemployeededuction.ee)
+            phicPayable += (payroll.phicemployeededuction.er + payroll.phicemployeededuction.ee)
+            hdmfPayable += (2*payroll.pagibigemployeededuction.amount)
+            withholdingTax += payroll.employeetaxdeduction.amount
+
+            j = Journal()
+
+            j.code = str(y) + ": " + str(dateStart) + " - " + str(dateEnd)
+            j.datetimeCreated = datetime.datetime.now()
+            j.createdBy = request.user
+            j.journalDate = datetime.datetime.now()
+            j.save()
+            request.user.branch.journal.add(j)
+            ########## DEBIT ##########
+            jeAPI(request, j, "Debit", dChildAccount.salariesExpense, salariesExpense)
+            jeAPI(request, j, "Debit", dChildAccount.bonus, bonus)
+            jeAPI(request, j, "Debit", dChildAccount.deminimisBenefit, deminimis)
+            jeAPI(request, j, "Debit", dChildAccount.hdmfShare, hdmfER)
+            jeAPI(request, j, "Debit", dChildAccount.phicERShare, phicER)
+            jeAPI(request, j, "Debit", dChildAccount.sssERShare, sssER)
+            ########## CREDIT ##########
+            jeAPI(request, j, "Credit", dChildAccount.salariesPayable, salariesPayable)
+            jeAPI(request, j, "Credit", dChildAccount.sssPayable, sssPayable)
+            jeAPI(request, j, "Credit", dChildAccount.phicPayable, phicPayable)
+            jeAPI(request, j, "Credit", dChildAccount.hdmfPayable, hdmfPayable)
+            jeAPI(request, j, "Credit", dChildAccount.withholdingTaxPayable, withholdingTax)
 
             payslip = Payslip()
             payslip.payroll = payroll
