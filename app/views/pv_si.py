@@ -10,9 +10,12 @@ import sweetify
 from datetime import date as now
 from datetime import datetime
 from decimal import Decimal
+from django.core.exceptions import PermissionDenied
 
 class PaymentVoucherView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         
         try:
             pv = request.user.branch.paymentVoucher.latest('pk')
@@ -45,6 +48,8 @@ class PaymentVoucherView(View):
 
 class SavePaymentVoucher(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         paymentVoucher = request.data
 
         if paymentVoucher['pvType'] == "Default":
@@ -126,6 +131,8 @@ class SavePaymentVoucher(APIView):
 
 class SalesInvoiceView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         try:
             si = request.user.branch.salesInvoice.latest('pk')
@@ -154,6 +161,8 @@ class SalesInvoiceView(View):
 
 class SaveSalesInvoice(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         salesInvoice = request.data
 
         si = SalesInvoice()

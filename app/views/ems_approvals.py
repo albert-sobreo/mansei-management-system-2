@@ -9,9 +9,12 @@ from decimal import Decimal
 from datetime import datetime, date
 import re
 from .journalAPI import jeAPI
+from django.core.exceptions import PermissionDenied
 
 class EMS_OvertimePendingView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         context = {
             'ots': request.user.branch.otRequest.filter(status = "Pending"),
@@ -20,6 +23,8 @@ class EMS_OvertimePendingView(View):
 
 class EMS_OvertimeApprovedView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         context = {
             'ots': request.user.branch.otRequest.filter(status = "Approved"),
@@ -28,6 +33,8 @@ class EMS_OvertimeApprovedView(View):
 
 class EMS_OvertimeApproval(APIView):
     def put(self, request, pk):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         ot = OTRequest.objects.get(pk=pk)
         ot.datetimeApproved = datetime.now()
         ot.status = "Approved"
@@ -38,6 +45,8 @@ class EMS_OvertimeApproval(APIView):
 
 class EMS_OvertimeDisapproval(APIView):
     def put(self, request, pk):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         ot = OTRequest.objects.get(pk=pk)
         ot.datetimeApproved = datetime.now()
         ot.status = "Declined"
@@ -49,6 +58,8 @@ class EMS_OvertimeDisapproval(APIView):
 
 class EMS_UndertimePendingView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         context = {
             'uts': request.user.branch.utRequest.filter(status = "Pending"),
@@ -57,6 +68,8 @@ class EMS_UndertimePendingView(View):
 
 class EMS_UndertimeApprovedView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         context = {
             'uts': request.user.branch.utRequest.filter(status = "Approved"),
@@ -65,6 +78,8 @@ class EMS_UndertimeApprovedView(View):
 
 class EMS_UndertimeApproval(APIView):
     def put(self, request, pk):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         ut = UTRequest.objects.get(pk=pk)
         ut.datetimeApproved = datetime.now()
         ut.status = "Approved"
@@ -75,6 +90,8 @@ class EMS_UndertimeApproval(APIView):
 
 class EMS_UndertimeDisapproval(APIView):
     def put(self, request, pk):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         ut = UTRequest.objects.get(pk=pk)
         ut.datetimeApproved = datetime.now()
         ut.status = "Declined"
@@ -85,6 +102,8 @@ class EMS_UndertimeDisapproval(APIView):
 
 class EMS_LeavePendingView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         context = {
             'leaves': request.user.branch.leaveRequest.filter(status = "Pending"),
@@ -93,6 +112,8 @@ class EMS_LeavePendingView(View):
 
 class EMS_LeaveApprovedView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         context = {
             'leaves': request.user.branch.leaveRequest.filter(status = "Approved"),
@@ -101,6 +122,8 @@ class EMS_LeaveApprovedView(View):
 
 class EMS_LeaveApproval(APIView):
     def put(self, request, pk):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         leave = LeaveRequest.objects.get(pk=pk)
 
         try: 
@@ -146,6 +169,8 @@ class EMS_LeaveApproval(APIView):
 
 class EMS_LeaveDisapproval(APIView):
     def put(self, request, pk):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         leave = LeaveRequest.objects.get(pk=pk)
         leave.approvedBy = request.user
         leave.datetimeApproved = datetime.now()
@@ -157,6 +182,8 @@ class EMS_LeaveDisapproval(APIView):
 
 class EMS_PayrollApprovalAll(APIView):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         y = request.GET['year']
         dateRange = request.GET['dateRange']
         dateStart = dateRange.split(' ')[0]

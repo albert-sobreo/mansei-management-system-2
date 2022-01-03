@@ -9,6 +9,7 @@ from decimal import Decimal
 from datetime import datetime, date
 import re
 from time import sleep
+from django.core.exceptions import PermissionDenied
 
 class PPS_ProjectPlannerView(View):
     def get(self, request):
@@ -28,6 +29,8 @@ class PPS_AddDepartment(APIView):
 
 class PPS_AddProject(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
         
         project = ProjectPlan()
@@ -46,6 +49,8 @@ class PPS_AddProject(APIView):
 
 class PPS_AddStage(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
         stage = ProjectStage()
         stage.name = data['name']
@@ -60,6 +65,8 @@ class PPS_AddStage(APIView):
 
 class PPS_AddTask(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
         task = ProjectTask()
         task.name = data['name']
@@ -82,6 +89,8 @@ class PPS_AddTask(APIView):
 
 class PPS_SaveEditStage(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
         stage = ProjectStage.objects.get(pk=data['id'])
         stage.name = data['name']
@@ -94,6 +103,8 @@ class PPS_SaveEditStage(APIView):
 
 class PPS_DeleteEditStage(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
         ProjectStage.objects.get(pk=data['id']).delete()
         
@@ -103,6 +114,8 @@ class PPS_DeleteEditStage(APIView):
 
 class PPS_SaveEditTask(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
         task = ProjectTask.objects.get(pk=data['id'])
         task.name = data['name']
@@ -126,6 +139,8 @@ class PPS_SaveEditTask(APIView):
 
 class PPS_DeleteEditTask(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
         ProjectTask.objects.get(pk=data['id']).delete()
 
@@ -135,6 +150,8 @@ class PPS_DeleteEditTask(APIView):
 
 class PPS_SaveEditDepartment(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
         dep = ProjectDepartment.objects.get(pk=data['id'])
         dep.name = data['name']
@@ -146,6 +163,8 @@ class PPS_SaveEditDepartment(APIView):
 
 class PPS_SaveEditProject(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
 
         print(data)
@@ -165,6 +184,8 @@ class PPS_SaveEditProject(APIView):
 
 class PPS_DeleteEditProject(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
         ProjectPlan.objects.get(pk=data['id']).delete()
 
@@ -174,6 +195,8 @@ class PPS_DeleteEditProject(APIView):
 
 class MoveTaskToStage(APIView):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = request.data
 
         task = ProjectTask.objects.get(pk=data['taskID'])

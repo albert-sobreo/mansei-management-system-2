@@ -6,9 +6,12 @@ from ..serializers import *
 from ..models import *
 import sweetify
 import pandas as pd
+from django.core.exceptions import PermissionDenied
 
 class ImportATC(View):
     def post(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         df = pd.read_excel(request.FILES['excel'])
         jsonDF = json.loads(df.to_json(orient='records'))
 

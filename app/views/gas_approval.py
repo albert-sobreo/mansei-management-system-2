@@ -10,9 +10,12 @@ from datetime import datetime
 import re
 from .journalAPI import jeAPI
 from .petty_cash_api import *
+from django.core.exceptions import PermissionDenied
 
 class ADVapproved(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         user = request.user
         context = {
@@ -22,6 +25,8 @@ class ADVapproved(View):
 
 class ADVnonapproved(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         user = request.user
         context = {
@@ -31,6 +36,9 @@ class ADVnonapproved(View):
 
 class ADVapprovalAPI(APIView):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         adv = AdvancementThruPettyCash.objects.get(pk=request.data['id'])
         adv.approved = True
@@ -38,14 +46,61 @@ class ADVapprovalAPI(APIView):
         adv.datetimeApproved = datetime.datetime.now()
         adv.save()
 
+        j = Journal()
+
+        j.code = adv.code
+        j.datetimeCreated = adv.datetimeApproved
+        j.createdBy = adv.issuer
+        j.journalDate = datetime.now()
+        j.save()
+
+        request.user.branch.journal.add(j)
+
+        jeAPI(request, j, 'Credit', dChildAccount.pettyCash, adv.amount)
+        try:
+            jeAPI(request, j, 'Debit', adv.requestor.employeeAccount.get(name__regex=r"[Pp]ayable"), adv.amount)
+        except:
+            emploAcc = AccountChild()
+            emploAcc.name = 'Account Payables - ' + adv.requestor.first_name + ' ' + adv.requestor.last_name
+            emploAcc.accountSubGroup = request.user.branch.subGroup.get(name="Accounts Payables")
+            emploAcc.amount = Decimal(0)
+            jeAPI(request, j, 'Debit',emploAcc, adv.amount)
+
+
+
         request.user.branch.branchProfile.branchDefaultChildAccount.pettyCash.amount -= adv.amount
         request.user.branch.branchProfile.branchDefaultChildAccount.pettyCash.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+class ReimbursementProcess(APIView):
+    def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+
+        data = request.data
+        lqd = Liquidation.objects.get(pk=data['id'])
+        if lqd.reimbursementStatus == True:
+            sweetify.sweetalert(request, icon='warning', title='Liquidation already reimbursed', persistent='Dismiss')
+            return JsonResponse(0, safe=False)
+        lqd.reimbursementStatus = True
+        lqd.save()
+
+        """PUT SOME JOURNAL ENTRIES BELOW THIS"""
+
+        #### B0SS ####
+
+        """END OF JOURNAL"""
+        
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+
 class ADVDeleteAPI(APIView):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         AdvancementThruPettyCash.objects.get(pk=request.data['id']).delete()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
@@ -53,6 +108,8 @@ class ADVDeleteAPI(APIView):
 
 class LQDapproved(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'lqds': request.user.branch.liquidation.filter(approved = True),
         }
@@ -61,6 +118,8 @@ class LQDapproved(View):
 
 class LQDnonapproved(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'lqds': request.user.branch.liquidation.filter(approved = False),
         }
@@ -69,6 +128,8 @@ class LQDnonapproved(View):
 
 class LiquidationApprovalAPI(APIView):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         data = request.data
 
         lqd = Liquidation.objects.get(pk=data['id'])

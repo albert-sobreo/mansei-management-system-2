@@ -9,11 +9,13 @@ from decimal import Decimal
 from datetime import datetime
 import re
 from .journalAPI import jeAPI
+from django.core.exceptions import PermissionDenied
 
 ################# PURCHASE REQUEST #################
 class PRapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'purchase': user.branch.purchaseRequest.filter(approved=True),
@@ -22,7 +24,8 @@ class PRapprovedView(View):
 
 class PRnonapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'purchase': user.branch.purchaseRequest.filter(approved=False),
@@ -31,6 +34,8 @@ class PRnonapprovedView(View):
 
 class PRApprovalAPI(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         prequest = PurchaseRequest.objects.get(pk=pk)
 
@@ -44,6 +49,8 @@ class PRApprovalAPI(APIView):
 
 class PRVoid(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         pr = PurchaseRequest.objects.get(pk=pk)
         pr.voided = True
         pr.datetimeVoided = datetime.now()
@@ -65,7 +72,8 @@ class PRVoid(APIView):
 
 class POapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'purchase': user.branch.purchaseOrder.filter(approved=True),
@@ -74,7 +82,8 @@ class POapprovedView(View):
 
 class POnonapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'purchase': user.branch.purchaseOrder.filter(approved=False),
@@ -83,7 +92,8 @@ class POnonapprovedView(View):
 
 class POApprovalAPI(APIView):
     def put(self, request, pk, format = None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         purchase = PurchaseOrder.objects.get(pk=pk)
 
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
@@ -124,6 +134,8 @@ class POApprovalAPI(APIView):
 
 class POVoid(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         purchase = PurchaseOrder.objects.get(pk=pk)
         purchase.voided = True
         purchase.voidedBy = request.user
@@ -165,6 +177,8 @@ class POVoid(APIView):
 ########## RECEIVING REPORT ##########
 class RRnonapproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'purchase': request.user.branch.receivingReport.filter(approved=False),
         }
@@ -172,6 +186,8 @@ class RRnonapproved(View):
 
 class RRapproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'purchase': request.user.branch.receivingReport.filter(approved=True)
         }
@@ -179,7 +195,8 @@ class RRapproved(View):
 
 class RRApprovalAPI(APIView):
     def put(self, request, pk, format = None):
-        
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         receive = ReceivingReport.objects.get(pk=pk)
@@ -282,7 +299,8 @@ class RRApprovalAPI(APIView):
 
 class RRVoid(APIView):
     def put(self, request, pk, format = None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         rr = ReceivingReport.objects.get(pk=pk)
@@ -365,7 +383,8 @@ class RRVoid(APIView):
 ################# INWARD INVENTORY #################
 class IIapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'inward': user.branch.inwardInventory.filter(approved=True, adjusted=True),
@@ -374,7 +393,8 @@ class IIapprovedView(View):
 
 class IInonapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'inward': user.branch.inwardInventory.filter(approved=False, adjusted=True),
@@ -383,7 +403,8 @@ class IInonapprovedView(View):
 
 class IIApprovalAPI(APIView):
     def put(self, request, pk, format = None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         ii = InwardInventory.objects.get(pk=pk)
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         ii.datetimeApproved = datetime.now()
@@ -448,6 +469,8 @@ class IIApprovalAPI(APIView):
 
 class IIVoid(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         ii = InwardInventory.objects.get(pk=pk)
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         ii.voided = True
@@ -485,7 +508,8 @@ class IIVoid(APIView):
 ################# PAYMENT VOUCHER #################
 class PVapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'voucher': user.branch.paymentVoucher.filter(approved=True),
@@ -494,7 +518,8 @@ class PVapprovedView(View):
 
 class PVnonapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'voucher': user.branch.paymentVoucher.filter(approved=False),
@@ -503,6 +528,8 @@ class PVnonapprovedView(View):
 
 class PVApprovalAPI(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         voucher = PaymentVoucher.objects.get(pk=pk)
 
         voucher.datetimeApproved = datetime.now()
@@ -789,6 +816,8 @@ class PVApprovalAPI(APIView):
 
 class PVVoid(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         voucher = PaymentVoucher.objects.get(pk=pk)
         voucher.voided = True
         voucher.datetimeVoided = datetime.now()
@@ -1026,7 +1055,8 @@ class PVVoid(APIView):
 ################# QUOTATIONS #################
 class QQapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'quotes': user.branch.quotations.filter(approved=True),
@@ -1035,7 +1065,8 @@ class QQapprovedView(View):
 
 class QQnonapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'quotes': user.branch.quotations.filter(approved=False),
@@ -1044,7 +1075,8 @@ class QQnonapprovedView(View):
 
 class QQApprovalAPI(APIView):
     def put(self, request, pk, format = None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         quotes = Quotations.objects.get(pk=pk)
 
         quotes.datetimeApproved = datetime.now()
@@ -1058,7 +1090,8 @@ class QQApprovalAPI(APIView):
 ################# SALES ORDER #################
 class SOapprovedView(View):
     def get(self, request, format=None):
-
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         user = request.user
         context = {
             'salesorder': user.branch.salesOrder.filter(approved=True),
@@ -1067,6 +1100,8 @@ class SOapprovedView(View):
 
 class SOnonapprovedView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         user = request.user
         context = {
@@ -1076,6 +1111,8 @@ class SOnonapprovedView(View):
 
 class SOApprovalAPI(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         salesOrder = SalesOrder.objects.get(pk=pk)
 
@@ -1103,6 +1140,8 @@ class SOApprovalAPI(APIView):
 
 class SOVoid(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         salesOrder = SalesOrder.objects.get(pk=pk)
         salesOrder.voided = True
         salesOrder.datetimeVoided = datetime.now()
@@ -1126,6 +1165,8 @@ class SOVoid(APIView):
 
 class SCapprovedView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         user = request.user
         context = {
@@ -1135,6 +1176,8 @@ class SCapprovedView(View):
 
 class SCnonapprovedView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         user = request.user
         context = {
@@ -1144,6 +1187,8 @@ class SCnonapprovedView(View):
 
 class SCApprovalAPI(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         sale = SalesContract.objects.get(pk=pk)
 
@@ -1196,6 +1241,8 @@ class SCApprovalAPI(APIView):
 
 class SCVoid(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         sale = SalesContract.objects.get(pk=pk)
 
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
@@ -1291,6 +1338,8 @@ class SCVoid(APIView):
 ################# SALES INVOICE #################
 class SIapprovedView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         user = request.user
         context = {
@@ -1300,6 +1349,8 @@ class SIapprovedView(View):
 
 class SInonapprovedView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         user = request.user
         context = {
@@ -1309,6 +1360,8 @@ class SInonapprovedView(View):
 
 class SIApprovalAPI(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         invoice = SalesInvoice.objects.get(pk=pk)
 
         invoice.datetimeApproved = datetime.now()
@@ -1324,6 +1377,8 @@ class SIApprovalAPI(APIView):
 ################# DELIVERIES #################
 class DeliveriesNonApproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'deliveries': request.user.branch.deliveries.filter(approved=False)
         }
@@ -1331,6 +1386,8 @@ class DeliveriesNonApproved(View):
 
 class DeliveriesApproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'deliveries': request.user.branch.deliveries.filter(approved=True)
         }
@@ -1338,6 +1395,8 @@ class DeliveriesApproved(View):
 
 class DeliveriesApprovalAPI(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         deliveries = request.data
         d = Deliveries.objects.get(pk=pk)
@@ -1406,6 +1465,8 @@ class DeliveriesApprovalAPI(APIView):
 
 class DeliveriesVoid(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         d = Deliveries.objects.get(pk=pk)
 
@@ -1465,6 +1526,8 @@ class DeliveriesVoid(APIView):
 ################# TRANSFER AND ADJUSTMENT #################
 class TransferNonApproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'transfers': request.user.branch.transfer.filter(approved=False)
         }
@@ -1472,6 +1535,8 @@ class TransferNonApproved(View):
 
 class TransferApproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'transfer': request.user.branch.transfer.filter(approved=True)
         }
@@ -1479,6 +1544,8 @@ class TransferApproved(View):
 
 class TransferApproval(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         tr = Transfer.objects.get(pk=pk)
 
@@ -1514,6 +1581,8 @@ class TransferApproval(APIView):
 
 class AdjustmentsNonApproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'adjusts': request.user.branch.adjustments.filter(approved=False)
         }
@@ -1521,6 +1590,8 @@ class AdjustmentsNonApproved(View):
 
 class AdjustmentsApproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'adjusts': request.user.branch.adjustments.filter(approved=True)
         }
@@ -1528,6 +1599,8 @@ class AdjustmentsApproved(View):
 
 class AdjustmentApproval(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
 
         ad = Adjustments.objects.get(pk=pk)
 
@@ -1556,6 +1629,8 @@ class AdjustmentApproval(APIView):
 ########## BANK RECONCILIATION ##########
 class BankReconNonApproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'cheques': request.user.branch.cheque.filter(approved = False)
         }
@@ -1564,6 +1639,8 @@ class BankReconNonApproved(View):
 
 class BankReconApproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'cheques': request.user.branch.cheque.filter(approved = True)
         }
@@ -1571,6 +1648,8 @@ class BankReconApproved(View):
         return render(request, 'bank-recon-approved.html', context)
 class BankReconApprovalAPI(APIView):
     def put(self, request, pk, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         cheque = Cheques.objects.get(pk=pk)
         
@@ -1611,6 +1690,8 @@ class BankReconApprovalAPI(APIView):
 ########## PPE ##########
 class CRnonapproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'crs': request.user.branch.completionReport.filter(approved=False),
         }
@@ -1618,6 +1699,8 @@ class CRnonapproved(View):
 
 class CRapproved(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'crs': request.user.branch.completionReport.filter(approved=True),
         }
@@ -1625,6 +1708,8 @@ class CRapproved(View):
 
 class CRApproval(View):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 

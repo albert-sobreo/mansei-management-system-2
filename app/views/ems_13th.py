@@ -16,6 +16,8 @@ import string
 
 class EMS_13thMonthView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         context = {
             'users': request.user.branch.user.exclude(authLevel='dtr')
         }

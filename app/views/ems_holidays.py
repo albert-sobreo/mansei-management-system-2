@@ -9,6 +9,7 @@ from decimal import Decimal
 import pandas as pd
 import json
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 class EMS_HolidaysView(APIView):
     def get(self, request):
@@ -45,6 +46,8 @@ class EMS_HolidaysView(APIView):
 
 class EMS_ImportHolidays(APIView):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         df = pd.read_excel(request.FILES['excel'])
         jsonDF = json.loads(df.to_json(orient='records'))
 
@@ -73,6 +76,8 @@ class EMS_ImportHolidays(APIView):
 
 class EMS_SaveEditHoliday(APIView):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
         data = request.data
         
         print(data)

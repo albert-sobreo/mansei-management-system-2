@@ -13,9 +13,12 @@ from decimal import Decimal
 import datetime
 from .petty_cash_api import *
 from .journalAPI import *
+from django.core.exceptions import PermissionDenied
 
 class LiquidationView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         user = request.user
 
         try:
@@ -47,6 +50,8 @@ class LiquidationView(View):
 
 class LiquidationListView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         context = {
             
         }
@@ -55,6 +60,8 @@ class LiquidationListView(View):
 
 class SaveLiquidationForm(View):
     def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         data = json.loads(request.POST['POSTDATA'])
         files = request.FILES
 

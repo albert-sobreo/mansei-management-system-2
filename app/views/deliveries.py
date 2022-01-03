@@ -10,9 +10,12 @@ import sweetify
 from datetime import date as now
 from django.http.response import Http404
 from datetime import datetime
+from django.core.exceptions import PermissionDenied
 
 class DeliveriesView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         
         user = request.user
 
@@ -45,10 +48,14 @@ class DeliveriesView(View):
 
 class DeliveriesListView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'delivery-list.html')
 
 class TruckView(View):
     def post(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         request.data = json.loads(request.body)
         jsonTruck = request.data
 
@@ -66,10 +73,14 @@ class TruckView(View):
         return JsonResponse(0, safe=False)
 
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'trucks.html')
 
 class DriverView(View):
     def post(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         request.data = json.loads(request.body)
         jsonDriver = request.data
 
@@ -87,10 +98,14 @@ class DriverView(View):
         return JsonResponse(0, safe=False)
 
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'drivers.html')
 
 class InTransitView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         context = {
             'trucks': request.user.branch.truck.filter(status='In-transit')
         }
@@ -98,16 +113,22 @@ class InTransitView(View):
 
 class DeliveryLogsView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'logs-deliveries.html')
 
 class ReturnTruck(APIView):
     def get_object(self, pk):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         try:
             return Truck.objects.get(pk=pk)
         except Truck.DoesNotExist:
             raise Http404
 
     def put(self, request, pk, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         truck = self.get_object(pk)
         truck.status = "Available"
         truck.driver.status = truck.status
@@ -120,6 +141,8 @@ class ReturnTruck(APIView):
 
 class SaveDelivery(APIView):
     def post(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         deliveries = request.data
         
         d = Deliveries()

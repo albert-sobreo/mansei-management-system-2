@@ -21,6 +21,8 @@ class LoginView(View):
             auth_login(request, user)
             if user.authLevel == 'dtr':
                 return redirect('/ems-dtr/')
+            elif user.authLevel == '2':
+                return redirect('/ems-my-dtr/')
             return redirect('/')
         else:
             return HttpResponse(user)

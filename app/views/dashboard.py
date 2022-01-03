@@ -7,6 +7,7 @@ from ..forms import *
 from ..models import *
 from decimal import Decimal
 from time import sleep
+from django.core.exceptions import PermissionDenied
 
 class DashboardView(View):
     def get(self, request):
@@ -19,6 +20,8 @@ class DashboardView(View):
 
 class AdminDashboardView(View):
     def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == "1":
+            raise PermissionDenied()
         context = {
             'branches': Branch.objects.all()
         }
@@ -67,6 +70,8 @@ class SaveAnnouncement(APIView):
 
 class DeleteAnnouncement(APIView):
     def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == "1":
+            raise PermissionDenied()
         data= request.data
         Announcement.objects.get(pk=data['id']).delete()
 

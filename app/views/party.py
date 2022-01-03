@@ -8,9 +8,12 @@ from ..models import *
 import sweetify
 import pandas as pd
 import json
+from django.core.exceptions import PermissionDenied
 
 class VendorView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         context = {
             'vendors': request.user.branch.party.filter(type='Vendor')
         }
@@ -18,6 +21,8 @@ class VendorView(View):
 
 class CustomerView(View):
     def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         context = {
             'customers': request.user.branch.party.filter(type='Customer')
         }
@@ -25,6 +30,8 @@ class CustomerView(View):
 
 class SaveParty(APIView):
     def post(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         jsonParty = request.data
         
         childAR = AccountChild()
@@ -100,6 +107,8 @@ class SaveParty(APIView):
 
 class ImportCustomerVendor(View):
     def post(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         df = pd.read_excel(request.FILES['excel'])
         jsonDF = json.loads(df.to_json(orient='records'))
 
@@ -188,6 +197,8 @@ class ImportCustomerVendor(View):
 
 class EditParty(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         party = Party.objects.get(pk=pk)
         edit = request.data
 

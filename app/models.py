@@ -57,6 +57,7 @@ class User(AbstractUser):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, null=True, blank=True)
     branch = models.ForeignKey('Branch', related_name="user", on_delete=models.CASCADE, null=True, blank=True)
     payrollable = models.BooleanField(default=True)
+    employeeAccounts = models.ManyToManyField('AccountChild', blank = True)
 
     # DISCONNECT USER TO BRANCH IF THE USER IS NO LONGER IN THAT COMPANY
 
@@ -1632,6 +1633,7 @@ class Liquidation(models.Model):
     datetimeCreated = models.DateTimeField(null=True, blank=True)
     approved = models.BooleanField(default=False)
     approvedBy = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='liquidationapprovedby', null=True, blank=True)
+    reimbursementStatus = models.BooleanField(default=False)
 
     def __str__(self):
         return self.code

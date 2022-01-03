@@ -11,9 +11,12 @@ from decimal import Decimal
 from datetime import datetime
 from .journalAPI import jeAPI
 import re
+from django.core.exceptions import PermissionDenied
 
 class ReceivedPaymentView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
 
         try:
             rp = request.user.branch.receivePayment.latest('pk')
@@ -44,6 +47,8 @@ class ReceivedPaymentView(View):
 
 class SaveReceivePayment(APIView):
     def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         receivePayment = request.data
 
@@ -168,6 +173,8 @@ class SaveReceivePayment(APIView):
 
 class RPVoid(APIView):
     def put(self, request, pk, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         
         rp = ReceivedPayment.objects.get(pk=pk)

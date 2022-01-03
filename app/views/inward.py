@@ -11,13 +11,18 @@ from datetime import datetime
 from decimal import Decimal
 import pandas as pd
 import json
+from django.core.exceptions import PermissionDenied
 
 class InwardView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         return render(request, 'inward-inventory.html')
 
 class InwardAdjustmentsView(View):
     def get(self, request, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         context = {
             'ii': request.user.branch.inwardInventory.filter()
         }
@@ -25,6 +30,8 @@ class InwardAdjustmentsView(View):
 
 class ImportInwardInventory(View):
     def post(self, request, format= None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         try:
             ii = request.user.branch.inwardInventory.latest('pk')
@@ -106,6 +113,8 @@ class ImportInwardInventory(View):
 
 class InwardAdjustmentSave(APIView):
     def post(self, request, pk, format=None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
         inward = request.data
         
         for item in inward['items']:
