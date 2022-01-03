@@ -495,35 +495,36 @@
                         <div class="row my-2">
                             <div class="col-6 pr-2">
                                 <label for="">ID Number</label>
-                                <input placeholder="Enter ID Number" type="text" class="form-control">
+                                <input v-model="addE.idUser" placeholder="Enter ID Number" type="text" class="form-control">
                             </div>
                         </div>
 
                         <div class="row my-2">
                             <div class="col-6 pr-2">
                                 <label for="">First Name</label>
-                                <input placeholder="Enter First Name" type="text" class="form-control">
+                                <input v-model="addE.first_name" placeholder="Enter First Name" type="text" class="form-control">
                             </div>
                             <div class="col-6 pl-2">
                                 <label for="">Last Name</label>
-                                <input placeholder="Enter Last Name" type="text" class="form-control">
+                                <input v-model="addE.last_name" placeholder="Enter Last Name" type="text" class="form-control">
                             </div>
                         </div>
 
                         <div class="row mt-2 order-card pt-3">
                             <div class="col">
                                 <label for="">Position</label>
-                                <select name="" id="" class="form-control">
-                                    <option value="" selected disabled>Select Postion</option>
-                                </select>
+                                <input v-model="addE.position" type="text" class="form-control">
                             </div>
                         </div>
 
                         <div class="row mb-2 order-card pb-3">
                             <div class="col">
                                 <label for="">Account Authorization Level</label>
-                                <select name="" id="" class="form-control">
-                                    <option value="" selected disabled>Select Auth Level</option>
+                                <select v-model="addE.authLevel" name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Authorization Level</option>
+                                    <option value="0">0 - Top Level ---- Can see and control all branches</option>
+                                    <option value="1">1 - Branch Admin ---- Can see and control single branch</option>
+                                    <option value="2">2 - Branch Basic ---- Limited access on a single branch</option>
                                 </select>
                             </div>
                         </div>
@@ -531,18 +532,18 @@
                         <div class="row mt-2 pt-3">
                             <div class="col">
                                 <label for="">Mobile No.</label>
-                                <input placeholder="Enter Mobile No." type="text" class="form-control">
+                                <input v-model="addE.mobile" placeholder="Enter Mobile No." type="text" class="form-control">
                             </div>
                             <div class="col">
                                 <label for="">Email</label>
-                                <input placeholder="Enter Email" type="text" class="form-control">
+                                <input v-model="addE.email" placeholder="Enter Email" type="text" class="form-control">
                             </div>
                         </div>
 
                         <div class="row mb-2 pb-3">
                             <div class="col">
                                 <label for="">Blood Type</label>
-                                <select class="form-control">
+                                <select v-model="addE.bloodType" class="form-control">
                                     <option value="" selected disabled>Select Blood Type</option>
                                     <option value="Unknown">Unknown</option>
                                 </select>
@@ -553,7 +554,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input type="text" class="form-control box-shadow-off" placeholder="Enter Daily Rate" onkeypress="validate()">
+                                    <input v-model="addE.dailyRate" type="text" class="form-control box-shadow-off" placeholder="Enter Daily Rate" onkeypress="validate()">
                                 </div>
                             </div>
                         </div>
@@ -561,29 +562,29 @@
                         <div class="row mt-2 order-card pt-3">
                             <div class="col">
                                 <label for="">TIN Number</label>
-                                <input placeholder="Enter TIN Number" type="text" class="form-control">
+                                <input v-model="addE.tin" placeholder="Enter TIN Number" type="text" class="form-control">
                             </div>
                             <div class="col">
                                 <label for="">SSS Number</label>
-                                <input placeholder="Enter SSS Number" type="text" class="form-control">
+                                <input v-model="addE.sss" placeholder="Enter SSS Number" type="text" class="form-control">
                             </div>
                         </div>
 
                         <div class="row mb-2 order-card pb-3">
                             <div class="col">
                                 <label for="">PHIC No.</label>
-                                <input placeholder="Enter PHIC No." type="text" class="form-control">
+                                <input v-model="addE.phic" placeholder="Enter PHIC No." type="text" class="form-control">
                             </div>
                             <div class="col">
                                 <label for="">Pag-Ibig No.</label>
-                                <input placeholder="Enter Pag-Ibig No." type="text" class="form-control">
+                                <input v-model="addE.hdmf" placeholder="Enter Pag-Ibig No." type="text" class="form-control">
                             </div>
                         </div>
 
                         <!-- BUTTONS -->
                         <div class="row mt-3">
                             <div class="col">
-                                <button class="col btn btn-primary">Add Employee</button>
+                                <button class="col btn btn-primary" @click="submitAddE()">Add Employee</button>
                             </div>
                         </div>
                     </div>
@@ -675,6 +676,22 @@
 
             },
 
+            addE:{
+                idUser: null,
+                first_name: null,
+                last_name: null,
+                position: null,
+                authLevel: null,
+                mobile: null,
+                email: null,
+                bloodType: null,
+                dailyRate: null,
+                tin: null,
+                sss: null,
+                phic: null,
+                hdmf: null,
+            },
+            
             givePromotion:{
                 user: null,
                 position: null,
@@ -749,6 +766,22 @@
                 axios.get(`/api/user/${id}/`)
                 .then(res=>{
                     this.modal = res.data
+                })
+            },
+
+            submitAddE(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: "warning",
+                    html: "Are you sure you want to create an employee?",
+                    showCancelButton: true,
+                    confirmButtonText: 'I am sure.'
+                })
+                .then(result=>{
+                    if(result.isConfirmed){
+                        axios.post('/add-employee/', this.addE, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                    }
                 })
             },
 

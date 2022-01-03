@@ -439,5 +439,6 @@ urlpatterns = [
     path('1601-C/', login_required(views.BIR1601CView.as_view())),
     path('1702-Q/', login_required(views.BIR1702QView.as_view())),
     path('reimbursement/', login_required(views.ReimbursementView.as_view())),
-    path('reimburse-process/', login_required(views.ReimbursementProcess.as_view()))
+    path('reimburse-process/', login_required(views.ReimbursementProcess.as_view())),
+    path('add-employee/', login_required(views.EMS_AddEmployee.as_view()))
 ]

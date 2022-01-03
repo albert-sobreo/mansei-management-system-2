@@ -12,6 +12,7 @@ from datetime import datetime, date
 from ..models import*
 from django.core.exceptions import PermissionDenied
 
+
 class EMS_EmployeesView(View):
     def get(self, request):
         if request.user.authLevel == '2':
@@ -22,6 +23,18 @@ class EMS_EmployeesView(View):
         }
         return render(request, 'ems-employees.html', context)
 
+class EMS_AddEmployee(APIView):
+    def post(self, request):
+        newHire = User.objects.create_user(idUser = request.data['idUser'], username=request.data['idUser'], password = "ManseiTechno", first_name = request.data['first_name'], 
+        last_name = request.data['last_name'], position = request.data['position'], authLevel = request.data['authLevel'], 
+        mobile = request.data['mobile'], email = request.data['email'], bloodType = request.data['bloodType'], rate = request.data['dailyRate'],
+        tin = request.data['tin'], sss = request.data['sss'], phic = request.data['phic'], hdmf = request.data['hdmf'])
+
+        newHire.branch = request.user.branch
+        newHire.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
 
 class EMS_RaiseHistoryView(View):
     def get(self, request):
