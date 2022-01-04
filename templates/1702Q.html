@@ -58,25 +58,1244 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">For</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=1 v-model="bir.l1">
+                                <label for="">Calendar</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=0 v-model="bir.l1">
+                                <label for="">Fiscal</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label for="">Year Ended</label>
+                            <input type="month" v-model="bir.l2" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label for="">Quarter</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=1 v-model="bir.l3">
+                                <label for="">1st</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=2 v-model="bir.l3">
+                                <label for="">2nd</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=3 v-model="bir.l3">
+                                <label for="">3rd</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label for="">Amended Return?</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=1 v-model="bir.l4">
+                                <label for="">Yes</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=0 v-model="bir.l4">
+                                <label for="">No</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label for="">Alphanumeric Tax Code (ATC)</label>
+                            <input type="text" v-model="bir.l5.code" class="form-control">
+                            <input type="text" v-model="bir.l5.name" class="form-control">
+                            <input type="text" v-model="bir.l5.other" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part I - Background Information</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col-10 pr-1">
+                            <label for="">Taxpayer Identification Number (TIN)</label>
+                            <input type="text" v-model="bir.l6" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <label for="">RDO Code</label>
+                            <input type="text" v-model="bir.l7" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Registered name</label>
+                            <input type="text" v-model="bir.l8" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-10 pr-1">
+                            <label for="">Registered Address</label>
+                            <input type="text" v-model="bir.l9" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <label for="">ZIP Code</label>
+                            <input type="text" v-model="bir.l9A" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-5 pr-1">
+                            <label for="">Contact Number</label>
+                            <input type="tel" v-model="bir.l10" class="form-control">
+                        </div>
+                        <div class="col-7 pl-1">
+                            <label for="">Email Address</label>
+                            <input type="text" v-model="bir.l11" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Methods of Deduction</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=1 v-model="bir.l12">
+                                <label class="font-medium" for="">Itemized Deductions (Section 34 (A-J), NIRC)</label>
+                            </div>
+
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=0 v-model="bir.l12">
+                                <label class="font-medium" for="">Optional Standard Deduction (OSD) - 40% of Gross Income (Section 34(L) NIRC, as amended)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8 pr-1">
+                            <label for="">Are you availing of tax relief under Special Law/International Tax Treaty?</label>
+
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=1 v-model="bir.l13">
+                                <label class="font-medium" for="">Yes</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=0 v-model="bir.l13">
+                                <label class="font-medium" for="">No</label>
+                            </div>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <label for="">If yes, specify</label>
+                            <input type="text" v-model="bir.l13A" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part II - Total Tax Payable</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>14</b>&emsp;Income Tax Due - Regular/Normal Rate(From Part IV - Schedule 2, item 13)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l14" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>15</b>&emsp;Less: Unexpired Excess of Prior  Year's MCIT over Regular/Normal Income Tax Rate</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l15" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>16</b>&emsp;Balance/Income Tax Still Due - Regular/Normal Rate (Item 14 less item 15)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l16" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>17</b>&emsp;Add: Income Tax Due - Special Rate (from Part IV - Schedule 1, item 13)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l17" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>18</b>&emsp;Aggregate Income Tax Due (Sum of items 16 and 17)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l18" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>19</b>&emsp;Less: Total Tax Credits/Payments (from Part IV - Schedule 4, item 7)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l19" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>20</b>&emsp;Net Tax Payable/(Overpayment) (Item 18 less than 19)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l20" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>21</b>&emsp;Surcharge</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l21" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>22</b>&emsp;Interest</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l22" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>23</b>&emsp;Compromise</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l23" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>24</b>&emsp;Total Penalties (SUm of Items 21 to 23)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l24" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for=""><b>25</b>&emsp;Total Amount Payable/ (Overpayment) (Sum of Items 20 and 24)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l25" class="form-control box-shadow">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">No. of Attachments</label>
+                            <input type="text" v-model="bir.l26" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part III - Details of Payment</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <label for="">Particulars</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Drawee Bank/Agency</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Number</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Date</label>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Amount</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Cash/Bank Debit Memo</span>
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l27.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l27.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l27.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l27.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Check</span>
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l28.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l28.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l28.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l28.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Tax Debit Memo</span>
+                        </div>
+                        <div class="col px-1">
+                            
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l29.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l29.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l29.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <input type="text" v-model="bir.l30.particulars" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l30.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l30.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l30.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l30.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Page 2</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col-5 pr-1">
+                            <label for="">Taxpayer Identification Number (TIN)</label>
+                            <input type="text" v-model="pg2.tin" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Registered Name</label>
+                            <input type="text" v-model="pg2.name" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <label for=""><b>Schedule 1</b> Declaration This Quarter</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">A. EXEMPT</label>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">B. SPECIAL</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>1.</b> Sales/Receipt/Revenues/Fees</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l1.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l1.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>2.</b> Less: Cost of Sales/Services</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l2.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l2.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>3.</b> Gross Income From Operation (item 1 less item 2)</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l3.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l3.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>4.</b> Add: Non-operating and Other Taxable Income</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l4.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l4.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>5.</b> Total Gross Income (Sum of items 3 and 4)</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l5.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l5.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>6.</b> Less: Deductions</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l6.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l6.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>7.</b> Taxable Income this Quarter (Items 5 less items 6)</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l7.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l7.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>8.</b> Add: Taxable Income Previous Quarter/s</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l8.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l8.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>9.</b> Total Taxable Income to Date (Sum of items 7 and 8)</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l9.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l9.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>10.</b> Applicable Income Tax Rate (except minimum corporate income tax (MCIT) rate)</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <input type="text" v-model="pg2.l10.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <input type="text" v-model="pg2.l10.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>11.</b> Income Tax Due Other than MCIT (Item 9 x Item 10)</span>
+                        </div>
+                        <div class="col px-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l11.ex" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l11.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>12.</b> Less: Share of Other Agencies, if remitted directly</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l12.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>13.</b> Net Income Tax Due to National Government (Item 11 less item 12) (To part II Item 17)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.l13.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <label for=""><b>Schedule 2</b> Declaration This Quarter - REGULAR/NORMAL RATE</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">A. EXEMPT</label>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">B. SPECIAL</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>1.</b> Sales/Receipt/Revenues/Fees</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m1.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>2.</b> Less: Cost of Sales/Services</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m2.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>3.</b> Gross Income from Operation (Item 1 less Item 2)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m3.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>4.</b> Add: Non-Operating and Other Taxable Income</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m4.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>5.</b> Total Gross Income (Sum of items 3 and 4)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m5.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>6.</b> Less: Deductions</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m6.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>7.</b> Taxable Income This Quarter (Item 5 less Item 6)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m7.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>8.</b> Add: Taxable INcome Previous Quarter/s</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m8.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>9.</b> Total Taxable Income to Date (Sum of Items 7 and &)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m9.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>10.</b> Applicable Incoem Tax Rate (except MCIT rate)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <input type="text" v-model="pg2.m10.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>11.</b> Income Tax Due Other Than MCIT (item 9 x item 10)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m11.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>12.</b> Minimum Corporate Income Tax (MCIT) (from schedule 3 item 6)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m12.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>13.</b> Income Tax Due</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.m13.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <label for=""><b>Schedule 3</b> Computation of Minimum Corporate Income (MCIT) Tax for the Quarters</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">A. EXEMPT</label>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">B. SPECIAL</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>1.</b> Gross Income Regular/Normal Rate - 1st Quarter</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.n1.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>2.</b> Gross Income Regular/Normal Rate - 2nd Quarter</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.n2.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>3.</b> Gross Income Regular/Normal Rate - 3rd Quarter</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.n3.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>4.</b> Total Gross Income (Sum of items 1 to 3)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.n4.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>5.</b> MCIT RATE</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <input type="text" v-model="pg2.n5.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>6.</b> Minimum Corporate Income Tax (To Schedule 2 item 12)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.n6.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <label for=""><b>Schedule 4</b> Tax Credits/Payments</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">A. EXEMPT</label>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">B. SPECIAL</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>1.</b> Prior Year's Excess Credits</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.o1.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>2.</b> Tax payment/s for the previous quarter/s of the same taxable year other than MCIT</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.o2.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>3.</b> MCIT Payment/s for the previous quarter/s of the same taxable year</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.o3.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>4.</b> Creditable Tax Withheld for the previous quarter/s</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.o4.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>5.</b> Creditable Tax Withheld per BIR Form No. 2307 for this quarter</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.o5.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>6.</b> Tax paid in return previously filed if this is an amended return</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.o6.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Other Tax Credits/Payments</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8 pr-1">
+                            <input type="text" v-model="pg2.a.other" class="form-control">
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.a.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8 pr-1">
+                            <input type="text" v-model="pg2.b.other" class="form-control">
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.b.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span class="font-medium"><b>7.</b> Total Tax Credits/Payments (Sum of items 1 to 6b) (To Part II Item 19)</span>
+                        </div>
+                        <div class="col px-1">
+                            &emsp;
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="pg2.o7.sp" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <pre>[[$data]]</pre> -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PIXEL -->
-    <div class="sticky-top">
-        <div id="pixels"></div>
-        <br>
-        Pg. 2
-        <div id="pixels2"></div>
-    </div>
 
     <!-- THE FILE -->
     <div class="d-flex justify-content-center container">
         <div id="form-container">
             <div id="app2" class="roboto-mono font-bold font-size-18 position-relative">
-                <span class="position-absolute" style="top: 159px; left: 69px; letter-spacing: 8px;"><i class="fas fa-times"></i></span>
-                <span class="position-absolute" style="top: 159px; left: 145px; letter-spacing: 8px;"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 159px; left: 69px; letter-spacing: 8px;" v-if="bir.l1 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 159px; left: 145px; letter-spacing: 8px;" v-else><i class="fas fa-times"></i></span>
 
                 <span class="position-absolute" style="top: 193px; left: 50px; letter-spacing: .35em;">[[ getMonth(bir.l2) ]]</span>
                 <span class="position-absolute" style="top: 193px; left: 114px; letter-spacing: .35em;">[[ getYear(bir.l2) ]]</span>
@@ -238,230 +1457,214 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-    $(document).ready(function () {
-        $("#app2").mousemove(function (e) {
-            var pX = e.offsetX;
-            var pY = e.offsetY;
-            $("#pixels").html("Y="+pY+"; X="+pX);
-        });
-
-        $("#app3").mousemove(function (e) {
-            var pX = e.offsetX;
-            var pY = e.offsetY;
-            $("#pixels2").html("Y="+pY+"; X="+pX);
-        });
-    });
-</script>
-
-<script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: "#app",
 
         data: {
             bir: {
-                l1: true,
-                l2: "2021-02",
-                l3: 1,
-                l4: true,
+                l1: null,
+                l2: null,
+                l3: null,
+                l4: null,
                 l5: {
-                    code: 'W019',
-                    name: "ATC CODE",
+                    code: null,
+                    name: null,
                     other: null,
                 },
-                l6: '777-888-888',
-                l7: '019',
-                l8: 'MANSEI TECHNO PHILS CORP.',
-                l9: 'TEHCNO PARK SUBIC BAY',
-                l9A: '2222',
-                l10: '09990120129',
-                l11: 'email@gmail.com',
-                l12: true,
-                l13: true,
-                l13A: 'specify',
-                l14: '0',
-                l15: '0',
-                l16: '0',
-                l17: '0',
-                l18: '0',
-                l19: '0',
-                l20: '0',
-                l21: '0',
-                l22: '0',
-                l23: '0',
-                l24: '0',
-                l25: '0',
-                l26: '1',
+                l6: null,
+                l7: null,
+                l8: null,
+                l9: null,
+                l9A: null,
+                l10: null,
+                l11: null,
+                l12: null,
+                l13: null,
+                l13A: null,
+                l14: null,
+                l15: null,
+                l16: null,
+                l17: null,
+                l18: null,
+                l19: null,
+                l20: null,
+                l21: null,
+                l22: null,
+                l23: null,
+                l24: null,
+                l25: null,
+                l26: null,
                 l27: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223A',
-                    date: '2021-12-30',
-                    amount: '0',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 l28: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223A',
-                    date: '2021-12-30',
-                    amount: '18000',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 l29: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223A',
-                    date: '2021-12-30',
-                    amount: '18000',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 l30: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 }
             },
             pg2: {
-                tin: '777999000',
-                name: 'Clark Kent',
+                tin: null,
+                name: null,
                 l1: {
-                    ex: '1000',
-                    sp: '1000',
+                    ex: null,
+                    sp: null,
                 },
                 l2: {
-                    ex: '1000',
-                    sp: '1000',
+                    ex: null,
+                    sp: null,
                 },
                 l3: {
-                    ex: '1000',
-                    sp: '1000',
+                    ex: null,
+                    sp: null,
                 },
                 l4: {
-                    ex: '1000',
-                    sp: '1000',
+                    ex: null,
+                    sp: null,
                 },
                 l5: {
-                    ex: '1000',
-                    sp: '1000',
+                    ex: null,
+                    sp: null,
                 },
                 l6: {
-                    ex: '1000',
-                    sp: '1000',
+                    ex: null,
+                    sp: null,
                 },
                 l7: {
-                    ex: '1000',
-                    sp: '1000',
+                    ex: null,
+                    sp: null,
                 },
                 l8: {
-                    ex: '1000',
-                    sp: '1000',
+                    ex: null,
+                    sp: null,
                 },
                 l9: {
-                    ex: '1000',
-                    sp: '1000',
+                    ex: null,
+                    sp: null,
                 },
                 l10: {
-                    ex: '10',
-                    sp: '10.0'
+                    ex: null,
+                    sp: null
                 },
                 l11: {
-                    ex: '1000',
-                    sp: '1000',
+                    ex: null,
+                    sp: null,
                 },
                 l12: {
-                    sp: '1000',
+                    sp: null,
                 },
                 l13: {
-                    sp: '1000',
+                    sp: null,
                 },
 
                 m1: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m2: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m3: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m4: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m5: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m6: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m7: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m8: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m9: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m10: {
-                    sp: '10',
+                    sp: null,
                 },
                 m11: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m12: {
-                    sp: '1000',
+                    sp: null,
                 },
                 m13: {
-                    sp: '1000',
+                    sp: null,
                 },
                 
                 n1: {
-                    sp: '1000',
+                    sp: null,
                 },
                 n2: {
-                    sp: '1000',
+                    sp: null,
                 },
                 n3: {
-                    sp: '1000',
+                    sp: null,
                 },
                 n4: {
-                    sp: '1000',
+                    sp: null,
                 },
                 n5: {
-                    sp: '12',
+                    sp: null,
                 },
                 n6: {
-                    sp: '1000',
+                    sp: null,
                 },
                 
                 o1: {
-                    sp: '1000',
+                    sp: null,
                 },
                 o2: {
-                    sp: '1000',
+                    sp: null,
                 },
                 o3: {
-                    sp: '1000',
+                    sp: null,
                 },
                 o4: {
-                    sp: '1000',
+                    sp: null,
                 },
                 o5: {
-                    sp: '1000',
+                    sp: null,
                 },
                 o6: {
-                    sp: '1000',
+                    sp: null,
                 },
                 a: {
-                    other: 'Other',
-                    sp: '1000'
+                    other: null,
+                    sp: null
                 },
                 b: {
-                    other: "Other",
-                    sp: '100'
+                    other: null,
+                    sp: null
                 },
                 o7: {
-                    sp: '1000',
+                    sp: null,
                 },
                 
                 
@@ -483,6 +1686,9 @@
             },
 
             formatDate(value){
+                if (!value){
+                    return null
+                }
                 const months = [
                     '01',
                     '02',
@@ -507,6 +1713,9 @@
             },
 
             getMonth(value){
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)
 
@@ -514,6 +1723,9 @@
             },
 
             getYear(value){
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 year = value.getFullYear()
 
@@ -521,6 +1733,9 @@
             },
 
             formatMonth(value){
+                if (!value){
+                    return null
+                }
                 const months = [
                     '01',
                     '02',

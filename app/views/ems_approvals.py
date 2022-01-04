@@ -227,24 +227,24 @@ class EMS_PayrollApprovalAll(APIView):
             j = Journal()
 
             j.code = 'PYRL' + ": " + str(dateStart) + "  " + str(dateEnd)
-            j.datetimeCreated = datetime.datetime.now()
+            j.datetimeCreated = datetime.now()
             j.createdBy = request.user
-            j.journalDate = datetime.datetime.now()
+            j.journalDate = datetime.now()
             j.save()
             request.user.branch.journal.add(j)
             ########## DEBIT ##########
-            jeAPI(request, j, "Debit", dChildAccount.salariesExpense, salariesExpense)
-            jeAPI(request, j, "Debit", dChildAccount.bonus, bonus)
-            jeAPI(request, j, "Debit", dChildAccount.deminimisBenefit, deminimis)
-            jeAPI(request, j, "Debit", dChildAccount.hdmfShare, hdmfER)
-            jeAPI(request, j, "Debit", dChildAccount.phicERShare, phicER)
-            jeAPI(request, j, "Debit", dChildAccount.sssERShare, sssER)
+            # jeAPI(request, j, "Debit", dChildAccount.salariesExpense, salariesExpense)
+            # jeAPI(request, j, "Debit", dChildAccount.bonus, bonus)
+            # jeAPI(request, j, "Debit", dChildAccount.deminimisBenefit, deminimis)
+            # jeAPI(request, j, "Debit", dChildAccount.hdmfShare, hdmfER)
+            # jeAPI(request, j, "Debit", dChildAccount.phicERShare, phicER)
+            # jeAPI(request, j, "Debit", dChildAccount.sssERShare, sssER)
             ########## CREDIT ##########
-            jeAPI(request, j, "Credit", dChildAccount.salariesPayable, salariesPayable)
-            jeAPI(request, j, "Credit", dChildAccount.sssPayable, sssPayable)
-            jeAPI(request, j, "Credit", dChildAccount.phicPayable, phicPayable)
-            jeAPI(request, j, "Credit", dChildAccount.hdmfPayable, hdmfPayable)
-            jeAPI(request, j, "Credit", dChildAccount.withholdingTaxPayable, withholdingTax)
+            # jeAPI(request, j, "Credit", dChildAccount.salariesPayable, salariesPayable)
+            # jeAPI(request, j, "Credit", dChildAccount.sssPayable, sssPayable)
+            # jeAPI(request, j, "Credit", dChildAccount.phicPayable, phicPayable)
+            # jeAPI(request, j, "Credit", dChildAccount.hdmfPayable, hdmfPayable)
+            # jeAPI(request, j, "Credit", dChildAccount.withholdingTaxPayable, withholdingTax)
 
             payslip = Payslip()
             payslip.payroll = payroll

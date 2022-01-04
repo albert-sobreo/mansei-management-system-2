@@ -58,18 +58,577 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">For the Year</label>
+                            <input type="text" v-model="bir.l1" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label for="">Quarter</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=1 v-model="bir.l2">
+                                <label for="">1st</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=2 v-model="bir.l2">
+                                <label for="">2nd</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=3 v-model="bir.l2">
+                                <label for="">3rd</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=4 v-model="bir.l2">
+                                <label for="">4th</label>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <label for="">Amended Return?</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=1 v-model="bir.l3">
+                                <label for="">Yes</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=0 v-model="bir.l3">
+                                <label for="">No</label>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <label for="">Any Taxes Withheld?</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=1 v-model="bir.l4">
+                                <label for="">Yes</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=0 v-model="bir.l4">
+                                <label for="">No</label>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <label for="">No. of Sheets/Attached</label>
+                            <input type="text" v-model="bir.l5" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part I - Background Information</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col-10 pr-1">
+                            <label for="">Taxpayer Identification Number (TIN)</label>
+                            <input type="text" v-model="bir.l6" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <label for="">RDO Code</label>
+                            <input type="text" v-model="bir.l7" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Withholding Agent's Name</label>
+                            <input type="text" v-model="bir.l8" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-10 pr-1">
+                            <label for="">Registered Address</label>
+                            <input type="text" v-model="bir.l9" class="form-control">
+                        </div>
+                        <div class="col-2 pl-1">
+                            <label for="">ZIP Code</label>
+                            <input type="text" v-model="bir.l9A" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8">
+                            <label for="">Contact Number</label>
+                            <input type="tel" v-model="bir.l10" class="form-control">
+                        </div>
+                        <div class="col-4">
+                            <label for="">Category of Withholding Agent</label>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=1 v-model="bir.l11">
+                                <label for="">Private</label>
+                            </div>
+                            <div class="form-check d-flex align-items-center">
+                                <input type="radio" value=0 v-model="bir.l11">
+                                <label for="">Government</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="">Email Address</label>
+                            <input type="email" v-model="bir.l12" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part II - Computation of Tax </span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col-1 pr-1">
+                            <label for="">#</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">ATC</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Tax Base</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Tax Rate</label>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Tax Withheld</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-1 pr-1">
+                            <label for="">13</label>
+                        </div>
+                        <div class="col pr-1">
+                            <input type="text" v-model="bir.l13.atc" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l13.tax" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l13.rate" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <input type="text" v-model="bir.l13.withheld" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-1 pr-1">
+                            <label for="">14</label>
+                        </div>
+                        <div class="col pr-1">
+                            <input type="text" v-model="bir.l14.atc" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l14.tax" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l14.rate" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <input type="text" v-model="bir.l14.withheld" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-1 pr-1">
+                            <label for="">15</label>
+                        </div>
+                        <div class="col pr-1">
+                            <input type="text" v-model="bir.l15.atc" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l15.tax" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l15.rate" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <input type="text" v-model="bir.l15.withheld" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-1 pr-1">
+                            <label for="">16</label>
+                        </div>
+                        <div class="col pr-1">
+                            <input type="text" v-model="bir.l16.atc" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l16.tax" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l16.rate" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <input type="text" v-model="bir.l16.withheld" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-1 pr-1">
+                            <label for="">17</label>
+                        </div>
+                        <div class="col pr-1">
+                            <input type="text" v-model="bir.l17.atc" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l17.tax" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l17.rate" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <input type="text" v-model="bir.l17.withheld" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-1 pr-1">
+                            <label for="">18</label>
+                        </div>
+                        <div class="col pr-1">
+                            <input type="text" v-model="bir.l18.atc" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l18.tax" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l18.rate" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <input type="text" v-model="bir.l18.withheld" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>19</b>&emsp;Total Taxes Withheld for the Quarter (Sum of items 13 to 18)</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l19.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>20</b>&emsp;Less: Remittances Made: 1st Month of the Quarter</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l20.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>21</b>&emsp;Less: Remittances Made: 2nd Month of the Quarter</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l21.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>22</b>&emsp;Tax Remitted in Return Previously Filed, if this is an amended return</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l22.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>23</b>&emsp;Over-remittance from Previous Quarter of the same Taxable Year</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l23.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>24</b>&emsp;Other Payments Made (please attach proof of payments - BIR Form No. 1605)</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l24.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>25</b>&emsp;Total Remittances Made (Sum of items 20 to 24)</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l25.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>26</b>&emsp;Tax Still Due (Over-remittance) (Item 19 less item 25)</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l26.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>27</b>&emsp;Surcharge</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l27.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>28</b>&emsp;Interest</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l28.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>29</b>&emsp;Compromise</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l29.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>30</b>&emsp;Total Penalties</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l30.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center">
+                        <div class="col-8">
+                            <label for=""><b>31</b>&emsp;TOTAL AMOUNT STILL DUE (Over-remittance) (Sum of item 26 and 30)</label>
+                        </div>
+                        <div class="col-4 pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l31.withheld" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Part III - Details of Payment</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <label for="">Particulars</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Drawee Bank/Agency</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Number</label>
+                        </div>
+                        <div class="col px-1">
+                            <label for="">Date</label>
+                        </div>
+                        <div class="col pl-1">
+                            <label for="">Amount</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Cash/Bank Debit Memo</span>
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l32.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l32.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l32.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l32.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Check</span>
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l33.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l33.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l33.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l33.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <span>Tax Debit Memo</span>
+                        </div>
+                        <div class="col px-1">
+                            
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l34.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l34.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l34.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col pr-1 d-flex align-items-center">
+                            <input type="text" v-model="bir.l35.particulars" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l35.agency" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="text" v-model="bir.l35.number" class="form-control">
+                        </div>
+                        <div class="col px-1">
+                            <input type="date" v-model="bir.l35.date" class="form-control">
+                        </div>
+                        <div class="col pl-1">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">₱</span>
+                                </div>
+                                <input type="text" v-model="bir.l35.amount" class="form-control box-shadow-off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col">
+                            <span class="font-bold font-size-14 gray">Page 2</span>
+                        </div>
+                    </div>
+                    <hr class="mt-0">
+
+                    <div class="row">
+                        <div class="col-5">
+                            <label for="">TIN</label>
+                            <input type="text" v-model="pg2.tin" class="form-control">
+                        </div>
+                        <div class="col-7">
+                            <label for="">Withholding Agent's Name</label>
+                            <input type="text" v-model="pg2.name" class="form-contorl">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PIXEL -->
-    <div class="sticky-top">
-        <div id="pixels"></div>
-        <br>
-        Pg. 2
-        <div id="pixels2"></div>
-    </div>
 
     <!-- THE FILE -->
     <div class="d-flex justify-content-center container">
@@ -187,150 +746,134 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
-    $(document).ready(function () {
-        $("#app2").mousemove(function (e) {
-            var pX = e.offsetX;
-            var pY = e.offsetY;
-            $("#pixels").html("Y="+pY+"; X="+pX);
-        });
-
-        $("#app3").mousemove(function (e) {
-            var pX = e.offsetX;
-            var pY = e.offsetY;
-            $("#pixels2").html("Y="+pY+"; X="+pX);
-        });
-    });
-</script>
-
-<script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: "#app",
 
         data: {
             bir: {
-                l1: '2021',
-                l2: '1',
-                l3: true,
-                l4: true,
-                l5: 1,
-                l6: '777/777/777/0000',
-                l7: '019',
-                l8: 'Mansei Techno Phils Corp',
-                l9: 'Address',
-                l9A: '2222',
-                l10: '09999999999',
-                l11: true,
-                l12: 'email@gmail.com',
+                l1: null,
+                l2: null,
+                l3: null,
+                l4: null,
+                l5: null,
+                l6: null,
+                l7: null,
+                l8: null,
+                l9: null,
+                l9A: null,
+                l10: null,
+                l11: null,
+                l12: null,
 
 
                 l13: {
-                    atc: 'w01',
-                    tax: '10000.00',
-                    rate: '12%',
-                    withheld: '10000.00',
+                    atc: null,
+                    tax: null,
+                    rate: null,
+                    withheld: null,
                 },
                 l14: {
-                    atc: 'w01',
-                    tax: '10000.00',
-                    rate: '12%',
-                    withheld: '10000.00',
+                    atc: null,
+                    tax: null,
+                    rate: null,
+                    withheld: null,
                 },
                 l15: {
-                    atc: 'w01',
-                    tax: '10000.00',
-                    rate: '12%',
-                    withheld: '10000.00',
+                    atc: null,
+                    tax: null,
+                    rate: null,
+                    withheld: null,
                 },
                 l16: {
-                    atc: 'w01',
-                    tax: '10000.00',
-                    rate: '12%',
-                    withheld: '10000.00',
+                    atc: null,
+                    tax: null,
+                    rate: null,
+                    withheld: null,
                 },
                 l17: {
-                    atc: 'w01',
-                    tax: '10000.00',
-                    rate: '12%',
-                    withheld: '10000.00',
+                    atc: null,
+                    tax: null,
+                    rate: null,
+                    withheld: null,
                 },
                 l18: {
-                    atc: 'w01',
-                    tax: '10000.00',
-                    rate: '12%',
-                    withheld: '10000.00',
+                    atc: null,
+                    tax: null,
+                    rate: null,
+                    withheld: null,
                 },
                 l19: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l20: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l21: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l22: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l23: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l24: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l25: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l26: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l27: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l28: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l29: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l30: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l31: {
-                    withheld: '10000.00',
+                    withheld: null,
                 },
                 l32: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 l33: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 l34: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 l35: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
             },
             pg2:{
-                tin: '7777779990000',
-                name: 'Clark Kent'
+                tin: null,
+                name: null
             }
         },
 
@@ -363,6 +906,9 @@
                     '11',
                     '12',
                 ]
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 year = value.getFullYear()
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)
@@ -373,6 +919,9 @@
             },
 
             getMonth(value){
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)
 
@@ -380,6 +929,9 @@
             },
 
             getYear(value){
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 year = value.getFullYear()
 
@@ -401,6 +953,9 @@
                     '11',
                     '12',
                 ]
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 year = value.getFullYear()
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)

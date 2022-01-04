@@ -40,6 +40,14 @@
         </div>
     </div>
 
+    <!-- PIXEL -->
+    <div class="sticky-top">
+        <div id="pixels"></div>
+        <br>
+        Pg. 2
+        <div id="pixels2"></div>
+    </div>
+
     <!-- EDIT MODAL -->
     <div class="modal fade" id="editForm">
         <div class="modal-dialog modal-lg">
@@ -694,14 +702,6 @@
         </div>
     </div>
 
-    <!-- PIXEL -->
-    <div class="sticky-top">
-        <div id="pixels"></div>
-        <br>
-        Pg. 2
-        <div id="pixels2"></div>
-    </div>
-
     <!-- THE FILE -->
     <div class="d-flex justify-content-center container">
         <div id="form-container">
@@ -712,18 +712,81 @@
                 <span class="position-absolute" style="top: 135px; left: 696px; letter-spacing: .75em;" >[[getDate(bir.l2.to)]]</span>
 
                 <span class="position-absolute" style="top: 176px; left: 100px; letter-spacing: .38em;" >[[bir.l3]]</span>
-                <span class="position-absolute" style="top: 210px; left: 41px; letter-spacing: .00em;" >[[bir.l4]]</span>
+                <span class="position-absolute" style="top: 210px; left: 41px; letter-spacing: -.10em;" >[[bir.l4]]</span>
                 <span class="position-absolute" style="top: 210px; left: 348px; letter-spacing: .32em;" >[[bir.l5]]</span>
-                <span class="position-absolute" style="top: 250px; left: 41px; letter-spacing: .00em;" >[[bir.l6]]</span>
+                <span class="position-absolute font-extralight font-size-12" style="top: 254px; left: 41px; letter-spacing: -.20em;" >[[bir.l6]]</span>
                 <span class="position-absolute" style="top: 250px; left: 343px; letter-spacing: .35em;" >[[bir.l6A]]</span>
-                <span class="position-absolute" style="top: 284px; left: 41px; letter-spacing: .00em;" >[[bir.l6B]]</span>
+                <span class="position-absolute font-extralight font-size-12" style="top: 288px; left: 41px; letter-spacing: -.20em;" >[[bir.l6B]]</span>
                 <span class="position-absolute" style="top: 284px; left: 343px; letter-spacing: .35em;" >[[bir.l6C]]</span>
-                <span class="position-absolute" style="top: 320px; left: 41px; letter-spacing: .00em;" >[[bir.l6D]]</span>
+                <span class="position-absolute font-extralight font-size-12" style="top: 324px; left: 41px; letter-spacing: -.20em;" >[[bir.l6D]]</span>
                 <span class="position-absolute" style="top: 358px; left: 45px; letter-spacing: .37em;" >[[formatDate(bir.l7)]]</span>
                 <span class="position-absolute" style="top: 358px; left: 214px; letter-spacing: .39em;" >[[bir.l8]]</span>
 
                 <span class="position-absolute" style="top: 383px; right: 408px; letter-spacing: .39em;" >[[bir.l9]]</span>
                 <span class="position-absolute" style="top: 408px; right: 408px; letter-spacing: .39em;" >[[bir.l10]]</span>
+                <span class="position-absolute" style="top: 433px; left: 47px; letter-spacing: .39em;" v-if="bir.l11"><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 470px; left: 100px; letter-spacing: .37em;">[[bir.l12]]</span>
+                <span class="position-absolute" style="top: 507px; left: 40px; letter-spacing: -.10em;">[[bir.l13]]</span>
+
+                <span class="position-absolute font-extralight font-size-12" style="top: 546px; left: 40px; letter-spacing: -.20em;">[[bir.l14]]</span>
+                <span class="position-absolute" style="top: 543px; left: 340px; letter-spacing: .34em;">[[bir.l14A]]</span>
+
+                <span class="position-absolute" style="top: 567px; left: 141px; letter-spacing: .34em;" v-if="bir.l15 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 567px; left: 258px; letter-spacing: .34em;" v-else><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 604px; left: 101px; letter-spacing: .36em;">[[bir.l16]]</span>
+                <span class="position-absolute" style="top: 640px; left: 41px; letter-spacing: -.10em;" >[[bir.l17]]</span>
+
+                <span class="position-absolute font-extralight font-size-12" style="top: 680px; left: 41px; letter-spacing: -.20em;" >[[bir.l18]]</span>
+                <span class="position-absolute" style="top: 676px; left: 340px; letter-spacing: .34em;">[[bir.l18A]]</span>
+
+
+                <span class="position-absolute" style="top: 717px; left: 269px; letter-spacing: -.10em;">[[bir.l19]]</span>
+                <span class="position-absolute" style="top: 744px; left: 269px; letter-spacing: -.10em;">[[bir.l20]]</span>
+                <span class="position-absolute" style="top: 771px; left: 269px; letter-spacing: -.10em;">[[bir.l21]]</span>
+                <span class="position-absolute" style="top: 798px; left: 269px; letter-spacing: -.10em;">[[bir.l22]]</span>
+                <span class="position-absolute" style="top: 825px; left: 269px; letter-spacing: -.10em;">[[bir.l23]]</span>
+                <span class="position-absolute" style="top: 852px; left: 269px; letter-spacing: -.10em;">[[bir.l24]]</span>
+                <span class="position-absolute" style="top: 879px; left: 269px; letter-spacing: -.10em;">[[bir.l25A]]</span>
+                <span class="position-absolute" style="top: 906px; left: 269px; letter-spacing: -.10em;">[[bir.l25B]]</span>
+                <span class="position-absolute" style="top: 933px; left: 269px; letter-spacing: -.10em;">[[bir.l26]]</span>
+
+                <span class="position-absolute" style="top: 201px; left: 654px; letter-spacing: -.10em;">[[bir.l27]]</span>
+                <span class="position-absolute" style="top: 228px; left: 654px; letter-spacing: -.10em;">[[bir.l28]]</span>
+                <span class="position-absolute" style="top: 255px; left: 654px; letter-spacing: -.10em;">[[bir.l29]]</span>
+                <span class="position-absolute" style="top: 282px; left: 654px; letter-spacing: -.10em;">[[bir.l30]]</span>
+                <span class="position-absolute" style="top: 309px; left: 654px; letter-spacing: -.10em;">[[bir.l31]]</span>
+                <span class="position-absolute" style="top: 336px; left: 654px; letter-spacing: -.10em;">[[bir.l32]]</span>
+                <span class="position-absolute" style="top: 363px; left: 654px; letter-spacing: -.10em;">[[bir.l33]]</span>
+                <span class="position-absolute" style="top: 390px; left: 654px; letter-spacing: -.10em;">[[bir.l34]]</span>
+                <span class="position-absolute" style="top: 417px; left: 654px; letter-spacing: -.10em;">[[bir.l35]]</span>
+                <span class="position-absolute" style="top: 444px; left: 654px; letter-spacing: -.10em;">[[bir.l36]]</span>
+                <span class="position-absolute" style="top: 496px; left: 654px; letter-spacing: -.10em;">[[bir.l37]]</span>
+                <span class="position-absolute" style="top: 523px; left: 654px; letter-spacing: -.10em;">[[bir.l38]]</span>
+                <span class="position-absolute" style="top: 550px; left: 654px; letter-spacing: -.10em;">[[bir.l39]]</span>
+                <span class="position-absolute" style="top: 577px; left: 654px; letter-spacing: -.10em;">[[bir.l40]]</span>
+                <span class="position-absolute" style="top: 604px; left: 654px; letter-spacing: -.10em;">[[bir.l41]]</span>
+
+                <span class="position-absolute" style="top: 642px; left: 457px; letter-spacing: -.10em;">[[bir.l42A.name]]</span>
+                <span class="position-absolute" style="top: 642px; left: 654px; letter-spacing: -.10em;">[[bir.l42A.amount]]</span>
+                <span class="position-absolute" style="top: 669px; left: 457px; letter-spacing: -.10em;">[[bir.l42B.name]]</span>
+                <span class="position-absolute" style="top: 669px; left: 654px; letter-spacing: -.10em;">[[bir.l42B.amount]]</span>
+
+                <span class="position-absolute" style="top: 704px; left: 654px; letter-spacing: -.10em;">[[bir.l43]]</span>
+                <span class="position-absolute" style="top: 731px; left: 654px; letter-spacing: -.10em;">[[bir.l44]]</span>
+                <span class="position-absolute" style="top: 758px; left: 654px; letter-spacing: -.10em;">[[bir.l45]]</span>
+                <span class="position-absolute" style="top: 785px; left: 654px; letter-spacing: -.10em;">[[bir.l46]]</span>
+                <span class="position-absolute" style="top: 812px; left: 654px; letter-spacing: -.10em;">[[bir.l47]]</span>
+                <span class="position-absolute" style="top: 839px; left: 654px; letter-spacing: -.10em;">[[bir.l48]]</span>
+
+
+                <span class="position-absolute" style="top: 879px; left: 457px; letter-spacing: -.10em;">[[bir.l49A.name]]</span>
+                <span class="position-absolute" style="top: 879px; left: 654px; letter-spacing: -.10em;">[[bir.l49A.amount]]</span>
+                <span class="position-absolute" style="top: 906px; left: 457px; letter-spacing: -.10em;">[[bir.l49B.name]]</span>
+                <span class="position-absolute" style="top: 906px; left: 654px; letter-spacing: -.10em;">[[bir.l49B.amount]]</span>
+
+                <span class="position-absolute" style="top: 933px; left: 654px; letter-spacing: -.10em;">[[bir.l50]]</span>
                 <!-- END SPANS -->
             </div>
         </div>
@@ -759,80 +822,80 @@
 
         data: {
             bir: {
-                l1: '2021',
+                l1: null,
                 l2: {
-                    from: '2021-01-01',
-                    to: '2021-01-02'
+                    from: null,
+                    to: null
                 },
-                l3: '777-777-777-0000',
-                l4: 'Parker, Parker',
-                l5: '018',
-                l6: 'Olongapo City',
-                l6A: '2200',
-                l6B: 'Olongapo City',
-                l6C: '2200',
-                l6D: 'Washington D.C.',
-                l7: '2021-01-01',
-                l8: '09999999999',
-                l9: '420.00',
-                l10: '420.00',
-                l11: true,
-                l12: '777-777-777-9000',
-                l13: 'Clark Kent',
-                l14: 'Address',
-                l14A: '2200',
-                l15: true,
-                l16: '777-777-777-0000',
-                l17: 'Jonathan Joestar',
-                l18: 'England',
-                l18A: '1000',
-                l19: '10,000.00',
-                l20: '10,000.00',
-                l21: '10,000.00',
-                l22: '10,000.00',
-                l23: '10,000.00',
-                l24: '10,000.00',
-                l25A: '10,000.00',
-                l25B: '10,000.00',
-                l26: '10,000.00',
-                l27: '10,000.00',
-                l28: '10,000.00',
-                l29: '10,000.00',
-                l30: '10,000.00',
-                l31: '10,000.00',
-                l32: '10,000.00',
-                l33: '10,000.00',
-                l34: '10,000.00',
-                l35: '10,000.00',
-                l36: '10,000.00',
-                l37: '10,000.00',
-                l38: '10,000.00',
-                l39: '10,000.00',
-                l40: '10,000.00',
-                l41: '10,000.00',
+                l3: null,
+                l4: null,
+                l5: null,
+                l6: null,
+                l6A: null,
+                l6B: null,
+                l6C: null,
+                l6D: null,
+                l7: null,
+                l8: null,
+                l9: null,
+                l10: null,
+                l11: null,
+                l12: null,
+                l13: null,
+                l14: null,
+                l14A: null,
+                l15: null,
+                l16: null,
+                l17: null,
+                l18: null,
+                l18A: null,
+                l19: null,
+                l20: null,
+                l21: null,
+                l22: null,
+                l23: null,
+                l24: null,
+                l25A: null,
+                l25B: null,
+                l26: null,
+                l27: null,
+                l28: null,
+                l29: null,
+                l30: null,
+                l31: null,
+                l32: null,
+                l33: null,
+                l34: null,
+                l35: null,
+                l36: null,
+                l37: null,
+                l38: null,
+                l39: null,
+                l40: null,
+                l41: null,
                 l42A:{
-                    name: 'name',
-                    amount: '10,000.00',
+                    name: null,
+                    amount: null,
                 },
                 l42B: {
-                    name: "name",
-                    amount: '10,000.00',
+                    name: null,
+                    amount: null,
                 },
-                l43: '10,000.00',
-                l44: '10,000.00',
-                l45: '10,000.00',
-                l46: '10,000.00',
-                l47: '10,000.00',
-                l48: '10,000.00',
+                l43: null,
+                l44: null,
+                l45: null,
+                l46: null,
+                l47: null,
+                l48: null,
                 l49A:{
-                    name: 'name',
-                    amount: '10,000.00'
+                    name: null,
+                    amount: null
                 },
                 l49B:{
-                    name: 'name',
-                    amount: '10,000.00'
+                    name: null,
+                    amount: null
                 },
-                l50: '10,000.00',
+                l50: null,
                 
 
                 
@@ -869,6 +932,9 @@
                     '11',
                     '12',
                 ]
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 year = value.getFullYear()
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)
@@ -879,6 +945,9 @@
             },
 
             getMonth(value){
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)
 
@@ -886,6 +955,9 @@
             },
 
             getDate(value){
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)
                 date = ('0' + String(value.getDate()+1)).slice(-2)
@@ -894,6 +966,9 @@
             },
 
             getYear(value){
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 year = value.getFullYear()
 
@@ -901,6 +976,9 @@
             },
 
             formatMonth(value){
+                if (!value){
+                    return null
+                }
                 const months = [
                     '01',
                     '02',

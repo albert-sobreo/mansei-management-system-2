@@ -66,22 +66,22 @@
                         <div class="col px-1">
                             <label for="">Amended Form?</label>
                             <div class="form-check d-flex align-items-center">
-                                <input type="radio" v-model="bir.l2" value=true class="">
+                                <input type="radio" v-model="bir.l2" value=1 class="">
                                 <label for="">Yes</label>
                             </div>
                             <div class="form-check d-flex align-items-center">
-                                <input type="radio" v-model="bir.l2" value=false class="">
+                                <input type="radio" v-model="bir.l2" value=0 class="">
                                 <label for="">No</label>
                             </div>
                         </div>
                         <div class="col px-1">
                             <label for="">Any Taxes Withheld?</label>
                             <div class="form-check d-flex align-items-center">
-                                <input type="radio" v-model="bir.l3" value=true class="">
+                                <input type="radio" v-model="bir.l3" value=1 class="">
                                 <label for="">Yes</label>
                             </div>
                             <div class="form-check d-flex align-items-center">
-                                <input type="radio" v-model="bir.l3" value=false class="">
+                                <input type="radio" v-model="bir.l3" value=0 class="">
                                 <label for="">No</label>
                             </div>
                         </div>
@@ -135,11 +135,11 @@
                         <div class="col-4 pl-1">
                             <label for="">Category of Withholding Agent</label>
                             <div class="form-check d-flex align-items-center">
-                                <input type="radio" v-model="bir.l11" value=true class="">
+                                <input type="radio" v-model="bir.l11" value=1 class="">
                                 <label for="">Private</label>
                             </div>
                             <div class="form-check d-flex align-items-center">
-                                <input type="radio" v-model="bir.l11" value=false class="">
+                                <input type="radio" v-model="bir.l11" value=0 class="">
                                 <label for="">Government</label>
                             </div>
                         </div>
@@ -156,11 +156,11 @@
                         <div class="col pr-1">
                             <label for="">Are there payees availing of tax relief under Special Law or Internation Tax Treaty?</label>
                             <div class="form-check d-flex align-items-center">
-                                <input type="radio" v-model="bir.l13" value=true class="">
+                                <input type="radio" v-model="bir.l13" value=1 class="">
                                 <label for="">Yes</label>
                             </div>
                             <div class="form-check d-flex align-items-center">
-                                <input type="radio" v-model="bir.l13" value=false class="">
+                                <input type="radio" v-model="bir.l13" value=0 class="">
                                 <label for="">No</label>
                             </div>
                         </div>
@@ -807,8 +807,6 @@
 
     <!-- PIXEL -->
 
-    <div id="pixels" class="sticky-top"></div>
-
     <!-- THE FILE -->
     <div class="d-flex justify-content-center container">
         <div id="form-container">
@@ -930,15 +928,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-<script>
-    $(document).ready(function () {
-        $("#app3").mousemove(function (e) {
-            var pX = e.offsetX;
-            var pY = e.offsetY;
-            $("#pixels").html("Y="+pY+"; X="+pX);
-        });
-    });
-</script>
 
 <script>
     var app = new Vue({
@@ -947,113 +936,113 @@
 
         data: {
             bir: {
-                l1: "2021-12",
-                l2: true,
-                l3: true,
-                l4: '01',
-                l5: 'WW010',
-                l6: '777/123/123/0000',
-                l7: '018',
-                l8: 'MANSEI TECHNO PHILS CORP',
-                l9: 'TECHNO PARK, SUBIC BAY FREEPORT ZONE',
-                l9A: '2222',
-                l10: '09132922948',
-                l11: true,
-                l12: 'email@gmail.com',
-                l13: true,
-                l13A: 'specify',
-                l14: '10000.00',
-                l15: '10000.00',
-                l16: '10000.00',
-                l17: '10000.00',
-                l18: '10000.00',
-                l19: '10000.00',
-                l20: '10000.00',
-                l21: '10000.00',
-                l22: '10000.00',
-                l23: '10000.00',
-                l24: '10000.00',
-                l25: '10000.00',
-                l26: '10000.00',
-                l27: '10000.00',
-                l28: '10000.00',
-                l29: '10000.00',
-                l30: '10000.00',
-                l31: '10000.00',
-                l32: '10000.00',
-                l33: '10000.00',
-                l34: '10000.00',
-                l35: '10000.00',
-                l36: '10000.00',
+                l1: null,
+                l2: null,
+                l3: null,
+                l4: null,
+                l5: null,
+                l6: null,
+                l7: null,
+                l8: null,
+                l9: null,
+                l9A: null,
+                l10: null,
+                l11: null,
+                l12: null,
+                l13: null,
+                l13A: null,
+                l14: null,
+                l15: null,
+                l16: null,
+                l17: null,
+                l18: null,
+                l19: null,
+                l20: null,
+                l21: null,
+                l22: null,
+                l23: null,
+                l24: null,
+                l25: null,
+                l26: null,
+                l27: null,
+                l28: null,
+                l29: null,
+                l30: null,
+                l31: null,
+                l32: null,
+                l33: null,
+                l34: null,
+                l35: null,
+                l36: null,
                 l37: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 l38: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 l39: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 l40: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
             },
 
             pg2: {
-                tin: '7770000000000',
-                name: 'Clark Kent',
+                tin: null,
+                name: null,
                 k1: {
-                    previousMonth: '2021-01',
-                    datePaid: '2021-01-01',
-                    agency: '00101',
-                    number: '111234',
-                    taxPaid: '10000.00',
+                    previousMonth: null,
+                    datePaid: null,
+                    agency: null,
+                    number: null,
+                    taxPaid: null,
                 },
                 k2: {
-                    previousMonth: '2021-01',
-                    datePaid: '2021-01-01',
-                    agency: '00101',
-                    number: '111234',
-                    taxPaid: '10000.00',
+                    previousMonth: null,
+                    datePaid: null,
+                    agency: null,
+                    number: null,
+                    taxPaid: null,
                 },
                 k3: {
-                    previousMonth: '2021-01',
-                    datePaid: '2021-01-01',
-                    agency: '00101',
-                    number: '111234',
-                    taxPaid: '10000.00',
+                    previousMonth: null,
+                    datePaid: null,
+                    agency: null,
+                    number: null,
+                    taxPaid: null,
                 },
 
                 m1: {
-                    taxDue: '10000.00',
-                    adjustments: '10000.00',
+                    taxDue: null,
+                    adjustments: null,
                 },
                 m2: {
-                    taxDue: '10000.00',
-                    adjustments: '10000.00',
+                    taxDue: null,
+                    adjustments: null,
                 },
                 m3: {
-                    taxDue: '10000.00',
-                    adjustments: '10000.00',
+                    taxDue: null,
+                    adjustments: null,
                 },
                 m4: {
-                    adjustments: '10000.00',
+                    adjustments: null,
                 },
             }
         },
@@ -1087,6 +1076,9 @@
                     '11',
                     '12',
                 ]
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 year = value.getFullYear()
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)
@@ -1111,6 +1103,9 @@
                     '11',
                     '12',
                 ]
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 year = value.getFullYear()
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)

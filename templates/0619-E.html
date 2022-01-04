@@ -446,51 +446,51 @@
 
         data: {
             bir: {
-                L1: '2021-12',
-                L2: '2021-12-30',
-                L3: true,
-                L4: true,
-                L5: 'WME10',
-                L6: 'WE',
-                L7: '777-123-142-0000',
-                L8: '018',
-                L9: 'Mansei Techno Phils Corp',
-                L10: 'Techno Park, Subic Bay Freeport Zone',
-                LA10: '2222',
-                L11: '09123459288',
-                L12: true,
-                L13: 'email@gmail.com',
-                L14: '18000.00',
-                L15: '18000.00',
-                L16: '18000.00',
-                LA17: '18000.00',
-                LB17: '18000.00',
-                LC17: '18000.00',
-                LD17: '18000.00',
-                L18: '18000.00',
+                L1: null,
+                L2: null,
+                L3: null,
+                L4: null,
+                L5: null,
+                L6: null,
+                L7: null,
+                L8: null,
+                L9: null,
+                L10: null,
+                LA10: null,
+                L11: null,
+                L12: null,
+                L13: null,
+                L14: null,
+                L15: null,
+                L16: null,
+                LA17: null,
+                LB17: null,
+                LC17: null,
+                LD17: null,
+                L18: null,
                 L19: {
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 L20: {
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 L21: {
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    number: null,
+                    date: null,
+                    amount: null,
                 },
                 L22: {
-                    particulars: 'par',
-                    agency: '15231',
-                    number: '234223',
-                    date: '2021-12-30',
-                    amount: '18000.00',
+                    particulars: null,
+                    agency: null,
+                    number: null,
+                    date: null,
+                    amount: null,
                 }
             }
         },
@@ -524,6 +524,9 @@
                     '11',
                     '12',
                 ]
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 year = value.getFullYear()
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)
@@ -548,6 +551,9 @@
                     '11',
                     '12',
                 ]
+                if (!value){
+                    return null
+                }
                 value = new Date(value)
                 year = value.getFullYear()
                 month = ('0' + String(value.getMonth() + 1)).slice(-2)
