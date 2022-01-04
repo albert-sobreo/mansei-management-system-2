@@ -22,7 +22,7 @@
         </div>
 
         <!-- TABLE -->
-        {% for journal in journals %}
+        <!-- {% for journal in journals %}
         <table class="table table-borderless table-striped table-sm box-shadow-medium b-radius-15 mt-2 mb-5">
             <thead class="thead-dark">
                 <th colspan="2" class="pl-5" style="border-top: 0">
@@ -41,7 +41,7 @@
                 {% for je in journal.journalentries.all|dictsortreversed:"normally" %}
                 <tr>
                     <td class="pl-5">{{je.accountChild.name}}</td>
-                    <!-- ADD IF ELSE HERE FOR DEBIT AND CREDIT -->
+                    ADD IF ELSE HERE FOR DEBIT AND CREDIT
                     {% if je.normally == 'Debit' %}
                     <td>₱[[formatPrice('{{je.amount}}')]]</td>
                     <td></td>
@@ -61,7 +61,93 @@
                 </tr>
             </tbody>
         </table>
-        {% endfor %}
+        {% endfor %} -->
+
+        <div class="row">
+            <div class="col-2">
+                <label for="">Date</label>
+            </div>
+            <div class="col-2">
+                <label for="">Reference Code</label>
+            </div>
+            <div class="col-4">
+                <label for="">Accounts</label>
+            </div>
+            <div class="col-2">
+                <label for="">Debit</label>
+            </div>
+            <div class="col-2">
+                <label for="">Credit</label>
+            </div>
+        </div>
+
+        <div class="b-radius-15 b-radius-15 row box-shadow-medium">
+            {% if not journals %}
+            <div class="col-12 text-center py-4">
+                <span class="font-bold">No Data</span>
+            </div>
+            {% else %}
+            {% for journal in journals %}
+            <div class="col-12">
+                {% if forloop.counter|divisibleby:2 %}
+                <div class="row py-4 order-card">
+                {% else %}
+                <div class="row py-4">
+                {% endif %}
+                    <div class="col-2">
+                        <span class="font-semibold">{{journal.journalDate}}</span>
+                    </div>
+                    <div class="col-2">
+                        <span class="font-semibold">{{journal.code}}</span>
+                    </div>
+                    <div class="col-8">
+                        {% for je in journal.journalentries.all|dictsortreversed:"normally" %}
+                        <div class="row">
+                            <!-- INSERT IF HERE -->
+                            {% if je.normally == 'Debit' %}
+                            <div class="col-6">
+                                <span class="font-semibold">{{je.accountChild.name}}</span>
+                            </div>
+                            <div class="col-3">
+                                <span class="font-semibold">₱[[formatPrice('{{je.amount}}')]]</span>
+                            </div>
+                            <div class="col-3">
+                                <span class="font-semibold"></span>
+                            </div>
+                            <!-- ELSE HERE -->
+                            {% elif je.normally == 'Credit' %}
+                            <div class="col-6">
+                                <span class="font-semibold">&emsp;&emsp;{{je.accountChild.name}}</span>
+                            </div>
+                            <div class="col-3">
+                                <span class="font-semibold"></span>
+                            </div>
+                            <div class="col-3">
+                                <span class="font-semibold">₱[[formatPrice('{{je.amount}}')]]</span>
+                            </div>
+                            <!-- ENDIF -->
+                            {% endif %}
+                        </div>
+                        <div class="row mb-2 pt-0">
+                            <div class="col">
+                                <hr class="my-0 pt-0">
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="row">
+                            <div class="col-12">
+                                <span class="font-italic text-center">{{journal.remarks}}</span>
+                            </div>
+                        </div>
+        
+        
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
 
         <!-- MODAL -->
         <div class="modal fade" id="addJournalEntry">
@@ -305,6 +391,12 @@
         },
         methods:{
             filterJournal(){
+                message = "Filtering Journals"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 var date = new Date();
                 var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
                 var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
@@ -369,6 +461,12 @@
                 this.$delete(this.addJournalModal.credit, index)
             },
             submitJournal(){
+                message = "Recording Journal"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 var x = document.getElementById('save')
                 x.disabled = true
 
@@ -413,8 +511,8 @@
         mounted(){
             let params = new URLSearchParams(location.search);
             
-            this.startDate = params.get('startDate')
-            this.endDate = params.get('endDate')
+            this.startDate = params.get('startDate')?params.get('startDate'):'{{startDate|date:"Y-m-d"}}'
+            this.endDate = params.get('endDate')?params.get('endDate'):'{{endDate|date:"Y-m-d"}}'
         }
     })
 </script>

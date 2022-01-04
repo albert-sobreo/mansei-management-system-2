@@ -27,8 +27,10 @@ class JournalView(View):
             startDate = now.today().replace(day=1)
             try:
                 nextMonth = now.today().replace(month=startDate.month+1, day=1)
-            except:
+            except Exception as e:
+                print(e)
                 nextMonth = now.today().replace(month=1, day=1)
+            print(nextMonth)
             endDate = nextMonth - timedelta(days=1)
 
         try:
@@ -51,10 +53,12 @@ class JournalView(View):
             new_code = 'J-{}-{}-0001'.format(listed_date[0], listed_date[1])
 
 
-
+        print(startDate, endDate)
         context = {
             'new_code': new_code,
-            'journals': request.user.branch.journal.filter(journalDate__range=[startDate, endDate]).order_by('pk').reverse()
+            'journals': request.user.branch.journal.filter(journalDate__range=[startDate, endDate]).order_by('pk').reverse(),
+            'startDate': startDate,
+            'endDate': endDate
         }
 
 
