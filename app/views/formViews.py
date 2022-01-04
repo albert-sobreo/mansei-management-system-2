@@ -35,3 +35,15 @@ class BIR1702QView(View):
         if request.user.authLevel == '2':
             raise PermissionDenied()
         return render(request, '1702Q.html')
+
+class BIR1601EQView(View):
+    def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+        return render(request, '1601-EQ.html')
+
+class BIR2316View(View):
+    def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+        return render(request, '2316.html')

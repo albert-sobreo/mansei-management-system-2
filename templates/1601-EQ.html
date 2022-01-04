@@ -1,0 +1,415 @@
+{% extends 'base-template.html' %}
+{% block title %} 1601-EQ {% endblock %}
+
+{% block body %}
+<style>
+    #app2{
+        background-image: url('/static/media/BIR/1601-EQ-1.png');
+        height: 13in;
+        width: 8.5in;
+        background-size: contain;
+    }
+
+    #app3{
+        background-image: url('/static/media/BIR/1601-EQ-2.png');
+        height: 13in;
+        width: 8.5in;
+        background-size: contain;
+    }
+
+</style>
+<div id="app">
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-forms" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <div class="container">
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/2307/" class="mx-3">2307</a>
+                <a href="/1702-Q/" class="mx-3">1702Q</a>
+                <a href="/1601-C/" class="mx-3">1601-C</a>
+                <a href="/1601-EQ/" class="active-gas mx-3">1601-EQ</a>
+                <a href="/2316/" class="mx-3">2316</a>
+                <a href="/0619-E/" class="mx-3">0619-E</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- BUTTON TO SAVE AS PDF -->
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary" @click="generatePDF()">Save</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#editForm">Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal fade" id="editForm">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content b-radius-15">
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <span class="modal-title">Edit 1601-EQ</span>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIXEL -->
+    <div class="sticky-top">
+        <div id="pixels"></div>
+        <br>
+        Pg. 2
+        <div id="pixels2"></div>
+    </div>
+
+    <!-- THE FILE -->
+    <div class="d-flex justify-content-center container">
+        <div id="form-container">
+            <div id="app2" class="roboto-mono font-bold font-size-18 position-relative">
+                <!-- SPANS BELOW -->
+                <span class="position-absolute" style="top: 146px; left: 48px; letter-spacing: .45em;" >[[bir.l1]]</span>
+                <span class="position-absolute" style="top: 146px; left: 160px; letter-spacing: .45em;" v-if="bir.l2 == 1"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 146px; left: 218px; letter-spacing: .45em;" v-if="bir.l2 == 2"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 146px; left: 276px; letter-spacing: .45em;" v-if="bir.l2 == 3"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 146px; left: 335px; letter-spacing: .45em;" v-if="bir.l2 == 4"><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 146px; left: 410px; letter-spacing: .45em;" v-if="bir.l3 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 146px; left: 469px; letter-spacing: .45em;" v-if="bir.l3 == false"><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 146px; left: 545px; letter-spacing: .45em;" v-if="bir.l4 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 146px; left: 602px; letter-spacing: .45em;" v-if="bir.l4 == false"><i class="fas fa-times"></i></span>
+
+                <span class="position-absolute" style="top: 146px; left: 700px; letter-spacing: .45em;">[[bir.l5]]</span>
+
+                <span class="position-absolute" style="top: 190px; left: 314px; letter-spacing: .47em;">[[bir.l6]]</span>
+                <span class="position-absolute" style="top: 190px; left: 736px; letter-spacing: .47em;">[[bir.l7]]</span>
+
+                <span class="position-absolute" style="top: 228px; left: 28px; letter-spacing: .464em;">[[bir.l8]]</span>
+                <span class="position-absolute" style="top: 265px; left: 28px; letter-spacing: .464em;">[[bir.l9]]</span>
+                <span class="position-absolute" style="top: 288px; left: 716px; letter-spacing: .505em;">[[bir.l9A]]</span>
+                <span class="position-absolute" style="top: 312px; left: 142px; letter-spacing: .464em;">[[bir.l10]]</span>
+
+                <span class="position-absolute" style="top: 312px; left: 599px; letter-spacing: .464em;" v-if="bir.l11 == true"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 312px; left: 695px; letter-spacing: .464em;" v-if="bir.l11 == false"><i class="fas fa-times"></i></span>
+                <span class="position-absolute" style="top: 335px; left: 142px; letter-spacing: .464em;">[[bir.l12]]</span>
+
+
+
+                <span class="position-absolute" style="top: 394px; left: 48px; letter-spacing: .464em;">[[bir.l13.atc]]</span>
+                <span class="position-absolute" style="top: 394px; right: 386px; letter-spacing: .464em;">[[bir.l13.tax]]</span>
+                <span class="position-absolute" style="top: 394px; left: 447px; letter-spacing: .464em;">[[bir.l13.rate]]</span>
+                <span class="position-absolute" style="top: 394px; right: 23px; letter-spacing: .464em;">[[bir.l13.withheld]]</span>
+
+                <span class="position-absolute" style="top: 418px; left: 48px; letter-spacing: .464em;">[[bir.l14.atc]]</span>
+                <span class="position-absolute" style="top: 418px; right: 386px; letter-spacing: .464em;">[[bir.l14.tax]]</span>
+                <span class="position-absolute" style="top: 418px; left: 447px; letter-spacing: .464em;">[[bir.l14.rate]]</span>
+                <span class="position-absolute" style="top: 418px; right: 23px; letter-spacing: .464em;">[[bir.l14.withheld]]</span>
+
+                <span class="position-absolute" style="top: 441px; left: 48px; letter-spacing: .464em;">[[bir.l15.atc]]</span>
+                <span class="position-absolute" style="top: 441px; right: 386px; letter-spacing: .464em;">[[bir.l15.tax]]</span>
+                <span class="position-absolute" style="top: 441px; left: 447px; letter-spacing: .464em;">[[bir.l15.rate]]</span>
+                <span class="position-absolute" style="top: 441px; right: 23px; letter-spacing: .464em;">[[bir.l15.withheld]]</span>
+
+                <span class="position-absolute" style="top: 465px; left: 48px; letter-spacing: .464em;">[[bir.l16.atc]]</span>
+                <span class="position-absolute" style="top: 465px; right: 386px; letter-spacing: .464em;">[[bir.l16.tax]]</span>
+                <span class="position-absolute" style="top: 465px; left: 447px; letter-spacing: .464em;">[[bir.l16.rate]]</span>
+                <span class="position-absolute" style="top: 465px; right: 23px; letter-spacing: .464em;">[[bir.l16.withheld]]</span>
+
+                <span class="position-absolute" style="top: 489px; left: 48px; letter-spacing: .464em;">[[bir.l17.atc]]</span>
+                <span class="position-absolute" style="top: 489px; right: 386px; letter-spacing: .464em;">[[bir.l17.tax]]</span>
+                <span class="position-absolute" style="top: 489px; left: 447px; letter-spacing: .464em;">[[bir.l17.rate]]</span>
+                <span class="position-absolute" style="top: 489px; right: 23px; letter-spacing: .464em;">[[bir.l17.withheld]]</span>
+
+                <span class="position-absolute" style="top: 512px; left: 48px; letter-spacing: .464em;">[[bir.l18.atc]]</span>
+                <span class="position-absolute" style="top: 512px; right: 386px; letter-spacing: .464em;">[[bir.l18.tax]]</span>
+                <span class="position-absolute" style="top: 512px; left: 447px; letter-spacing: .464em;">[[bir.l18.rate]]</span>
+                <span class="position-absolute" style="top: 512px; right: 23px; letter-spacing: .464em;">[[bir.l18.withheld]]</span>
+
+                <span class="position-absolute" style="top: 535px; right: 23px; letter-spacing: .464em;">[[bir.l19.withheld]]</span>
+                <span class="position-absolute" style="top: 558px; right: 23px; letter-spacing: .464em;">[[bir.l20.withheld]]</span>
+                <span class="position-absolute" style="top: 581px; right: 23px; letter-spacing: .464em;">[[bir.l21.withheld]]</span>
+                <span class="position-absolute" style="top: 605px; right: 23px; letter-spacing: .464em;">[[bir.l22.withheld]]</span>
+                <span class="position-absolute" style="top: 628px; right: 23px; letter-spacing: .464em;">[[bir.l23.withheld]]</span>
+                <span class="position-absolute" style="top: 651px; right: 23px; letter-spacing: .464em;">[[bir.l24.withheld]]</span>
+                <span class="position-absolute" style="top: 675px; right: 23px; letter-spacing: .464em;">[[bir.l25.withheld]]</span>
+                <span class="position-absolute" style="top: 698px; right: 23px; letter-spacing: .464em;">[[bir.l26.withheld]]</span>
+                <span class="position-absolute" style="top: 721px; right: 23px; letter-spacing: .464em;">[[bir.l27.withheld]]</span>
+                <span class="position-absolute" style="top: 744px; right: 23px; letter-spacing: .464em;">[[bir.l28.withheld]]</span>
+                <span class="position-absolute" style="top: 767px; right: 23px; letter-spacing: .464em;">[[bir.l29.withheld]]</span>
+                <span class="position-absolute" style="top: 790px; right: 23px; letter-spacing: .464em;">[[bir.l30.withheld]]</span>
+                <span class="position-absolute" style="top: 813px; right: 23px; letter-spacing: .464em;">[[bir.l31.withheld]]</span>
+
+
+
+                <span class="position-absolute" style="top: 1029px; left: 162px; letter-spacing: .464em;">[[bir.l32.agency]]</span>
+                <span class="position-absolute" style="top: 1029px; left: 258px; letter-spacing: .464em;">[[bir.l32.number]]</span>
+                <span class="position-absolute" style="top: 1029px; left: 371px; letter-spacing: .464em;">[[formatDate(bir.l32.date)]]</span>
+                <span class="position-absolute" style="top: 1029px; right: 22px; letter-spacing: .464em;">[[bir.l32.amount]]</span>
+
+                <span class="position-absolute" style="top: 1053px; left: 162px; letter-spacing: .464em;">[[bir.l33.agency]]</span>
+                <span class="position-absolute" style="top: 1053px; left: 258px; letter-spacing: .464em;">[[bir.l33.number]]</span>
+                <span class="position-absolute" style="top: 1053px; left: 371px; letter-spacing: .464em;">[[formatDate(bir.l33.date)]]</span>
+                <span class="position-absolute" style="top: 1053px; right: 22px; letter-spacing: .464em;">[[bir.l33.amount]]</span>
+
+                <span class="position-absolute" style="top: 1077px; left: 258px; letter-spacing: .464em;">[[bir.l33.number]]</span>
+                <span class="position-absolute" style="top: 1077px; left: 371px; letter-spacing: .464em;">[[formatDate(bir.l33.date)]]</span>
+                <span class="position-absolute" style="top: 1077px; right: 22px; letter-spacing: .464em;">[[bir.l33.amount]]</span>
+
+                <span class="position-absolute" style="top: 1111px; left: 28px; letter-spacing: .464em;">[[bir.l32.particulars]]</span>
+                <span class="position-absolute" style="top: 1111px; left: 162px; letter-spacing: .464em;">[[bir.l32.agency]]</span>
+                <span class="position-absolute" style="top: 1111px; left: 258px; letter-spacing: .464em;">[[bir.l32.number]]</span>
+                <span class="position-absolute" style="top: 1111px; left: 371px; letter-spacing: .464em;">[[formatDate(bir.l32.date)]]</span>
+                <span class="position-absolute" style="top: 1114px; right: 22px; letter-spacing: .464em;">[[bir.l32.amount]]</span>
+                <!-- END SPANS -->
+            </div>
+
+            <div id="app3" class="roboto-mono font-bold font-size-18 position-relative">
+                <span class="position-absolute" style="top: 147px; left: 28px; letter-spacing: .47em;" >[[pg2.tin]]</span>
+                <span class="position-absolute" style="top: 147px; left: 296px; letter-spacing: .47em;" >[[pg2.name]]</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#app2").mousemove(function (e) {
+            var pX = e.offsetX;
+            var pY = e.offsetY;
+            $("#pixels").html("Y="+pY+"; X="+pX);
+        });
+
+        $("#app3").mousemove(function (e) {
+            var pX = e.offsetX;
+            var pY = e.offsetY;
+            $("#pixels2").html("Y="+pY+"; X="+pX);
+        });
+    });
+</script>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            bir: {
+                l1: '2021',
+                l2: '1',
+                l3: true,
+                l4: true,
+                l5: 1,
+                l6: '777/777/777/0000',
+                l7: '019',
+                l8: 'Mansei Techno Phils Corp',
+                l9: 'Address',
+                l9A: '2222',
+                l10: '09999999999',
+                l11: true,
+                l12: 'email@gmail.com',
+
+
+                l13: {
+                    atc: 'w01',
+                    tax: '10000.00',
+                    rate: '12%',
+                    withheld: '10000.00',
+                },
+                l14: {
+                    atc: 'w01',
+                    tax: '10000.00',
+                    rate: '12%',
+                    withheld: '10000.00',
+                },
+                l15: {
+                    atc: 'w01',
+                    tax: '10000.00',
+                    rate: '12%',
+                    withheld: '10000.00',
+                },
+                l16: {
+                    atc: 'w01',
+                    tax: '10000.00',
+                    rate: '12%',
+                    withheld: '10000.00',
+                },
+                l17: {
+                    atc: 'w01',
+                    tax: '10000.00',
+                    rate: '12%',
+                    withheld: '10000.00',
+                },
+                l18: {
+                    atc: 'w01',
+                    tax: '10000.00',
+                    rate: '12%',
+                    withheld: '10000.00',
+                },
+                l19: {
+                    withheld: '10000.00',
+                },
+                l20: {
+                    withheld: '10000.00',
+                },
+                l21: {
+                    withheld: '10000.00',
+                },
+                l22: {
+                    withheld: '10000.00',
+                },
+                l23: {
+                    withheld: '10000.00',
+                },
+                l24: {
+                    withheld: '10000.00',
+                },
+                l25: {
+                    withheld: '10000.00',
+                },
+                l26: {
+                    withheld: '10000.00',
+                },
+                l27: {
+                    withheld: '10000.00',
+                },
+                l28: {
+                    withheld: '10000.00',
+                },
+                l29: {
+                    withheld: '10000.00',
+                },
+                l30: {
+                    withheld: '10000.00',
+                },
+                l31: {
+                    withheld: '10000.00',
+                },
+                l32: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                l33: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                l34: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+                l35: {
+                    particulars: 'par',
+                    agency: '15231',
+                    number: '234223',
+                    date: '2021-12-30',
+                    amount: '18000.00',
+                },
+            },
+            pg2:{
+                tin: '7777779990000',
+                name: 'Clark Kent'
+            }
+        },
+
+        methods: {
+            generatePDF(){
+                var element = document.getElementById('form-container');
+                var opt = {
+                    margin:       0,
+                    filename:     'myfile.pdf',
+                    image:        { type: 'jpeg', quality: 1 },
+                    html2canvas:  { scale: 1 },
+                    jsPDF:        { unit: 'in', format: [8.5, 13], orientation: 'portrait' }
+                };
+
+                html2pdf().set(opt).from(element).save();
+            },
+
+            formatDate(value){
+                const months = [
+                    '01',
+                    '02',
+                    '03',
+                    '04',
+                    '05',
+                    '06',
+                    '07', 
+                    '08',
+                    '09',
+                    '10',
+                    '11',
+                    '12',
+                ]
+                value = new Date(value)
+                year = value.getFullYear()
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+                date = ('0' + String(value.getDate())).slice(-2)
+                formatted = `${month}${date}${year}`
+
+                return formatted
+            },
+
+            getMonth(value){
+                value = new Date(value)
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+
+                return `${month}`
+            },
+
+            getYear(value){
+                value = new Date(value)
+                year = value.getFullYear()
+
+                return `${String(year).slice(-2)}`
+            },
+
+            formatMonth(value){
+                const months = [
+                    '01',
+                    '02',
+                    '03',
+                    '04',
+                    '05',
+                    '06',
+                    '07', 
+                    '08',
+                    '09',
+                    '10',
+                    '11',
+                    '12',
+                ]
+                value = new Date(value)
+                year = value.getFullYear()
+                month = ('0' + String(value.getMonth() + 1)).slice(-2)
+                formatted = `${month}${year}`
+
+                return formatted
+            },
+        }
+    })
+</script>
+
+{% endblock %}

@@ -51,20 +51,32 @@ class ADVapprovalAPI(APIView):
         j.code = adv.code
         j.datetimeCreated = adv.datetimeApproved
         j.createdBy = adv.issuer
-        j.journalDate = datetime.now()
+        j.journalDate = datetime.date.today()
         j.save()
 
         request.user.branch.journal.add(j)
 
         jeAPI(request, j, 'Credit', dChildAccount.pettyCash, adv.amount)
         try:
-            jeAPI(request, j, 'Debit', adv.requestor.employeeAccount.get(name__regex=r"[Ad]dvance"), adv.amount)
+            jeAPI(request, j, 'Debit', adv.requestor.employeeAccounts.get(name__regex=r"[Ad]dvance"), adv.amount)
         except:
             emploAcc = AccountChild()
-            emploAcc.me = AccountChild.objects.get(name='Advances to Employee')
+            try:
+                emploAcc.me = AccountChild.objects.get(name='Advances to Employee')
+            except Exception as e:
+                print(e)
+                advToEm = AccountChild()
+                advToEm.name = 'Advances to Employee'
+                advToEm.accountSubGroup = request.user.branch.subGroup.get(name="Accounts Receivable")
+                advToEm.amount = Decimal(0)
+                advToEm.save()
+                emploAcc.me = advToEm
             emploAcc.name = 'Advances to Employee - ' + adv.requestor.first_name + ' ' + adv.requestor.last_name
             emploAcc.accountSubGroup = request.user.branch.subGroup.get(name="Accounts Receivable")
             emploAcc.amount = Decimal(0)
+            emploAcc.save()
+            request.user.branch.accountChild.add(emploAcc)
+            adv.requestor.employeeAccounts.add(emploAcc)
             jeAPI(request, j, 'Debit',emploAcc, adv.amount)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
@@ -92,7 +104,7 @@ class ReimbursementProcess(APIView):
         j.journalDate = datetime.now()
         j.save()
         jeAPI(request, j, 'Credit', dChildAccount.pettyCash, lqd.payable)
-        jeAPI(request, j, 'Debit', lqd.createdBy.employeeAccount.get(name__regex=r"[Pp]ayable"), lqd.payable)
+        jeAPI(request, j, 'Debit', lqd.createdBy.employeeAccounts.get(name__regex=r"[Pp]ayable"), lqd.payable)
         #### B0SS ####
 
         """END OF JOURNAL"""
@@ -148,8 +160,9 @@ class LiquidationApprovalAPI(APIView):
         j.code = lqd.code
         j.datetimeCreated = datetime.datetime.now()
         j.createdBy = lqd.createdBy
-        j.journalDate = datetime.now()
+        j.journalDate = datetime.date.today()
         j.save()
+        request.user.branch.journal.add(j)
         if lqd.advancement:
             ##### PERFECT LIQUIDATION #####
             
@@ -157,7 +170,7 @@ class LiquidationApprovalAPI(APIView):
                 print('PERFECT')
                 for l in lqd.liquidationentries.all():
                     jeAPI(request, j, 'Debit', l.expense, l.amount)
-                jeAPI(request, j, 'Credit', lqd.createdBy.employeeAccount.get(name__regex=r"[Ad]dvance"), lqd.amount)
+                jeAPI(request, j, 'Credit', lqd.createdBy.employeeAccounts.get(name__regex=r"[Ad]dvance"), lqd.totalAmount)
                 lqd.advancement.balance = 0
                 lqd.advancement.closed = True
                 lqd.advancement.save()
@@ -168,7 +181,7 @@ class LiquidationApprovalAPI(APIView):
                 for l in lqd.liquidationentries.all():
                     jeAPI(request, j, 'Debit', l.expense, l.amount)
                 jeAPI(request, j, 'Debit', dChildAccount.pettyCash, lqd.change)
-                jeAPI(request, j, 'Credit', lqd.createdBy.employeeAccount.get(name__regex=r"[Ad]dvance"), lqd.amount + lqd.change)
+                jeAPI(request, j, 'Credit', lqd.createdBy.employeeAccounts.get(name__regex=r"[Ad]dvance"), lqd.totalAmount + lqd.change)
                 lqd.advancement.balance = 0
                 lqd.advancement.closed = True
                 lqd.advancement.save()
@@ -179,9 +192,9 @@ class LiquidationApprovalAPI(APIView):
                 print('PAYABLE')
                 for l in lqd.liquidationentries.all():
                     jeAPI(request, j, 'Debit', l.expense, l.amount)
-                jeAPI(request, j, 'Credit', lqd.createdBy.employeeAccount.get(name__regex=r"[Ad]dvance"), lqd.advancement.balance)
+                jeAPI(request, j, 'Credit', lqd.createdBy.employeeAccounts.get(name__regex=r"[Ad]dvance"), lqd.advancement.balance)
                 try:
-                    jeAPI(request, j, 'Credit', lqd.createdBy.employeeAccount.get(name__regex=r"[Pp]ayable"), lqd.payable)
+                    jeAPI(request, j, 'Credit', lqd.createdBy.employeeAccounts.get(name__regex=r"[Pp]ayable"), lqd.payable)
                 except:
                     emploAcc = AccountChild()
                     emploAcc.me = AccountChild.objects.get(name='Payables to Employee')
