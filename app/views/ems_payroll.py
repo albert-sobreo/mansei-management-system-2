@@ -67,7 +67,7 @@ class EMS_GeneratePayroll(APIView):
         # dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         
-
+        # gives payroll to each employee
         for user in users:
             holidays = Holiday.objects.filter(date__range=[dateStart, dateEnd], type='rh')
             holidays = list(holidays)
@@ -573,7 +573,7 @@ class EMS_GeneratePayroll(APIView):
         return JsonResponse(0, safe=False)
 
 class EMS_EditPayrollSave(APIView):
-    def put(self, request, pk, format = None):
+    def put(self, request, pk, format = None):             
         if request.user.authLevel == '2':
             raise PermissionDenied()
 
