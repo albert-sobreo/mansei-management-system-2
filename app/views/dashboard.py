@@ -130,9 +130,17 @@ class CreateBranchInDashboard(APIView):
         costOfSales.save()
         request.user.branch.accountGroup.add(costOfSales)
 
-        genExp = AccountGroup(code="##", name="General Expense", normally="Credit", permanence="Nominal", amount=Decimal(0))
-        genExp.save()
-        request.user.branch.accountGroup.add(genExp)
+        sales = AccountGroup(code="##", name="Sales", normally="Credit", permanence='Real', amount=Decimal(0))
+        sales.save()
+        request.user.branch.accountGroup.add(sales)
+
+        operatingExpense = AccountGroup(code="##", name="Operating Expense", normally="Credit", permanence="Nominal", amount=Decimal(0))
+        operatingExpense.save()
+        request.user.branch.accountGroup.add(operatingExpense)
+
+        adminExpense = AccountGroup(code="##", name="Administrative Expense", normally="Credit", permanence="Nominal", amount=Decimal(0))
+        adminExpense.save()
+        request.user.branch.accountGroup.add(adminExpense)
 
         otherIncome = AccountGroup(code="##", name="Other Income", normally="Credit", permanence="Real", amount=Decimal(0))
         otherIncome.save()
@@ -167,6 +175,10 @@ class CreateBranchInDashboard(APIView):
         shareCapital.save()
         request.user.branch.subGroup.add(shareCapital)
 
+        salesSubGroup = AccountSubGroup(code="##", name="Sales", accountGroup=sales, amount=Decimal(0))
+        salesSubGroup.save()
+        request.user.branch.subGroup.add(salesSubGroup)
+
         paidCapital = AccountSubGroup(code="##", name="Paid Capital", accountGroup=equity, amount=Decimal(0))
         paidCapital.save()
         request.user.branch.subGroup.add(paidCapital)
@@ -175,35 +187,62 @@ class CreateBranchInDashboard(APIView):
         retainedEarning.save()
         request.user.branch.subGroup.add(retainedEarning)
 
+        operatingExpenseSubGroup = AccountSubGroup(code="##", name="Operating Expense", accountGroup=operatingExpense, amount=Decimal(0))
+        operatingExpenseSubGroup.save()
+        request.user.branch.subGroup.add(operatingExpenseSubGroup)
+
+        adminExpenseSubGroup = AccountSubGroup(code="##", name="Administrative Expense", accountGroup=adminExpense, amount=Decimal(0))
+        adminExpenseSubGroup.save()
+        request.user.branch.subGroup.add(adminExpenseSubGroup)
+
 
         # CHILD ACCOUNT GROUP
         cashOnHand = AccountChild(code="##", name="Cash on Hand", accountSubGroup=cash, amount=Decimal(0))
         cashOnHand.save()
         request.user.branch.accountChild.add(cashOnHand)
+        bdca.cashOnHand = cashOnHand
+        bdca.save()
 
         cashInBank = AccountChild(code="##", name="Cash in Bank", accountSubGroup=cash, amount=Decimal(0))
         cashInBank.save()
         request.user.branch.accountChild.add(cashInBank)
+        bdca.cashInBank.add(cashInBank)
+        bdca.save()
+
+        pettyCash = AccountChild(code="##", name="Petty Cash", accountSubGroup=cash, amount=Decimal(0))
+        pettyCash.save()
+        request.user.branch.accountChild.add(pettyCash)
+        bdca.pettyCash = pettyCash
+        bdca.save()
 
         merchInventory = AccountChild(code="##", name="Merchandise Inventory", accountSubGroup=inventory, amount=Decimal(0))
         merchInventory.save()
         request.user.branch.accountChild.add(merchInventory)
+        bdca.merchInventory = merchInventory
+        bdca.save()
 
         tradeReceivable = AccountChild(code="##", name="Trade Receivable", accountSubGroup=accountsReceivable, amount=Decimal(0))
         tradeReceivable.save()
         request.user.branch.accountChild.add(tradeReceivable)
+        
 
         prepaidExpense = AccountChild(code="##", name="Prepaid Expense", accountSubGroup=otherCurrentAsset, amount=Decimal(0))
         prepaidExpense.save()
         request.user.branch.accountChild.add(prepaidExpense)
+        bdca.prepaidExpense = prepaidExpense
+        bdca.save()
 
         inputVAT = AccountChild(code="##", name="Input VAT", accountSubGroup=otherCurrentAsset, amount=Decimal(0))
         inputVAT.save()
         request.user.branch.accountChild.add(inputVAT)
+        bdca.inputVat = inputVAT
+        bdca.save()
 
         cwit = AccountChild(code="##", name="Creditable Withholding Income Tax", accountSubGroup=otherCurrentAsset, amount=Decimal(0))
         cwit.save()
         request.user.branch.accountChild.add(cwit)
+        bdca.cwit = cwit
+        bdca.save()
 
         tradePayables = AccountChild(code="##", name="Trade Payables", accountSubGroup=accountsPayables, amount=Decimal(0))
         tradePayables.save()
@@ -212,10 +251,92 @@ class CreateBranchInDashboard(APIView):
         wep = AccountChild(code="##", name="Withholding Expanded Payables", accountSubGroup=accountsPayables, amount=Decimal(0))
         wep.save()
         request.user.branch.accountChild.add(wep)
+        bdca.ewp = wep
+        bdca.save()
 
         outputVATPayables = AccountChild(code="##", name="Output VAT Payables", accountSubGroup=accountsPayables, amount=Decimal(0))
         outputVATPayables.save()
         request.user.branch.accountChild.add(outputVATPayables)
+        bdca.outputVat = outputVATPayables
+        bdca.save()
+
+        advancesToSupplier = AccountChild(code="##", name="Advances to Supplier", accountSubGroup=accountsReceivable, amount=Decimal(0))
+        advancesToSupplier.save()
+        request.user.branch.accountChild.add(advancesToSupplier)
+        bdca.advancesToSupplier.add(advancesToSupplier)
+        bdca.save()
+        
+        sales = AccountChild(code="##", name = "Sales", accountSubGroup = salesSubGroup, amount=Decimal(0))
+        sales.save()
+        request.user.branch.accountChild.add(sales)
+        bdca.sales = sales
+        bdca.save()
+
+        salariesExpense = AccountChild(code="##", name = "Salaries Expense", accountSubGroup = operatingExpenseSubGroup , amount = Decimal(0))
+        salariesExpense.save()
+        request.user.branch.accountChild.add(salariesExpense)
+        bdca.salariesExpense = salariesExpense
+        bdca.save()
+        
+        bonus = AccountChild(code="##", name = "Bonuses", accountSubGroup = operatingExpenseSubGroup , amount = Decimal(0))
+        bonus.save()
+        request.user.branch.accountChild.add(bonus)
+        bdca.bonus = bonus
+        bdca.save()
+        
+        deminimisBenefits = AccountChild(code="##", name = "Deminimis Benefits", accountSubGroup = operatingExpenseSubGroup , amount = Decimal(0))
+        deminimisBenefits.save()
+        request.user.branch.accountChild.add(deminimisBenefits)
+        bdca.deminimisBenefit = deminimisBenefits
+        bdca.save()
+
+        hdmfShare = AccountChild(code="##", name = "HDMF Share", accountSubGroup = operatingExpenseSubGroup , amount = Decimal(0))
+        hdmfShare.save()
+        request.user.branch.accountChild.add(hdmfShare)
+        bdca.hdmfShare = hdmfShare
+        bdca.save()
+
+        phicERShare = AccountChild(code="##", name = "PHIC ER Share", accountSubGroup = operatingExpenseSubGroup , amount = Decimal(0))
+        phicERShare.save()
+        request.user.branch.accountChild.add(phicERShare)
+        bdca.phicERShare = phicERShare
+        bdca.save()
+
+        sssERShare = AccountChild(code="##", name = "SSS ER Share", accountSubGroup = operatingExpenseSubGroup , amount = Decimal(0))
+        sssERShare.save()
+        request.user.branch.accountChild.add(sssERShare)
+        bdca.sssERShare = sssERShare
+        bdca.save()
+
+        salariesPayable = AccountChild(code="##", name = "Salaries Payable", accountSubGroup = accountsPayables , amount = Decimal(0))
+        salariesPayable.save()
+        request.user.branch.accountChild.add(salariesPayable)
+        bdca.salariesPayable = salariesPayable
+        bdca.save()
+
+        sssPayable = AccountChild(code="##", name = "SSS Payable", accountSubGroup = accountsPayables , amount = Decimal(0))
+        sssPayable.save()
+        request.user.branch.accountChild.add(sssPayable)
+        bdca.sssPayable = sssPayable
+        bdca.save()
+
+        phicPayable = AccountChild(code="##", name = "PHIC Payable", accountSubGroup = accountsPayables , amount = Decimal(0))
+        phicPayable.save()
+        request.user.branch.accountChild.add(phicPayable)
+        bdca.phicPayable = phicPayable
+        bdca.save()
+        
+        hdmfPayable = AccountChild(code="##", name = "HDMF Payable", accountSubGroup = accountsPayables , amount = Decimal(0))
+        hdmfPayable.save()
+        request.user.branch.accountChild.add(hdmfPayable)
+        bdca.hdmfPayable = hdmfPayable
+        bdca.save()
+
+        withholdingTaxPayable = AccountChild(code="##", name = "Withholding Tax Payable", accountSubGroup = accountsPayables , amount = Decimal(0))
+        withholdingTaxPayable.save()
+        request.user.branch.accountChild.add(withholdingTaxPayable)
+        bdca.withholdingTaxPayable = withholdingTaxPayable
+        bdca.save()
 
         childShareCapital = AccountChild(code="##", name="Share Capital", accountSubGroup=shareCapital, amount=Decimal(0))
         childShareCapital.save()
@@ -228,6 +349,13 @@ class CreateBranchInDashboard(APIView):
         childRetainedEarning = AccountChild(code="##", name="Retained Earnings", accountSubGroup=retainedEarning, amount=Decimal(0))
         childRetainedEarning.save()
         request.user.branch.accountChild.add(childRetainedEarning)
+
+        advancesToEmployee = AccountChild(code="##", name="Advances to Employee", accountSubGroup=accountsReceivable, amount=Decimal(0))
+        advancesToEmployee.save()
+        request.user.branch.accountChild.add(advancesToEmployee)
+
+
+        
 
 
 

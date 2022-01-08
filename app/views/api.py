@@ -19,7 +19,9 @@ import re
 class AccountGroupAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = AccountGroupSZ
-    queryset = AccountGroup.objects.all().order_by('code')
+
+    def get_queryset(self):
+        return self.request.user.branch.accountGroup.all()
 
 
 
@@ -29,18 +31,24 @@ class AccountGroupAPI(viewsets.ModelViewSet):
 class AccountChildAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = AccountChildSZ
-    queryset = AccountChild.objects.all().order_by('code')
+
+    def get_queryset(self):
+        return self.request.user.branch.accountChild.all()
 
 
 class AccountChildNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = AccountChildNestedSZ
-    queryset = AccountChild.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.accountChild.all()
 
 class AccountSubGroupAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SubGroupSZ
-    queryset = AccountSubGroup.objects.all().order_by('code')
+
+    def get_queryset(self):
+        return self.request.user.branch.subGroup.all()
 
 
 
@@ -66,12 +74,16 @@ class GetAccountExpensesAPI(APIView):
 class CustomerAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PartySZ
-    queryset = Party.objects.filter(type = 'Customer').order_by('name')
+
+    def get_queryset(self):
+        return self.request.user.branch.party.filter(type = 'Customer').order_by('name')
 
 class CustomerTransactionAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PartyNestedTransactionSZ
-    queryset = Party.objects.filter(type = 'Customer').order_by('name')
+
+    def get_queryset(self):
+        return self.request.user.branch.party.filter(type = 'Customer').order_by('name')
 
 
 
@@ -82,12 +94,16 @@ class CustomerTransactionAPI(viewsets.ModelViewSet):
 class VendorAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PartySZ
-    queryset = Party.objects.filter(type = 'Vendor').order_by('name')
+
+    def get_queryset(self):
+        return self.request.user.branch.party.filter(type = 'Vendor').order_by('name')
 
 class VendorTransactionAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PartyNestedTransactionSZ
-    queryset = Party.objects.filter(type = 'Vendor').order_by('name')
+
+    def get_queryset(self):
+        return self.request.user.branch.party.filter(type = 'Vendor').order_by('name')
 
 
 
@@ -98,12 +114,18 @@ class VendorTransactionAPI(viewsets.ModelViewSet):
 class WarehouseAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = WarehouseSZ
-    queryset = Warehouse.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.warehouse.all()
+
 
 class WarehouseNestedAPI(viewsets.ModelViewSet):
     permissions = [IsAuthenticated]
     serializer_class = WarehouseNestedSZ
-    queryset = Warehouse.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.warehouse.all()
+
 
 
 
@@ -114,12 +136,16 @@ class WarehouseNestedAPI(viewsets.ModelViewSet):
 class MerchandiseInventoryAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = MerchandiseInventorySZ
-    queryset = MerchandiseInventory.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.merchInventory.all()
 
 class MerchandiseInventoryNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = MerchandiseInventoryNestedSZ
-    queryset = MerchandiseInventory.objects.all()
+    
+    def get_queryset(self):
+        return self.request.user.branch.merchInventory.all()
 
 
 
@@ -129,7 +155,10 @@ class MerchandiseInventoryNestedAPI(viewsets.ModelViewSet):
 class OtherInventoryAPI2(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = OtherInventorySZ
-    queryset = OtherInventory.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.otherInventory.all()
+
 
 class OtherInventoryAPI(APIView):
     def post(self, request, format=None):
@@ -155,12 +184,18 @@ class OtherInventoryAPI(APIView):
 class PurchaseOrderAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseOrderNestedSZ
-    queryset = PurchaseOrder.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.purchaseOrder.all()
+
 
 class PurchaseOrderApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseOrderNestedSZ
-    queryset = PurchaseOrder.objects.filter(approved=True)
+
+    def get_queryset(self):
+        return self.request.user.branch.purchaseOrder.filter(approved=True)
+
 
 class PurchaseOrderApprovedRepairAPI(APIView):
     def get(self, request, format=None):
@@ -179,7 +214,9 @@ class PurchaseOrderApprovedRepairAPI(APIView):
 class SalesContractAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesContractNestedSZ
-    queryset = SalesContract.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.salesContract.all()
 
 
 
@@ -189,22 +226,31 @@ class SalesContractAPI(viewsets.ModelViewSet):
 class PurchaseApprovalNonApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseOrderNestedSZ
-    queryset = PurchaseOrder.objects.filter(approved = False).order_by('datetimeCreated').reverse()
+    
+    def get_queryset(self):
+        return self.request.user.branch.purchaseOrder.filter(approved = False).order_by('datetimeCreated').reverse()
 
 class PurchaseApprovalApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseOrderNestedSZ
-    queryset = PurchaseOrder.objects.filter(approved = True).order_by('datetimeCreated').reverse()
+
+    def get_queryset(self):
+        return self.request.user.branch.purchaseOrder.filter(approved = True).order_by('datetimeCreated').reverse()
+
 
 class SalesContractApprovalNonApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesContractNestedSZ
-    queryset = SalesContract.objects.filter(approved = False)
+
+    def get_queryset(self):
+        return self.request.user.branch.salesContract.filter(approved = False)
 
 class SalesContractApprovalApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesContractNestedSZ
-    queryset = SalesContract.objects.filter(approved = True)
+
+    def get_queryset(self):
+        return self.request.user.branch.salesContract.filter(approved = True)
 
 
 
@@ -214,7 +260,9 @@ class SalesContractApprovalApprovedAPI(viewsets.ModelViewSet):
 class SpecialTruckAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SpecialTruckSZ
-    queryset = Deliveries.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.deliveries.all()
 
 
 
@@ -224,7 +272,9 @@ class SpecialTruckAPI(viewsets.ModelViewSet):
 class LedgerAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = LedgerSZ
-    queryset = AccountChild.objects.all().order_by('pk')
+
+    def get_queryset(self):
+        return self.request.user.branch.accountChild.all().order_by('pk')
 
 
 
@@ -234,7 +284,9 @@ class LedgerAPI(viewsets.ModelViewSet):
 class DeliveriesAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = DeliveriesSZ
-    queryset = Deliveries.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.accountChild.all()
 
 
 
@@ -249,30 +301,35 @@ class ATCAPI(viewsets.ModelViewSet):
 
 
 
-
-
-
 ########## PURCHASE REQUEST ##########
 class PurchaseRequestAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseRequestSZ
-    queryset = PurchaseRequest.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.purchaseRequest.all()
 
 class PurchaseRequestApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseRequestSZ
-    queryset = PurchaseRequest.objects.filter(approved=True)
+
+    def get_queryset(self):
+        return self.request.user.branch.purchaseRequest.filter(approved=True)
 
 class PurchaseRequestNonApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseRequestSZ
-    queryset = PurchaseRequest.objects.filter(approved=False)
+
+    def get_queryset(self):
+        return self.request.user.branch.purchaseRequest.filter(approved=False)
 
 
 class PurchaseRequestNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PurchaseRequestNestedSZ
-    queryset = PurchaseRequest.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.purchaseRequest.all()
 
 
 
@@ -282,12 +339,15 @@ class PurchaseRequestNestedAPI(viewsets.ModelViewSet):
 class ReceivingReportNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ReceivingReportNestedSZ
-    queryset = ReceivingReport.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.receivingReport.all()
 
 class ReceivingReportNestedApprovedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ReceivingReportNestedSZ
-    queryset = ReceivingReport.objects.filter(approved=True).order_by("-pk")
+
+    def get_queryset(self):
+        return self.request.user.branch.receivingReport.filter(approved=True).order_by("-pk")
 
 
 
@@ -298,12 +358,14 @@ class ReceivingReportNestedApprovedAPI(viewsets.ModelViewSet):
 class InwardInventoryNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = InwardInventoryNestedSZ
-    queryset = InwardInventory.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.inwardInventory.all()
 
 class InwardInventoryAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = InwardInventorySZ
-    queryset = InwardInventory.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.inwardInventory.all()
 
 
 
@@ -314,7 +376,8 @@ class InwardInventoryAPI(viewsets.ModelViewSet):
 class PaymentVoucherAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = VoucherSZ
-    queryset = PaymentVoucher.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.paymentVoucher.all()
 
 
 
@@ -323,7 +386,8 @@ class PaymentVoucherAPI(viewsets.ModelViewSet):
 class ReceivedPaymentAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ReceivedPaymentsSZ
-    queryset = ReceivePayment.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.receivePayment.all()
 
 
 
@@ -333,7 +397,8 @@ class ReceivedPaymentAPI(viewsets.ModelViewSet):
 class SalesInvoiceAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesInvoiceSZ
-    queryset = SalesInvoice.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.receivePayment.all()
 
 
 
@@ -343,7 +408,8 @@ class SalesInvoiceAPI(viewsets.ModelViewSet):
 class QuotationsAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = QuotationsSZ
-    queryset = Quotations.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.quotations.all()
 
 
 
@@ -353,18 +419,21 @@ class QuotationsAPI(viewsets.ModelViewSet):
 class SalesOrderAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SalesOrderNestedSZ
-    queryset = SalesOrder.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.salesOrder.all()
 
 ########### TRANSFER & ADJUSTMENTS ##########
 class TransferAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = TransferSZ
-    queryset = Transfer.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.transfer.all()
 
 class AdjustmentAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = AdjustmentSZ
-    queryset = Adjustments.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.adjustments.all()
 
 
 
@@ -376,6 +445,8 @@ class BranchDefaultChildAccountAPI(viewsets.ModelViewSet):
     serializer_class = BranchDefaultChildAccountSZ
     queryset = BranchDefaultChildAccount.objects.all()
 
+    """DOESNT NEED GET_QUERYSET"""
+
 
 
 
@@ -383,7 +454,8 @@ class BranchDefaultChildAccountAPI(viewsets.ModelViewSet):
 ########## USER WITH DTR ##########
 class UserWithDTRAPI(viewsets.ModelViewSet):
     serializer_class = UserWithDTRSZ
-    queryset = User.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.user.all()
 
 
 
@@ -392,18 +464,22 @@ class UserWithDTRAPI(viewsets.ModelViewSet):
 ########## JUST USER ##########
 class UserAPI(viewsets.ModelViewSet):
     serializer_class = UserNestedSZ
-    queryset = User.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.user.all()
 
 
 class UserAPI2(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = UserNameOnlySZ
-    queryset = User.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.user.all()
 
 class UserPayrollableAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = UserNameOnlySZ
     queryset = User.objects.filter(payrollable=True)
+
+    """DOESNT NEED GET_QUERYSET"""
 
     @action(detail=False, methods=['get'])
     def filterByBranch(self, request):
@@ -414,7 +490,8 @@ class UserPayrollableAPI(viewsets.ModelViewSet):
 class UserWith13thAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = UserWith13thSZ
-    queryset = User.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.user.all()
 
 
 
@@ -424,12 +501,14 @@ class UserWith13thAPI(viewsets.ModelViewSet):
 class PPENestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PPENestedSZ
-    queryset = PPE.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.ppe.all()
 
 class PPEAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PPESZ
-    queryset = PPE.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.ppe.all()
 
 
 
@@ -439,7 +518,8 @@ class PPEAPI(viewsets.ModelViewSet):
 class CRNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = CRNestedSZ
-    queryset = CompletionReport.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.completionReport.all()
 
 
 
@@ -448,12 +528,14 @@ class CRNestedAPI(viewsets.ModelViewSet):
 class ComplexPayrollAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ComplexPayrollSZ
-    queryset = Payroll.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.payroll.all()
 
 class PayrollAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = PayrollSZ
-    queryset = Payroll.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.payroll.all()
 
 
 
@@ -463,7 +545,8 @@ class PayrollAPI(viewsets.ModelViewSet):
 class DeMinimisAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = DeMinimisSZ
-    queryset = DeMinimis.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.deMinimis.all()
 
 
 
@@ -473,7 +556,8 @@ class DeMinimisAPI(viewsets.ModelViewSet):
 class HolidayAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = HolidaySZ
-    queryset = Holiday.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.holiday.all()
 
 
 
@@ -483,42 +567,54 @@ class HolidayAPI(viewsets.ModelViewSet):
 class ProjectAssigneeAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ProjectAssigneeSZ
-    queryset = ProjectAssignee.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.projectAssignee.all()
 
 class ProjectTaskAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ProjectTaskSZ
-    queryset = ProjectTask.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.projectTask.all()
 
 class ProjectTaskNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ProjectTaskNestedSZ
-    queryset = ProjectTask.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.projectTask.all()
 
 class ProjectStageAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ProjectStageSZ
-    queryset = ProjectStage.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.projectStage.all()
 
 class ProjectStageNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ProjectStageNestedSZ
-    queryset = ProjectStage.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.projectStage.all()
 
 class ProjectPlanAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ProjectPlanSZ
-    queryset = ProjectPlan.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.projectPlan.all()
 
 class ProjectPlanNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ProjectPlanNestedSZ
-    queryset = ProjectPlan.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.projectPlan.all()
 
 class ProjectDepartmentAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ProjectDepartmentSZ
     queryset = ProjectDepartment.objects.all()
+
+    """DOESNT NEED GET_QUERYSET"""
 
     @action(detail=False, methods=['get'])
     def filterByBranch(self, request):
@@ -530,6 +626,8 @@ class ProjectDepartmentNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ProjectDepartmentNestedSZ
     queryset = ProjectDepartment.objects.all()
+
+    """DOESNT NEED GET_QUERYSET"""
 
     @action(detail=False, methods=['get'])
     def filterByBranch(self, request):
@@ -579,7 +677,8 @@ class DashboardAPI(APIView):
 
         try:
             dashData['branchName'] = request.user.branch.name
-        except:
+        except Exception as e:
+            print('Branch Name Exception:', e)
             dashData['branchName'] = "Null"
         
         try:
@@ -621,7 +720,10 @@ class DashboardAPI(APIView):
             dashData['po'] = serializer.data
         except Exception as e:
             print(e)
-            dashData['po'] = None
+            dashData['po'] = {
+                'code': None,
+                'amountTotal': None
+            }
 
         try:
             journals = request.user.branch.journal.filter(journalDate = datetime.date.today())
@@ -637,18 +739,60 @@ class DashboardAPI(APIView):
         except Exception as e:
             print(e)
 
+        dashData['dueDates'] = {}
+        try:
+            po = request.user.branch.purchaseOrder.filter(fullyPaid = False, dueDate__gte = datetime.datetime.now())
+            serializer = PurchaseOrderSZ(po, many=True)
+            if not po:
+                raise Exception
+            dashData['dueDates']['po'] = serializer.data
+        except Exception as e:
+            print(e)
+            dashData['dueDates']['po'] = {
+                'code':None,
+                'dueDate':None
+            }
+
+        try:
+            sc = request.user.branch.salesContract.filter(fullyPaid = False, dueDate__gte = datetime.datetime.now())
+            serializer = SalesContractSZ(sc, many=True)
+            if not sc:
+                raise Exception
+            dashData['dueDates']['sc'] = serializer.data
+        except Exception as e:
+            print(e)
+            dashData['dueDates']['sc'] = {
+                'code':None,
+                'dueDate':None
+            }
+
+        try:
+            shecks = request.user.branch.cheque.filter(dueDate__gte = datetime.datetime.now())
+            serializer = ChequesSZ(shecks, many = True)
+            if not sc:
+                raise Exception
+            dashData['dueDates']['shecks']= serializer.data
+        except Exception as e:
+            print(e)
+            dashData['dueDates']['shecks'] = {
+                'chequeNo':None,
+                'dueDate':None
+            }
+
         return JsonResponse(dashData, safe=False)
 
 ########## PETTY CASH ###########
 class AdvancementAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = AdvancementSZ
-    queryset = AdvancementThruPettyCash.objects.all()
+    def get_queryset(self):
+        return self.request.user.branch.advancementThruPettyCash.all()
 
 class UsersAdvancementsAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = UsersAdvancementsSZ
     queryset = User.objects.all()
+    """DOESNT NEED GET_QUERYSET"""
 
 
 
@@ -657,6 +801,7 @@ class BranchListAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = BranchSZ
     queryset = Branch.objects.all()
+    """DOESNT NEED GET_QUERYSET"""
 
 
 
@@ -666,4 +811,6 @@ class BranchListAPI(viewsets.ModelViewSet):
 class LiquidationAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = LiquidationSZ
-    queryset = Liquidation.objects.all()
+
+    def get_queryset(self):
+        return self.request.user.branch.liquidation.all()
