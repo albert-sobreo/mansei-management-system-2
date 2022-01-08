@@ -1808,6 +1808,7 @@ class Branch(models.Model):
     payroll = models.ManyToManyField(Payroll, blank=True)
     deMinimisOfUser = models.ManyToManyField(DeMinimisOfUser, blank=True)
     deMinimisPay = models.ManyToManyField(DeMinimisPay, blank=True)
+    deMinimis = models.ManyToManyField(DeMinimis, blank=True)
 
     bonusOfUser = models.ManyToManyField(BonusOfUser, blank=True)
     bonusPay = models.ManyToManyField(BonusPay, blank=True)

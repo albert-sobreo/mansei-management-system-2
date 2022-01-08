@@ -125,6 +125,13 @@ class AccountChildSZ(serializers.ModelSerializer):
 
 
 
+########## CHEQUE ##########
+class ChequesSZ(MS):
+    class Meta:
+        model = Cheques
+        fields = "__all__"
+
+
 
 
 class SubGroupNestedSZ(serializers.ModelSerializer):
@@ -1242,3 +1249,4 @@ class LiquidationSZ(MS):
     class Meta:
         model = Liquidation
         fields = "__all__"
+
