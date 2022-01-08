@@ -23,9 +23,10 @@ class LedgerView(View):
             endDate = nextMonth - timedelta(days=1)
 
         context = {
-            'children': request.user.branch.accountChild.all(),
+            'children': request.user.branch.accountChild.all().order_by('pk'),
             'startDate': startDate,
             'endDate': endDate,
-            'date': str(startDate)+ ',' +str(endDate)
+            'date': str(startDate)+ ',' +str(endDate),
+            'pos': request.user.branch.purchaseOrder.all().order_by('pk').iterator()
         }
         return render(request, 'ledger.html', context)
