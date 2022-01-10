@@ -1354,3 +1354,14 @@ select.form-control{
     cursor: pointer;
     font-weight: 600;
 }
+
+.no-decoration{
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
+}
+
+.no-decoration:hover{
+    text-decoration: none;
+    color: gray;
+}

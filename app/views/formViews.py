@@ -47,3 +47,65 @@ class BIR2316View(View):
         if request.user.authLevel == '2':
             raise PermissionDenied()
         return render(request, '2316.html')
+
+class BalanceSheetView(APIView):
+    def get(self, request):
+        try:
+            startDate = request.GET['startDate']
+            endDate = request.GET['endDate']
+        except Exception as e:
+            print(e)
+            startDate = datetime.date(datetime.date.today().year, 1, 1)
+            endDate = datetime.date(datetime.date.today().year, 12, 31)
+
+
+        data = {
+            "asset": {
+                "amount": Decimal(0),
+                "groupAccount": [{
+                    "name": None,
+                    "amount": Decimal(0),
+                    "subGroup": [{
+                        "name": None,
+                        "amount": 0
+                    }]
+                }]
+            },
+
+            "liabilities": {
+                "amount": Decimal(0),
+                "groupAccount": [{
+                    "name": None,
+                    "amount": Decimal(0),
+                    "subGroup": [{
+                        "name": None,
+                        "amount": 0
+                    }]
+                }]
+            },
+
+            "equity": {
+                "amount": Decimal(0),
+                "groupAccount": [{
+                    "name": None,
+                    "amount": Decimal(0),
+                    "subGroup": [{
+                        "name": None,
+                        "amount": 0
+                    }]
+                }]
+            }
+        }
+
+        """FETCH JOURNALS AND DO FOR LOOP BELOW"""
+        
+
+        
+        """                END                 """
+        
+
+        context = {
+            'startDate': startDate,
+            'endDate': endDate,
+        }
+        return render(request, 'balance-sheet.html', context)

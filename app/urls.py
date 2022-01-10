@@ -443,5 +443,6 @@ urlpatterns = [
     path('reimburse-process/', login_required(views.ReimbursementProcess.as_view())),
     path('add-employee/', login_required(views.EMS_AddEmployee.as_view())),
     path('1601-EQ/', login_required(views.BIR1601EQView.as_view())),
-    path('2316/', login_required(views.BIR2316View.as_view()))
+    path('2316/', login_required(views.BIR2316View.as_view())),
+    path('balance-sheet/', login_required(views.BalanceSheetView.as_view()))
 ]
