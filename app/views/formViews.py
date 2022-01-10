@@ -99,8 +99,8 @@ class BalanceSheetView(APIView):
 
         """FETCH JOURNALS AND DO FOR LOOP BELOW"""
         
+        """                B0SS                """
 
-        
         """                END                 """
         
 
