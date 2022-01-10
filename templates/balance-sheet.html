@@ -26,7 +26,7 @@
             <div class="col-12">
                 <input v-model="startDate" type="date" class="form-control d-inline-block" style="width: 200px;">
                 <input v-model="endDate" type="date" class="form-control d-inline-block" style="width: 200px;">
-                <button class="btn btn-warning d-inline-block">Set</button>
+                <button class="btn btn-warning d-inline-block" @click="setDate()">Set</button>
             </div>
         </div>
 
@@ -35,7 +35,7 @@
 
 
             <!-- ASSET -->
-            <div>
+            <div v-if="balanceSheet.asset != null">
                 <!-- TITLE -->
                 <div class="row">
                     <div class="col">
@@ -45,26 +45,26 @@
                 <!-- END TITLE -->
 
                 <!-- PARENT CONTAINER -->
-                <div>
+                <div v-for="(value, key, index) in balanceSheet.asset" v-if="typeof value != 'string'">
                     <div class="row my-2">
                         <div class="col-10">
-                            <a data-toggle="collapse" href="#non-current-asset" class="font-semibold no-decoration ml-4"><i class="fas fa-angle-right"></i> Non-Current Assets</a>
+                            <a data-toggle="collapse" :href="'#asset'+index" class="font-semibold no-decoration ml-4"><i class="fas fa-angle-right"></i> [[key]]</a>
                         </div>
                         <div class="col-2 text-right">
-                            <span class="font-semibold">₱200,000.00</span>
+                            <span class="font-semibold">₱[[formatPrice(value.amount)]]</span>
                         </div>
                         <div class="col">
                             <hr class="my-0 ml-4">
                         </div>
                     </div>
                     <!-- SUB GROUP CONTAINER -->
-                    <div class="collapse" id="non-current-asset">
-                        <div class="row">
+                    <div class="collapse" :id="'asset'+index">
+                        <div class="row" v-for="(sub, key2) in value"  v-if="typeof sub != 'string'">
                             <div class="col-10">
-                                <span class="font-semibold ml-5">Cash and Cash Equivalent</span>
+                                <span class="font-semibold ml-5">[[key2]]</span>
                             </div>
                             <div class="col-2 text-right">
-                                <span class="font-regular">200,000.00</span>
+                                <span class="font-regular">[[formatPrice(sub.amount)]]</span>
                             </div>
                             <div class="col">
                                 <hr class="my-0 ml-5">
@@ -74,6 +74,7 @@
                     <!-- END SUB GROUP CONTAINER -->
                 </div>
                 <!-- END PARENT CONTAINER -->
+                
 
                 <!-- TOTAL ASSET CONTAINER -->
                 <div class="row">
@@ -81,7 +82,7 @@
                         <span class="font-bold font-size-14">Total Assets</span>
                     </div>
                     <div class="col-2 text-right">
-                        <span class="font-bold font-size-14">₱200,000.00</span>
+                        <span class="font-bold font-size-14" v-if="balanceSheet != null">₱[[formatPrice(balanceSheet.asset.amount)]]</span>
                     </div>
                 </div>
 
@@ -96,7 +97,7 @@
             
 
             <!-- LIABILITIES AND EQUITY -->
-            <div>
+            <div v-if="balanceSheet.liabilities != null">
                 <!-- TITLE -->
                 <div class="row">
                     <div class="col">
@@ -106,26 +107,26 @@
                 <!-- END TITLE -->
 
                 <!-- PARENT CONTAINER -->
-                <div>
+                <div v-for="(value, key, index) in balanceSheet.liabilities" v-if="typeof value != 'string'">
                     <div class="row my-2">
                         <div class="col-10">
-                            <a data-toggle="collapse" href="#non-current-liabilities" class="font-semibold no-decoration ml-4"><i class="fas fa-angle-right"></i> Non-Current Liabilities</a>
+                            <a data-toggle="collapse" :href="'#liab' + index" class="font-semibold no-decoration ml-4"><i class="fas fa-angle-right"></i> [[key]]</a>
                         </div>
                         <div class="col-2 text-right">
-                            <span class="font-semibold">₱100,000.00</span>
+                            <span class="font-semibold">₱[[formatPrice(value.amount)]]</span>
                         </div>
                         <div class="col">
                             <hr class="my-0 ml-4">
                         </div>
                     </div>
                     <!-- SUB GROUP CONTAINER -->
-                    <div class="collapse" id="non-current-liabilities">
-                        <div class="row">
+                    <div class="collapse" :id="'liab'+index">
+                        <div class="row" v-for="(sub, key2) in value" v-if="typeof sub != 'string'">
                             <div class="col-10">
-                                <span class="font-semibold ml-5">Account Payables</span>
+                                <span class="font-semibold ml-5">[[key2]]</span>
                             </div>
                             <div class="col-2 text-right">
-                                <span class="font-regular">100,000.00</span>
+                                <span class="font-regular">[[formatPrice(sub.amount)]]</span>
                             </div>
                             <div class="col">
                                 <hr class="my-0 ml-5">
@@ -148,26 +149,26 @@
                 <!-- END TITLE -->
 
                 <!-- PARENT CONTAINER -->
-                <div>
+                <div v-for="(value, key, index) in balanceSheet.equity" v-if="typeof value != 'string'">
                     <div class="row my-2">
                         <div class="col-10">
-                            <a data-toggle="collapse" href="#sub-equity" class="font-semibold no-decoration ml-4"><i class="fas fa-angle-right"></i> Sub-Equity</a>
+                            <a data-toggle="collapse" :href="'#equity'+index" class="font-semibold no-decoration ml-4"><i class="fas fa-angle-right"></i> [[key]]</a>
                         </div>
                         <div class="col-2 text-right">
-                            <span class="font-semibold">₱100,000.00</span>
+                            <span class="font-semibold">₱[[formatPrice(value.amount)]]</span>
                         </div>
                         <div class="col">
                             <hr class="my-0 ml-4">
                         </div>
                     </div>
                     <!-- SUB GROUP CONTAINER -->
-                    <div class="collapse" id="sub-equity">
-                        <div class="row">
+                    <div class="collapse" :id="'equity'+index">
+                        <div class="row" v-for="(sub, key2) in value" v-if="typeof sub != 'string'">
                             <div class="col-10">
-                                <span class="font-semibold ml-5">Capital</span>
+                                <span class="font-semibold ml-5">[[key2]]</span>
                             </div>
                             <div class="col-2 text-right">
-                                <span class="font-regular">100,000.00</span>
+                                <span class="font-regular">[[formatPrice(sub.amount)]]</span>
                             </div>
                             <div class="col">
                                 <hr class="my-0 ml-5">
@@ -187,7 +188,7 @@
                         <span class="font-bold font-size-14">Total Liabilities and Equity</span>
                     </div>
                     <div class="col-2 text-right">
-                        <span class="font-bold font-size-14">₱100,000.00</span>
+                        <span class="font-bold font-size-14">₱[[formatPrice(addNumber(balanceSheet.liabilities.amount, balanceSheet.equity.amount))]]</span>
                     </div>
                 </div>
 
@@ -215,16 +216,50 @@
         data: {
             startDate: null,
             endDate: null,
+
+            balanceSheet: {
+                asset: null,
+                liabilities: null,
+                equity: null,
+            }
         },
 
         methods: {
             onload(){
                 this.startDate = '{{startDate|date:"Y-m-d"}}'
                 this.endDate = '{{endDate|date:"Y-m-d"}}'
+
+                message = "Fetching Data"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.get(`/balance-sheet-request/?startDate=${this.startDate}&endDate=${this.endDate}`)
+                .then(res=>{
+                    
+                    this.balanceSheet = res.data
+                    Swal.close()
+                })
+            }, 
+            formatPrice(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(2).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            setDate(){
+                location.href=`/balance-sheet/?startDate=${this.startDate}&endDate=${this.endDate}`
+            },
+
+            addNumber(num1, num2){
+                return Number(num1) + Number(num2)
             }
         },
         mounted(){
-            this.onload()
+            this.onload() 
         }
     })
 </script>

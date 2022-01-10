@@ -11,6 +11,7 @@ import re
 from .journalAPI import jeAPI
 from .petty_cash_api import *
 from django.core.exceptions import PermissionDenied
+from dateutil import parser
 
 class BIR2307View(View):
     def get(self, request):
@@ -51,61 +52,102 @@ class BIR2316View(View):
 class BalanceSheetView(APIView):
     def get(self, request):
         try:
-            startDate = request.GET['startDate']
-            endDate = request.GET['endDate']
+            startDate = parser.parse(request.GET['startDate'])
+            endDate = parser.parse(request.GET['endDate'])
         except Exception as e:
             print(e)
             startDate = datetime.date(datetime.date.today().year, 1, 1)
-            endDate = datetime.date(datetime.date.today().year, 12, 31)
-
-
-        data = {
-            "asset": {
-                "amount": Decimal(0),
-                "groupAccount": [{
-                    "name": None,
-                    "amount": Decimal(0),
-                    "subGroup": [{
-                        "name": None,
-                        "amount": 0
-                    }]
-                }]
-            },
-
-            "liabilities": {
-                "amount": Decimal(0),
-                "groupAccount": [{
-                    "name": None,
-                    "amount": Decimal(0),
-                    "subGroup": [{
-                        "name": None,
-                        "amount": 0
-                    }]
-                }]
-            },
-
-            "equity": {
-                "amount": Decimal(0),
-                "groupAccount": [{
-                    "name": None,
-                    "amount": Decimal(0),
-                    "subGroup": [{
-                        "name": None,
-                        "amount": 0
-                    }]
-                }]
-            }
-        }
-
-        """FETCH JOURNALS AND DO FOR LOOP BELOW"""
-        
-        """                B0SS                """
-
-        """                END                 """
-        
+            endDate = datetime.date(datetime.date.today().year, 12, 31)        
 
         context = {
             'startDate': startDate,
             'endDate': endDate,
         }
         return render(request, 'balance-sheet.html', context)
+
+class BalanceSheetRequest(APIView):
+    def get(self, request):
+        try:
+            startDate = request.GET['startDate']
+            endDate = request.GET['endDate']
+            print(request)
+        except Exception as e:
+            print(e)
+            startDate = datetime.date(datetime.date.today().year, 1, 1)
+            endDate = datetime.date(datetime.date.today().year, 12, 31)     
+
+
+        data = {
+            "asset": {
+                "amount": Decimal(0),
+            },
+
+            "liabilities": {
+                "amount": Decimal(0),
+            },
+
+            "equity": {
+                "amount": Decimal(0),
+            }
+        }
+
+        """FETCH JOURNALS AND DO FOR LOOP BELOW"""
+
+        
+        journal = request.user.branch.journal.filter(journalDate__range=[startDate, endDate])
+        print('journal', journal)
+        for j in journal:
+            for je in j.journalentries.all().iterator():
+                # je.accountChild.accountSubGroup.accountGroup.name
+                if re.search('[Aa]sset', je.accountChild.accountSubGroup.accountGroup.name):
+                    data['asset']['amount'] += je.amount
+                    try:
+                        data['asset'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
+                        
+                    except:
+                        data['asset'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': je.amount}
+                        
+                    
+
+                    try:
+                        data['asset'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] += je.amount
+                        
+                    except:
+                        data['asset'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': je.amount}
+                        
+                
+                elif re.search('[Ll]iabilit',  je.accountChild.accountSubGroup.accountGroup.name):
+                    data['liabilities']['amount'] += je.amount
+                    try:
+                        data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
+                        
+                    except:
+                        data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': je.amount}
+                        
+                    
+
+                    try:
+                        data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] += je.amount
+                        
+                    except:
+                        data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': je.amount}
+                        
+
+                elif re.search('[Ee]quity',  je.accountChild.accountSubGroup.accountGroup.name):
+                    data['equity']['amount'] += je.amount
+                    try:
+                        data['equity'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
+                        
+                    except:
+                        data['equity'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': je.amount}
+                        
+
+                    try:
+                        data['equity'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] += je.amount
+                        
+                    except:
+                        data['equity'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': je.amount}
+                        
+
+        """                END                 """
+        return JsonResponse(data, safe=False)
