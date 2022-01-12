@@ -88,6 +88,9 @@ class BalanceSheetRequest(APIView):
 
             "equity": {
                 "amount": Decimal(0),
+            },
+            "retainedEarnings":{
+                "amount": Decimal(0)
             }
         }
 
@@ -100,53 +103,108 @@ class BalanceSheetRequest(APIView):
             for je in j.journalentries.all().iterator():
                 # je.accountChild.accountSubGroup.accountGroup.name
                 if re.search('[Aa]sset', je.accountChild.accountSubGroup.accountGroup.name):
-                    data['asset']['amount'] += je.amount
+                    if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                        data['asset']['amount'] += je.amount
+                    else:
+                        data['asset']['amount'] -= je.amount
+
+
+
                     try:
-                        data['asset'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['asset'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
+                        else:
+                            data['asset'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] -= je.amount
                         
                     except:
-                        data['asset'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': je.amount}
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['asset'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': je.amount}
+                        else:
+                            data['asset'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': -je.amount}
                         
                     
 
                     try:
-                        data['asset'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] += je.amount
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['asset'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] += je.amount
+                        else:
+                            data['asset'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] -= je.amount
                         
                     except:
-                        data['asset'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': je.amount}
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['asset'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': je.amount}
+                        else:
+                            data['asset'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': -je.amount}
                         
                 
                 elif re.search('[Ll]iabilit',  je.accountChild.accountSubGroup.accountGroup.name):
-                    data['liabilities']['amount'] += je.amount
+                    if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                        data['liabilities']['amount'] += je.amount
+                    else:
+                        data['liabilities']['amount'] -= je.amount
                     try:
-                        data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
+                        else:
+                            data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] -= je.amount
                         
                     except:
-                        data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': je.amount}
-                        
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': je.amount}
+                        else:
+                            data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': -je.amount}
                     
 
                     try:
-                        data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] += je.amount
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] += je.amount
+                        else:
+                            data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] -= je.amount
                         
                     except:
-                        data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': je.amount}
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': je.amount}
+                        else:
+                            data['liabilities'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': -je.amount}
                         
 
                 elif re.search('[Ee]quity',  je.accountChild.accountSubGroup.accountGroup.name):
-                    data['equity']['amount'] += je.amount
+                    if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                        data['equity']['amount'] += je.amount
+                    else:
+                        data['equity']['amount'] -= je.amount
                     try:
-                        data['equity'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['equity'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
+                        else:
+                            data['equity'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] -= je.amount
                         
                     except:
-                        data['equity'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': je.amount}
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['equity'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': je.amount}
+                        else:
+                            data['equity'][je.accountChild.accountSubGroup.accountGroup.name] = {'amount': -je.amount}
                         
 
                     try:
-                        data['equity'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] += je.amount
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['equity'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] += je.amount
+                        else:
+                            data['equity'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name]['amount'] -= je.amount
                         
                     except:
-                        data['equity'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': je.amount}
+                        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                            data['equity'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': je.amount}
+                        else:
+                            data['equity'][je.accountChild.accountSubGroup.accountGroup.name][je.accountChild.accountSubGroup.name] = {'amount': -je.amount}
+
+                elif re.search('[Ee]xpense', je.accountChild.accountSubGroup.accountGroup.name) or re.search('[Rr]evenue', je.accountChild.accountSubGroup.accountGroup.name) or re.search('[Ii]ncome', je.accountChild.accountSubGroup.accountGroup.name) or re.search('[Ss]ale', je.accountChild.accountSubGroup.accountGroup.name):
+                    if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                        print(re.search('[Ss]ale', je.accountChild.accountSubGroup.accountGroup.name))
+                        data['retainedEarnings']['amount'] += je.amount
+                    else:
+                        print(re.search('[Ss]ale', je.accountChild.accountSubGroup.accountGroup.name))
+                        data['retainedEarnings']['amount'] -= je.amount
                         
 
         """                END                 """
