@@ -175,6 +175,70 @@
                         </div>
                     </div>
                 </div>
+                <div class="d-flex flex-column mb-5">
+                    <div class="label mr-2">
+                        <label for="" class="gray font-bold font-size-18">Transactions</label>
+                    </div>
+                    <div class="d-flex border b-radius-10 box-shadow-medium mr-2 p-2">
+                        <div id="po-transactions" class="container m-0 p-0">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <span class="font-size-18 font-bold">Purchase Order</span>&emsp;<span class="gray">recent 3</span>
+                                </div>
+                            </div>
+                            <div class="row" v-for="po in dashData.transactions.po">
+                                <div class="col-3">
+                                    <label for="">[[po.code]]1</label><br>
+                                    <span class="gray font-semibold">Reference No.</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="">[[po.party.name]]</label><br>
+                                    <span class="gray font-semibold">Vendor</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="" v-if="po.dueDate">[[formatDate(po.dueDate)]]</label>
+                                    <label for="" v-else>None</label><br>
+                                    <span class="gray font-semibold">Due Date</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="">₱[[formatPrice(po.amountTotal)]]</label><br>
+                                    <span class="gray font-semibold">Total Amount</span>
+                                </div>
+                                <div class="col-12">
+                                    <hr>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2 mt-2">
+                                <div class="col">
+                                    <span class="font-size-18 font-bold">Sales Contract</span>&emsp;<span class="gray">recent 3</span>
+                                </div>
+                            </div>
+                            <div class="row" v-for="sc in dashData.transactions.sc">
+                                <div class="col-3">
+                                    <label for="">[[sc.code]]1</label><br>
+                                    <span class="gray font-semibold">Reference No.</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="">[[sc.party.name]]</label><br>
+                                    <span class="gray font-semibold">Vendor</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="" v-if="sc.dueDate">[[formatDate(sc.dueDate)]]</label>
+                                    <label for="" v-else>None</label><br>
+                                    <span class="gray font-semibold">Due Date</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="">₱[[formatPrice(sc.amountTotal)]]</label><br>
+                                    <span class="gray font-semibold">Total Amount</span>
+                                </div>
+                                <div class="col-12">
+                                    <hr>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="d-flex flex-column h-100 px-4 py-3" id="main-body-right" style="max-height: 100vh; overflow:auto">
                 <div class="d-flex flex-column mb-5" id="due-dates">
@@ -381,6 +445,10 @@
                     avg: null,
                     list: [],
                 },
+                transactions: {
+                    po: [],
+                    sc: [],
+                }
             },
 
             type: 'createBranch',
