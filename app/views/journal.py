@@ -9,7 +9,7 @@ from ..models import *
 from datetime import date as now
 from datetime import datetime
 from datetime import timedelta
-from .journalAPI import jeAPI
+from .journalAPI import jeAPI, voidJournal
 from django.core.exceptions import PermissionDenied
 
 class JournalView(View):
@@ -101,3 +101,10 @@ class SaveJournal(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
         
+class VoidJournal(View):
+    def post(self, request, pk):
+        journal = Journal.objects.get(pk=pk)
+        voidJournal(request, journal)
+        
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)

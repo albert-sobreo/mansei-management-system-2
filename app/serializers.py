@@ -1250,3 +1250,13 @@ class LiquidationSZ(MS):
         model = Liquidation
         fields = "__all__"
 
+
+
+
+
+
+########## MONTHLY EXPENSE ##########
+class MonthlyExpenseSZ(MS):
+    class Meta:
+        model = MonthlyExpense
+        fields = '__all__'

@@ -445,5 +445,6 @@ urlpatterns = [
     path('1601-EQ/', login_required(views.BIR1601EQView.as_view())),
     path('2316/', login_required(views.BIR2316View.as_view())),
     path('balance-sheet/', login_required(views.BalanceSheetView.as_view())),
-    path('balance-sheet-request/', login_required(views.BalanceSheetRequest.as_view()))
+    path('balance-sheet-request/', login_required(views.BalanceSheetRequest.as_view())),
+    path('void-journal/<int:pk>/', login_required(views.VoidJournal.as_view()))
 ]

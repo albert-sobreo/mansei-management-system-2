@@ -226,7 +226,7 @@ class EMS_PayrollApprovalAll(APIView):
 
             j = Journal()
 
-            j.code = 'PYRL' + ": " + str(dateStart) + "  " + str(dateEnd)
+            j.code = 'PYRL' + ": " + str(dateEnd)
             j.datetimeCreated = datetime.now()
             j.createdBy = request.user
             j.journalDate = datetime.now()

@@ -1,3 +1,4 @@
+from curses import echo
 import datetime
 from django.db.models import query
 from django.http.response import Http404, JsonResponse
@@ -748,10 +749,7 @@ class DashboardAPI(APIView):
             dashData['dueDates']['po'] = serializer.data
         except Exception as e:
             print(e)
-            dashData['dueDates']['po'] = {
-                'code':None,
-                'dueDate':None
-            }
+            dashData['dueDates']['po'] = []
 
         try:
             sc = request.user.branch.salesContract.filter(fullyPaid = False, dueDate__gte = datetime.datetime.now())
@@ -761,23 +759,54 @@ class DashboardAPI(APIView):
             dashData['dueDates']['sc'] = serializer.data
         except Exception as e:
             print(e)
-            dashData['dueDates']['sc'] = {
-                'code':None,
-                'dueDate':None
-            }
+            dashData['dueDates']['sc'] = []
 
         try:
             shecks = request.user.branch.cheque.filter(dueDate__gte = datetime.datetime.now())
             serializer = ChequesSZ(shecks, many = True)
-            if not sc:
+            if not shecks:
                 raise Exception
             dashData['dueDates']['shecks']= serializer.data
         except Exception as e:
             print(e)
-            dashData['dueDates']['shecks'] = {
-                'chequeNo':None,
-                'dueDate':None
-            }
+            dashData['dueDates']['shecks'] = []
+
+        dashData['monthlyExpense'] = {}
+        try:
+            monthlyExpense = request.user.branch.monthlyExpense.all()
+
+            avgFunc = lambda monExp: sum([i.amount for i in monExp])/monExp.count()
+
+            avg = avgFunc(monthlyExpense)
+
+            monthlyExpense3 = monthlyExpense.order_by('-id')[:3]
+
+            serializer = MonthlyExpenseSZ(monthlyExpense3, many=True)
+            if not monthlyExpense:
+                raise Exception
+            dashData['monthlyExpense']['list'] = serializer.data
+            dashData['monthlyExpense']['avg'] = avg
+        except Exception as e:
+            print(e)
+            dashData['monthlyExpense']['list'] = None
+            dashData['monthlyExpense']['avg'] = 0
+
+        dashData['transactions'] = {}
+        try:
+            po = request.user.branch.purchaseOrder.all().order_by('-id')[:3]
+            serializer = PurchaseOrderNestedSZ(po, many=True)
+            dashData['transactions']['po'] = serializer.data
+        except Exception as e:
+            print(e)
+            dashData['transactions']['po'] = []
+
+        try:
+            sc = request.user.branch.salesContract.all().order_by('-id')[:3]
+            serializer = SalesContractSZ(sc, many=True)
+            dashData['transactions']['sc'] = serializer.data
+        except:
+            dashData['transactions']['sc'] = []
+        
 
         return JsonResponse(dashData, safe=False)
 

@@ -55,3 +55,25 @@ def jeAPI(request, journal, normally, accountChild, amount):
     je.save()
 
     request.user.branch.journalEntries.add(je)
+
+def voidJournal(request, journal):
+    for je in journal.journalentries.all():
+
+        # I REVERESED THE PLUS AND MINUS FROM ABOVE #
+        if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+            je.accountChild.amount -= je.amount
+            je.accountChild.accountSubGroup.amount -= je.amount
+            je.accountChild.accountSubGroup.accountGroup.amount -= je.amount
+            je.accountChild.save()
+            je.accountChild.accountSubGroup.save()
+            je.accountChild.accountSubGroup.accountGroup.save()
+        else:
+            je.accountChild.amount += je.amount
+            je.accountChild.accountSubGroup.amount += je.amount
+            je.accountChild.accountSubGroup.accountGroup.amount += je.amount
+            je.accountChild.save()
+            je.accountChild.accountSubGroup.save()
+            je.accountChild.accountSubGroup.accountGroup.save()
+        print(journal.pk)
+
+    journal.delete()

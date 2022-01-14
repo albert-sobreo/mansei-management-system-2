@@ -1,6 +1,10 @@
 {% extends "base-template.html" %}
 {% block title %}Admin | Dashboard{% endblock %}
 
+{% block header_links %}
+<link rel="stylesheet" href="/static/css/scrollbars.css">
+{% endblock %}
+
 {% block body %}
 
 <div id="app" class="position-relative" v-cloak>
@@ -161,14 +165,124 @@
                         </div>
                     </div>
                 </div>
+                <div class="d-flex flex-column mb-5">
+                    <div class="label mr-2">
+                        <label for="" class="gray font-bold font-size-18">Monthly Avg Expense</label>
+                    </div>
+                    <div class="dash-gray d-flex border b-radius-10 box-shadow-medium mr-2">
+                        <div class="d-flex flex-column justify-content-between flex-even p-2">
+                            <div>
+                                <span class="font-size-14 font-bold">Avg. Monthly Expense</span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <div>
+                                    <span class="dash-dark-green font-bold font-size-18" v-if="dashData.monthlyExpense.avg != null">₱[[formatPrice(dashData.monthlyExpense.avg)]]</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-for="(value, index) in dashData.monthlyExpense.list" class="d-flex flex-column justify-content-between flex-even p-2 c-border-left">
+                            <div>
+                                <span class="font-size-14 font-bold">[[formatDate(value.date)]]</span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <div>
+                                    <span class="dash-dark-green font-bold font-size-18" v-if="dashData.po.code">₱[[formatPrice(value.amount)]]</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column mb-5">
+                    <div class="label mr-2">
+                        <label for="" class="gray font-bold font-size-18">Transactions</label>
+                    </div>
+                    <div class="d-flex border b-radius-10 box-shadow-medium mr-2 p-2">
+                        <div id="po-transactions" class="container m-0 p-0">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <span class="font-size-18 font-bold">Purchase Order</span>&emsp;<span class="gray">recent 3</span>
+                                </div>
+                            </div>
+                            <div class="row" v-for="po in dashData.transactions.po">
+                                <div class="col-3">
+                                    <label for="">[[po.code]]1</label><br>
+                                    <span class="gray font-semibold">Reference No.</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="">[[po.party.name]]</label><br>
+                                    <span class="gray font-semibold">Vendor</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="" v-if="po.dueDate">[[formatDate(po.dueDate)]]</label>
+                                    <label for="" v-else>None</label><br>
+                                    <span class="gray font-semibold">Due Date</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="">₱[[formatPrice(po.amountTotal)]]</label><br>
+                                    <span class="gray font-semibold">Total Amount</span>
+                                </div>
+                                <div class="col-12">
+                                    <hr>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2 mt-2">
+                                <div class="col">
+                                    <span class="font-size-18 font-bold">Sales Contract</span>&emsp;<span class="gray">recent 3</span>
+                                </div>
+                            </div>
+                            <div class="row" v-for="sc in dashData.transactions.sc">
+                                <div class="col-3">
+                                    <label for="">[[sc.code]]1</label><br>
+                                    <span class="gray font-semibold">Reference No.</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="">[[sc.party.name]]</label><br>
+                                    <span class="gray font-semibold">Vendor</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="" v-if="sc.dueDate">[[formatDate(sc.dueDate)]]</label>
+                                    <label for="" v-else>None</label><br>
+                                    <span class="gray font-semibold">Due Date</span>
+                                </div>
+                                <div class="col-3">
+                                    <label for="">₱[[formatPrice(sc.amountTotal)]]</label><br>
+                                    <span class="gray font-semibold">Total Amount</span>
+                                </div>
+                                <div class="col-12">
+                                    <hr>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="d-flex flex-column h-100 px-4 py-3" id="main-body-right" style="max-height: 100vh; overflow:auto">
                 <div class="d-flex flex-column mb-5" id="due-dates">
                     <label for="" class="gray font-bold font-size-18">Due Dates</label>
                     <div class="d-flex flex-column box-shadow-small-2 b-radius-10">
-                        <div class="p-4 d-flex flex-column justify-content-center align-items-center">
-                            <img src="/static/media/icons/crane.svg" height="32px" alt="">
-                            <span class="font-bold">Under Development</span>
+                        <div class="px-3 py-1 d-flex flex-column">
+                            <div class="my-1" v-for="value in dashData.dueDates.po">
+                                <div class="d-flex justify-content-between">
+                                    <span class="font-bold font-size-14">[[formatDate(value.dueDate)]]</span>
+                                    <span class="font-semibold gray">[[value.code]]</span>
+                                </div>
+                                <span class="font-semibold dash-yellow">₱[[formatPrice(value.amountTotal)]]</span>
+                            </div>
+                            <div class="my-1" v-for="value in dashData.dueDates.sc">
+                                <div class="d-flex justify-content-between">
+                                    <span class="font-bold font-size-14">[[formatDate(value.dueDate)]]</span>
+                                    <span class="font-semibold gray">[[value.code]]</span>
+                                </div>
+                                <span class="font-semibold dash-yellow">₱[[formatPrice(value.amountTotal)]]</span>
+                            </div>
+                            <div class="my-1" v-for="value in dashData.dueDates.shecks">
+                                <div class="d-flex justify-content-between">
+                                    <span class="font-bold font-size-14">[[formatDate(value.dueDate)]]</span>
+                                    <span class="font-semibold gray">[[value.code]]</span>
+                                </div>
+                                <span class="font-semibold dash-yellow">₱[[formatPrice(value.amountTotal)]]</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -203,6 +317,42 @@
                         </div>
                         <div class=" px-2 d-flex justify-content-end" style="height: 20px;">
                             <span class="link font-size-10" @click="submitNotepad()">Save</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CREATE ANNOUNCEMENTS -->
+        <div class="modal fade" id="createAnnouncementModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Create An Announcement</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Title</label>
+                                <input v-model="createAnnouncement.title" placeholder="Enter Announcement Title" type="text" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="row my-2">
+                            <div class="col">
+                                <label for="">Content</label>
+                                <textarea v-model="createAnnouncement.contents" placeholder="Enter Announcement Content" name="" id="" cols="30" rows="3" class="form-control"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col">
+                                <button @click="submitAnnouncement()" class="btn btn-primary col">Save</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -456,6 +606,19 @@
                     amountTotal: null,
                 },
                 totalExpenses: null,
+                dueDates: {
+                    po: [],
+                    sc: [],
+                    shecks: [],
+                },
+                monthlyExpense: {
+                    avg: null,
+                    list: [],
+                },
+                transactions: {
+                    po: [],
+                    sc: [],
+                }
             },
 
             type: 'createBranch',
@@ -619,7 +782,43 @@
                         this.onload()
                     }
                 })
-            }
+            },
+
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                day = days[value.getDay()]
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
         },
 
         mounted(){

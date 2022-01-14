@@ -90,10 +90,18 @@
             {% for journal in journals %}
             <div class="col-12">
                 {% if forloop.counter|divisibleby:2 %}
-                <div class="row py-4 order-card">
+                <div class="row py-4 order-card position-relative">
                 {% else %}
-                <div class="row py-4">
+                <div class="row py-4 position-relative">
                 {% endif %}
+                    <!-- DROPDOWN -->
+                    <div class="position-absolute dropleft no-decoration link" data-toggle="dropdown" style="top:3px; right: 7px">
+                        <i class="fas fa-ellipsis-h"></i>
+                        <div class="dropdown-menu  b-radius-5 py-0">
+                            <a class="dropdown-item d-item-gas font-size-12 font-semibold" href="#" @click="voidJournal('{{journal.id}}', '{{journal.code}}')">Void</a>
+                        </div>
+                    </div>
+                    <!-- DROPDOWN END -->
                     <div class="col-2">
                         <span class="font-semibold">{{journal.journalDate}}</span>
                     </div>
@@ -390,6 +398,41 @@
             }
         },
         methods:{
+            voidJournal(id, journalCode){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: 'warning',
+                    html: `Are you sure you want to void <br><b>${journalCode}</b>?<br>This action cannot be undone.`,
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'I am sure.'
+                })
+                .then(result=>{
+                    if (result.isConfirmed){
+                        Swal.fire({
+                            title: "Confirm Void",
+                            showConfirmButton: true,
+                            confirmButtonColor: "#ff4545",
+                            showCancelButton: true,
+                            confirmButtonText: 'Void'
+                        })
+                        .then(result=>{
+                            if (result.isConfirmed){
+                                message = "Voiding journal"
+                                Swal.fire({
+                                    showConfirmButton: false,
+                                    allowOutsideClick: false,
+                                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                                })
+                                axios.post(`/void-journal/${id}/`, {}, this.config)
+                                .then(res=>{
+                                    res.data==0?location.reload():''
+                                })
+                            }
+                        })
+                    }
+                })
+            },
             filterJournal(){
                 message = "Filtering Journals"
                 Swal.fire({
