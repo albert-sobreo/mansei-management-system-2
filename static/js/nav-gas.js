@@ -58,11 +58,9 @@ Vue.component('navbar-gas', {
             <a href="/ledger/" class="mx-3" id="nav-reports">Reports</a>
             <a href="/customers/" class="mx-3" id="nav-customers">Customers</a>
             <a href="/vendors/" class="mx-3" id="nav-vendors">Vendors</a>
-            <a href="/bank-recon/" class="mx-3" id="nav-bank-recon">Bank Recon</a>
             <a href="/petty-cash/" class="mx-3" id="nav-petty-cash">Petty Cash</a>
             <a href="/chart-of-accounts/" class="mx-3" id="nav-accounts">Chart of Accounts</a>
             <a href="/ppe/" class="mx-3" id="nav-ppe">PPE</a>
-            <a href="/2307/" class="mx-3" id="nav-forms">Forms</a>
             <div class="btn-group mx-3">
                 <a href="#" data-toggle="dropdown" id="nav-approvals">Approvals</a>
                 <div class="dropdown-menu b-radius-5 py-0">

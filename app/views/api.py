@@ -742,7 +742,7 @@ class DashboardAPI(APIView):
 
         dashData['dueDates'] = {}
         try:
-            po = request.user.branch.purchaseOrder.filter(fullyPaid = False, dueDate__gte = datetime.datetime.now())
+            po = request.user.branch.purchaseOrder.filter(fullyPaid = False, dueDate__gte = datetime.datetime.now(), dueDate__lte = datetime.datetime.now() + datetime.timedelta(days=14))
             serializer = PurchaseOrderSZ(po, many=True)
             if not po:
                 raise Exception
@@ -752,7 +752,7 @@ class DashboardAPI(APIView):
             dashData['dueDates']['po'] = []
 
         try:
-            sc = request.user.branch.salesContract.filter(fullyPaid = False, dueDate__gte = datetime.datetime.now())
+            sc = request.user.branch.salesContract.filter(fullyPaid = False, dueDate__gte = datetime.datetime.now(), dueDate__lte = datetime.datetime.now() + datetime.timedelta(days=14))
             serializer = SalesContractSZ(sc, many=True)
             if not sc:
                 raise Exception

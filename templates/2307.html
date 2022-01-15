@@ -13,21 +13,12 @@
 </style>
 <div id="app">
     <!-- NAVIGATION BAR -->
-    <navbar-gas active="nav-forms" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <navbar-gas active="nav-reports" photo="/media/{{request.user.image}}"></navbar-gas>
     <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
     <app-card></app-card>
 
     <div class="container">
-        <div class="d-flex font-semibold mb-2 justify-content-center">
-            <div class="justify-content-center c-nav-links gas-nav">
-                <a href="/2307/" class="active-gas mx-3">2307</a>
-                <a href="/1702-Q/" class="mx-3">1702Q</a>
-                <a href="/1601-C/" class="mx-3">1601-C</a>
-                <a href="/1601-EQ/" class="mx-3">1601-EQ</a>
-                <a href="/2316/" class="mx-3">2316</a>
-                <a href="/0619-E/" class="mx-3">0619-E</a>
-            </div>
-        </div>
+        <reports-sec-nav active="2307"></reports-sec-nav>
     </div>
 
     <!-- BUTTON TO SAVE AS PDF -->

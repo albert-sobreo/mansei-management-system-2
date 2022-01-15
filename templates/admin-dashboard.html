@@ -260,7 +260,7 @@
             <div class="d-flex flex-column h-100 px-4 py-3" id="main-body-right" style="max-height: 100vh; overflow:auto">
                 <div class="d-flex flex-column mb-5" id="due-dates">
                     <label for="" class="gray font-bold font-size-18">Due Dates</label>
-                    <div class="d-flex flex-column box-shadow-small-2 b-radius-10" v-if="dashData.dueDates.po.length && dashData.dueDates.sc.length && dashData.dueDates.shecks.length">
+                    <div class="d-flex flex-column box-shadow-small-2 b-radius-10" v-if="dashData.dueDates.po.length || dashData.dueDates.sc.length || dashData.dueDates.shecks.length">
                         <div class="px-3 py-1 d-flex flex-column">
                             <div class="my-1" v-for="value in dashData.dueDates.po">
                                 <div class="d-flex justify-content-between">
