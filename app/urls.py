@@ -446,5 +446,9 @@ urlpatterns = [
     path('2316/', login_required(views.BIR2316View.as_view())),
     path('balance-sheet/', login_required(views.BalanceSheetView.as_view())),
     path('balance-sheet-request/', login_required(views.BalanceSheetRequest.as_view())),
+    path('income-statement/', login_required(views.IncomeStatementView.as_view())),
+    path('income-statement-request/', login_required(views.IncomeStatementRequest.as_view())),
+    path('cash-flow/', login_required(views.CashFlowView.as_view())),
+    path('cash-flow-request/', login_required(views.CashFlowRequest.as_view())),
     path('void-journal/<int:pk>/', login_required(views.VoidJournal.as_view()))
 ]

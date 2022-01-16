@@ -13,6 +13,8 @@ Vue.component('reports-sec-nav', {
         <div class="justify-content-center c-nav-links gas-nav">
             <a id="ledger" href="/ledger/" class="mx-2">Ledger</a>
             <a id="balance-sheet" href="/balance-sheet/" class="mx-2">Balance Sheet</a>
+            <a id="income-statement" href="/income-statement/" class="mx-2">Income Statement</a>
+            <a id="cash-flow" href="/cash-flow/" class="mx-2">Cash Flow</a>
             <a id="bank-recon" href="/bank-recon/" class="mx-2">Bank Reconciliation</a>
             <a id="2307" href="/2307/" class="mx-2">2307</a>
             <a id="1702Q" href="/1702-Q/" class="mx-2">1702Q</a>

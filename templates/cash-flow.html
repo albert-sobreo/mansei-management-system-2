@@ -1,0 +1,99 @@
+{% extends "base-template.html" %}
+{% block title %}Cash Flow{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAV BAR -->
+    <navbar-gas active="nav-reports" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAVIGATION --- VUE COMPONENT -->
+        <reports-sec-nav active="cash-flow"></reports-sec-nav>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Cash Flow</span>
+        </div>
+
+        <div class="row">
+            <div class="col-12 my-0">
+                <label for="">Select Date Range</label>
+            </div>
+            <div class="col-12">
+                <input v-model="startDate" type="date" class="form-control d-inline-block" style="width: 200px;">
+                <input v-model="endDate" type="date" class="form-control d-inline-block" style="width: 200px;">
+                <button class="btn btn-warning d-inline-block" @click="setDate()">Set</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <pre>[[$data]]</pre>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            startDate: null,
+            endDate: null,
+
+            cashFlow: {}
+        },
+
+        methods: {
+            onload(){
+                this.startDate = '{{startDate|date:"Y-m-d"}}'
+                this.endDate = '{{endDate|date:"Y-m-d"}}'
+
+                message = "Fetching Data"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.get(`/cash-flow-request/?startDate=${this.startDate}&endDate=${this.endDate}`)
+                .then(res=>{
+                    console.log(res.data)
+                    this.cashFlow = res.data
+                    Swal.close()
+                })
+            }, 
+            formatPrice(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(2).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            setDate(){
+                location.href=`/cash-flow/?startDate=${this.startDate}&endDate=${this.endDate}`
+            },
+
+            addNumber(){
+                var sum = Number(0)
+                for (var i = 0; i < arguments.length; i++){
+                    sum += Number(arguments[i])
+                }
+                return Number(sum)
+            }
+        },
+        mounted(){
+            this.onload()
+        }
+    })
+</script>
+
+{% endblock %}
