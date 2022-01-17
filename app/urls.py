@@ -247,4 +247,6 @@ urlpatterns = [
     path('addppe/', login_required(views.AddPPE.as_view())),
     path('import-ppe/', login_required(views.ImportPPE.as_view())),
     path('edit-ppe/<int:pk>/', login_required(views.EditPPE.as_view())),
+    path('ppe-lapsing-schedule/', login_required(views.LapsingView.as_view())),
+    path('ppe-update-depr/', login_required(views.UpdateDepr.as_view())),
 ]

@@ -1040,6 +1040,9 @@ class PPE(models.Model):
     bookValue = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     usefulLife = models.IntegerField(null=True, blank=True)
     purchasePrice = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    deprCycle = models.IntegerField(null=True, blank=True) # BASIS: MONTH
+    startingDeprDate = models.DateField(null=True, blank=True)
+    deprRate = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
 
     def __str__(self):
         return str(self.code) + " " + self.name + " " + self.type
