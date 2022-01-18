@@ -196,9 +196,9 @@ class BalanceSheetRequest(APIView):
 
                 elif re.search('[Ee]xpense', je.accountChild.accountSubGroup.accountGroup.name) or re.search('[Rr]evenue', je.accountChild.accountSubGroup.accountGroup.name) or re.search('[Ii]ncome', je.accountChild.accountSubGroup.accountGroup.name) or re.search('[Ss]ale', je.accountChild.accountSubGroup.accountGroup.name):
                     if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
-                        data['retainedEarnings']['amount'] += je.amount
-                    else:
                         data['retainedEarnings']['amount'] -= je.amount
+                    else:
+                        data['retainedEarnings']['amount'] += je.amount
                         
 
         """                END                 """

@@ -213,7 +213,7 @@ class LiquidationApprovalAPI(APIView):
                 
             for l in lqd.liquidationentries.all():
                 jeAPI(request, j, 'Debit', l.expense, l.amount)
-            jeAPI(request, j, dChildAccount.pettyCash, lqd.amount)
+            jeAPI(request, j, 'Credit', dChildAccount.pettyCash, lqd.totalAmount)
 
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')

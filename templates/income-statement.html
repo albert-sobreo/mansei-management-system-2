@@ -30,6 +30,97 @@
             </div>
         </div>
 
+        <!-- TABLE -->
+        <div class="container my-2 px-4 py-3 b-radius-15 box-shadow-medium border">
+
+
+            <!-- REVENUE -->
+            <div v-if="incomeStatement != null">
+                <!-- TITLE -->
+                <div class="row">
+                    <div class="col">
+                        <span class="font-size-18 font-bold">Revenue</span>
+                    </div>
+                </div>
+                <!-- END TITLE -->
+
+                <!-- PARENT CONTAINER -->
+                <div v-for="(value, key, index) in incomeStatement" v-if="typeof value != 'string' && includes(key, 'Revenue') || includes(key, 'Sales')">
+                    <div class="row my-2">
+                        <div class="col-10">
+                            <span class="font-semibold no-decoration ml-4"></i> [[key]]</span>
+                        </div>
+                        <div class="col-2 text-right">
+                            <span class="font-semibold">₱[[formatPrice(value.amount)]]</span>
+                        </div>
+                        <div class="col">
+                            <hr class="my-0 ml-4">
+                        </div>
+                    </div>
+                    <!-- END SUB GROUP CONTAINER -->
+                </div>
+                <!-- END PARENT CONTAINER -->
+
+                <!-- TOTAL GROSS INCOME CONTAINER -->
+                <div class="row">
+                    <div class="col-10">
+                        <span class="font-bold font-size-14">Gross Income</span>
+                    </div>
+                    <div class="col-2 text-right">
+                        <span class="font-bold font-size-14" v-if="incomeStatement != null">₱[[formatPrice(this.incomeStatement.grossIncome)]]</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- EXPENSES -->
+            <div v-if="incomeStatement != null">
+                <!-- TITLE -->
+                <div class="row">
+                    <div class="col">
+                        <span class="font-size-18 font-bold">Expenses</span>
+                    </div>
+                </div>
+                <!-- END TITLE -->
+
+                <!-- PARENT CONTAINER -->
+                <div v-for="(value, key, index) in incomeStatement" v-if="typeof value != 'string' && includes(key, 'Expenses') || includes(key, 'Expense')">
+                    <div class="row my-2">
+                        <div class="col-10">
+                            <span class="font-semibold no-decoration ml-4"></i> [[key]]</span>
+                        </div>
+                        <div class="col-2 text-right">
+                            <span class="font-semibold">₱[[formatPrice(value.amount)]]</span>
+                        </div>
+                        <div class="col">
+                            <hr class="my-0 ml-4">
+                        </div>
+                    </div>
+                </div>
+                <!-- END PARENT CONTAINER -->
+
+                <!-- TOTAL TOTAL EXPENSES CONTAINER -->
+                <div class="row">
+                    <div class="col-10">
+                        <span class="font-bold font-size-14">Total Expenses</span>
+                    </div>
+                    <div class="col-2 text-right">
+                        <span class="font-bold font-size-14" v-if="incomeStatement != null">₱[[formatPrice(this.incomeStatement.cost)]]</span>
+                    </div>
+                </div>
+
+                <!-- NET PROFIT CONTAINER -->
+                <div class="row font-size-18 font-extrabold">
+                    <div class="col-10">
+                        <span class="font-bold">Net Profit Before Tax</span>
+                    </div>
+                    <div class="col-2 text-right">
+                        <span class="font-bold" v-if="incomeStatement != null">₱[[formatPrice(this.incomeStatement.netProfit)]]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <pre>[[$data]]</pre>
         </div>
@@ -65,11 +156,31 @@
                 })
                 axios.get(`/income-statement-request/?startDate=${this.startDate}&endDate=${this.endDate}`)
                 .then(res=>{
-                    console.log(res.data)
                     this.incomeStatement = res.data
                     Swal.close()
+                    // CALCULATIONS OF TOTALS
+                    this.incomeStatement.grossIncome = 0
+                    Object.keys(this.incomeStatement).forEach((key, index, val)=>{
+                        if(key.toLowerCase().includes('sales') || key.toLowerCase().includes('revenue')){
+                            this.incomeStatement.grossIncome += Number(this.incomeStatement[key].amount)
+                        }
+                    })
+
+                    this.incomeStatement.cost = 0
+                    Object.keys(this.incomeStatement).forEach((key, index, val)=>{
+                        if(key.toLowerCase().includes('expense') || key.toLowerCase().includes('expenses')){
+                            this.incomeStatement.cost += Number(this.incomeStatement[key].amount)
+                        }
+                    })
+                    this.incomeStatement.netProfit = this.incomeStatement.grossIncome - this.incomeStatement.cost
                 })
+
+
+                
             }, 
+            includes(string, substring){
+                return true?(string.toLowerCase()).includes(substring.toLowerCase()):false
+            },
             formatPrice(value) {
                 if (this.roundToggle){
                     return value
