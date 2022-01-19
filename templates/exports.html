@@ -1,0 +1,974 @@
+{% extends 'base-template.html' %}
+{% block title %} Exports {% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION -->
+    <navbar-gas active="nav-sales" photo="/media/{{request.user.image}}"></navbar-gas>
+    <app-card></app-card>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAVIGATION -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links gas-nav">
+                <a href="/exports/" class="active-gas mx-2">Create</a>
+                <a href="/exports-list/" class="mx-2">Exports List</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Exports</span>
+        </div>
+
+        <!-- ADD CUSTOMER MODAL -->
+        <div class="modal fade" id="addCustomerModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add Customer</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" v-model="addCustomerModal.name" class="form-control" placeholder="Enter Customer Name">
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Shipping Address</label>
+                                    <input type="text" v-model="addCustomerModal.shippingAddress" class="form-control" placeholder="Enter Shipping Address">
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Office Address</label>
+                                    <input type="text" v-model="addCustomerModal.officeAddress" class="form-control" placeholder="Enter Office Address">
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col-6 pr-2">
+                                <div class="form-group">
+                                    <label>Landline</label>
+                                    <input type="tel" v-model="addCustomerModal.landline" class="form-control" placeholder="Enter Landline">
+                                </div>
+                            </div>
+                            <div class="col-6 pl-2">
+                                <div class="form-group">
+                                    <label>Mobile No.</label>
+                                    <input type="tel" v-model="addCustomerModal.mobile" class="form-control" placeholder="Enter Mobile No.">
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" v-model="addCustomerModal.email" class="form-control" placeholder="Enter Email">
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Contact Person</label>
+                                    <input type="text" v-model="addCustomerModal.contactPerson" class="form-control" placeholder="Enter Contact Person">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Bank</label>
+                                    <input type="text" v-model="addCustomerModal.bank" class="form-control" placeholder="Enter Bank">
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Bank No. / Customer Account No.</label>
+                                    <input type="text" v-model="addCustomerModal.bankNo" class="form-control" placeholder="Enter Bank No.">
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>TIN</label>
+                                    <input type="text" v-model="addCustomerModal.tin" class="form-control" placeholder="Enter TIN">
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" v-model="addCustomerModal.crte" class="form-check-input">
+                                    <label class="form-check-label font-semibold">With CRTE</label>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Preferred Payment Method</label>
+                                    <select v-model="addCustomerModal.prefferedPayment" class="form-control py-0">
+                                        <option value="" selected disabled class="gray">Choose Preferred Payment Method</option>
+                                        <option value="Cash on Hand">Cash on Hand</option>
+                                        <option value="Cash in Bank">Cash in Bank</option>
+                                        <option value="Cheque">Cheque</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-primary mt-2 col" @click="submitAddCustomer()">Add Customer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXPORTS -->
+        <div>
+            <!-- REFERENCE NO AND DATES -->
+            <div class="row">
+                <div class="col col-3 pr-2">
+                    <label>Reference No.</label>
+                    <input v-model="order.code" type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
+                </div>
+                <div class="col col-2 px-2">
+                    <label>Date</label>
+                    <input v-model="order.date" type="date" class="form-control" name="date">
+                </div>
+                <div class="col col-2 px-2">
+                    <label><span>Retroactive</span>&nbsp;<span class="font-size-10 gray">(optional)</span></label>
+                    <input v-model="order.retroactive" type="date" class="form-control" name="retroactiveDate">
+                </div>
+            </div>
+            <!-- CUSTOMER -->
+            <div class="row mt-2 mb-4">
+                <div class="col col-5 pr-2">
+                    <label>Customer</label><button data-toggle="modal" data-target="#addCustomerModal" title="Add Customer" class="btn btn-warning btn-sm b-radius-5 ml-1 p-0 font-size-14" style="height: 18px; width: 18px">+</button>
+                    <select @change="checkCRTE(order.customer)" v-model="order.customer" class="form-control">
+                        <option value="" selected disabled>Choose Customer</option>
+                        <option v-for="customer in customers" :value="customer.id">[[customer.name]]</option>
+                    </select>
+                </div>
+                <div class="col col-2 px-2">
+                    <label>Tax Type</label>
+                    <select v-model="order.taxType" class="form-control">
+                        <option value="" selected disabled>Choose Tax Type</option>
+                        <option value="VAT">VAT</option>
+                        <option value="Percentage">Percentage</option>
+                    </select>
+                </div>
+                <div class="col col-2 pl-2">
+                    <label for="">Tax Rate</label>
+                    <select v-model="order.taxRate" class="form-control">
+                        <option value="" selected disabled>Choose Tax Rate</option>
+                        <option value="0">0%</option>
+                        <option value="1">1%</option>
+                        <option value="3">3%</option>
+                        <option value="12">12%</option>
+                        <option value="30">30%</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- PURCHASE ITEMS AND DETAILS -->
+            <div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
+                <div class="row">
+                    <div class="col px-1">
+                        <label for="warehouse" class="m-0">Code - Name Type --- T x W x L mm</label>
+                    </div>
+                    <div class="col-1 px-1">
+                        <label for="remaining" class="m-0">Remaining</label>
+                    </div>
+                    <div class="col-1 px-1">
+                        <label for="order-quantity" class="m-0">Sales Qty</label>
+                    </div>
+                    <div class="col-1 px-1">
+                        <label for="pallet-quantity" class="m-0">Pallet Qty</label>
+                    </div>
+                    <div class="col-1 px-1">
+                        <label class="m-0">CBM</label>
+                    </div>
+                    <div class="col-1 px-1">
+                        <label class="m-0">Vol.</label>
+                    </div>
+                    <div class="col px-1">
+                        <label for="order-quantity" class="m-0">Price Per Cubic</label>
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="Total Cost" class="m-0">Total Cost</label>
+                    </div>
+                    <i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
+                </div>
+                <!-- V-FOR ITEMS -->
+                <div class="row" v-for="(item, index) in order.items">
+                    <div class="col px-1">
+                        <select @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control">
+                            <option value="" selected disabled>Choose Merchandise Inventory</option>
+                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]] --- [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
+                        </select>
+                    </div>
+                    <div class="col-1 px-1">
+                        <input v-model="item.remaining" type="number" class="form-control" readonly>
+                    </div>
+                    <div class="col-1 px-1">
+                        <input v-model="item.quantity" @change="onForVol(index)" type="number" class="form-control" min="0">
+                    </div>
+                    <div class="col-1 px-1">
+                        <input v-model="item.pallet" type="number" class="form-control" min="0">
+                    </div>
+                    <div class="col-1 px-1">
+                        <select v-model="item.cbm" class="form-control">
+                            <option value="m3">M3</option>
+                        </select>
+                    </div>
+                    <div class="col-1 px-1">
+                        <input v-model="item.vol" @change="onForTotalCost(index)" class="form-control" type="number" step="0.00001" readonly>
+                    </div>
+                    <div class="col px-1">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input v-model="item.pricePerCubic" @change="onForTotalCost(index)" type="text" class="form-control box-shadow-off" min="0">
+                        </div>
+                    </div>
+                    <div class="col-2 pl-1">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">$</span>
+                            </div>
+                            <input type="text" :value="formatPrice(item.totalCost)" class="form-control box-shadow-off" readonly>
+                        </div>
+                    </div>
+                    <i @click="remove(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
+                </div>
+                <!-- ADD NEW LINE -->
+                <div class="row">
+                    <div class="col px-1">
+                        <button @click="addLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
+                    </div>
+                </div>
+
+                <!-- ATC AND AMOUNT -->
+                <div class="row mt-2">
+                    <!-- ATC AND MORE -->
+                    <div class="col-6 pl-0">
+                        <div class="p-4 order-card-darker b-radius-15">
+                            <div class="row">
+                                <div class="col-3 px-1">
+                                    <label>ATC Code</label>
+                                </div>
+                                <div class="col-3 px-1">
+                                    <label>Tax Base</label>
+                                </div>
+                                <div class="col-3 px-1">
+                                    <label>Tax Rate</label>
+                                </div>
+                                <div class="col-3 px-1">
+                                    <label>To be Withheld</label>
+                                </div>
+                            </div>
+                            <div class="row" v-for="(line, index) in order.atc">
+                                <div class="col-3 px-1">
+                                    <select v-model="line.code" class="form-control" @change="setATCRate(line.code, index)">
+                                        <optgroup v-for="atcGroup in formattedATCList" :label="atcGroup.name">
+                                            <option v-for="atc in atcGroup.list" :value="atc.id">[[atc.code]]</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="col-3 px-1">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input :value="formatPrice(line.amount)" type="text" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-3 px-1">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                        <input v-model="line.taxRate" type="number" step="0.02" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-3 px-1">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input :value="formatPrice(line.amountWithheld)" type="text" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- REMARKS -->
+                            <div class="row mt-2">
+                                <div class="col-12 px-1">
+                                    <label>Remarks</label>
+                                    <textarea v-model="order.remarks" cols="30" rows="2" class="form-control" placeholder="Enter Remarks (Optional)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 order-card-darker b-radius-15 mt-4">
+                            <div class="row">
+                                <div class="col px-1">
+                                    <label>Other Fees</label>
+                                </div>
+                                <div class="col-7 px-1">
+                                    <label>Description</label>
+                                </div>
+                                <i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
+                            </div>
+                            <div class="row" v-for="(item, index) in order.otherFees">
+                                <div class="col px-1">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input v-model="item.fee" type="number" step="0.01" class="form-control box-shadow-off">
+                                    </div>
+                                </div>
+                                <div class="col-7 px-1">
+                                    <input v-model="item.description" type="text" class="form-control">
+                                </div>
+                                <i @click="removeFee(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
+                            </div>
+                            <!-- ADD NEW LINE -->
+                            <div class="row">
+                                <div class="col px-1">
+                                    <button @click="addFeeLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AMOUNT AND PAYMENT -->
+                    <div class="col-6 pr-0">
+                        <div class="p-4 order-card-darker b-radius-15">
+                            <div class="row">
+                                <div class="col px-1">
+                                    <label>Amount Due</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input type="text" :value="formatPrice(order.amountDue)" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 px-1">
+                                    <label>Total Output VAT</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input :value="formatPrice(order.taxPeso)" type="text" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 px-1">
+                                    <label>Total Other Fees</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input :value="formatPrice(order.otherFeesTotal)" type="text" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-6 px-1">
+                                    <label>Discount</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" v-if="order.discountType=='peso'">$</span>
+                                    <span class="input-group-text" v-else>%</span>
+                                        </div>
+                                        <input v-model="order.discount" type="text" class="form-control box-shadow-off">
+                                    </div>
+                                    <div class="ml-2 form-check form-check-inline">
+                                        <input v-model="order.discountType" value="percent" name="discount" type="radio" class="form-check-input">
+                                        <label class="form-check-label mr-2">%</label>
+                                        <input v-model="order.discountType" value="peso" name="discount" type="radio" class="form-check-input">
+                                        <label class="form-check-label">$</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 px-1">
+                                    <label class="font-size-18">Total Amount Due</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input type="text" :value="formatPrice(order.amountTotal)" class="form-control box-shadow-off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 px-1">
+                                    <label>Due Date</label>
+                                    <input v-model="order.dueDate" type="date" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div @click="checkForm()" class="container-extend border container-extend btn-bottom">
+                Save
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data:{
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            inventoryTypes: [
+                'Merchandise',
+                'Manufacturing',
+                'Office'
+            ],
+            order:{
+                code: '{{new_code}}',
+                date: new Date().toISOString().split('T')[0],
+                dateTimeCreated: new Date().toISOString(),
+                retroactive: null,
+                salesOrder: '',
+                customer: '',
+                taxType: '',
+                taxRate: '',
+                items: [{
+                    type: '',
+                    code: '',
+                    remaining: null,
+                    quantity: 0,
+                    pallet: 0,
+                    cbm: 'm3',
+                    vol: null,
+                    refVol: null,
+                    pricePerCubic: 0.00,
+                    totalCost: null
+                }],
+                atc: [{
+                    code: '',
+                    amount: 0,
+                    taxRate: 0,
+                    amountWithheld: 0,
+                }],
+
+                otherFees: [{
+                    fee: 0,
+                    description: null
+                }],
+                otherFeesTotal: 0,
+                discount: 0,
+                totalDiscount: 0,
+                discountType: 'peso',
+                taxPeso: 0,
+                withholdingTax: 0,
+                remarks: null,
+                amountDue: '0',
+                amountTotal: 0,
+                amountPaid: null,
+                paymentMethod: '',
+                paymentPeriod: null,
+                chequeNo: null,
+                dueDate: null,
+                bank: null,
+            },
+            customers: [],
+            merchandiseInventory: [],
+            atcList: [],
+            formattedATCList: [],
+            errors: [],
+            addCustomerModal:{
+                name: null,
+                type: 'Customer',
+                shippingAddress: null,
+                officeAddress: null,
+                landline: null,
+                mobile: null,
+                email: null,
+                contactPerson: null,
+                bank: null,
+                bankNo: null,
+                tin: null,
+                crte: false,
+                prefferedPayment: ''
+            },
+
+        },
+        computed: {
+            amountDue(){
+                return this.order.items.map(item=>item.totalCost)
+            },
+
+            amountPaid(){
+                return Number(this.order.amountPaid)
+            },
+            amountDue2(){
+                return Number(this.order.amountDue)
+            },
+            amountTotal(){
+                return Number(this.order.amountTotal)
+            },
+            amountWithheld(){
+                return this.order.atc.map(item=>item.amountWithheld)
+            },
+            taxRate(){
+                return Number(this.order.taxRate)
+            },
+            otherFeesTotal(){
+                return this.order.otherFees.map(item=>item.fee)
+            },
+            discountType(){
+                return this.order.discountType
+            },
+            discount(){
+                return this.order.discount
+            },
+        },
+
+        watch: {
+            otherFeesTotal(){
+                //this.order.otherFeesTotal = this.otherFeesTotal.reduce((a,b)=>Number(a)+Number(b),0).toFixed(5)
+//
+                //this.order.amountTotal = this.order.otherFeesTotal + this.order.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0))
+                //this.order.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
+                //this.order.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+//
+                //
+//
+//
+                //if (this.order.discountType == 'percent'){
+                //    this.order.totalDiscount = (this.order.amountDue*(this.order.discount / 100))
+                //    this.order.amountTotal = this.order.amountDue - this.order.totalDiscount + this.order.taxPeso
+                //}
+                //else if (this.order.discountType == 'peso'){
+                //    this.order.totalDiscount = this.order.discount
+                //    this.order.amountTotal = this.order.amountDue - this.order.totalDiscount + this.order.taxPeso
+                //}
+                
+                this.watchers()
+            },
+            
+            amountDue(){
+                //console.log(this.otherFeesTotal.reduce((a, b)=>Number(a)+Number(b), 0))
+                //this.order.amountDue = (this.amountDue.reduce((a, b)=>Number(a)+Number(b), 0))
+                //this.order.atc.forEach(item=>{
+                //    item.amount = Number(this.order.amountDue).toFixed(2)
+                //})
+//
+                //this.order.amountTotal = this.order.otherFeesTotal + this.order.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                //this.order.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
+                //this.order.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                //this.order.atc[0].amountWithheld = ((this.order.atc[0].taxRate) / 100) * this.order.amountDue
+                //if (this.order.discountType == 'percent'){
+                //    this.order.totalDiscount = (this.order.amountDue*(this.order.discount / 100))
+                //    this.order.amountTotal = this.order.amountDue - this.order.totalDiscount + this.order.taxPeso
+                //}
+                //else if (this.order.discountType == 'peso'){
+                //    this.order.totalDiscount = this.order.discount
+                //    this.order.amountTotal = this.order.amountDue - this.order.totalDiscount + this.order.taxPeso
+                //}
+                this.watchers()
+            },
+
+            amountTotal(){
+                if (this.amountPaid == this.amountTotal){
+                    this.order.paymentPeriod = 'Full Payment'
+                } else {
+                    this.order.paymentPeriod = 'Partial Payment'
+                }
+            },
+
+            amountPaid(){
+                this.watchers()
+                if (this.amountPaid == this.amountTotal){
+                    this.order.paymentPeriod = 'Full Payment'
+                } else {
+                    this.order.paymentPeriod = 'Partial Payment'
+                }
+            },
+            amountWithheld(){
+                //this.order.amountTotal = this.order.otherFeesTotal + this.order.amountDue - (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                //this.order.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
+                //this.order.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                //if (this.order.discountType == 'percent'){
+                //    this.order.totalDiscount = (this.order.amountDue*(this.order.discount / 100))
+                //    this.order.amountTotal = this.order.amountDue - this.order.totalDiscount + this.order.taxPeso
+                //}
+                //else if (this.order.discountType == 'peso'){
+                //    this.order.totalDiscount = this.order.discount
+                //    this.order.amountTotal = this.order.amountDue - this.order.totalDiscount + this.order.taxPeso
+                //}
+
+                this.watchers()
+            },
+            taxRate(){
+                //this.order.taxPeso = (Number(this.amountTotal) * Number(this.taxRate/100))
+                //this.order.withholdingTax = (this.amountWithheld.reduce((a,b)=>Number(a)+Number(b),0)).toFixed(5)
+                //if (this.order.discountType == 'percent'){
+                //    this.order.totalDiscount = (this.order.amountDue*(this.order.discount / 100))
+                //    this.order.amountTotal = this.order.amountDue - this.order.totalDiscount + this.order.taxPeso
+                //}
+                //else if (this.order.discountType == 'peso'){
+                //    this.order.totalDiscount = this.order.discount
+                //    this.order.amountTotal = this.order.amountDue - this.order.totalDiscount + this.order.taxPeso
+                //}
+
+                this.watchers()
+            },
+            discountType(){
+                this.watchers()
+                
+            },
+            discount(){
+                this.watchers()
+            }
+        },
+
+        methods:{
+            submitAddCustomer(){
+                axios.post('/save-party/', this.addCustomerModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+            watchers(){
+                this.order.otherFeesTotal = this.otherFeesTotal.reduce((a,b)=>Number(a)+Number(b), 0)
+                this.order.amountDue = this.amountDue.reduce((a,b)=>Number(a)+Number(b),0)
+                this.order.atc[0].amount = this.order.amountDue - this.order.taxPeso
+                this.order.atc[0].amountWithheld = (((this.order.atc[0].taxRate)/100) * this.order.atc[0].amount)
+                if (this.order.discountType == 'percent'){
+                    this.order.totalDiscount = (this.order.amountDue*(this.order.discount / 100))
+                    this.order.amountDue = this.order.amountDue - this.order.totalDiscount
+                }
+                else if (this.order.discountType == 'peso'){
+                    this.order.totalDiscount = this.order.discount
+                    this.order.amountDue = this.order.amountDue - this.order.totalDiscount
+                }
+                this.order.taxPeso = this.order.amountDue * (this.order.taxRate/100)
+                this.order.amountTotal = this.order.amountDue + this.order.otherFeesTotal - this.order.withholdingTax
+                this.order.withholdingTax = Number(this.order.amountPaid/((1+(this.order.taxRate/100)-(this.order.atc[0].taxRate)/100))) * (this.order.atc[0].taxRate)/100
+            },
+
+            loadData(){
+                axios.get('/api/customer/')
+                .then(res=>this.customers=res.data)
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: 'customer failed to fetch',
+                        icon: 'error'
+                    })
+                })
+
+                axios.get('/api/merchinventory/')
+                .then(res=>this.merchandiseInventory=res.data)
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: 'inventory failed to fetch',
+                        icon: 'error'
+                    })
+                })
+
+                axios.get('/api/atc/')
+                .then(res=>this.atcList=res.data)
+                .then(res=>{
+                    var none = []
+                    var wiTempList = []
+                    var wcTempList = []
+
+                    this.atcList.forEach((item, index)=>{
+                        if(item.code.includes('None')){
+                            none.push(item)
+                        }
+                        else if(item.code.includes('WI')){
+                            wiTempList.push(item)
+                        } else {
+                            wcTempList.push(item)
+                        }
+                        this.formattedATCList = [
+                            {
+                                name: 'None',
+                                list: none
+                            },
+                            {
+                                name: 'Individual',
+                                list: wiTempList
+                            },
+                            {
+                                name: 'Corporation',
+                                list: wcTempList
+                            }
+                        ]
+                    })
+                })
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: 'atc failed to fetch',
+                        icon: 'error'
+                    })
+                })
+            },
+
+            checkCRTE(customer){
+                axios.get(`/api/customer/${customer}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    if (res.data.crte){
+                        this.order.taxType = 'VAT'
+                        this.order.taxRate = '0'
+                    } else {
+                        this.order.taxType = 'VAT'
+                        this.order.taxRate = '12'
+                    }
+                })
+            },
+
+            checkForm(e){
+                var success1 = false
+                if (
+                    this.order.code &&
+                    this.order.date &&
+                    this.order.customer &&
+                    this.order.taxType &&
+                    this.order.taxRate
+                    )
+                {
+                    for(var item of this.order.items){
+                        if(
+                            item.code &&
+                            item.quantity &&
+                            item.totalCost
+                        )
+                        {
+                            success1=true
+                        } else {
+                            success1 = false
+                            break
+                        }
+                    }
+                    for(var item of this.order.atc){
+                        if(
+                            item.code
+                        )
+                        {
+                            success1 = true
+                        } else {
+                            success1 = false
+                            break
+                        }
+                    }
+                    if(success1){
+                        this.submit()
+                        return
+                    }
+                }
+                this.errors = []
+                success = true
+                if (!this.order.code){
+                    this.errors.push('Code Required')
+                }
+                if (!this.order.date){
+                    this.errors.push('Date Required')
+                }
+                if (!this.order.customer){
+                    this.errors.push('Customer Required')
+                }
+                if (!this.order.taxType){
+                    this.errors.push('Tax Type Required')
+                }
+                if (!this.order.taxRate){
+                    this.errors.push('Tax Rate Required')
+                }
+
+                this.order.items.forEach((item, index)=>{
+                    if(!item.code){
+                        this.errors.push('Item Code Required at index: ' + String(index+1))
+                    }
+                    if(!item.quantity){
+                        this.errors.push('Item Quantity Required at index: ' + String(index+1))
+                    }
+                    if(!item.totalCost){
+                        this.errors.push('Total Cost Required at index: ' + String(index+1))
+                    }
+                })
+
+                this.order.atc.forEach((item, index)=>{
+                    if(!item.code){
+                        this.errors.push('ATC Required')
+                    }
+                })
+
+                Swal.fire({
+                    title: "Unfilled Inputs",
+                    html: this.errors.join('<br>'),
+                    icon: 'warning'
+                })
+            },
+            
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+
+            addLine(){
+                this.order.items.push({
+                    type: '',
+                    code: '',
+                    remaining: null,
+                    quantity: null,
+                    vatable: 0.00,
+                    inputVAT: 0,
+                    totalCost: null
+                })
+            },
+
+            addATC(){
+                this.order.atc.push({
+                    code: '',
+                    amount: Number(this.amountDue).toFixed(2),
+                    taxRate: 0,
+                    amountWithheld: 0,
+                })
+            },
+
+            getMerchRemaining(id, index){
+                item = this.merchandiseInventory.find(x=>x.id==id)
+                this.order.items[index].remaining = item.qtyA
+                this.order.items[index].pricePerCubic = Number(item.pricePerCubic).toFixed(2)
+                this.order.items[index].vol = item.vol
+                this.order.items[index].refVol = item.vol
+
+                this.onForTotalCost(index)
+            },
+
+            onForVol(index){
+                row = this.order.items[index]
+                row.vol = Number(row.refVol * row.quantity).toFixed(4)
+                this.onForTotalCost(index)
+            },
+
+            onForTotalCost(index){
+                row = this.order.items[index]
+                row.totalCost = Number(row.pricePerCubic * row.vol).toFixed(4)
+            },
+
+            remove (index) {
+                this.$delete(this.order.items, index)
+            },
+            submit(){
+                message = "Creating Sales Contract"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.post('/save-exports/', this.order, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        html: err.message,
+                        icon: 'error',
+                    })
+                })
+                
+            },
+            setATCRate(code, index){
+                object = this.atcList.find(x=>x.id==code)
+                this.order.atc[index].taxRate = ((object.rate)*100).toFixed(2)
+
+                this.order.atc[index].amountWithheld = (((this.order.atc[index].taxRate)/100) * this.order.atc[index].amount).toFixed(2)
+            },
+            roundNumber2(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(2).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            roundNumber0(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(0).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            fixed2(value){
+                return Number(value).toFixed(2)
+            },
+
+            addFeeLine(){
+                this.order.otherFees.push({
+                    fee: null,
+                    description: null
+                })
+            },
+            removeFee(index){
+                this.$delete(this.order.otherFees, index)
+            },
+        },
+        mounted(){
+            this.loadData()
+        }
+    })
+</script>
+
+{% endblock %}

@@ -859,6 +859,73 @@ class SalesContract(models.Model):
     def __str__(self):
         return self.code
 
+class Exports(models.Model):
+    code = models.CharField(max_length=50)
+    datetimeCreated = models.DateTimeField()
+    dateSold = models.DateField()
+    party = models.ForeignKey(Party, related_name="exports", on_delete=models.CASCADE, null=True, blank=True)
+    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null = True)
+    amountDue = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
+    discountPercent = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    taxType = models.CharField(max_length=20, null = True, blank = True)
+    taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
+    paymentMethod = models.CharField(max_length=50, null=True, blank=True)
+    paymentPeriod = models.CharField(max_length=50, null=True, blank=True)
+    chequeNo = models.CharField(max_length=50, null=True, blank=True)
+    dueDate = models.DateField(null = True, blank = True)
+    bank = models.CharField(max_length=50, null = True, blank = True)
+    remarks = models.TextField(null = True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "exportscreatedby")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "exportsapprovedby")
+    datetimeApproved = models.DateTimeField(null=True, blank=True)
+    approved = models.BooleanField(null = True, default = False)
+    voided = models.BooleanField(null = True, default = False)
+    voidedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True, related_name= "exportsvoidedby")
+    datetimeVoided = models.DateTimeField(null = True, blank = True)
+    journal = models.ForeignKey(Journal, related_name="exports", on_delete=models.CASCADE, null=True, blank=True)
+    fullyPaid = models.BooleanField(null = True, blank=True, default = False)
+    runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    
+
+    class Meta:
+        verbose_name = "Export"
+        verbose_name_plural = "Exports"
+
+    def __str__(self):
+        return self.code
+
+class ExportOtherFees(models.Model):
+    export = models.ForeignKey(Exports, related_name='exportotherfees', on_delete=models.CASCADE)
+    fee = models.DecimalField(max_digits=20, decimal_places=5)
+    description = models.CharField(max_length=255, null = True)
+
+class ExportItemsMerch(models.Model):
+    export = models.ForeignKey(Exports, related_name='exportitemsmerch', on_delete=models.CASCADE)
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="exportitemsmerch", on_delete=models.CASCADE, null=True, blank=True)
+    remaining = models.IntegerField()
+    qty = models.IntegerField()
+    cbm = models.CharField(max_length=10, null = True)
+    vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    delivered = models.BooleanField(null = True, default = False)
+
+    class Meta:
+        verbose_name = "Export Items Merch"
+        verbose_name_plural = "Export Items Merchs"
+
+    def __str__(self):
+        return self.merchInventory.code
+
+class Exportatc(models.Model):
+    export = models.ForeignKey(Exports, related_name='exportatc', on_delete=models.CASCADE)
+    code = models.ForeignKey(ATC, related_name="exportatc",on_delete=models.CASCADE, null=True, blank=True)
+    amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
+
 class PaymentVoucher(models.Model):
     code = models.CharField(max_length = 50, null = True, blank=True)
     datetimeCreated = models.DateTimeField(null = True, blank=True)

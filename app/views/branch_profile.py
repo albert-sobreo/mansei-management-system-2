@@ -176,7 +176,7 @@ class SaveDefaultAccounts(APIView):
 
         for item in items['advancesToSupplier']:
             bdacct.advancesToSupplier.clear()
-            bdacct.advancesToSupplier = AccountChild.objects.get(pk=item)
+            bdacct.advancesToSupplier.add(AccountChild.objects.get(pk=item))
 
         
         bdacct.save()

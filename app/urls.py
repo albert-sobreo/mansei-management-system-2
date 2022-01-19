@@ -449,6 +449,8 @@ urlpatterns = [
     path('income-statement/', login_required(views.IncomeStatementView.as_view())),
     path('income-statement-request/', login_required(views.IncomeStatementRequest.as_view())),
     path('cash-flow/', login_required(views.CashFlowView.as_view())),
+
     path('cash-flow-request/', login_required(views.CashFlowRequest.as_view())),
-    path('void-journal/<int:pk>/', login_required(views.VoidJournal.as_view()))
+    path('void-journal/<int:pk>/', login_required(views.VoidJournal.as_view())),
+    path('exports/', login_required(views.ExportsView.as_view()))
 ]

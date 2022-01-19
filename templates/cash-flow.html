@@ -30,6 +30,179 @@
             </div>
         </div>
 
+        <!-- TABLE -->
+        <div class="container my-2 px-4 py-3 b-radius-15 box-shadow-medium border">
+            <!-- RETAINED EARNINGS -->
+            <div v-if="cashFlow">
+                <!-- TITLE -->
+                <div class="row">
+                    <div class="col">
+                        <span class="font-size-18 font-bold">Retained Earnings</span>
+                    </div>
+                </div>
+                <!-- END TITLE -->
+
+                <!-- PARENT CONTAINER -->
+                <div>
+                    <div class="row my-2">
+                        <div class="col-10">
+                            <span class="font-semibold no-decoration ml-4"></i>Amount</span>
+                        </div>
+                        <div class="col-2 text-right">
+                            <span class="font-semibold">₱[[formatPrice(cashFlow.retainedEarnings.amount)]]</span>
+                        </div>
+                        <div class="col">
+                            <hr class="my-0 ml-4">
+                        </div>
+                    </div>
+                    <!-- END SUB GROUP CONTAINER -->
+                </div>
+                <!-- END PARENT CONTAINER -->
+            </div>
+
+
+
+
+            <!-- OPERATING -->
+            <div v-for="(value, key, index) in cashFlow" v-if="cashFlow != null && typeof value != 'string' && key != 'retainedEarnings' && key != 'cashBeginning'">
+                <!-- TITLE -->
+                <div class="row">
+                    <div class="col">
+                        <span class="font-size-18 font-bold">[[capitalize(key)]] Activities </span>
+                    </div>
+                </div>
+                <!-- END TITLE -->
+
+                <!-- PARENT CONTAINER -->
+                <div v-for="(value2, key2, index2) in value" v-if="key2 != 'amount'">
+                    <div class="row my-2">
+                        <div class="col-10">
+                            <a data-toggle="collapse" :href="'#' + key + index2" class="font-semibold no-decoration ml-4"></i><i class="fas fa-angle-right"></i>  [[capitalize(key2)]]</a>
+                        </div>
+                        <div class="col-2 text-right">
+                            <span class="font-semibold">₱[[formatPrice(value2.amount)]]</span>
+                        </div>
+                        <div class="col">
+                            <hr class="my-0 ml-4">
+                        </div>
+                    </div>
+                    <!-- SUB GROUP CONTAINER -->
+                    <div class="collapse" :id="key+index2">
+                        <div class="row" v-for="(sub, key3) in value2"  v-if="typeof sub != 'string'">
+                            <div class="col-10">
+                                <span class="font-semibold ml-5">[[key3]]</span>
+                            </div>
+                            <div class="col-2 text-right">
+                                <span class="font-regular">[[formatPrice(sub.amount)]]</span>
+                            </div>
+                            <div class="col">
+                                <hr class="my-0 ml-5">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END SUB GROUP CONTAINER -->
+                </div>
+                <!-- END PARENT CONTAINER -->
+            </div>
+
+
+
+
+
+            <!-- TOTAL CASH FLOW -->
+            <div v-if="cashFlow">
+                <!-- TITLE -->
+                <div class="row">
+                    <div class="col">
+                        <span class="font-size-18 font-bold">Total Cash Flow</span>
+                    </div>
+                </div>
+                <!-- END TITLE -->
+
+                <!-- PARENT CONTAINER -->
+                <div>
+                    <div class="row my-2">
+                        <div class="col-10">
+                            <span class="font-semibold no-decoration ml-4"></i>Amount</span>
+                        </div>
+                        <div class="col-2 text-right">
+                            <span class="font-semibold">₱[[formatPrice(cashFlow.tcf)]]</span>
+                        </div>
+                        <div class="col">
+                            <hr class="my-0 ml-4">
+                        </div>
+                    </div>
+                    <!-- END SUB GROUP CONTAINER -->
+                </div>
+                <!-- END PARENT CONTAINER -->
+            </div>
+
+            
+
+
+
+
+            <!-- CASH BEGINNING -->
+            <div v-if="cashFlow">
+                <!-- TITLE -->
+                <div class="row">
+                    <div class="col">
+                        <span class="font-size-18 font-bold">Cash Beginning</span>
+                    </div>
+                </div>
+                <!-- END TITLE -->
+
+                <!-- PARENT CONTAINER -->
+                <div>
+                    <div class="row my-2">
+                        <div class="col-10">
+                            <span class="font-semibold no-decoration ml-4"></i>Amount</span>
+                        </div>
+                        <div class="col-2 text-right">
+                            <span class="font-semibold">₱[[formatPrice(cashFlow.cashBeginning.amount)]]</span>
+                        </div>
+                        <div class="col">
+                            <hr class="my-0 ml-4">
+                        </div>
+                    </div>
+                    <!-- END SUB GROUP CONTAINER -->
+                </div>
+                <!-- END PARENT CONTAINER -->
+            </div>
+
+
+
+
+            <!-- CASH ENDING -->
+            <div v-if="cashFlow">
+                <!-- TITLE -->
+                <div class="row">
+                    <div class="col">
+                        <span class="font-size-18 font-bold">Cash Ending</span>
+                    </div>
+                </div>
+                <!-- END TITLE -->
+
+                <!-- PARENT CONTAINER -->
+                <div>
+                    <div class="row my-2">
+                        <div class="col-10">
+                            <span class="font-semibold no-decoration ml-4"></i>Amount</span>
+                        </div>
+                        <div class="col-2 text-right">
+                            <span class="font-semibold">₱[[formatPrice(cashFlow.cashEnding)]]</span>
+                        </div>
+                        <div class="col">
+                            <hr class="my-0 ml-4">
+                        </div>
+                    </div>
+                    <!-- END SUB GROUP CONTAINER -->
+                </div>
+                <!-- END PARENT CONTAINER -->
+            </div>
+
+        </div>
+
         <div class="row">
             <pre>[[$data]]</pre>
         </div>
@@ -49,7 +222,7 @@
             startDate: null,
             endDate: null,
 
-            cashFlow: {}
+            cashFlow: null
         },
 
         methods: {
@@ -65,11 +238,19 @@
                 })
                 axios.get(`/cash-flow-request/?startDate=${this.startDate}&endDate=${this.endDate}`)
                 .then(res=>{
-                    console.log(res.data)
                     this.cashFlow = res.data
                     Swal.close()
+
+                    this.cashFlow.tcf = String(this.addNumber(this.cashFlow.operating.amount, this.cashFlow.financing.amount, this.cashFlow.investing.amount))
+                    this.cashFlow.cashEnding = String(this.addNumber(this.cashFlow.tcf, this.cashFlow.cashBeginning.amount, this.cashFlow.retainedEarnings.amount))
                 })
-            }, 
+            },
+            includes(string, substring){
+                return true?(string.toLowerCase()).includes(substring.toLowerCase()):false
+            },
+            capitalize(string){
+                return  string.slice(0,1).toUpperCase() + string.slice(1)
+            },
             formatPrice(value) {
                 if (this.roundToggle){
                     return value

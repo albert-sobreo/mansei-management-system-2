@@ -6,7 +6,7 @@ from django.views import View
 from ..forms import *
 import sweetify
 from decimal import Decimal
-from datetime import datetime
+from datetime import date, datetime
 import re
 from .journalAPI import jeAPI
 from .petty_cash_api import *
@@ -278,10 +278,33 @@ class CashFlowRequest(APIView):
             'retainedEarnings': {
                 'amount': Decimal(0)
             },
-            "operating": {},
-            "financing": {},
-            "investing": {},
+            "operating": {
+                'amount': Decimal(0)
+            },
+            "financing": {
+                'amount': Decimal(0)
+            },
+            "investing": {
+                'amount': Decimal(0)
+            },
+            "cashBeginning":{
+                'amount': Decimal(0)
+            }
         }
+        """GET BEGINNING BALANCE OF CASH"""
+        startDateObject = datetime.date(int(startDate.split('-')[0]), int(startDate.split("-")[1]), int(startDate.split('-')[2]))
+        jcash = request.user.branch.journal.filter(journalDate__lte = startDateObject).order_by('-pk')
+
+        for j in jcash:
+            for je in j.journalentries.all():
+                if re.search('[Cc]ash', je.accountChild.accountSubGroup.name):
+                    if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                        data['cashBeginning']['amount'] += je.amount
+                    else:
+                        data['cashBeginning']['amount'] -= je.amount
+        """END"""
+
+
 
         """FETCH JOURNALS AND DO FOR LOOP BELOW"""
 
@@ -290,7 +313,12 @@ class CashFlowRequest(APIView):
         for j in journal:
             for je in j.journalentries.all().iterator():
                 # je.accountChild.accountSubGroup.accountGroup.name
-                if re.search('^[Cc]urrent', je.accountChild.accountSubGroup.accountGroup.name):
+                if re.search('^[Cc]urrent', je.accountChild.accountSubGroup.accountGroup.name) and not re.search('[Cc]ash', je.accountChild.accountSubGroup.name):
+                    if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                        data['operating']['amount'] += je.amount
+                    else:
+                        data['operating']['amount'] -= je.amount
+
                     try:
                         if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
                             data['operating'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
@@ -319,6 +347,10 @@ class CashFlowRequest(APIView):
                         
                 
                 elif re.search('(^[Nn]on)|([Aa]sset$)',  je.accountChild.accountSubGroup.accountGroup.name):
+                    if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                        data['investing']['amount'] += je.amount
+                    else:
+                        data['investing']['amount'] -= je.amount
                     try:
                         if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
                             data['investing'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
@@ -346,6 +378,10 @@ class CashFlowRequest(APIView):
                         
 
                 elif re.search('(^[Nn]on)|([Ll]iabilities$)', je.accountChild.accountSubGroup.accountGroup.name) or re.search('[Ee]quity',  je.accountChild.accountSubGroup.accountGroup.name):
+                    if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
+                        data['financing']['amount'] += je.amount
+                    else:
+                        data['financing']['amount'] -= je.amount
                     try:
                         if je.normally == je.accountChild.accountSubGroup.accountGroup.normally or not re.search('[Rr]etain', je.accountChild.accountSubGroup.name):
                             data['financing'][je.accountChild.accountSubGroup.accountGroup.name]['amount'] += je.amount
@@ -373,8 +409,8 @@ class CashFlowRequest(APIView):
                 
                 elif re.search('[Ee]xpense', je.accountChild.accountSubGroup.accountGroup.name) or re.search('[Rr]evenue', je.accountChild.accountSubGroup.accountGroup.name) or re.search('[Ii]ncome', je.accountChild.accountSubGroup.accountGroup.name) or re.search('[Ss]ale', je.accountChild.accountSubGroup.accountGroup.name):
                     if je.normally == je.accountChild.accountSubGroup.accountGroup.normally:
-                        data['retainedEarnings']['amount'] += je.amount
-                    else:
                         data['retainedEarnings']['amount'] -= je.amount
+                    else:
+                        data['retainedEarnings']['amount'] += je.amount
                         
         return JsonResponse(data, safe=False)
