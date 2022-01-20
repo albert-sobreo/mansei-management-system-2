@@ -1,0 +1,938 @@
+{% extends "base-template.html" %}
+{% block title %}Received Payment - USD{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-sales" photo="/media/{{request.user.image}}"></navbar-gas>
+    <app-card></app-card>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Received Payments for Exports (USD)</span>
+        </div>
+
+        <!-- TABLE -->
+        <table  id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+            <thead class="thead-dark">
+                <th>RP Code</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Created By</th>
+            </thead>
+            <tbody>
+                {% for item in request.user.branch.receivePayment.all %}
+
+                {% if item.voided %}
+                <tr class="voided">
+                {% else %}
+                <tr>
+                {% endif %}
+                    <td @click="getExport2({{item.pk}})" class="link" data-toggle="modal" data-target="#rpModal">{{item.code}}</td>
+                    <td>{{item.salesContract.party.name}}</td>
+                    <td>$[[formatPrice('{{item.amountPaid}}')]]</td>
+                    <td>{{item.createdBy.first_name}} {{item.createdBy.last_name}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="modal fade" id="rpModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <div class="order-card row my-2">
+                            <!-- LVL 1 -->
+                            <div class="col-4 mt-3">
+                                <label for="" class="gray">RP Code</label><br>
+                                <span class="font-size-14 font-bold">[[rpModal.code]]</span>
+                            </div>
+                            <div class="col-4 mt-3">
+                                <label for="" class="gray">Status</label><br>
+                                <span class="font-size-14 font-bold text-danger" v-if="rpModal.voided">Voided</span>
+                                <span class="font-size-14 font-bold approved" v-else-if="rpModal.approved">Approved</span>
+                                <span class="font-size-14 font-bold text-info" v-else-if="rpModal.approved==null">Unknown</span>
+                                <span class="font-size-14 font-bold text-danger" v-else-if="rpModal.voided">Voided</span>
+                                <span class="font-size-14 font-bold pending" v-else>Pending</span>
+                            </div>
+                            <div class="col-4 mt-3">
+                                <label for="" class="gray">Created By</label><br>
+                                <span class="font-size-14 font-bold">[[rpModal.createdBy.first_name]] [[rpModal.createdBy.last_name]]</span>
+                            </div>
+                            <!-- LVL 2 -->
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">Date Created</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[formatDateTime(rpModal.datetimeCreated)]]</span>
+                            </div>
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">Approved By</label>
+                                <br>
+                                <span class="font-size-14 font-bold" v-if="rpModal.approvedBy != null">[[rpModal.approvedBy.first_name]] [[rpModal.approvedBy.last_name]]</span>
+                            </div>
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">Date Approved</label>
+                                <br>
+                                <span class="font-size-14 font-bold" v-if="rpModal.datetimeApproved != null">[[formatDateTime(rpModal.datetimeApproved)]]</span>
+                            </div>
+                        </div>
+
+                        <!-- MIDDLE CARD -->
+                        <div class="order-card row my-2">
+                            <div class="col-4 mt-3">
+                                <label for="" class="gray">SC Code</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[rpModal.salesContract.code]]</span>
+                            </div>
+                            <div class="col-4 mt-3">
+                                <label for="" class="gray">Customer</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[rpModal.salesContract.party.name]]</span>
+                            </div>
+                            <div class="col-4 mt-3">
+                                <label for="" class="gray">Amount Paid</label>
+                                <br>
+                                <span class="font-size-14 font-bold">$[[formatPrice(rpModal.amountPaid)]]</span>
+                            </div>
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">Amount Withheld</label>
+                                <br>
+                                <span class="font-size-14 font-bold">$[[formatPrice(rpModal.wep)]]</span>
+                            </div>
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">Payment Method</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[rpModal.paymentMethod]]</span>
+                            </div>
+                            <div class="col-4 my-3">
+                                <label for="" class="gray">Payment Period</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[rpModal.paymentPeriod]]</span>
+                            </div>
+                        </div>
+
+                        <!-- PO ITEMS -->
+                        <div class="row mt-4">
+                            <div class="col">
+                                <span class="font-bold">SC Items</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <th><span class="font-bold gray">Type</span></th>
+                                    <th><span class="font-bold gray">Code - Class - Type</span></th>
+                                    <th><span class="font-bold gray">Vol</span></th>
+                                    <th><span class="font-bold gray">Qty</span></th>
+                                    <th><span class="font-bold gray">Amount</span></th>
+                                    <th><span class="font-bold gray">Total Amount</span></th>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in rpModal.salesContract.scitemsmerch">
+                                        <td>Merchandise</td>
+                                        <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
+                                        <td>[[item.vol]]</td>
+                                        <td>[[item.qty]]</td>
+                                        <td>$[[formatPrice(item.pricePerCubic)]]</td>
+                                        <td>$[[formatPrice(item.totalCost)]]</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addPV">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content b-radius-15 px-3 py-2">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-start">
+                                <div class="form-group d-flex align-items-center">
+                                    <input @change="changeModalContent()" v-model="rpType" type="radio" name="rpType" value="Default">
+                                    <label for="">Default</label>
+                                    &nbsp;
+                                    <input @change="changeModalContent()" v-model="rpType" type="radio" name="rpType" value="Custom">
+                                    <label for="">Custom</label>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="modal-title"> Create Receive Payments</span>
+                            </div>
+                        </div>
+
+                         <!-- CUSTOM VOUCHER -->
+                         <div id="custom" style="display: none;">
+                            <!-- START -->
+                            <div class="row">
+                                <div class="col-3 pr-2">
+                                    <div class="form-group">
+                                        <label>Reference No.</label>
+                                        <input v-model="addJournalModal.code" type="text" class="form-control" placeholder="Enter Reference No.">
+                                    </div>
+                                </div>
+                                <div class="col col-3 px-2">
+                                    <div class="form-group">
+                                        <label>Date</label>
+                                        <input v-model="addJournalModal.date" type="date" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col col-3 pl-2">
+                                    <div class="form-group">
+                                        <label>Retroactive <span class="font-size-10 gray">optional</span></label>
+                                        <input v-model="addJournalModal.retroactive" type="date" class="form-control" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-3 pl-2">
+                                    <div class="form-group">
+                                        <label for="">Customer</label>
+                                        <select v-model="addJournalModal.party" name="" id="" class="form-control">
+                                            <option value="" disabled selected>Select Customer</option>
+                                            {% for customer in customers %}
+                                            <option value="{{customer.pk}}">{{customer.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- DEBIT -->
+                            <div class="row">
+                                <div class="col col-7">
+                                    <label>Debit Account</label>
+                                </div>
+                                <div class="col col-5">
+                                    <label>Amount</label>
+                                </div>
+                            </div>
+                            <div class="row" v-for="(line, index) in addJournalModal.debit">
+                                <div class="col col-7 pr-2">
+                                    <select v-model="line.accountChild" class="form-control">
+                                        <option value="" selected disabled class="gray">Choose Account</option>
+                                        {% for debit in request.user.branch.subGroup.all %}
+                                        <optgroup label="{{debit.name}}">
+                                            {% for child in debit.accountchild.all %}
+                                            <option value="{{child.pk}}">{{child.name}}</option>
+                                            {% endfor %}
+                                        </optgroup>
+                                        {% endfor %}
+                                    </select>
+
+                                </div>
+                                <div class="col pl-2">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input v-model="line.amount" type="text" class="form-control box-shadow-off" style="margin-top: 0px;">
+                                    </div>                            
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-minus-circle stop text-shadow-small" @click="removeDebit(index)"></i>
+                                </div>
+                            </div>
+                            <div class="row" >
+                                <div class="col">
+                                    <button @click="addLineDebit()" class="btn btn-warning my-2">+ Add new debit</button>
+                                </div>
+                            </div>
+
+                            <!-- CREDIT -->
+                            <div class="row">
+                                <div class="col col-7">
+                                    <label>Credit Account</label>
+                                </div>
+                                <div class="col col-5">
+                                    <label>Amount</label>
+                                </div>
+                            </div>
+                            <div class="row" v-for="(line, index) in addJournalModal.credit">
+                                <div class="col col-7 pr-2">
+                                    <select v-model="line.accountChild" class="form-control">
+                                        <option value="" selected disabled class="gray">Choose Account</option>
+                                        {% for credit in request.user.branch.subGroup.all %}
+                                        <optgroup label="{{credit.name}}">
+                                            {% for child in credit.accountchild.all %}
+                                            <option value="{{child.pk}}">{{child.name}}</option>
+                                            {% endfor %}
+                                        </optgroup>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col pl-2">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input v-model="line.amount" type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;">
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-minus-circle stop text-shadow-small" @click="removeCredit(index)"></i>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button @click="addLineCredit()" class="btn btn-warning my-2">+ Add new credit</button>
+                                </div>
+                            </div>
+
+                            <!-- DESCRIPTION -->
+                            <div class="row">
+                                <div class="col">
+                                    <label>Description</label>
+                                    <textarea v-model="addJournalModal.remarks" class="form-control" id="" cols="30" rows="2" placeholder="Enter Description"></textarea>
+                                </div>
+                            </div>
+                            <div class="row my-2">
+                                <div class="col col-3 pr-2">
+                                    <label>Debit</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input v-model="addJournalModal.tDebit" type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
+                                    </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
+                                </div>
+                                <div class="col col-3 pl-2">
+                                    <label>Credit</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">$</span>
+                                        </div>
+                                        <input v-model="addJournalModal.tCredit" type="number" step="0.00001" class="form-control box-shadow-off" style="margin-top: 0px;" readonly>
+                                    </div><hr style="padding: 0; margin:2px 0px"><hr  style="padding: 0; margin:2px 0px">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-12">
+                                    <div class="d-flex flex-row-reverse">
+                                        <button @click="submitCustomRP()" class="btn btn-primary mt-2" id="save" disabled>Create</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DEFAULT INVOICE -->
+                        <div id="default">
+                            <!-- START -->
+                            <div class="row">
+                                <div class="col col-3 pr-2">
+                                    <div class="form-group">
+                                        <label for="">Reference No.</label>
+                                        <input v-model="create.code" type="text" class="form-control" placeholder="Enter Reference No.">
+                                    </div>
+                                </div>
+                                <div class="col col-3 px-2">
+                                    <div class="form-group">
+                                        <label for="">Date</label>
+                                        <input v-model="create.date" type="date" class="form-control" readonly>
+                                    </div>
+                                </div>
+                                <div class="col col-3 px-2">
+                                    <div class="form-group">
+                                        <label for="">Retroactive <span class="font-size-10 gray">optional</span></label>
+                                        <input v-model="create.retroactive" type="date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-3 pl-2">
+                                    <div class="form-group">
+                                        <label for="">Select Export</label>
+                                        <select @change="getExport(create.scCode)" v-model="create.scCode" class="form-control">
+                                            <option value="" disabled selected>Select Exports</option>
+                                            {% for item in exports reversed %}
+                                            <option value="{{item.pk}}">{{item.code}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-6 pr-2">
+                                    <div class="form-group">
+                                        <label for="">Exchange Rate</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">₱</span>
+                                            </div>
+                                            <input type="text" v-model="create.exchangeRate" onkeypress="validate()" placeholder="USD to PHP - ex. 51.05" class="form-control box-shadow-off">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ORDER CARD -->
+                            <div class="order-card py-3" style="margin-left: -32px; margin-right: -32px; padding-left: 32px; padding-right: 32px">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <label class="gray">Cash Payment Due</label><br>
+                                        <span class="font-size-14 font-bold">$[[roundNumber2(create.sc.runningBalance)]]</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="gray">To be Withheld</label><br>
+                                        <span class="font-size-14 font-bold">$[[roundNumber2(create.sc.wep)]]</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class='gray'>Customer</label><br>
+                                        <span class="font-size-14 font-bold">[[create.sc.party.name]]</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <label for="" class="gray">Due Date</label><br>
+                                        <span class="font-size-14 font-bold">[[create.sc.dueDate]]</span>
+                                    </div>
+                                </div>
+                                <a href="#" @click="roundToggler()">Show Raw Numbers</a>
+                            </div>
+
+                            <!-- PAYMENT METHOD -->
+                            <div class="row my-2">
+                                <div class="col-6 pr-2">
+                                    <div class="form-group">
+                                        <label for="">Payment Method</label>
+                                        <select @change="toggleMemorandum()" v-model="create.paymentMethod" name="" id="" class="form-control">
+                                            <option value="" selected disabled>Choose Payment Method</option>
+                                            <optgroup label="Cash">
+                                                <option value="{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}}">{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}}</option>
+                                                {% for item in request.user.branch.branchProfile.branchDefaultChildAccount.cashInBank.all%}
+                                                <option value="{{item.name}}">{{item.name}}</option>
+                                                {% endfor %}
+                                            </optgroup>
+                                            <optgroup label="Cheque">
+                                                <option value="Cheque">Cheque</option>
+                                            </optgroup>
+                                            <optgroup label="Non-Cash">
+                                                <option value="Memorandum">Memorandum</option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col ml-2 my-2 form-check form-check-inline">
+                                    <input v-model="create.paymentPeriod" value="Full Payment" name="radios" type="radio" class="form-check-input">
+                                    <label class="form-check-label">Full Payment</label>
+                                </div>
+                                <div class="col my-2 form-check form-check-inline">
+                                    <input v-model=create.paymentPeriod value="Partial Payment" name="radios" type="radio" class="form-check-input">
+                                    <label class="form-check-label">Partial Payment</label>
+                                </div>
+
+                                <div class="col-12 d-none" id="memorandum">
+                                    <div class="form-group">
+                                        <label>Transaction to Credit/Debit</label>
+                                        <select @change="fetchPOBalance()" class="form-control" v-model="create.transactionID">
+                                            <option value="">Choose Transaction</option>
+                                            {% for item in po reversed %}
+                                            <option value="{{item.pk}}">{{item.code}} - <span class="gray">Cash Payment Due: </span>$[[formatPrice('{{item.runningBalance}}')]]</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-3 pr-2 py-2">
+                                    <div class="form-group">
+                                        <label for="">Amount Withheld</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">$</span>
+                                            </div>
+                                            <input v-model="create.wep" type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Withheld">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 pl-2 order-card py-2 b-tl-radius-10 b-bl-radius-10">
+                                    <div class="form-group">
+                                        <label for="">Cheque No.</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-money-check"></i></span>
+                                            </div>
+                                            <input v-model="create.chequeNo" type="text" class="form-control box-shadow-off" style="margin-top: 0px" placeholder="Leave blank if applicable">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 px-2 order-card py-2">
+                                    <div class="form-group">
+                                        <label for="">Receiving Bank</label>
+                                        <select v-model="create.bank" class="form-control">
+                                            <option value="">Choose Bank</option>
+                                            {% for item in request.user.branch.branchProfile.branchDefaultChildAccount.cashInBank.all%}
+                                            <option value="{{item.pk}}">{{item.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-3 pl-2 py-2 order-card b-tr-radius-10 b-br-radius-10">
+                                    <div class="form-group">
+                                        <label for="">Cheque Due Date</label>
+                                        <input v-model="create.dueDate" type="date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="">Amount Paid</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">$</span>
+                                            </div>
+                                            <input v-model="create.amountPaid" type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Paid">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="">Description</label>
+                                        <textarea v-model="create.description" cols="30" rows="2" class="form-control" placeholder="Enter Description"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button @click="checkForm()" class="col btn btn-primary">Create</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <pre>[[$data]]</pre>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ["[[", "]]"],
+        el: "#app", 
+
+        data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+
+            rpModal:{
+                code: null,
+                approved: null,
+                createdBy: {
+                    first_name: null,
+                    last_name: null,
+                },
+                datetimeCreated: null,
+                approvedBy: {
+                    first_name:null,
+                    last_name: null,
+                },
+                datetimeApproved: null,
+                salesContract: {
+                    code: null,
+                    party: {
+                        name: null,
+                    },
+                    scitemsmerch: []
+                },
+                amountPaid: null,
+                paymentMethod: null,
+                paymentPeriod: null,
+                wep:null
+            },
+
+            create: {
+                rpType: 'Default',
+                code: '{{new_code}}',
+                date: new Date().toISOString().split('T')[0],
+                retroactive: null,
+                scCode: '',
+                bank: '',
+                exchangeRate: 0,
+                sc: {
+                    code: null,
+                    runningBalance: null,
+                    wep: null,
+                    party: {
+                        name: null,
+                    },
+                    atc: {
+                        code: null,
+                        rate: null,
+                    },
+                    taxRate: null,
+                    dueDate: null,
+                },
+                transactionID: '',
+                paymentMethod: '',
+                paymentPeriod: null,
+                chequeNo: null,
+                dueDate: null,
+                amountPaid: 0,
+                description: null,
+                wep: 0
+            },
+
+            rpType: 'Default',
+
+            addJournalModal:{
+                rpType: 'Custom',
+                code: '{{new_code}}',
+                date: new Date().toISOString().split('T')[0],
+                retroactive: null,
+                party: '',
+                debit: [{
+                    accountChild: '',
+                    amount: null,
+                    normally: 'Debit',
+                }],
+                credit: [{
+                    accountChild: '',
+                    amount: null,
+                    normally: 'Credit',
+                }],
+                remarks: null,
+                tDebit: null,
+                tCredit: null,
+
+            },
+            voucherToggle: false,
+            roundToggle: false,
+            errors: [],
+        },
+
+        computed:{
+            amountPaid(){
+                return this.create.amountPaid
+            },
+            paymentPeriod(){
+                return this.create.paymentPeriod
+            },
+
+            totalCostDebit(){
+                return this.addJournalModal.debit.map(line=>line.amount)
+            },
+            totalCostCredit(){
+                return this.addJournalModal.credit.map(line=>line.amount)
+            },
+            tDebit(){
+                return this.addJournalModal.tDebit
+            },
+            tCredit(){
+                return this.addJournalModal.tCredit
+            }
+        },
+
+        watch: {
+            amountPaid(){
+                if (Number(this.create.amountPaid).toFixed(2) == Number(this.create.sc.runningBalance).toFixed(2)){
+                    this.create.paymentPeriod = 'Full Payment'
+                } else {
+                    this.create.paymentPeriod = 'Partial Payment'
+                }
+            },
+            paymentPeriod(){
+                this.paymentPeriod == 'Full Payment'?this.create.amountPaid=this.create.sc.runningBalance:''
+            },
+
+            totalCostDebit(){
+                this.addJournalModal.tDebit = (this.totalCostDebit.reduce((a,b)=>Number(a)+Number(b), 0)).toFixed(5)
+            },
+            totalCostCredit(){
+                this.addJournalModal.tCredit = (this.totalCostCredit.reduce((a,b)=>Number(a)+Number(b), 0)).toFixed(5)
+            },
+            tDebit(){
+                var x = document.getElementById('save')
+                if (this.tDebit == this.addJournalModal.tCredit){
+                    x.disabled = false
+                } else {
+                    x.disabled = true
+                }
+            },
+            tCredit(){
+                var x = document.getElementById('save')
+                if (this.tCredit == this.addJournalModal.tDebit){
+                    x.disabled = false
+                } else {
+                    x.disabled = true
+                }
+            }
+        },
+        
+        methods: {
+            fetchPOBalance(){
+                axios.get(`/api/purchase-order/${this.create.transactionID}/`)
+                .then(res=>this.create.amountPaid=res.data.runningBalance)
+            },
+            toggleMemorandum(){
+                if(this.create.paymentMethod==='Memorandum'){
+                    document.getElementById('memorandum').classList.remove('d-none')
+                } else {
+                    document.getElementById('memorandum').classList.add('d-none')
+                }
+            },
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+            getExport(id){
+                axios.get(`/api/exports/${id}/`)
+                .then(res=>{
+                    console.log(res.data)
+                    var item = res.data
+                    this.create.sc.code = item.id
+                    this.create.sc.runningBalance = item.runningBalance
+                    this.create.sc.party = item.party
+                    this.create.sc.dueDate = item.dueDate
+
+                })
+            },
+            checkForm(){
+                if (
+                    this.create.scCode &&
+                    this.create.paymentMethod &&
+                    this.create.paymentPeriod &&
+                    this.create.amountPaid && 
+                    this.create.exchangeRate
+                ) {
+                    this.submit()
+                    return
+                }
+
+                this.errors = []
+
+                if(!this.create.scCode){
+                    this.errors.push("SC Required")
+                }
+                if(!this.create.paymentMethod){
+                    this.errors.push("Payment Method Required")
+                }
+                if(!this.create.paymentPeriod){
+                    this.errors.push("Payment Method Required")
+                }
+                if(!this.create.amountPaid){
+                    this.errors.push("Amount Paid Required")
+                }
+                if(!this.create.exchangeRate){
+                    this.errors.push("Exchange Rate Required")
+                }
+
+                Swal.fire({
+                    title: "Unfilled Inputs",
+                    html: this.errors.join('<br>'),
+                    icon: 'warning'
+                })
+            },
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
+            roundNumber2(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(3).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            roundToggler(){
+                this.roundToggle = !this.roundToggle
+            },
+            submit(){
+                message = "Creating Received Payments"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.post('/save-received-payments-usd/', this.create, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        html: err.message,
+                        icon: 'error',
+                    })
+                })
+            },
+
+            getExport2(id){
+                axios.get(`/api/exports/${id}/`)
+                .then(res=>this.rpModal=res.data)
+            },
+            approveSC(id){
+                axios.put(`/si-approval/${id}/`, this.create, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+
+            changeModalContent(){
+                var body = {
+                    default: document.getElementById('default'),
+                    custom: document.getElementById('custom'),
+                }
+    
+                if(this.rpType == "Default"){
+                    console.log('help')
+                    body.custom.style.display = "none"
+                    body.default.style.display = "block"
+                } else {
+                    body.custom.style.display = "block"
+                    body.default.style.display = "none"
+                }
+            },
+            addLineDebit(){
+                this.addJournalModal.debit.push({
+                    accountChild: '',
+                    amount: null,
+                    normally: 'Debit',
+                })
+            },
+            addLineCredit(){
+                this.addJournalModal.credit.push({
+                    accountChild: '',
+                    amount: null,
+                    normally: 'Credit',
+                })
+            },
+            removeDebit (index) {
+                this.$delete(this.addJournalModal.debit, index)
+            },
+            removeCredit(index){
+                this.$delete(this.addJournalModal.credit, index)
+            },
+            submitCustomPV(){
+                message = "Creating Custom Received Payments"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.post(`/save-custom-pv/`, this.addJournalModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        html: err.message,
+                        icon: 'error',
+                    })
+                })
+            }
+            
+        }
+    })
+</script>
+
+<script>
+    $(document).ready(function() {
+        $.fn.dataTable.moment( 'MMMM D, YYYY' );
+        $.fn.dataTable.moment( 'dddd, MMMM Do, YYYY' );
+        $('#table').DataTable({
+            language: { search: '', searchPlaceholder: 'Search'},
+            dom: "<'d-flex p-0 m-0 '<'p-0 m-0 justify-content-start d-flex flex-fill align-items-center flex-grow-0 mr-3 'l><'justify-content-center flex-fill 'B><'justify-content-end flex-fill  align-items-center'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            "order": [[ 0, "desc" ]],
+            "pageLength": 25,
+            buttons: {
+                buttons: [
+                {
+                    text: 'Create Receive Payments',
+                    className: 'btn btn-warning',
+                    titleAttr: 'Add Inventory',
+                    action: function(){
+                        $("#addPV").modal('show')
+                    }
+                },
+                
+                {
+                    text: '<i class="fas fa-file-excel"></i>',
+                    className: 'btn text-success btn-table',
+                    titleAttr: 'Export Excel',
+                    extend: 'excel'
+                },
+                {
+                    text: '<i class="fas fa-file-csv"></i>',
+                    className: 'btn text-warning btn-table',
+                    titleAttr: 'Export CSV',
+                    extend: 'csv'
+                },
+                {
+                    text: '<i class="fas fa-print"></i>',
+                    className: 'btn btn-table',
+                    titleAttr: 'Print',
+                    extend: 'print'
+                },
+                {
+                    text: "RAW",
+                    className: 'btn btn-table font-size-10',
+                    titleAttr: 'View Raw Numbers',
+                    action: function(){
+                        app.roundToggler()
+                    }
+                }
+                ],
+                dom: {
+                    button: {
+                        className: 'btn'
+                    }
+                }
+            },
+            "initComplete": function(){
+                $("#loader-container").hide()
+                $("#loader").hide()
+                $('#table').show()
+            },
+        
+        });
+    });
+    $('option').mousedown(function(e) {
+        e.preventDefault();
+        $(this).prop('selected', !$(this).prop('selected'));
+        return false;
+    });
+</script>
+
+{% endblock %}

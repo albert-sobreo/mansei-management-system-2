@@ -152,6 +152,10 @@ router.register(r"branch-list", views.BranchListAPI, 'branch-list')
 ########## LIQUIDATION ##########
 router.register(r"liquidation", views.LiquidationAPI, 'liquidation')
 
+########## EXPORTS ##########
+router.register(r"exports", views.ExportsAPI, 'exports')
+router.register(r"receivepaymentsUSD", views.ReceivedPaymentsUSDAPI, 'receivepaymentsUSD')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -452,5 +456,9 @@ urlpatterns = [
 
     path('cash-flow-request/', login_required(views.CashFlowRequest.as_view())),
     path('void-journal/<int:pk>/', login_required(views.VoidJournal.as_view())),
-    path('exports/', login_required(views.ExportsView.as_view()))
+    path('exports/', login_required(views.ExportsView.as_view())),
+    path('exports-list/', login_required(views.ExportsListView.as_view())),
+    path('save-exports/', login_required(views.SaveExports.as_view())),
+    path('received-payments-usd/', login_required(views.ReceivedPaymentsUSDView.as_view())),
+    path('save-received-payments-usd/', login_required(views.SaveReceivePaymentsUSD.as_view())),
 ]

@@ -869,9 +869,7 @@ class Exports(models.Model):
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
     discountPercent = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
     discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
-    taxType = models.CharField(max_length=20, null = True, blank = True)
-    taxRate = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    taxPeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank=True)
+    forex = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     paymentMethod = models.CharField(max_length=50, null=True, blank=True)
     paymentPeriod = models.CharField(max_length=50, null=True, blank=True)
     chequeNo = models.CharField(max_length=50, null=True, blank=True)
@@ -888,7 +886,6 @@ class Exports(models.Model):
     journal = models.ForeignKey(Journal, related_name="exports", on_delete=models.CASCADE, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    wep = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     
 
     class Meta:
@@ -909,6 +906,7 @@ class ExportItemsMerch(models.Model):
     remaining = models.IntegerField()
     qty = models.IntegerField()
     cbm = models.CharField(max_length=10, null = True)
+    pallet = models.IntegerField(default = 0, blank = True, null = True)
     vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True)
@@ -920,11 +918,6 @@ class ExportItemsMerch(models.Model):
 
     def __str__(self):
         return self.merchInventory.code
-
-class Exportatc(models.Model):
-    export = models.ForeignKey(Exports, related_name='exportatc', on_delete=models.CASCADE)
-    code = models.ForeignKey(ATC, related_name="exportatc",on_delete=models.CASCADE, null=True, blank=True)
-    amountWithheld = models.DecimalField(max_digits=20, decimal_places=5, blank=True, null=True)
 
 class PaymentVoucher(models.Model):
     code = models.CharField(max_length = 50, null = True, blank=True)
@@ -1051,6 +1044,22 @@ class ReceivePayment(models.Model):
     voided = models.BooleanField(default = False)
     cheque = models.ForeignKey(Cheques, related_name= "receivepayment", on_delete=models.CASCADE, null = True, blank = True )
     party = models.ForeignKey(Party, on_delete=models.CASCADE, null=True, blank=True)
+
+class ReceivePaymentUSD(models.Model):
+    code = models.CharField(max_length=50, null = True)
+    datetimeCreated = models.DateTimeField(null = True)
+    paymentDate = models.DateField(null = True)
+    exports = models.ForeignKey(Exports, related_name= "receivepaymentUSD", on_delete=models.CASCADE, null = True)
+    journal = models.ForeignKey(Journal, related_name= "receivepaymentUSD", on_delete=models.CASCADE, null = True)
+    remarks = models.TextField(null = True)
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True , related_name="rpUSDCreatedBy")
+    paymentMethod = models.CharField(max_length = 50, null = True)
+    paymentPeriod = models.CharField(max_length = 50, null = True)
+    amountPaid = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
+    voided = models.BooleanField(default = False)
+    cheque = models.ForeignKey(Cheques, related_name= "receivepaymentUSD", on_delete=models.CASCADE, null = True, blank = True )
+    party = models.ForeignKey(Party, on_delete=models.CASCADE, null=True, blank=True)
+    forex = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
 
 class CustomRPEntries(models.Model):
     receivePayment = models.ForeignKey(ReceivePayment, related_name="customrpentries", on_delete=models.CASCADE, null=True, blank=True)
@@ -1920,6 +1929,12 @@ class Branch(models.Model):
     #### LIQUIDATION ####
     liquidation = models.ManyToManyField(Liquidation, blank=True)
     liquidationEntries = models.ManyToManyField(LiquidationEntries, blank=True)
+
+    #### EXPORTS ####
+    exports = models.ManyToManyField(Exports, blank=True)
+    exportOtherFees = models.ManyToManyField(ExportOtherFees, blank=True)
+    exportItemsMerch = models.ManyToManyField(ExportItemsMerch, blank=True)
+    receivepaymentsUSD = models.ManyToManyField(ReceivePaymentUSD, blank = True)
     
 
     def __str__(self):

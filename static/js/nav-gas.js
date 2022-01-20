@@ -42,6 +42,7 @@ Vue.component('navbar-gas', {
                     <a href="/exports/" class="dropdown-item d-item-gas font-size-12 font-semibold">Exports</a> 
                     <a href="#" class="dropdown-item d-item-gas font-size-12 font-semibold">DR/LS</a>
                     <a href="/received-payment/" class="dropdown-item d-item-gas font-size-12 font-semibold">Received Payments</a> 
+                    <a href="/received-payments-usd/" class="dropdown-item d-item-gas font-size-12 font-semibold">Received Payments USD</a> 
                 </div>
             </div>
             <div class="btn-group mx-3">

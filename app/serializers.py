@@ -1260,3 +1260,40 @@ class MonthlyExpenseSZ(MS):
     class Meta:
         model = MonthlyExpense
         fields = '__all__'
+
+
+
+
+
+
+########## EXPORTS ##########
+class ExportsSZ(MS):
+    class Meta:
+        model = Exports
+        fields = "__all__"
+
+class ExportOtherFeesSZ(MS):
+    class Meta:
+        model = ExportOtherFees
+        fields = "__all__"
+
+class ExportItemsMerchSZ(MS):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = ExportItemsMerch
+        fields = "__all__"
+
+class ExportNestedSZ(MS):
+    exportitemsmerch = ExportItemsMerchSZ(read_only=True, many=True)
+    exportotherfees = ExportOtherFeesSZ(read_only=True, many=True)
+    class Meta:
+        model = Exports
+        fields = "__all__"
+        depth = 1
+
+class ReceivedPaymentsUSDSZ(serializers.ModelSerializer):
+    exports = ExportNestedSZ(read_only=True)
+    class Meta:
+        model = ReceivePaymentUSD
+        fields = '__all__'
+        depth = 1

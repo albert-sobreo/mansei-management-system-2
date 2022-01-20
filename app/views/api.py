@@ -221,6 +221,16 @@ class SalesContractAPI(viewsets.ModelViewSet):
 
 
 
+########## EXPORTS ##########
+class ExportsAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ExportNestedSZ
+
+    def get_queryset(self):
+        return self.request.user.branch.exports.all()
+
+
+
 
 
 ########## ACCOUNTING APPROVALS ##########
@@ -843,3 +853,10 @@ class LiquidationAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.request.user.branch.liquidation.all()
+
+########## RECEIVED PAYMENTS USD ##########
+class ReceivedPaymentsUSDAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReceivedPaymentsUSDSZ
+    def get_queryset(self):
+        return self.request.user.branch.receivePaymentUSD.all()
