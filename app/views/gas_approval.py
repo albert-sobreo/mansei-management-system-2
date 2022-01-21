@@ -218,3 +218,40 @@ class LiquidationApprovalAPI(APIView):
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+
+class Exportsnonapproved(View):
+    def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
+        
+        context = {
+            'exports': request.user.branch.exports.filter(approved=False),
+        }
+        return render(request, 'exports-nonapproved.html', context)
+    
+class Exportsapproved(View):
+    def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
+        
+        context = {
+            'exports': request.user.branch.exports.filter(approved=True),
+        }
+        return render(request, 'exports-approved.html', context)
+
+class ExportsApprovalAPI(APIView):
+    def post(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
+
+        data = request.data
+
+        ex = Exports.objects.get(pk=data['id'])
+        ex.approved = True
+        ex.approvedBy = request.user
+        ex.datetimeApproved = datetime.datetime.now()
+        ex.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)

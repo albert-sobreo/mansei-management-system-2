@@ -49,7 +49,7 @@ class ExportsListView(View):
     def get(self, request, format=None):
         if request.user.authLevel == '2':
             raise PermissionDenied()
-        return render(request, 'export-list.html')
+        return render(request, 'exports-list.html')
 
 class SaveExports(APIView):
     def post(self, request, format = None):

@@ -461,4 +461,7 @@ urlpatterns = [
     path('save-exports/', login_required(views.SaveExports.as_view())),
     path('received-payments-usd/', login_required(views.ReceivedPaymentsUSDView.as_view())),
     path('save-received-payments-usd/', login_required(views.SaveReceivePaymentsUSD.as_view())),
+    path('exports-nonapproved/', login_required(views.Exportsnonapproved.as_view())),
+    path('exports-approved/', login_required(views.Exportsapproved.as_view())),
+    path('exports-approval/', login_required(views.ExportsApprovalAPI.as_view()))
 ]
