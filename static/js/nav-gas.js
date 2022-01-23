@@ -56,7 +56,17 @@ Vue.component('navbar-gas', {
                     <a href="/payment-voucher/" class="dropdown-item d-item-gas font-size-12 font-semibold">Vouchers</a>
                 </div>
             </div>
-            <a href="/ledger/" class="mx-3" id="nav-reports">Reports</a>
+            <div class="btn-group mx-3">
+                <a id="nav-reports" href="#" class="" data-toggle="dropdown">Reports</a>
+                <div class="dropdown-menu b-radius-5 py-0">
+                    <a href="/ledger/" class="dropdown-item d-item-gas font-size-12 font-semibold">Ledger</a>
+                    <a href="/balance-sheet/" class="dropdown-item d-item-gas font-size-12 font-semibold">Balance Sheet</a>
+                    <a href="/income-statement/" class="dropdown-item d-item-gas font-size-12 font-semibold">Income Statement</a>
+                    <a href="/cash-flow/" class="dropdown-item d-item-gas font-size-12 font-semibold">Cash Flow</a>
+                    <a href="/bank-recon/" class="dropdown-item d-item-gas font-size-12 font-semibold">Bank Reconciliation</a>
+                    <a href="/2307/" class="dropdown-item d-item-gas font-size-12 font-semibold">BIR Forms</a>
+                </div>
+            </div>
             <a href="/customers/" class="mx-3" id="nav-customers">Customers</a>
             <a href="/vendors/" class="mx-3" id="nav-vendors">Vendors</a>
             <a href="/petty-cash/" class="mx-3" id="nav-petty-cash">Petty Cash</a>

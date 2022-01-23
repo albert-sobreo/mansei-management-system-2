@@ -1,0 +1,56 @@
+{% extends 'base-template.html' %}
+{% block title %} HTML TO EXCEL - PROTOTYPE {% endblock %}
+
+{% block header_scripts %}
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
+        <thead>
+            <th>First Name</th>
+            <th>Last Name</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Albert</td>
+                <td>Sobreo</td>
+            </tr>
+            <tr>
+                <td>Michael</td>
+                <td>Malicsi Jr.</td>
+            </tr>
+            <tr>
+                <td colspan="2"><span class="font-size-24">Help</span></td>
+            </tr>
+        </tbody>
+    </table>
+    <button onclick="ExportToExcel('xlsx')">Export table to excel</button>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+    function ExportToExcel(type, fn, dl) {
+        var elt = document.getElementById('table');
+        var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
+        return dl ?
+            XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+            XLSX.writeFile(wb, fn || ('MySheetName.' + (type || 'xlsx')));
+    }
+
+</script>
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app"
+    })
+</script>
+
+{% endblock %}
