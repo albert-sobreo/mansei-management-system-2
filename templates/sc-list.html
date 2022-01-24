@@ -1,6 +1,10 @@
 {% extends "base-template.html" %}
 {% block title %}Sales Contract List{% endblock %}
 
+{% block header_scripts %}
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+{% endblock %}
+
 {% block body %}
 
 <div id="app" v-cloak>
@@ -172,7 +176,106 @@
                                 </tbody>
                             </table>
                         </div>
-                        <a href="/qq-nonapproved">Go to approvals</a>
+                        <a href="/qq-nonapproved" class="mr-3">Go to approvals</a>
+                        <a data-toggle="modal" href="#dr">Create DR/LS</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- YET ANOTHER MODAL -->
+        <div class="modal fade" id="dr">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <table id="dr-table" class="table table-borderless table-sm">
+                            <tr>
+                                <td colspan="5">Mansei</td>
+                                <td colspan="1">DR No.:</td>
+                                <td colspan="1"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">MANSEI TECHNO PHILS. CORP.</td>
+                                <td colspan="1">Date:</td>
+                                <td colspan="1"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7">Blk. G-1 Subic Techno Park, Boton Area</td>
+                            </tr>
+                            <tr>
+                                <td colspan="7">Subic Bay Freeport Zone.</td>
+                            </tr>
+                            <tr>
+                                <td colspan="7">Tel. No. (6347) 250-2698</td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="7"></td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="7" class="text-center"><b>LOADING SLIP(DR)</b></td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="7"></td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="1"><b>BUYER:</b></td>
+                                <td colspan="6">[[orderModal.party.name]]</td>
+                            </tr>
+                            <tr>
+                                <td colspan="1"><b>PURPOSE:</b></td>
+                                <td colspan="6"></td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="7"></td>
+                            </tr>
+                            
+                            <th class="border">ITEM</th>
+                            <th class="border">L</th>
+                            <th class="border">W</th>
+                            <th class="border">T</th>
+                            <th class="border">QTY</th>
+                            <th class="border">TOTAL OUT</th>
+                            <th class="border">REMARKS</th>
+                    
+                            <tbody>
+                                <tr class="border" v-for="item in orderModal.scitemsmerch">
+                                    <td class="border">[[item.merchInventory.classification]] [[item.merchInventory.type]] [[item.merchInventory.name]]</td>
+                                    <td class="border">[[roundNumber0(item.merchInventory.length)]]</td>
+                                    <td class="border">[[roundNumber0(item.merchInventory.width)]]</td>
+                                    <td class="border">[[roundNumber0(item.merchInventory.thickness)]]</td>
+                                    <td class="border">[[item.qty]]</td>
+                                    <td class="border"></td>
+                                    <td class="border"></td>
+                                </tr>
+
+                                <tr>
+                                   <td colspan="7"></td> 
+                                </tr>
+                    
+                                <tr>
+                                    <td colspan="2"><b>PREPARED BY:</b></td>
+                                    <td colspan="5"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><b>CONFIRMED BY:</b></td>
+                                    <td colspan="5"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><b>RECEIVED  BY:</b></td>
+                                    <td colspan="5"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col">
+                                <button @click="ExportToExcel('xlsx','','', 'DR/LS for ' + orderModal.code)" class="col btn btn-primary">Export as Excel</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -318,6 +421,13 @@
         },
         
         methods: {
+            ExportToExcel(type, fn, dl, filename){
+                var elt = document.getElementById('dr-table');
+                var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
+                return dl ?
+                    XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+                    XLSX.writeFile(wb, fn || (filename + '.' + (type || 'xlsx')));
+            },
             viewSC(code){
                 axios.get(`/api/sales-contract/${code}/`)
                 .then(res=>this.orderModal=res.data)
@@ -328,6 +438,14 @@
                 } else {
                     let val = (value/1).toFixed(2).replace(',', '.')
                     return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            roundNumber0(value) {
+                if (this.roundToggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(0)
+                    return val.toString()
                 }
             },
             roundToggler(){
