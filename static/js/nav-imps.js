@@ -34,7 +34,7 @@ Vue.component('navbar-imps', {
         <!-- TABS CONTAINER -->
         <div class="imps-nav justify-content-center font-semibold navbar">
             <a href='/merchinventory/' class="mx-3" id="nav-inventory">Inventory</a>
-            <a href="#" class="mx-3" id="nav-job-order">Job Order</a>
+            <a href="/job-order/" class="mx-3" id="nav-job-order">Job Order</a>
             <a href="/transfer/" class="mx-3" id="nav-transfer">Transfer</a>
             <a href="/adjustments/" class="mx-3" id="nav-adjustments">Adjustments</a>
             <a href="/deliveries/" class="mx-3" id="nav-deliveries">Deliveries</a>

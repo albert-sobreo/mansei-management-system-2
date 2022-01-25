@@ -464,5 +464,8 @@ urlpatterns = [
     path('exports-nonapproved/', login_required(views.Exportsnonapproved.as_view())),
     path('exports-approved/', login_required(views.Exportsapproved.as_view())),
     path('exports-approval/', login_required(views.ExportsApprovalAPI.as_view())),
-    path('html-to-excel/', login_required(views.HTMLtoEXCELView.as_view()))
+
+    path('html-to-excel/', login_required(views.HTMLtoEXCELView.as_view())),
+    path('job-order/', login_required(views.JobOrderView.as_view())),
+    path('create-job-order/', login_required(views.CreateJobOrderAPI.as_view())),
 ]

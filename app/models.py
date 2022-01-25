@@ -1725,6 +1725,63 @@ class LiquidationEntries(models.Model):
     def __str__(self):
         return self.orNo
 
+class JobOrder(models.Model):
+    code = models.CharField(max_length=50, blank = True, null = True)
+    datetimeCreated = models.DateTimeField(null=True, blank=True)
+    jobOrderCost = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
+    method = models.CharField(max_length=50, null=True, blank=True)
+    status = models.CharField(max_length=50, null=True, blank=True)
+    datetimeFinished = models.DateTimeField(null=True, blank=True)
+    approved = models.BooleanField(null = True, default=False)
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "joCreatedBy")
+    approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name= "joApprovedBy")
+    journal = models.ForeignKey(Journal, related_name="joborder", on_delete=models.CASCADE, null=True, blank=True)
+
+
+class RawMaterials(models.Model):
+    merchInventory = models.ForeignKey(MerchandiseInventory, related_name="rawmaterials", on_delete=models.CASCADE, null=True, blank=True)
+    jobOrder = models.ForeignKey(JobOrder, related_name="rawmaterials", on_delete=models.CASCADE, null=True, blank=True)
+    qty = models.PositiveIntegerField(blank = True, null = True)
+    totalCost= models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    remaining = models.PositiveIntegerField(blank = True, null = True)
+    purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+
+class OverheadExpenses(models.Model):
+    expenses = models.ForeignKey(AccountChild, related_name="overheadexpenses", on_delete=models.CASCADE, null=True, blank=True)
+    cost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    jobOrder = models.ForeignKey(JobOrder, related_name="overheadexpenses", on_delete=models.CASCADE, null=True, blank=True)
+
+class FinalProduct(models.Model):
+    name = models.CharField(max_length=256, null = True, blank = True)
+    qty = models.PositiveIntegerField(blank = True, null = True)
+    unitCost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    jobOrder = models.ForeignKey(JobOrder, related_name="finalproduct", on_delete=models.CASCADE, null=True, blank=True)
+
+class MaterialLosses(models.Model):
+    name = models.CharField(max_length=256, null = True, blank = True)
+    qty = models.PositiveIntegerField(blank = True, null = True)
+    unitCost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    jobOrder = models.ForeignKey(JobOrder, related_name="materiallosses", on_delete=models.CASCADE, null=True, blank=True)
+
+class ManufacturingInventory(models.Model):
+    code = models.CharField(max_length=50)
+    name = models.CharField(max_length=256, null = True, blank = True)
+    length =  models.DecimalField(max_digits=20, decimal_places=5)
+    width =  models.DecimalField(max_digits=20, decimal_places=5)
+    height =  models.DecimalField(max_digits=20, decimal_places=5)
+    purchasingPrice =  models.DecimalField(max_digits=20, decimal_places=5)
+    sellingPrice =  models.DecimalField(max_digits=20, decimal_places=5)
+    vol = models.DecimalField(max_digits=20, decimal_places=4, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    inventoryDate = models.DateField(null=True, blank=True)
+    jobOrder = models.ForeignKey(JobOrder, related_name="manufacturinginventory", on_delete=models.CASCADE, null=True, blank=True)
+    
+    class Meta:
+        verbose_name = "Merchandise Inventory"
+        verbose_name_plural = "Merchandise Inventories"
+
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
     rm = models.ForeignKey(AccountChild, related_name="branchdefaultrm", on_delete=models.CASCADE, null=True, blank=True)
@@ -1759,7 +1816,7 @@ class BranchDefaultChildAccount(models.Model):
     phicPayable = models.ForeignKey(AccountChild, related_name="branchphicpayable", on_delete=models.CASCADE, blank = True, null = True)
     hdmfPayable = models.ForeignKey(AccountChild, related_name="branchhdmfpayable", on_delete=models.CASCADE, blank = True, null = True)
     withholdingTaxPayable = models.ForeignKey(AccountChild, related_name="branchwithholdingtaxpayable", on_delete=models.CASCADE, blank = True, null = True)
-
+    
 class BranchProfile(models.Model):
     branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.CASCADE, null=True, blank=True)
 
@@ -1935,6 +1992,15 @@ class Branch(models.Model):
     exportOtherFees = models.ManyToManyField(ExportOtherFees, blank=True)
     exportItemsMerch = models.ManyToManyField(ExportItemsMerch, blank=True)
     receivepaymentsUSD = models.ManyToManyField(ReceivePaymentUSD, blank = True)
+
+    #### JOB ORDER ####
+    jobOrder = models.ManyToManyField(JobOrder, blank = True)
+    rawMaterials = models.ManyToManyField(RawMaterials, blank = True)
+    overheadExpenses = models.ManyToManyField(OverheadExpenses, blank = True)
+    finalProduct = models.ManyToManyField(FinalProduct, blank = True)
+    materialLosses = models.ManyToManyField(MaterialLosses, blank = True)
+    manufacturingInventory = models.ManyToManyField(ManufacturingInventory, blank = True)
+
     
 
     def __str__(self):

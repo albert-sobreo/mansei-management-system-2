@@ -1,0 +1,370 @@
+{% extends 'base-template.html' %}
+{% block title %}Job Order{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-imps active="nav-job-order" photo="/media/{{request.user.image}}"></navbar-imps>
+    <app-card></app-card>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <!-- END NAVIGATION -->
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- MORE NAV -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links imps-nav">
+                <a href="/job-order/" class="active-imps mx-2">Create</a>
+                <a href="/job-order-ongoing/" class="mx-2">On-Going</a>
+                <a href="/job-order-finished/" class="mx-2">Finished</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1 mt-3">Job Order</span>
+        </div>
+
+        <!-- JOB ORDER -->
+        <div>
+            <div class="row">
+                <div class="col col-3 pr-2">
+                    <label for="">Reference No.</label>
+                    <input type="text" class="form-control" v-model="jobOrder.code">
+                </div>
+                <div class="col col-3 px-2">
+                    <label for="">Date</label>
+                    <input type="date" class="form-control" readonly v-model="jobOrder.date">
+                </div>
+                <div class="col col-3 pl-2">
+                    <label for="">Job Order Method &emsp;<span class="link"><i class="fas fa-info-circle"></i></span></label><br>
+                    <div class="form-check form-check-inline align-items-center d-flex">
+                        <input v-model="jobOrder.method" class="form-check-input" type="radio" id="inlineCheckbox1" value="absorption">
+                        <label class="form-check-label" for="inlineCheckbox1">Absorption</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input v-model="jobOrder.method" class="form-check-input" type="radio" id="inlineCheckbox2" value="direct">
+                        <label class="form-check-label" for="inlineCheckbox2">Direct</label>
+                      </div>
+                </div>
+            </div>
+
+            <!-- MATERIALS -->
+            <div class="container-extend px-5 py-3 b-radius-15 order-card mt-3">
+                <div class="row">
+                    <div class="col px-1">
+                        <label for="">Materials to Use</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5 px-1">
+                        <label for="">Inventory Item</label>
+                        <select v-for="(item, index) in jobOrder.rawmaterials" v-model="item.merchInventory" name="" id="" class="form-control">
+                            <option value="" disabled selected>Select an Inventory Item</option>
+                            {% for item in request.user.branch.merchInventory.all %}
+                            <option value="{{item.pk}}">{{item.classification}} - {{item.name}} - {{item.type}}</option>
+                            {% endfor%}
+                        </select>
+                    </div>
+                    <div class="col px-1">
+                        <label for="">Available</label>
+                        <input v-for="(item, index) in jobOrder.rawmaterials" v-model="item.remaining" type="text" class="form-control" readonly>
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="">Purchasing Price</label>
+                        <div class="input-group" v-for="(item, index) in jobOrder.rawmaterials">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input onkeypress="validate()" v-model="item.purchasingPrice" type="text" class="form-control box-shadow-off">
+                        </div>
+                    </div>
+                    <div class="col px-1">
+                        <label for="">Qty to use</label>
+                        <input onkeypress="validate()" v-for="(item, index) in jobOrder.rawmaterials" v-model="item.qty" type="text" class="form-control">
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="">Total Cost</label>
+                        <div class="input-group" v-for="(item, index) in jobOrder.rawmaterials">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input onkeypress="validate()"  v-model="item.totalCost" type="text" class="form-control box-shadow-off">
+                        </div>
+                    </div>
+                    <div class="px-1 text-right">
+                        <label for=""><i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i></label><br>
+                        <template v-for="(item, index) in jobOrder.rawmaterials">
+                            <i @click="removeMaterials(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i><br>
+                        </template>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col px-1 mt-1">
+                        <button class="btn btn-warning" @click="addMaterials()">+ Add new line</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OVERHEAD -->
+            <div class="container-extend px-5 py-3 b-radius-15 order-card mt-3">
+                <div class="row">
+                    <div class="col px-1">
+                        <label for="">Factory Overhead</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-9 px-1">
+                        <label for="">Account</label>
+                        <select v-for="(item, index) in jobOrder.overheadexpenses" v-model="item.expenses" name="" id="" class="form-control">
+                            <option value="" selected disabled>Select an Account</option>
+                        </select>
+                    </div>
+                    <div class="col px-1">
+                        <label for="">Cost</label>
+                        <div class="input-group" v-for="(item, index) in jobOrder.overheadexpenses">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input v-model="item.cost" type="text" class="form-control box-shadow-off">
+                        </div>
+                    </div>
+                    <div class="px-1 text-right">
+                        <label for=""><i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i></label><br>
+                        <template v-for="(item, index) in jobOrder.overheadexpenses">
+                            <i @click="removeOverhead(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i><br>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col px-1 mt-1">
+                        <button class="btn btn-warning" @click="addOverhead()">+ Add new line</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXPECTED FINISHED GOODS -->
+            <div class="container-extend px-5 py-3 b-radius-15 order-card mt-3">
+                <div class="row">
+                    <div class="col px-1">
+                        <label for="">Expected Finished Goods</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col px-1">
+                        <label for="">Final Product</label>
+                        <input v-for="(item, index) in jobOrder.finalproduct" v-model="item.name" type="text" class="form-control">
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="">Cost per Item</label>
+                        <div class="input-group" v-for="(item, index) in jobOrder.finalproduct">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input v-model="item.unitCost" type="text" class="form-control box-shadow-off">
+                        </div>
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="">Quantity</label>
+                        <input v-for="(item, index) in jobOrder.finalproduct" v-model="item.qty" type="text" class="form-control">
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="">Cost</label>
+                        <div class="input-group" v-for="(item, index) in jobOrder.finalproduct">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input v-model="item.totalCost" type="text" class="form-control box-shadow-off">
+                        </div>
+                    </div>
+                    <div class="px-1 text-right">
+                        <label for=""><i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i></label><br>
+                        <template v-for="(item, index) in jobOrder.finalproduct">
+                            <i @click="removeFinal(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i><br>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col px-1 my-1">
+                        <button class="btn btn-warning" @click="addFinalProduct()">+ Add new line</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col px-1">
+                        <label for="">Material Losses</label>
+                        <input v-for="(item, index) in jobOrder.materiallosses" v-model="item.name" type="text" class="form-control">
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="">Cost per Item</label>
+                        <div class="input-group" v-for="(item, index) in jobOrder.materiallosses">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input v-model="item.unitCost" type="text" class="form-control box-shadow-off">
+                        </div>
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="">Quantity</label>
+                        <input v-for="(item, index) in jobOrder.materiallosses" v-model="item.qty" type="text" class="form-control">
+                    </div>
+                    <div class="col-2 px-1">
+                        <label for="">Cost</label>
+                        <div class="input-group" v-for="(item, index) in jobOrder.materiallosses">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input v-model="item.totalCost" type="text" class="form-control box-shadow-off">
+                        </div>
+                    </div>
+                    <div class="px-1 text-right">
+                        <label for=""><i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i></label><br>
+                        <template v-for="(item, index) in jobOrder.materiallosses">
+                            <i @click="removeLose(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i><br>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col px-1 mt-1">
+                        <button class="btn btn-warning" @click="addLosses()">+ Add new line</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXPECTED FINISHED GOODS -->
+            <div class="container my-2">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-group">
+                        <label for="">Job Order Cost</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">₱</span>
+                            </div>
+                            <input v-model="jobOrder.jobOrderCost" type="text" class="form-control box-shadow-off">
+                        </div>
+                    </div>
+                    <div>
+                        <button @click="submit()" class="btn btn-primary">Request Job Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+
+        data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            jobOrder: {
+                code: null,
+                date: new Date().toISOString().split('T')[0],
+                jobOrderCost: null,
+                method: null,
+                rawmaterials: [{
+                    merchInventory: '',
+                    jobOrder: null,
+                    qty: null,
+                    totalCost: null,
+                    remaining: 0,
+                    purchasingPrice: null,
+                }],
+                overheadexpenses: [{
+                    expenses: '',
+                    cost: null,
+                    jobOrder: null,
+                }],
+                finalproduct: [{
+                    name: null,
+                    qty: null,
+                    unitCost: null,
+                    totalCost: null,
+                    jobOrder: null,
+                }],
+                materiallosses: [{
+                    name: null,
+                    qty: null,
+                    unitCost: null,
+                    totalCost: null,
+                    jobOrder: null,
+                }]
+            }
+        },
+
+        methods: {
+            submit(){
+                axios.post('/create-job-order/', this.jobOrder, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
+            addMaterials(){
+                this.jobOrder.rawmaterials.push({
+                    merchInventory: '',
+                    jobOrder: null,
+                    qty: null,
+                    totalCost: null,
+                    remaining: null,
+                    purchasingPrice: null,
+                })
+            },
+
+            addOverhead(){
+                this.jobOrder.overheadexpenses.push({
+                    expenses: '',
+                    cost: null,
+                    jobOrder: null,
+                })
+            },
+            addFinalProduct(){
+                this.jobOrder.finalproduct.push({
+                    name: null,
+                    qty: null,
+                    unitCost: null,
+                    totalCost: null,
+                    jobOrder: null,
+                })
+            },
+            addLosses(){
+                this.jobOrder.materiallosses.push({
+                    name: null,
+                    qty: null,
+                    unitCost: null,
+                    totalCost: null,
+                    jobOrder: null,
+                })
+            },
+
+            removeMaterials(index){
+                this.$delete(this.jobOrder.rawmaterials, index)
+            },
+
+            removeOverhead(index){
+                this.$delete(this.jobOrder.overheadexpenses, index)
+            },
+
+            removeFinal(index){
+                this.$delete(this.jobOrder.finalproduct, index)
+            },
+
+            removeLose(index){
+                this.$delete(this.jobOrder.materiallosses, index)
+            }
+        }
+    })
+</script>
+
+{% endblock %}
