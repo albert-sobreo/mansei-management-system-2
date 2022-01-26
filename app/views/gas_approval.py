@@ -14,7 +14,7 @@ from django.core.exceptions import PermissionDenied
 
 class ADVapproved(View):
     def get(self, request):
-        if request.user.authLevel == '2' or request.user.authLevel == '1':
+        if request.user.authLevel == '2':
             raise PermissionDenied()
 
         user = request.user
@@ -25,7 +25,7 @@ class ADVapproved(View):
 
 class ADVnonapproved(View):
     def get(self, request):
-        if request.user.authLevel == '2' or request.user.authLevel == '1':
+        if request.user.authLevel == '2':
             raise PermissionDenied()
 
         user = request.user
@@ -36,7 +36,7 @@ class ADVnonapproved(View):
 
 class ADVapprovalAPI(APIView):
     def post(self, request):
-        if request.user.authLevel == '2' or request.user.authLevel == '1':
+        if request.user.authLevel == '2':
             raise PermissionDenied()
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
@@ -115,7 +115,7 @@ class ReimbursementProcess(APIView):
 
 class ADVDeleteAPI(APIView):
     def post(self, request):
-        if request.user.authLevel == '2' or request.user.authLevel == '1':
+        if request.user.authLevel == '2':
             raise PermissionDenied()
         AdvancementThruPettyCash.objects.get(pk=request.data['id']).delete()
 
@@ -124,7 +124,7 @@ class ADVDeleteAPI(APIView):
 
 class LQDapproved(View):
     def get(self, request):
-        if request.user.authLevel == '2' or request.user.authLevel == '1':
+        if request.user.authLevel == '2':
             raise PermissionDenied()
         context = {
             'lqds': request.user.branch.liquidation.filter(approved = True),
@@ -134,7 +134,7 @@ class LQDapproved(View):
 
 class LQDnonapproved(View):
     def get(self, request):
-        if request.user.authLevel == '2' or request.user.authLevel == '1':
+        if request.user.authLevel == '2':
             raise PermissionDenied()
         context = {
             'lqds': request.user.branch.liquidation.filter(approved = False),
@@ -144,7 +144,7 @@ class LQDnonapproved(View):
 
 class LiquidationApprovalAPI(APIView):
     def post(self, request):
-        if request.user.authLevel == '2' or request.user.authLevel == '1':
+        if request.user.authLevel == '2':
             raise PermissionDenied()
         data = request.data
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
@@ -222,7 +222,7 @@ class LiquidationApprovalAPI(APIView):
 
 class Exportsnonapproved(View):
     def get(self, request):
-        if request.user.authLevel == '2' or request.user.authLevel == '1':
+        if request.user.authLevel == '2':
             raise PermissionDenied()
         
         context = {
@@ -232,7 +232,7 @@ class Exportsnonapproved(View):
     
 class Exportsapproved(View):
     def get(self, request):
-        if request.user.authLevel == '2' or request.user.authLevel == '1':
+        if request.user.authLevel == '2':
             raise PermissionDenied()
         
         context = {
@@ -242,7 +242,7 @@ class Exportsapproved(View):
 
 class ExportsApprovalAPI(APIView):
     def post(self, request):
-        if request.user.authLevel == '2' or request.user.authLevel == '1':
+        if request.user.authLevel == '2':
             raise PermissionDenied()
 
         data = request.data
@@ -255,3 +255,18 @@ class ExportsApprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class JobOrdernonapproved(View):
+    def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+
+        return render(request, 'job-order-nonapproved.html')
+
+class JobOrderapproved(View):
+    def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+
+        return render(request, 'job-order-approved.html')
+

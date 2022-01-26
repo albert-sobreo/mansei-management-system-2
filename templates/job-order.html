@@ -60,7 +60,7 @@
                 <div class="row">
                     <div class="col-5 px-1">
                         <label for="">Inventory Item</label>
-                        <select v-for="(item, index) in jobOrder.rawmaterials" v-model="item.merchInventory" name="" id="" class="form-control">
+                        <select v-for="(item, index) in jobOrder.rawmaterials" v-model="item.merchInventory" @change="getMerchRemaining(item.merchInventory, index)" name="" id="" class="form-control">
                             <option value="" disabled selected>Select an Inventory Item</option>
                             {% for item in request.user.branch.merchInventory.all %}
                             <option value="{{item.pk}}">{{item.classification}} - {{item.name}} - {{item.type}}</option>
@@ -77,12 +77,12 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input onkeypress="validate()" v-model="item.purchasingPrice" type="text" class="form-control box-shadow-off">
+                            <input onkeypress="validate()" @change="onMaterialsCost(index)" v-model="item.purchasingPrice" type="text" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="col px-1">
                         <label for="">Qty to use</label>
-                        <input onkeypress="validate()" v-for="(item, index) in jobOrder.rawmaterials" v-model="item.qty" type="text" class="form-control">
+                        <input onkeypress="validate()" @change="onMaterialsCost(index)" v-for="(item, index) in jobOrder.rawmaterials" v-model="item.qty" type="text" class="form-control">
                     </div>
                     <div class="col-2 px-1">
                         <label for="">Total Cost</label>
@@ -90,7 +90,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input onkeypress="validate()"  v-model="item.totalCost" type="text" class="form-control box-shadow-off">
+                            <input onkeypress="validate()" readonly  v-model="item.totalCost" type="text" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="px-1 text-right">
@@ -119,6 +119,25 @@
                         <label for="">Account</label>
                         <select v-for="(item, index) in jobOrder.overheadexpenses" v-model="item.expenses" name="" id="" class="form-control">
                             <option value="" selected disabled>Select an Account</option>
+                            {% for op in operational %}
+                            {% for sub in op.accountsubgroup.all %}
+                            <optgroup label="{{sub.name}}">
+                                {% for child in sub.accountchild.all %}
+                                <option value="{{child.pk}}">{{child.name}}</option>
+                                {% endfor %}
+                            </optgroup>
+                            {% endfor %}
+                            {% endfor %}
+
+                            {% for op in administrative %}
+                            {% for sub in op.accountsubgroup.all %}
+                            <optgroup label="{{sub.name}}">
+                                {% for child in sub.accountchild.all %}
+                                <option value="{{child.pk}}">{{child.name}}</option>
+                                {% endfor %}
+                            </optgroup>
+                            {% endfor %}
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="col px-1">
@@ -163,12 +182,12 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input v-model="item.unitCost" type="text" class="form-control box-shadow-off">
+                            <input v-model="item.unitCost" @change="onFinalProductCost(index)" type="text" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="col-2 px-1">
                         <label for="">Quantity</label>
-                        <input v-for="(item, index) in jobOrder.finalproduct" v-model="item.qty" type="text" class="form-control">
+                        <input v-for="(item, index) in jobOrder.finalproduct" v-model="item.qty" @change="onFinalProductCost(index)" type="text" class="form-control">
                     </div>
                     <div class="col-2 px-1">
                         <label for="">Cost</label>
@@ -176,7 +195,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input v-model="item.totalCost" type="text" class="form-control box-shadow-off">
+                            <input v-model="item.totalCost" readonly type="text" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="px-1 text-right">
@@ -204,12 +223,12 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input v-model="item.unitCost" type="text" class="form-control box-shadow-off">
+                            <input v-model="item.unitCost" @change="onLossesCost(index)" type="text" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="col-2 px-1">
                         <label for="">Quantity</label>
-                        <input v-for="(item, index) in jobOrder.materiallosses" v-model="item.qty" type="text" class="form-control">
+                        <input v-for="(item, index) in jobOrder.materiallosses" @change="onLossesCost(index)" v-model="item.qty" type="text" class="form-control">
                     </div>
                     <div class="col-2 px-1">
                         <label for="">Cost</label>
@@ -217,7 +236,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input v-model="item.totalCost" type="text" class="form-control box-shadow-off">
+                            <input v-model="item.totalCost" readonly type="text" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="px-1 text-right">
@@ -272,7 +291,7 @@
                 }
             },
             jobOrder: {
-                code: null,
+                code: '{{new_code}}',
                 date: new Date().toISOString().split('T')[0],
                 jobOrderCost: null,
                 method: null,
@@ -306,10 +325,59 @@
             }
         },
 
+        computed: {
+            rawMaterialsTotal(){
+                return this.jobOrder.rawmaterials.map(item=>item.totalCost)
+            },
+            overheadTotal(){
+                return this.jobOrder.overheadexpenses.map(item=>item.cost)
+            },
+            finalProductTotal(){
+                return this.jobOrder.finalproduct.map(item=>item.totalCost)
+            },
+            lossesTotal(){
+                return this.jobOrder.materiallosses.map(item=>item.totalCost)
+            }
+        },
+
+        watch:{
+            rawMaterialsTotal(){
+                this.watchers()
+            },
+            overheadTotal(){
+                this.watchers()
+            },
+            finalProductTotal(){
+                this.watchers()
+            },
+            lossesTotal(){
+                this.watchers()
+            },
+        },
+
         methods: {
+            watchers(){
+                let totalMaterialsCost = this.rawMaterialsTotal.reduce((a,b)=>Number(a)+Number(b),0)
+                let totalOverheadCost = this.overheadTotal.reduce((a,b)=>Number(a)+Number(b),0)
+                let totalFinalProductCost = this.finalProductTotal.reduce((a,b)=>Number(a)+Number(b),0)
+                let totalLossesCost = this.lossesTotal.reduce((a,b)=>Number(a)+Number(b),0)
+                this.jobOrder.jobOrderCost = Number(totalMaterialsCost) + Number(totalOverheadCost)
+            },
             submit(){
                 axios.post('/create-job-order/', this.jobOrder, this.config)
                 .then(res=>res.data==0?location.reload():'')
+            },
+            onMaterialsCost(index){
+                row = this.jobOrder.rawmaterials[index]
+                row.totalCost = Number(row.qty * row.purchasingPrice)
+            },
+            onFinalProductCost(index){
+                row = this.jobOrder.finalproduct[index]
+                row.totalCost = Number(row.unitCost * row.qty)
+            },
+            onLossesCost(index){
+                row = this.jobOrder.materiallosses[index]
+                row.totalCost = Number(row.unitCost * row.qty)
             },
             addMaterials(){
                 this.jobOrder.rawmaterials.push({
@@ -362,6 +430,13 @@
 
             removeLose(index){
                 this.$delete(this.jobOrder.materiallosses, index)
+            },
+
+            getMerchRemaining(id, index){
+                axios.get(`/api/merchinventory/${id}/`)
+                .then(res=>{
+                    this.jobOrder.rawmaterials[index].remaining = res.data.qtyA
+                })
             }
         }
     })

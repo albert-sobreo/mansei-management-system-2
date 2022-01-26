@@ -468,4 +468,5 @@ urlpatterns = [
     path('html-to-excel/', login_required(views.HTMLtoEXCELView.as_view())),
     path('job-order/', login_required(views.JobOrderView.as_view())),
     path('create-job-order/', login_required(views.CreateJobOrderAPI.as_view())),
+    path('job-order-nonapproved/', login_required(views.JobOrdernonapproved.as_view()))
 ]

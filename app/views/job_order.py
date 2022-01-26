@@ -35,8 +35,12 @@ class JobOrderView(View):
             listed_date = str(datetime.date.today()).split('-')
             new_code = 'JO-{}-{}-0001'.format(listed_date[0], listed_date[1])
 
+        operationalExpenses = request.user.branch.accountGroup.filter(name__regex=r"[Oo]peration")
+        administrativeExpenses = request.user.branch.accountGroup.filter(name__regex=r"[Aa]dmin")
         context = {
             'new_code': new_code,
+            'operational': operationalExpenses,
+            'administrative': administrativeExpenses
         }    
         return render(request, 'job-order.html', context)
 

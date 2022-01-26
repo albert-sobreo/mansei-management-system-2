@@ -43,7 +43,7 @@ Vue.component('navbar-imps', {
             <div class="btn-group mx-3">
                 <a id="nav-approvals" href="#" data-toggle="dropdown">Approvals</a>
                 <div class="dropdown-menu b-radius-5 py-0">
-                    <a href="#" class="dropdown-item d-item-imps font-size-12 font-semibold">Job Orders</a>
+                    <a href="/job-order-nonapproved/" class="dropdown-item d-item-imps font-size-12 font-semibold">Job Orders</a>
                     <a href="/tr-nonapproved/" class="dropdown-item d-item-imps font-size-12 font-semibold">Transfers</a>
                     <a href="/ad-nonapproved/" class="dropdown-item d-item-imps font-size-12 font-semibold">Adjustments</a>
                     <a href="/deliveriesnonapproved/" class="dropdown-item d-item-imps font-size-12 font-semibold">Deliveries</a>
