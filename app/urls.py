@@ -468,5 +468,9 @@ urlpatterns = [
     path('html-to-excel/', login_required(views.HTMLtoEXCELView.as_view())),
     path('job-order/', login_required(views.JobOrderView.as_view())),
     path('create-job-order/', login_required(views.CreateJobOrderAPI.as_view())),
-    path('job-order-nonapproved/', login_required(views.JobOrdernonapproved.as_view()))
+    path('job-order-nonapproved/', login_required(views.JobOrdernonapproved.as_view())),
+    path('export-sales-order/<int:pk>/', login_required(views.ExportSO.as_view())),
+    path('export-sales-contract/<int:pk>/', login_required(views.ExportSC.as_view())),
+    path('export-dr-ls/<int:pk>/', login_required(views.ExportDRLS.as_view())),
+    path('export-quotations-slip/<int:pk>/', login_required(views.ExportQuotationsSlip.as_view()))
 ]

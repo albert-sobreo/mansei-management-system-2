@@ -905,13 +905,13 @@
 
             onForVol(index){
                 row = this.order.items[index]
-                row.vol = Number(row.refVol * row.quantity).toFixed(4)
+                row.vol = Number(row.refVol * row.quantity).toFixed(5)
                 this.onForTotalCost(index)
             },
 
             onForTotalCost(index){
                 row = this.order.items[index]
-                row.totalCost = Number(row.pricePerCubic * row.vol).toFixed(4)
+                row.totalCost = Number(row.pricePerCubic * row.vol).toFixed(5)
             },
 
             remove (index) {

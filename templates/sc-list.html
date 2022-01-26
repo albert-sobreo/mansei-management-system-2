@@ -177,7 +177,8 @@
                             </table>
                         </div>
                         <a href="/qq-nonapproved" class="mr-3">Go to approvals</a>
-                        <a data-toggle="modal" href="#dr">Create DR/LS</a>
+                        <a :href="'/export-dr-ls/'+orderModal.id" class="mr-3">Create DR/LS</a>
+                        <a :href="'/export-sales-contract/'+orderModal.id">Create SC Form</a>
                     </div>
                 </div>
             </div>

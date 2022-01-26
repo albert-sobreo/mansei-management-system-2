@@ -10,6 +10,8 @@ from datetime import date as now
 from decimal import Decimal
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
+import pandas as pd
+import openpyxl as op
 
 ########## SALES CONTRACT ##########
 class SalesContractView(View):
@@ -374,3 +376,172 @@ class SaveSalesOrder(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+class ExportSO(APIView):
+    def get(self, request, pk):
+        so = SalesOrder.objects.get(pk=pk)
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="Sales Order {so.code}.xlsx"'
+
+
+        wb = op.load_workbook('static/files/salesOrder.xlsx')
+        ws = wb.active
+
+        buyer = ws.cell(row=7, column=3)
+        soCode = ws.cell(row=8, column=10)
+        controlNo = ws.cell(row=6, column=10)
+        date = ws.cell(row=7, column=11)
+
+        gTotalPiecesQty = ws.cell(row=31, column=8)
+        gTotalPiecesUnitPrice = ws.cell(row=31, column=9)
+        gTotalAmount = ws.cell(row=30, column=10)
+        gTotalVol = ws.cell(row=30, column=11)
+
+        buyer.value=so.party.name
+        soCode.value=so.code
+        controlNo.value="Control No."
+        date.value=so.dateSold
+        
+        gTotalPiecesQty.value=0
+        gTotalPiecesUnitPrice.value=0
+        gTotalAmount.value=0
+        gTotalVol.value=0
+
+        ctr = 0
+        for i in so.soitemsmerch.all():
+
+            invName = ws.cell(row=13+ctr, column=2)
+            length = ws.cell(row=13+ctr, column=3)
+            width = ws.cell(row=13+ctr, column=5)
+            thick = ws.cell(row=13+ctr, column=7)
+            qty = ws.cell(row=13+ctr, column=8)
+            unitCost = ws.cell(row=13+ctr, column=9)
+            amount = ws.cell(row=13+ctr, column=10)
+            vol = ws.cell(row=13+ctr, column=11)
+
+            invName.value=f"{i.merchInventory.name} {i.merchInventory.classification}"
+            length.value=f"{round(i.merchInventory.length, 0)}"
+            width.value=f"{round(i.merchInventory.width, 0)}"
+            thick.value=f"{round(i.merchInventory.thickness, 0)}"
+            qty.value=i.qty
+            amount.value=round(i.totalCost, 2)
+            vol.value=i.vol
+            unitCost.value=(vol.value/qty.value)*i.pricePerCubic
+
+            gTotalPiecesQty.value += qty.value
+            gTotalPiecesUnitPrice.value += unitCost.value
+            gTotalAmount.value += amount.value
+            gTotalVol.value += vol.value
+
+            ctr+=1
+
+        wb.save(response)
+        return response
+
+class ExportSC(APIView):
+    def get(self, request, pk):
+        sc = SalesContract.objects.get(pk=pk)
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="Sales Contract {sc.code}.xlsx"'
+
+        wb = op.load_workbook('static/files/salesContract.xlsx')
+        ws = wb.active
+
+        buyer = ws.cell(row=7, column=3)
+        scCode = ws.cell(row=6, column=11)
+        date = ws.cell(row=7, column=12)
+
+        buyer.value=sc.party.name
+        scCode.value=sc.code
+        date.value=sc.dateSold
+
+        ctr = 0
+        for i in sc.scitemsmerch.all():
+            invName = ws.cell(row=15+ctr, column=2)
+            length = ws.cell(row=15+ctr, column=3)
+            width = ws.cell(row=15+ctr, column=5)
+            thick = ws.cell(row=15+ctr, column=7)
+            qty = ws.cell(row=15+ctr, column=8)
+            pricePerCubic = ws.cell(row=15+ctr, column=9)
+            unitCost = ws.cell(row=15+ctr, column=10)
+
+            invName.value=f"{i.merchInventory.name} {i.merchInventory.classification}"
+            length.value=f"{round(i.merchInventory.length, 0)}"
+            width.value=f"{round(i.merchInventory.width, 0)}"
+            thick.value=f"{round(i.merchInventory.thickness, 0)}"
+            qty.value=i.qty
+            pricePerCubic.value=round(i.pricePerCubic, 2)
+
+            ctr+=1
+        
+        wb.save(response)
+        return response
+
+class ExportDRLS(APIView):
+    def get(self, request, pk):
+        sc = SalesContract.objects.get(pk=pk)
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="Loading Slip DR {sc.code}.xlsx"'
+
+        wb = op.load_workbook('static/files/DR_LS.xlsx')
+        ws = wb.active
+
+        buyer = ws.cell(row=7, column=2)
+        date = ws.cell(row=4, column=9)
+
+        buyer.value=sc.party.name
+        date.value=sc.dateSold
+
+        ctr = 0
+        for i in sc.scitemsmerch.all():
+            invName = ws.cell(row=12+ctr, column=1)
+            length = ws.cell(row=12+ctr, column=2)
+            width = ws.cell(row=12+ctr, column=3)
+            thick = ws.cell(row=12+ctr, column=4)
+            qty = ws.cell(row=12+ctr, column=5)
+
+            invName.value=f"{i.merchInventory.name} {i.merchInventory.classification}"
+            length.value=f"{round(i.merchInventory.length, 0)}"
+            width.value=f"{round(i.merchInventory.width, 0)}"
+            thick.value=f"{round(i.merchInventory.thickness, 0)}"
+            qty.value=i.qty
+
+            ctr+=1
+
+        wb.save(response)
+        return response
+
+class ExportQuotationsSlip(APIView):
+    def get(self, request, pk):
+        qq = Quotations.objects.get(pk=pk)
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="Quotations Slip {qq.code}.xlsx"'
+
+        wb = op.load_workbook('static/files/QuotationSlip.xlsx')
+        ws = wb.active
+
+        buyer = ws.cell(row=7, column=2)
+        date = ws.cell(row=4, column=9)
+        code = ws.cell(row=2, column=6)
+
+        buyer.value=qq.party.name
+        code.value=qq.code
+
+        ctr = 0
+
+        for i in qq.qqitemsmerch.all():
+            invName = ws.cell(row=12+ctr, column=1)
+            length = ws.cell(row=12+ctr, column=2)
+            width = ws.cell(row=12+ctr, column=3)
+            thick = ws.cell(row=12+ctr, column=4)
+            qty = ws.cell(row=12+ctr, column=5)
+
+            invName.value=f"{i.merchInventory.name} {i.merchInventory.classification}"
+            length.value=f"{round(i.merchInventory.length, 0)}"
+            width.value=f"{round(i.merchInventory.width, 0)}"
+            thick.value=f"{round(i.merchInventory.thickness, 0)}"
+            qty.value=i.qty
+
+            ctr+=1
+
+        wb.save(response)
+        return response

@@ -272,7 +272,7 @@ class MerchandiseInventory(models.Model):
     thickness =  models.DecimalField(max_digits=20, decimal_places=5)
     purchasingPrice =  models.DecimalField(max_digits=20, decimal_places=5)
     sellingPrice =  models.DecimalField(max_digits=20, decimal_places=5)
-    vol = models.DecimalField(max_digits=20, decimal_places=4, null=True, blank=True)
+    vol = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null=True, blank=True)
     qtyT = models.IntegerField()
     qtyR = models.IntegerField()

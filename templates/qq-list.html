@@ -165,7 +165,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        <a href="/qq-nonapproved">Go to approvals</a>
+                        <a href="/qq-nonapproved" class="mr-3">Go to approvals</a>
+                        <a :href="'/export-quotations-slip/'+number(orderModal.id)" class="mr-3">Create Quotations Slip</a>
                     </div>
                 </div>
             </div>
@@ -256,6 +257,9 @@
             },
             roundToggler(){
                 this.roundToggle = !this.roundToggle
+            },
+            number(val){
+                return Number(val)
             },
             formatDateTime(value){
                 const months = [
