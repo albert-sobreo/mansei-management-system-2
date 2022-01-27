@@ -192,7 +192,7 @@
 
                         <div class="row mt-3">
                             <div class="col">
-                                <button class="btn btn-primary col">Approve</button>
+                                <button @click="approve()" class="btn btn-primary col">Approve</button>
                             </div>
                         </div>
 
@@ -213,6 +213,11 @@
         el: "#app",
 
         data: {
+            config: {
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                }
+            },
             modal: {
                 code: null,
                 datetimeCreated: null,
@@ -295,6 +300,18 @@
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
             },
+
+            approve(){
+                axios.post('/job-order-approval/', this.modal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Something went wrong",
+                        html: err.message
+                    })
+                })
+            }
         }
     })
 </script>

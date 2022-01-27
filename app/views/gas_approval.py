@@ -255,29 +255,3 @@ class ExportsApprovalAPI(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
-
-class JobOrdernonapproved(View):
-    def get(self, request):
-        if request.user.authLevel == '2':
-            raise PermissionDenied()
-
-        context = {
-            'jos': request.user.branch.jobOrder.filter(approved = False)
-        }
-        return render(request, 'job-order-nonapproved.html', context)
-
-class JobOrderapproved(View):
-    def get(self, request):
-        if request.user.authLevel == '2':
-            raise PermissionDenied()
-
-        context = {
-            'jos': request.user.branch.jobOrder.filter(approved=True)
-        }
-
-        return render(request, 'job-order-approved.html', context)
-
-class JobOrderApprovalAPI(APIView):
-    def post(self, request):
-        pass
-

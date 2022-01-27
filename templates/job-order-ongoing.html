@@ -28,6 +28,7 @@
         <div class="d-flex font-semibold mb-2 justify-content-center">
             <div class="justify-content-center c-nav-links imps-nav">
                 <a href="/job-order/" class="mx-2">Create</a>
+                <a href="/job-order-edit-on-going/" class="mx-2">Edit On-Going</a>
                 <a href="/job-order-ongoing/" class="active-imps mx-2">On-Going</a>
                 <a href="/job-order-finished/" class="mx-2">Finished</a>
             </div>
@@ -196,6 +197,12 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <div class="row mt-3">
+                            <div class="col">
+                                <button @click="finish()" class="btn btn-primary col">Finish</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -213,6 +220,11 @@
         el: "#app",
 
         data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
             modal: {
                 code: null,
                 datetimeCreated: null,
@@ -237,6 +249,10 @@
         },
 
         methods: {
+            finish(){
+                axios.post('/finish-job-order/', this.modal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+            },
             formatPrice(val){
                 val = Number(val).toFixed(2)
                 var num = val.replace(/,/gi, "");

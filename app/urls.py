@@ -158,6 +158,7 @@ router.register(r"receivepaymentsUSD", views.ReceivedPaymentsUSDAPI, 'receivepay
 
 ########## JOB ORDER ##########
 router.register(r"job-order", views.JobOrderAPI, 'job-order')
+router.register(r"job-order-2", views.JobOrderAPI2, 'job-order-2')
 
 urlpatterns = [
     path('api/', include(router.urls)),
@@ -480,5 +481,8 @@ urlpatterns = [
     path('export-quotations-slip/<int:pk>/', login_required(views.ExportQuotationsSlip.as_view())),
 
     path('job-order-ongoing/', login_required(views.JobOrderOnGoingView.as_view())),
-    path('job-order-finished/', login_required(views.JobOrderFinishedView.as_view()))
-]
+    path('job-order-finished/', login_required(views.JobOrderFinishedView.as_view())),
+    path('edit-job-order/', login_required(views.EditJobOrder.as_view())),
+    path('job-order-edit-on-going/', login_required(views.EditJobOrderView.as_view())),
+    path('finish-job-order/', login_required(views.JobOrderFinish.as_view()))
+]   

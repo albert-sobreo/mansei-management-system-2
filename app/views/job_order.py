@@ -116,11 +116,107 @@ class JobOrderOnGoingView(View):
         context = {
             'jos': request.user.branch.jobOrder.filter(status='on-going')
         }
-        return render(request, 'job-order-ongoing.html')
+        return render(request, 'job-order-ongoing.html', context)
 
 class JobOrderFinishedView(View):
     def get(self, request):
         context = {
             'jos': request.user.branch.jobOrder.filter(status='finished')
         }
-        return render(request, 'job-order-finished.html')
+        return render(request, 'job-order-finished.html', context)
+
+class EditJobOrderView(View):
+    def get(self, request):
+        if request.user.authLevel=='2':
+            raise PermissionDenied()
+
+
+        operationalExpenses = request.user.branch.accountGroup.filter(name__regex=r"[Oo]peration")
+        administrativeExpenses = request.user.branch.accountGroup.filter(name__regex=r"[Aa]dmin")
+
+
+        context = {
+            'jos': request.user.branch.jobOrder.exclude(status='finished'),
+            'operational': operationalExpenses,
+            'administrative': administrativeExpenses
+        }
+
+        return render(request, 'job-order-edit-on-going.html', context)
+
+class EditJobOrder(APIView):
+    def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+
+        jo = JobOrder.objects.get(pk=request.data['id'])
+
+        jo.rawmaterials.all().delete()
+        jo.overheadexpenses.all().delete()
+        jo.finalproduct.all().delete()
+        jo.materiallosses.all().delete()
+
+        jo.save()
+
+        for item in request.data['rawmaterials']:
+            if item['merchInventory']:
+                rawMat = RawMaterials()
+                rawMat.merchInventory = MerchandiseInventory.objects.get(pk=item['merchInventory'])
+                rawMat.jobOrder = jo
+                rawMat.qty = item['qty']
+                rawMat.remaining = item['remaining']
+                rawMat.purchasingPrice = item['purchasingPrice']
+                rawMat.totalCost = item['totalCost']
+                rawMat.save()
+                request.user.branch.rawMaterials.add(rawMat)
+
+        for item in request.data['overheadexpenses']:
+            if item['expenses']:
+                ov = OverheadExpenses()
+                ov.expenses = AccountChild.objects.get(pk=item['expenses'])
+                ov.cost = item['cost']
+                ov.jobOrder = jo
+                ov.save()
+                request.user.branch.overheadExpenses.add(ov)
+
+        for item in request.data['finalproduct']:
+            if item['name']:
+                finalProduct = FinalProduct()
+                finalProduct.name = item['name']
+                finalProduct.qty = item['qty']
+                finalProduct.unitCost = item['unitCost']
+                finalProduct.totalCost = item['totalCost']
+                finalProduct.jobOrder = jo
+                finalProduct.save()
+                request.user.branch.finalProduct.add(finalProduct)
+
+        for item in request.data['materiallosses']:
+            if item['name']:
+                losses = MaterialLosses()
+                losses.name = item['name']
+                losses.qty = item['qty']
+                losses.unitCost = item['unitCost']
+                losses.totalCost = item['totalCost']
+                losses.jobOrder = jo
+                losses.save()
+                request.user.branch.materialLosses.add(losses)
+        
+        jo.jobOrderCost = request.data['jobOrderCost']
+        jo.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+class JobOrderFinish(APIView):
+    def post(self, request, format = None):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+
+        jo = JobOrder.objects.get(pk=request.data['id'])
+        jo.datatimeFinished = datetime.datetime.now()
+        jo.status = 'finished'
+        jo.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+        
