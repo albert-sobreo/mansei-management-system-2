@@ -1297,3 +1297,43 @@ class ReceivedPaymentsUSDSZ(serializers.ModelSerializer):
         model = ReceivePaymentUSD
         fields = '__all__'
         depth = 1
+
+
+
+
+
+
+########## JOB ORDER ##########
+class RawMaterialsSZ(MS):
+    merchInventory = MerchandiseInventoryNestedSZ(read_only=True)
+    class Meta:
+        model = RawMaterials
+        fields = "__all__"
+
+class OverheadExpensesSZ(MS):
+    expenses = AccountChildSZ(read_only=True)
+    class Meta:
+        model = OverheadExpenses
+        fields = "__all__"
+
+class FinalProductSZ(MS):
+    class Meta:
+        model = FinalProduct
+        fields = "__all__"
+
+class MaterialLossesSZ(MS):
+    class Meta:
+        model = MaterialLosses
+        fields = "__all__"
+
+class JobOrderSZ(MS):
+    rawmaterials = RawMaterialsSZ(many=True, read_only=True)
+    overheadexpenses = OverheadExpensesSZ(many=True, read_only=True)
+    finalproduct = FinalProductSZ(many=True, read_only=True)
+    materiallosses = MaterialLossesSZ(many=True, read_only=True)
+    createdBy = UserNameOnlySZ(read_only=True)
+    approvedBy = UserNameOnlySZ(read_only=True)
+    class Meta:
+        model = JobOrder
+        fields = "__all__"
+        depth = 1

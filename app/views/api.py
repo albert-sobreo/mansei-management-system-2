@@ -854,9 +854,23 @@ class LiquidationAPI(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.request.user.branch.liquidation.all()
 
+
+
+
+
 ########## RECEIVED PAYMENTS USD ##########
 class ReceivedPaymentsUSDAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ReceivedPaymentsUSDSZ
     def get_queryset(self):
         return self.request.user.branch.receivePaymentUSD.all()
+
+
+
+
+
+########### JOB ORDER ##########
+class JobOrderAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = JobOrderSZ
+    queryset = JobOrder.objects.all()

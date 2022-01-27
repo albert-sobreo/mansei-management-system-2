@@ -399,7 +399,7 @@ class ExportSO(APIView):
         buyer.value=so.party.name
         soCode.value=so.code
         controlNo.value="Control No."
-        date.value=so.dateSold
+        date.value=now.today()
         
         gTotalPiecesQty.value=0
         gTotalPiecesUnitPrice.value=0
@@ -452,7 +452,7 @@ class ExportSC(APIView):
 
         buyer.value=sc.party.name
         scCode.value=sc.code
-        date.value=sc.dateSold
+        date.value=now.today()
 
         ctr = 0
         for i in sc.scitemsmerch.all():
@@ -489,7 +489,7 @@ class ExportDRLS(APIView):
         date = ws.cell(row=4, column=9)
 
         buyer.value=sc.party.name
-        date.value=sc.dateSold
+        date.value=now.today()
 
         ctr = 0
         for i in sc.scitemsmerch.all():
@@ -525,6 +525,7 @@ class ExportQuotationsSlip(APIView):
 
         buyer.value=qq.party.name
         code.value=qq.code
+        date.value=now.today()
 
         ctr = 0
 

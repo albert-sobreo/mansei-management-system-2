@@ -16,24 +16,26 @@
 
 <div id="app" v-cloak>
     <!-- NAVIGATION BAR -->
-    <navbar-imps active="nav-approvals" photo="/media/{{request.user.image}}"></navbar-imps>
+    <navbar-imps active="nav-job-order" photo="/media/{{request.user.image}}"></navbar-imps>
     <app-card></app-card>
     <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
     <!-- END NAVIGATION -->
 
     <!-- MAIN BODY -->
     <div class="container">
+        
         <!-- MORE NAV -->
         <div class="d-flex font-semibold mb-2 justify-content-center">
             <div class="justify-content-center c-nav-links imps-nav">
-                <a href="/job-order-nonapproved/" class="active-imps mx-2">Pending</a>
-                <a href="/job-order-approved/" class="mx-2">Approved</a>
+                <a href="/job-order/" class="mx-2">Create</a>
+                <a href="/job-order-ongoing/" class="active-imps mx-2">On-Going</a>
+                <a href="/job-order-finished/" class="mx-2">Finished</a>
             </div>
         </div>
 
         <!-- TITLE AND BUTTONS -->
         <div class="d-flex align-items-center mb-3">
-            <span class="font-size-18 font-bold mr-1 mt-3">Job Order</span>
+            <span class="font-size-18 font-bold mr-1 mt-3">Job Order On-Going</span>
         </div>
         <!-- END TITLE AND BUTTONS -->
 
@@ -86,6 +88,11 @@
                             <div class="col-3 my-3">
                                 <label for="" class="gray">Job Order Cost</label><br>
                                 <span class="font-size-14 font-bold">₱[[formatPrice(modal.jobOrderCost)]]</span>
+                            </div>
+
+                            <div class="col-3 my-3">
+                                <label for="" class="gray">Status</label><br>
+                                <span class="font-size-14 font-bold">[[modal.status]]</span>
                             </div>
                         </div>
 
@@ -189,13 +196,6 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <div class="row mt-3">
-                            <div class="col">
-                                <button class="btn btn-primary col">Approve</button>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </div>

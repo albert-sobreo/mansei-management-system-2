@@ -111,3 +111,16 @@ class CreateJobOrderAPI(APIView):
 
         
 
+class JobOrderOnGoingView(View):
+    def get(self, request):
+        context = {
+            'jos': request.user.branch.jobOrder.filter(status='on-going')
+        }
+        return render(request, 'job-order-ongoing.html')
+
+class JobOrderFinishedView(View):
+    def get(self, request):
+        context = {
+            'jos': request.user.branch.jobOrder.filter(status='finished')
+        }
+        return render(request, 'job-order-finished.html')

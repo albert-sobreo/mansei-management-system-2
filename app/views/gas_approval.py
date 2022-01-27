@@ -261,12 +261,23 @@ class JobOrdernonapproved(View):
         if request.user.authLevel == '2':
             raise PermissionDenied()
 
-        return render(request, 'job-order-nonapproved.html')
+        context = {
+            'jos': request.user.branch.jobOrder.filter(approved = False)
+        }
+        return render(request, 'job-order-nonapproved.html', context)
 
 class JobOrderapproved(View):
     def get(self, request):
         if request.user.authLevel == '2':
             raise PermissionDenied()
 
-        return render(request, 'job-order-approved.html')
+        context = {
+            'jos': request.user.branch.jobOrder.filter(approved=True)
+        }
+
+        return render(request, 'job-order-approved.html', context)
+
+class JobOrderApprovalAPI(APIView):
+    def post(self, request):
+        pass
 

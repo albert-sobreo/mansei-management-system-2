@@ -156,6 +156,9 @@ router.register(r"liquidation", views.LiquidationAPI, 'liquidation')
 router.register(r"exports", views.ExportsAPI, 'exports')
 router.register(r"receivepaymentsUSD", views.ReceivedPaymentsUSDAPI, 'receivepaymentsUSD')
 
+########## JOB ORDER ##########
+router.register(r"job-order", views.JobOrderAPI, 'job-order')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -469,8 +472,13 @@ urlpatterns = [
     path('job-order/', login_required(views.JobOrderView.as_view())),
     path('create-job-order/', login_required(views.CreateJobOrderAPI.as_view())),
     path('job-order-nonapproved/', login_required(views.JobOrdernonapproved.as_view())),
+    path('job-order-approved/', login_required(views.JobOrderapproved.as_view())),
+    path('job-order-approval/', login_required(views.JobOrderApprovalAPI.as_view())),
     path('export-sales-order/<int:pk>/', login_required(views.ExportSO.as_view())),
     path('export-sales-contract/<int:pk>/', login_required(views.ExportSC.as_view())),
     path('export-dr-ls/<int:pk>/', login_required(views.ExportDRLS.as_view())),
-    path('export-quotations-slip/<int:pk>/', login_required(views.ExportQuotationsSlip.as_view()))
+    path('export-quotations-slip/<int:pk>/', login_required(views.ExportQuotationsSlip.as_view())),
+
+    path('job-order-ongoing/', login_required(views.JobOrderOnGoingView.as_view())),
+    path('job-order-finished/', login_required(views.JobOrderFinishedView.as_view()))
 ]
