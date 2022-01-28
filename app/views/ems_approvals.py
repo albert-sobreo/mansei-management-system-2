@@ -213,9 +213,16 @@ class EMS_PayrollApprovalAll(APIView):
 
             salariesExpense += payroll.grossPayBeforeBonus
             salariesPayable += payroll.netPayAfterTaxes
-            bonus += (payroll.grossPayAfterBonus - payroll.grossPayBeforeBonus)
-            for benefits in payroll.deminimispay.all():
-                deminimis += benefits.amount
+            try:
+                for benefits in payroll.deminimispay.all():
+                    deminimis += benefits.amount
+            except Exception as e:
+                print(e)
+            try:
+                for b in payroll.bonuspay.all():
+                    bonus += b.amount
+            except Exception as e:
+                print(e)
             hdmfER += payroll.pagibigemployeededuction.amount
             phicER += payroll.phicemployeededuction.er
             sssER += payroll.sssemployeededuction.er
@@ -224,27 +231,7 @@ class EMS_PayrollApprovalAll(APIView):
             hdmfPayable += (2*payroll.pagibigemployeededuction.amount)
             withholdingTax += payroll.employeetaxdeduction.amount
 
-            j = Journal()
-
-            j.code = 'PYRL' + ": " + str(dateEnd)
-            j.datetimeCreated = datetime.now()
-            j.createdBy = request.user
-            j.journalDate = datetime.now()
-            j.save()
-            request.user.branch.journal.add(j)
-            ########## DEBIT ##########
-            # jeAPI(request, j, "Debit", dChildAccount.salariesExpense, salariesExpense)
-            # jeAPI(request, j, "Debit", dChildAccount.bonus, bonus)
-            # jeAPI(request, j, "Debit", dChildAccount.deminimisBenefit, deminimis)
-            # jeAPI(request, j, "Debit", dChildAccount.hdmfShare, hdmfER)
-            # jeAPI(request, j, "Debit", dChildAccount.phicERShare, phicER)
-            # jeAPI(request, j, "Debit", dChildAccount.sssERShare, sssER)
-            ########## CREDIT ##########
-            # jeAPI(request, j, "Credit", dChildAccount.salariesPayable, salariesPayable)
-            # jeAPI(request, j, "Credit", dChildAccount.sssPayable, sssPayable)
-            # jeAPI(request, j, "Credit", dChildAccount.phicPayable, phicPayable)
-            # jeAPI(request, j, "Credit", dChildAccount.hdmfPayable, hdmfPayable)
-            # jeAPI(request, j, "Credit", dChildAccount.withholdingTaxPayable, withholdingTax)
+            
 
             payslip = Payslip()
             payslip.payroll = payroll
@@ -253,6 +240,28 @@ class EMS_PayrollApprovalAll(APIView):
             payslip.save()
             request.user.branch.payslip.add(payslip)
             payroll.save()
+
+        j = Journal()
+
+        j.code = 'PYRL' + ": " + str(dateEnd) + 'test'
+        j.datetimeCreated = datetime.now()
+        j.createdBy = request.user
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+        ########## DEBIT ##########
+        jeAPI(request, j, "Debit", dChildAccount.salariesExpense, salariesExpense)
+        jeAPI(request, j, "Debit", dChildAccount.bonus, bonus)
+        jeAPI(request, j, "Debit", dChildAccount.deminimisBenefit, deminimis)
+        jeAPI(request, j, "Debit", dChildAccount.hdmfShare, hdmfER)
+        jeAPI(request, j, "Debit", dChildAccount.phicERShare, phicER)
+        jeAPI(request, j, "Debit", dChildAccount.sssERShare, sssER)
+        ########## CREDIT ##########
+        jeAPI(request, j, "Credit", dChildAccount.salariesPayable, salariesPayable)
+        jeAPI(request, j, "Credit", dChildAccount.sssPayable, sssPayable)
+        jeAPI(request, j, "Credit", dChildAccount.phicPayable, phicPayable)
+        jeAPI(request, j, "Credit", dChildAccount.hdmfPayable, hdmfPayable)
+        jeAPI(request, j, "Credit", dChildAccount.withholdingTaxPayable, withholdingTax)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return redirect('/ems-payroll/?year={}&period=semi&dateRange={}%20{}'.format(y, dateStart, dateEnd))
