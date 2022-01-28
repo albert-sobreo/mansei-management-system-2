@@ -484,5 +484,7 @@ urlpatterns = [
     path('job-order-finished/', login_required(views.JobOrderFinishedView.as_view())),
     path('edit-job-order/', login_required(views.EditJobOrder.as_view())),
     path('job-order-edit-on-going/', login_required(views.EditJobOrderView.as_view())),
-    path('finish-job-order/', login_required(views.JobOrderFinish.as_view()))
+    path('finish-job-order/', login_required(views.JobOrderFinish.as_view())),
+    path('export-commercial-invoice/<int:pk>/', login_required(views.ExportCompercialInvoice.as_view())),
+    path('export-packing-list/<int:pk>/', login_required(views.ExportPackingList.as_view()))
 ]   

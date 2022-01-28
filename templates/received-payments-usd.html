@@ -25,7 +25,7 @@
                 <th>Created By</th>
             </thead>
             <tbody>
-                {% for item in request.user.branch.receivePayment.all %}
+                {% for item in request.user.branch.receivepaymentsUSD.all %}
 
                 {% if item.voided %}
                 <tr class="voided">
@@ -85,7 +85,7 @@
                         <!-- MIDDLE CARD -->
                         <div class="order-card row my-2">
                             <div class="col-4 mt-3">
-                                <label for="" class="gray">SC Code</label>
+                                <label for="" class="gray">Export Code</label>
                                 <br>
                                 <span class="font-size-14 font-bold">[[rpModal.salesContract.code]]</span>
                             </div>

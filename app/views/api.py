@@ -879,4 +879,3 @@ class JobOrderAPI2(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = JobOrderSZ2
     queryset = JobOrder.objects.all()
-    

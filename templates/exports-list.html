@@ -168,10 +168,11 @@
                                 </tbody>
                             </table>
                         </div>
-                        <a href="/exports-nonapproved">Go to approvals</a>
+                        <a href="/exports-nonapproved" class="mr-3">Go to approvals</a>
+                        <a :href="'/export-packing-list/' + orderModal.id" class="mr-3">Create Packing List</a>
+                        <a :href="'/export-commercial-invoice/' + orderModal.id" class="mr-3">Create Commercial Invoice</a>
                     </div>
                 </div>
-                
             </div>
         </div>
 

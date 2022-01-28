@@ -12,6 +12,8 @@ from datetime import datetime
 from django.core.exceptions import PermissionDenied
 from .journalAPI import jeAPI
 import re
+import openpyxl as op
+
 
 ########## EXPORTS ##########
 class ExportsView(View):
@@ -267,3 +269,126 @@ class SaveReceivePaymentsUSD(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class ExportCompercialInvoice(APIView):
+    def get(self, request, pk):
+        expo = Exports.objects.get(pk=pk)
+
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="Commercial Invoice {expo.code}.xlsx"'
+
+        wb = op.load_workbook('static/files/commercialInvoice.xlsx')
+        ws = wb.active  
+
+        rpdate = ws.cell(row=5, column=7)
+        rpcode = ws.cell(row=6, column=7)
+        partyName = ws.cell(row=12, column=1)
+        partyAddress = ws.cell(row=13, column=1)
+        contactNum = ws.cell(row=14, column=1)
+        contactPerson = ws.cell(row=15, column=1)
+        remarks = ws.cell(row=12, column=7)
+
+        totalAmount = ws.cell(row=36, column=8)
+        totalQty = ws.cell(row=36, column=4)
+        totalPallet = ws.cell(row=36, column=5)
+        totalVol = ws.cell(row=36, column=6)
+
+        rpdate.value = expo.receivepaymentUSD.earliest('pk').datetimeCreated
+        rpcode.value = expo.receivepaymentUSD.earliest('pk').code
+        partyName.value = expo.party.name
+        partyAddress.value = expo.party.shippingAddress if expo.party.shippingAddress else expo.party.officeAddress
+        contactNum.value = f"Tel.: {expo.party.landline} / Fax:"
+        contactPerson.value = f"Contact Persion: {expo.party.contactPerson}"
+        remarks.value = expo.remarks
+        totalAmount.value = expo.amountTotal
+
+        ctr = 0
+        qty=0
+        pallet=0
+        vol=0
+        for i in expo.exportitemsmerch.all():
+            invName = ws.cell(row=21+ctr, column=1)
+            size = ws.cell(row=21+ctr, column=3)
+            qtyPCS = ws.cell(row=21+ctr, column=4)
+            qtyPallet = ws.cell(row=21+ctr, column=5)
+            cubic = ws.cell(row=21+ctr, column=6)
+            cubicPrice = ws.cell(row=21+ctr, column=7)
+            amount = ws.cell(row=21+ctr, column=8)
+
+            invName.value = f"{i.merchInventory.name} {i.merchInventory.classification}"
+            size.value = f"{round(i.merchInventory.thickness, 0)} x {round(i.merchInventory.width, 0)} x {round(i.merchInventory.length, 0)}"
+            qtyPCS.value = i.qty
+            qtyPallet.value = i.pallet
+            cubic.value = i.vol
+            cubicPrice.value = i.pricePerCubic
+            amount.value = i.totalCost
+            qty += i.qty
+            pallet += i.pallet
+            vol += i.vol
+
+            ctr+=1
+
+        totalQty.value = qty
+        totalPallet.value = pallet
+        totalVol.value = vol
+        
+        wb.save(response)
+        return response
+            
+
+
+
+class ExportPackingList(APIView):
+    def get(self, request, pk):
+        expo = Exports.objects.get(pk=pk)
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = f'attachment; filename="Packing List {expo.code}.xlsx"'
+
+        wb = op.load_workbook('static/files/packingList.xlsx')
+        ws = wb.active
+
+        rpdate = ws.cell(row=5, column=6)
+        rpcode = ws.cell(row=6, column=6)
+
+        partyName = ws.cell(row=10, column=1)
+        partyAddress = ws.cell(row=11, column=1)
+        contactNum = ws.cell(row=12, column=1)
+        contactPerson = ws.cell(row=13, column=1)
+        remarks = ws.cell(row=8, column=6)
+
+        rpdate.value = expo.receivepaymentUSD.earliest('pk').datetimeCreated
+        rpcode.value = expo.receivepaymentUSD.earliest('pk').code
+
+        partyName.value = expo.party.name
+        partyAddress.value = expo.party.shippingAddress if expo.party.shippingAddress else expo.party.officeAddress
+        contactNum.value = f"Tel.: {expo.party.landline} / Fax:"
+        contactPerson.value = f"Contact Persion: {expo.party.contactPerson}"
+        remarks.value = expo.remarks
+
+        totalQty = ws.cell(row=38, column=4)
+        totalPallet = ws.cell(row=38, column=5)
+
+        totalQty.value = 0
+        totalPallet.value = 0
+
+        ctr = 0
+        for i in expo.exportitemsmerch.all():
+            invName = ws.cell(row=19+ctr, column=1)
+            palletNo = ws.cell(row=19+ctr, column=2)
+            size = ws.cell(row=19+ctr, column=3)
+            qtyPCS = ws.cell(row=19+ctr, column=4)
+            qtyPallet = ws.cell(row=19+ctr, column=5)
+
+            invName.value = f"{i.merchInventory.name} {i.merchInventory.classification}"
+            palletNo.value = ctr+1
+            size.value = f"{round(i.merchInventory.thickness, 0)} x {round(i.merchInventory.width, 0)} x {round(i.merchInventory.length, 0)}"
+            qtyPCS.value = i.qty
+            qtyPallet.value = i.pallet
+
+            totalQty.value += i.qty
+            totalPallet.value += i.pallet
+
+            ctr+=1
+            
+        wb.save(response)
+        return response
