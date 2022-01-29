@@ -1746,6 +1746,11 @@ class RawMaterials(models.Model):
     remaining = models.PositiveIntegerField(blank = True, null = True)
     purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
 
+class DirectLabor(models.Model):
+    expenses = models.ForeignKey(AccountChild, related_name="directlabor", on_delete=models.CASCADE, null=True, blank=True)
+    cost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    jobOrder = models.ForeignKey(JobOrder, related_name="directlabor", on_delete=models.CASCADE, null=True, blank=True)
+
 class OverheadExpenses(models.Model):
     expenses = models.ForeignKey(AccountChild, related_name="overheadexpenses", on_delete=models.CASCADE, null=True, blank=True)
     cost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
@@ -1816,6 +1821,7 @@ class BranchDefaultChildAccount(models.Model):
     phicPayable = models.ForeignKey(AccountChild, related_name="branchphicpayable", on_delete=models.CASCADE, blank = True, null = True)
     hdmfPayable = models.ForeignKey(AccountChild, related_name="branchhdmfpayable", on_delete=models.CASCADE, blank = True, null = True)
     withholdingTaxPayable = models.ForeignKey(AccountChild, related_name="branchwithholdingtaxpayable", on_delete=models.CASCADE, blank = True, null = True)
+    laborExpense = models.ForeignKey(AccountChild, related_name="branchlaborexpense", on_delete=models.CASCADE, blank = True, null = True)
     
 class BranchProfile(models.Model):
     branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.CASCADE, null=True, blank=True)

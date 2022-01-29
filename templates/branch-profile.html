@@ -253,6 +253,178 @@
                 </select>
             </div>
             <div class="form-group">
+                <label for="">Salaries Expense</label>
+                <select v-model="daccount.salariesExpense" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Payrll Bonus Expense</label>
+                <select v-model="daccount.bonus" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="">13th Month Pay Expense</label>
+                <select v-model="daccount.monthPay13" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="">Deminimis Benefit Expense</label>
+                <select v-model="daccount.deminimisBenefit" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">HDMF Share Expense</label>
+                <select v-model="daccount.hdmfShare" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">PHIC Share Expense</label>
+                <select v-model="daccount.phicERShare" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">SSS Share Expense</label>
+                <select v-model="daccount.sssERShare" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Salaries Payable</label>
+                <select v-model="daccount.salariesPayable" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">SSS Payable</label>
+                <select v-model="daccount.sssPayable" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">PHIC Payable</label>
+                <select v-model="daccount.phicPayable" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">HDMF Payable</label>
+                <select v-model="daccount.hdmfPayable" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Withholding Tax Payable</label>
+                <select v-model="daccount.withholdingTaxPayable" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">Labor Expense</label>
+                <select v-model="daccount.laborExpense" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="">Cash in Bank</label>
                 <div class="multi-select-container">
                     {% for subgroup in request.user.branch.subGroup.all %}

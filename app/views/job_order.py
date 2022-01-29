@@ -37,10 +37,17 @@ class JobOrderView(View):
 
         operationalExpenses = request.user.branch.accountGroup.filter(name__regex=r"[Oo]peration")
         administrativeExpenses = request.user.branch.accountGroup.filter(name__regex=r"[Aa]dmin")
+
+        try:
+            directLabor = request.user.branch.branchProfile.branchDefaultChildAccount.laborExpense
+        except Exception as e:
+            print(e)
+            directLabor = {'pk': None, 'name': 'Connect Labor Expense first in Branch profile'}
         context = {
             'new_code': new_code,
             'operational': operationalExpenses,
-            'administrative': administrativeExpenses
+            'administrative': administrativeExpenses,
+            'directLabor': directLabor
         }    
         return render(request, 'job-order.html', context)
 
@@ -63,47 +70,50 @@ class CreateJobOrderAPI(APIView):
             jo.save()
 
         for item in request.data['rawmaterials']:
-            if item['merchInventory']:
-                rawMat = RawMaterials()
+            rawMat = RawMaterials()
+            try:
                 rawMat.merchInventory = MerchandiseInventory.objects.get(pk=item['merchInventory'])
-                rawMat.jobOrder = jo
-                rawMat.qty = item['qty']
-                rawMat.remaining = item['remaining']
-                rawMat.purchasingPrice = item['purchasingPrice']
-                rawMat.totalCost = item['totalCost']
-                rawMat.save()
-                request.user.branch.rawMaterials.add(rawMat)
+            except Exception as e:
+                print(e)
+                rawMat.merchInventory = None
+            rawMat.jobOrder = jo
+            rawMat.qty = item['qty']
+            rawMat.remaining = item['remaining']
+            rawMat.purchasingPrice = item['purchasingPrice']
+            rawMat.totalCost = item['totalCost']
+            rawMat.save()
+            request.user.branch.rawMaterials.add(rawMat)
 
         for item in request.data['overheadexpenses']:
-            if item['expenses']:
-                ov = OverheadExpenses()
+            ov = OverheadExpenses()
+            try:
                 ov.expenses = AccountChild.objects.get(pk=item['expenses'])
-                ov.cost = item['cost']
-                ov.jobOrder = jo
-                ov.save()
-                request.user.branch.overheadExpenses.add(ov)
+            except Exception as e:
+                ov.expenses = None
+            ov.cost = item['cost']
+            ov.jobOrder = jo
+            ov.save()
+            request.user.branch.overheadExpenses.add(ov)
 
         for item in request.data['finalproduct']:
-            if item['name']:
-                finalProduct = FinalProduct()
-                finalProduct.name = item['name']
-                finalProduct.qty = item['qty']
-                finalProduct.unitCost = item['unitCost']
-                finalProduct.totalCost = item['totalCost']
-                finalProduct.jobOrder = jo
-                finalProduct.save()
-                request.user.branch.finalProduct.add(finalProduct)
+            finalProduct = FinalProduct()
+            finalProduct.name = item['name']
+            finalProduct.qty = item['qty']
+            finalProduct.unitCost = item['unitCost']
+            finalProduct.totalCost = item['totalCost']
+            finalProduct.jobOrder = jo
+            finalProduct.save()
+            request.user.branch.finalProduct.add(finalProduct)
 
         for item in request.data['materiallosses']:
-            if item['name']:
-                losses = MaterialLosses()
-                losses.name = item['name']
-                losses.qty = item['qty']
-                losses.unitCost = item['unitCost']
-                losses.totalCost = item['totalCost']
-                losses.jobOrder = jo
-                losses.save()
-                request.user.branch.materialLosses.add(losses)
+            losses = MaterialLosses()
+            losses.name = item['name']
+            losses.qty = item['qty']
+            losses.unitCost = item['unitCost']
+            losses.totalCost = item['totalCost']
+            losses.jobOrder = jo
+            losses.save()
+            request.user.branch.materialLosses.add(losses)
         
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')

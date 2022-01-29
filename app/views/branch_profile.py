@@ -169,6 +169,12 @@ class SaveDefaultAccounts(APIView):
             print(e)
             bdacct.withholdingTaxPayable = None
 
+        try:
+            bdacct.laborExpense = AccountChild.objects.get(pk=items['laborExpense'])
+        except Exception as e:
+            print(e)
+            bdacct.laborExpense = None
+
 
         for item in items['cashInBank']:
             bdacct.cashInBank.clear()

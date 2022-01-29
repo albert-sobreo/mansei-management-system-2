@@ -354,6 +354,12 @@ class CreateBranchInDashboard(APIView):
         advancesToEmployee.save()
         request.user.branch.accountChild.add(advancesToEmployee)
 
+        laborExpense = AccountChild(code="##", name="Labor Expense", accountSubGroup=operatingExpenseSubGroup, amount=Decimal(0))
+        laborExpense.save()
+        request.user.branch.accountChild.add(laborExpense)
+        bdca.laborExpense = laborExpense
+        bdca.save()
+
 
         
 
