@@ -376,11 +376,15 @@ class CreateBranchInDashboard(APIView):
         bdca.factorySupplies = factorySupplies
         bdca.save()
 
-        materialLosses = AccountChild(code="##", name="Material Losses", accountSubGroup=otherLossesSubGroup, amount=Decimal(0))
-        factorySupplies.save()
-        request.user.branch.accountChild.add(factorySupplies)
-        bdca.factorySupplies = factorySupplies
+
+
+        ####### THIS CODE NEEDS SOME CHECKING #######
+        materialLosses = AccountChild(code="##", name="Material Losses", accountSubGroup=otherLossSubGroup, amount=Decimal(0))
+        materialLosses.save()
+        request.user.branch.accountChild.add(materialLosses)
+        bdca.materialLosses = materialLosses
         bdca.save()
+        ####### END #######
 
 
         
