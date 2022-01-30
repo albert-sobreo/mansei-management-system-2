@@ -8,6 +8,7 @@
     <navbar-ems active="nav-loans" photo="/static/media/{{request.user.image}}"></navbar-ems>
     <app-card></app-card>
     <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <notification-card></notification-card>
 
     <!-- MAIN BODY -->
     <div class="container">

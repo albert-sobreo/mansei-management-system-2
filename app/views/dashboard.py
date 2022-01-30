@@ -146,7 +146,7 @@ class CreateBranchInDashboard(APIView):
         otherIncome.save()
         request.user.branch.accountGroup.add(otherIncome)
 
-        otherLoss = AccountGroup(code="##", name="Other Lose", normally="Credit", permanence="Real", amount=Decimal(0))
+        otherLoss = AccountGroup(code="##", name="Other Losses", normally="Credit", permanence="Real", amount=Decimal(0))
         otherLoss.save()
         request.user.branch.accountGroup.add(otherLoss)
         
@@ -194,6 +194,10 @@ class CreateBranchInDashboard(APIView):
         adminExpenseSubGroup = AccountSubGroup(code="##", name="Administrative Expense", accountGroup=adminExpense, amount=Decimal(0))
         adminExpenseSubGroup.save()
         request.user.branch.subGroup.add(adminExpenseSubGroup)
+
+        otherLossSubGroup = AccountSubGroup(code="##", name="Other Losses", normally="Credit", permanence="Real", amount=Decimal(0))
+        otherLossSubGroup.save()
+        request.user.branch.accountGroup.add(otherLossSubGroup)
 
 
         # CHILD ACCOUNT GROUP
@@ -358,6 +362,24 @@ class CreateBranchInDashboard(APIView):
         laborExpense.save()
         request.user.branch.accountChild.add(laborExpense)
         bdca.laborExpense = laborExpense
+        bdca.save()
+
+        workInProgress = AccountChild(code="##", name="Work in Progress", accountSubGroup=inventory, amount=Decimal(0))
+        workInProgress.save()
+        request.user.branch.accountChild.add(workInProgress)
+        bdca.workInProgress = workInProgress
+        bdca.save()
+
+        factorySupplies = AccountChild(code="##", name="Factory Supplies", accountSubGroup=operatingExpenseSubGroup, amount=Decimal(0))
+        factorySupplies.save()
+        request.user.branch.accountChild.add(factorySupplies)
+        bdca.factorySupplies = factorySupplies
+        bdca.save()
+
+        materialLosses = AccountChild(code="##", name="Material Losses", accountSubGroup=otherLossesSubGroup, amount=Decimal(0))
+        factorySupplies.save()
+        request.user.branch.accountChild.add(factorySupplies)
+        bdca.factorySupplies = factorySupplies
         bdca.save()
 
 

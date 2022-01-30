@@ -8,6 +8,8 @@ from ..models import *
 import sweetify
 import datetime
 from django.core.exceptions import PermissionDenied
+from decimal import Decimal
+from .journalAPI import jeAPI
 
 class JobOrderView(View):
     def get(self, request):
@@ -64,6 +66,8 @@ class CreateJobOrderAPI(APIView):
         jo.method = request.data['method']
         jo.save()
         request.user.branch.jobOrder.add(jo)
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
 
         if request.user.is_authenticated:
             jo.createdBy = request.user
@@ -179,6 +183,9 @@ class EditJobOrder(APIView):
 
         jo.save()
 
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
+        rawmat = Decimal(0)
         for item in request.data['rawmaterials']:
             if item['merchInventory']:
                 rawMat = RawMaterials()
@@ -190,7 +197,9 @@ class EditJobOrder(APIView):
                 rawMat.totalCost = item['totalCost']
                 rawMat.save()
                 request.user.branch.rawMaterials.add(rawMat)
+                rawmat += rawMat.totalCost
 
+        labor = Decimal (0)
         for item in request.data['directlabor']:
             dl = DirectLabor()
             try:
@@ -202,7 +211,9 @@ class EditJobOrder(APIView):
             dl.jobOrder = jo
             dl.save()
             request.user.branch.directLabor.add(dl)
+            labor += dl.cost
 
+        overhead = Decimal(0)
         for item in request.data['overheadexpenses']:
             if item['expenses']:
                 ov = OverheadExpenses()
@@ -211,6 +222,7 @@ class EditJobOrder(APIView):
                 ov.jobOrder = jo
                 ov.save()
                 request.user.branch.overheadExpenses.add(ov)
+                overhead += ov.cost
 
         for item in request.data['finalproduct']:
             if item['name']:
@@ -233,6 +245,24 @@ class EditJobOrder(APIView):
                 losses.jobOrder = jo
                 losses.save()
                 request.user.branch.materialLosses.add(losses)
+
+        j = Journal()
+
+        j.code = jo.code
+        j.datetimeCreated = jo.datetimeCreated
+        j.createdBy = jo.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+        
+        if not rawmat == Decimal(0):
+            jeAPI(request, j, 'Credit', dChildAccount.inventory, rawmat)
+        if not overhead == Decimal(0):
+            jeAPI(request, j, 'Credit', dChildAccount.factorySupplies, overhead)
+        if not labor == Decimal(0):
+            jeAPI(request, j, 'Credit', dChildAccount.laborExpense, labor)
+
+        jeAPI(request, j, 'Debit', dChildAccount.workInProgress, rawmat+overhead+labor)
         
         jo.jobOrderCost = request.data['jobOrderCost']
         jo.save()
@@ -245,10 +275,43 @@ class JobOrderFinish(APIView):
         if request.user.authLevel == '2':
             raise PermissionDenied()
 
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
         jo = JobOrder.objects.get(pk=request.data['id'])
         jo.datatimeFinished = datetime.datetime.now()
         jo.status = 'finished'
         jo.save()
+
+        j = Journal()
+
+        j.code = jo.code
+        j.datetimeCreated = jo.datetimeCreated
+        j.createdBy = jo.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+        
+        addloss = Decimal(0)
+        for loss in jo.materiallosses.all():
+            addloss += loss.totalCost
+
+        if jo.method == 'Absorption':
+            jeAPI(request, j, 'Credit', dChildAccount.workInProgress, jo.jobOrderCost)
+            jeAPI(request, j, 'Credit', dChildAccount.materialLosses, addloss)
+            jeAPI(request, j, 'Debit', dChildAccount.manuInventory, (jo.jobOrderCost + addloss))
+        elif jo.method == 'Direct':
+            jeAPI(request, j, 'Credit', dChildAccount.workInProgress, jo.jobOrderCost)
+            jeAPI(request, j, 'Debit', dChildAccount.manuInventory, jo.jobOrderCost)
+            jeAPI(request, j, 'Credit', dChildAccount.materialLosses, addloss)
+            jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, addloss)
+
+        # exp= Decimal(0)
+        # for expense in jo.overheadexpenses.all():
+        #     jeAPI(request, j, 'Credit', expense.expenses, expense.cost)
+        #     exp += expense.cost
+        # jeAPI(request, j, 'Debit', dChildAccount.factorySupplies, exp)
+
+
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

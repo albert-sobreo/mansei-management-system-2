@@ -12,8 +12,12 @@
     <div class="profile mx-3 position-absolute" onclick="toggleProfile()" style="top: 10px; right: 12px;">
         <img src="/static/media/{{request.user.image}}" alt="" height="20" class="profile-border b-radius-circle" id="profileToggler">
     </div>
+    <div class="profile mx-3 position-absolute" onclick="toggleNotificationCard()" style="top: 10px; right: 60px;">
+        <img src="/static/media/icons/bell-solid 1.svg" alt="" height="20"  id="notificationToggler">
+    </div>
     <profile-card branch="{{request.user.branch.name}}" branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
     <app-card></app-card>
+    <notification-card></notification-card>
 
     <div class="dashboard-container w-100 d-flex vh-100">
         <div id="sidebar" class="position-relative d-flex flex-column align-items-center w-20" style="background: #222A2E">

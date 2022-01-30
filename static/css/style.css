@@ -319,6 +319,24 @@ body{
     background: #0069d9
 }
 
+
+.b-tl-radius-5{
+    border-top-left-radius: 5px;
+}
+
+.b-tr-radius-5{
+    border-top-right-radius: 5px;
+}
+
+.b-bl-radius-5{
+    border-bottom-left-radius: 5px;
+}
+
+.b-br-radius-5{
+    border-bottom-right-radius: 5px;
+}
+
+
 .b-tl-radius-10{
     border-top-left-radius: 10px;
 }
@@ -1204,6 +1222,10 @@ select.form-control{
     width: 20%;
 }
 
+.w-90{
+    width: 90%;
+}
+
 .w-18{
     width: 18%;
 }
@@ -1364,4 +1386,47 @@ select.form-control{
 .no-decoration:hover{
     text-decoration: none;
     color: gray;
+}
+
+.notification-number{
+    height: 7px;
+    width: 7px;
+    margin: auto;
+    border-radius: 50%;
+    background-color: red;
+}
+
+.notification-item{
+    cursor: pointer;
+}
+
+.notification-item:hover{
+    background-color: rgb(247, 247, 247);
+}
+
+.notification-item-new{
+    box-shadow: 0px 0px 0px 2px #46a5f3
+}
+
+.soft-text{
+    color: rgb(85, 85, 85)
+}
+
+.softer-text{
+    color: rgb(136, 136, 136)
+}
+
+#notificationCard{
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.notification-delete{
+    background-color: rgb(255, 189, 189);
+    color: rgb(230, 79, 79);
+}
+
+.notification-delete:hover{
+    background-color: rgb(255, 169, 169);
+    color: rgb(230, 79, 79);
 }

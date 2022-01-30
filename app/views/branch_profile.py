@@ -175,6 +175,24 @@ class SaveDefaultAccounts(APIView):
             print(e)
             bdacct.laborExpense = None
 
+        try:
+            bdacct.workInProgress = AccountChild.objects.get(pk=items['workInProgress'])
+        except Exception as e:
+            print(e)
+            bdacct.workInProgress = None
+
+        try:
+            bdacct.factorySupplies = AccountChild.objects.get(pk=items['factorySupplies'])
+        except Exception as e:
+            print(e)
+            bdacct.factorySupplies = None
+
+        try:
+            bdacct.materialLosses = AccountChild.objects.get(pk=items['materialLosses'])
+        except Exception as e:
+            print(e)
+            bdacct.otherLosses = None
+
 
         for item in items['cashInBank']:
             bdacct.cashInBank.clear()

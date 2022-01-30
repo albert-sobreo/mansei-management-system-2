@@ -10,6 +10,7 @@ from datetime import date as now
 from decimal import Decimal
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class PurchaseRequestView(View):
     def get(self, request, format=None):
@@ -119,6 +120,8 @@ class SavePurchaseRequest(APIView):
 
                         vqitemsmerch.save()
                         request.user.branch.vendorQuotesItemsMerch.add(vqitemsmerch)
+
+        notify(request, 'New PR Request', pr.code, '/pr-nonapproved/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

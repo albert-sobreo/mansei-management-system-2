@@ -10,6 +10,9 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 router = routers.DefaultRouter()
 
+########## NOTIFICATIONS ##########
+router.register(r"notifications", views.NotificationsAPI, 'notifications')
+
 ########## CHART OF ACCOUNTS ##########
 router.register(r"group", views.AccountGroupAPI, 'group')
 router.register(r"sub-group", views.AccountSubGroupAPI, 'sub-group')
@@ -486,5 +489,7 @@ urlpatterns = [
     path('job-order-edit-on-going/', login_required(views.EditJobOrderView.as_view())),
     path('finish-job-order/', login_required(views.JobOrderFinish.as_view())),
     path('export-commercial-invoice/<int:pk>/', login_required(views.ExportCompercialInvoice.as_view())),
-    path('export-packing-list/<int:pk>/', login_required(views.ExportPackingList.as_view()))
+    path('export-packing-list/<int:pk>/', login_required(views.ExportPackingList.as_view())),
+    path('notifications/<int:pk>/', login_required(views.NotificationReceiver.as_view())),
+    path('notification-unread-checker/', login_required(views.NotificationUnreadChecker.as_view())),
 ]   

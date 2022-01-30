@@ -1368,3 +1368,13 @@ class JobOrderSZ2(MS):
         model = JobOrder
         fields = "__all__"
         depth = 1
+
+
+
+
+
+########## NOTIFICATIONS ###########
+class NotificationsSZ(MS):
+    class Meta:
+        model = Notifications
+        fields = "__all__"

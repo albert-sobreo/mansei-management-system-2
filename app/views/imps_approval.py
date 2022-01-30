@@ -46,8 +46,39 @@ class JobOrderApprovalAPI(APIView):
         jo.approvedBy = request.user
         jo.status = 'on-going'
 
-
         jo.save()
+
+        rawmat = Decimal(0)
+        for material in jo.rawmaterials.all():
+            rawmat += material.totalCost
+        
+        overhead = Decimal(0)
+        for oh in jo.overheadexpenses.all():
+            overhead += oh.cost
+
+        labor = Decimal (0)
+        for work in jo.directlabor.all():
+            labor += work.cost
+
+        j = Journal()
+
+        j.code = jo.code
+        j.datetimeCreated = jo.datetimeCreated
+        j.createdBy = jo.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+        
+        if not rawmat == Decimal(0):
+            jeAPI(request, j, 'Credit', dChildAccount.inventory, rawmat)
+        if not overhead == Decimal(0):
+            jeAPI(request, j, 'Credit', dChildAccount.factorySupplies, overhead)
+        if not labor == Decimal(0):
+            jeAPI(request, j, 'Credit', dChildAccount.laborExpense, labor)
+
+        jeAPI(request, j, 'Debit', dChildAccount.workInProgress, rawmat+overhead+labor)
+
+
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

@@ -16,6 +16,20 @@ from rest_framework.decorators import action
 from decimal import Decimal
 import re
 
+########## NOTIFICATIONS ##########
+class NotificationsAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = NotificationsSZ
+
+    def get_queryset(self):
+        return self.request.user.notifications.all().order_by('-pk')
+
+
+
+
+
+
+
 ########## CHART OF ACCOUNTS ##########
 class AccountGroupAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -23,11 +37,6 @@ class AccountGroupAPI(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.request.user.branch.accountGroup.all()
-
-
-
-
-
 
 class AccountChildAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]

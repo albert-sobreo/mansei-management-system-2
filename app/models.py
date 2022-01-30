@@ -68,6 +68,17 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+class Notifications(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    title = models.CharField(max_length=1024, default="Notification Title")
+    subject = models.CharField(max_length=1024, default="Notification Subject")
+    url = models.URLField()
+    read = models.BooleanField(default=False)
+    authLevel = models.CharField(max_length=2, null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
 class Notepad(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='notepad')
     notes = models.TextField(null=True, blank=True)
@@ -1822,7 +1833,10 @@ class BranchDefaultChildAccount(models.Model):
     hdmfPayable = models.ForeignKey(AccountChild, related_name="branchhdmfpayable", on_delete=models.CASCADE, blank = True, null = True)
     withholdingTaxPayable = models.ForeignKey(AccountChild, related_name="branchwithholdingtaxpayable", on_delete=models.CASCADE, blank = True, null = True)
     laborExpense = models.ForeignKey(AccountChild, related_name="branchlaborexpense", on_delete=models.CASCADE, blank = True, null = True)
-    
+    workInProgress = models.ForeignKey(AccountChild, related_name="branchworkinprogress", on_delete=models.CASCADE, blank = True, null = True)
+    factorySupplies = models.ForeignKey(AccountChild, related_name="branchfactorysupplies", on_delete=models.CASCADE, blank=True, null=True)
+    materialLosses = models.ForeignKey(AccountChild, related_name = "branchmateriallosses", on_delete=models.CASCADE, blank = True, null = True)
+
 class BranchProfile(models.Model):
     branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.CASCADE, null=True, blank=True)
 
@@ -2007,6 +2021,9 @@ class Branch(models.Model):
     finalProduct = models.ManyToManyField(FinalProduct, blank = True)
     materialLosses = models.ManyToManyField(MaterialLosses, blank = True)
     manufacturingInventory = models.ManyToManyField(ManufacturingInventory, blank = True)
+
+    #### NOTIFICATIONS ####
+    notifications = models.ManyToManyField(Notifications, blank=True)
 
     
 
