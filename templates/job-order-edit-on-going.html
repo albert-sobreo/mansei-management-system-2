@@ -34,7 +34,7 @@
                     <label for="">Reference No.</label>
                     <select @change="fetchJO(jobOrder.id)" v-model="jobOrder.id" name="" id="" class="form-control">
                         <option value="" selected disabled>Select Job Order to Edit</option>
-                        {% for jo in jos %}
+                        {% for jo in jos reversed %}
                         <option value="{{jo.pk}}">{{jo.code}}</option>
                         {% endfor %}
                     </select>

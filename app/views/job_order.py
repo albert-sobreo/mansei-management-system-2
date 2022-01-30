@@ -95,6 +95,18 @@ class CreateJobOrderAPI(APIView):
             ov.save()
             request.user.branch.overheadExpenses.add(ov)
 
+        for item in request.data['directlabor']:
+            dl = DirectLabor()
+            try:
+                dl.expenses = AccountChild.objects.get(pk=item['expenses'])
+            except Exception as e:
+                print(e)
+                dl.expenses = None
+            dl.cost = item['cost']
+            dl.jobOrder = jo
+            dl.save()
+            request.user.branch.directLabor.add(dl)
+
         for item in request.data['finalproduct']:
             finalProduct = FinalProduct()
             finalProduct.name = item['name']
@@ -178,6 +190,18 @@ class EditJobOrder(APIView):
                 rawMat.totalCost = item['totalCost']
                 rawMat.save()
                 request.user.branch.rawMaterials.add(rawMat)
+
+        for item in request.data['directlabor']:
+            dl = DirectLabor()
+            try:
+                dl.expenses = AccountChild.objects.get(pk=item['expenses'])
+            except Exception as e:
+                print(e)
+                dl.expenses = None
+            dl.cost = item['cost']
+            dl.jobOrder = jo
+            dl.save()
+            request.user.branch.directLabor.add(dl)
 
         for item in request.data['overheadexpenses']:
             if item['expenses']:

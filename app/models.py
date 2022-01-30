@@ -2002,6 +2002,7 @@ class Branch(models.Model):
     #### JOB ORDER ####
     jobOrder = models.ManyToManyField(JobOrder, blank = True)
     rawMaterials = models.ManyToManyField(RawMaterials, blank = True)
+    directLabor = models.ManyToManyField(DirectLabor, blank=True)
     overheadExpenses = models.ManyToManyField(OverheadExpenses, blank = True)
     finalProduct = models.ManyToManyField(FinalProduct, blank = True)
     materialLosses = models.ManyToManyField(MaterialLosses, blank = True)

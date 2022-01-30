@@ -1178,7 +1178,7 @@ class AnnouncementSZ(MS):
         model = Announcement
         fields = "__all__"
 
-        
+
 
 
 ########## BONUS 13th ###########
@@ -1336,6 +1336,11 @@ class MaterialLossesSZ(MS):
         model = MaterialLosses
         fields = "__all__"
 
+class DirectLaborSZ(MS):
+    class Meta:
+        model = DirectLabor
+        fields = "__all__"
+
 class JobOrderSZ(MS):
     rawmaterials = RawMaterialsNestedSZ(many=True, read_only=True)
     overheadexpenses = OverheadExpensesNestedSZ(many=True, read_only=True)
@@ -1350,6 +1355,7 @@ class JobOrderSZ(MS):
 
 class JobOrderSZ2(MS):
     rawmaterials = RawMaterialsSZ(many=True, read_only=True)
+    directlabor = DirectLaborSZ(many=True, read_only=True)
     overheadexpenses = OverheadExpensesSZ(many=True, read_only=True)
     finalproduct = FinalProductSZ(many=True, read_only=True)
     materiallosses = MaterialLossesSZ(many=True, read_only=True)
