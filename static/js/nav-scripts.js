@@ -37,9 +37,10 @@ document.addEventListener('mouseup', function(event){
         proceed = true
         return
     }
-    if (!cards.profileCard.contains(event.target) || !cards.appCard.contains(event.target)){
+    if (!cards.profileCard.contains(event.target) || !cards.appCard.contains(event.target) || !cards.notificationCard.contains(event.target)){
         profileCard.style.display = 'none'
         appCard.style.display = 'none'
+        notificationCard.style.display = 'none'
     }
 })
 //Toggles Profile Card

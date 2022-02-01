@@ -45,11 +45,14 @@ class JobOrderView(View):
         except Exception as e:
             print(e)
             directLabor = {'pk': None, 'name': 'Connect Labor Expense first in Branch profile'}
+        
+        fact = request.user.branch.branchProfile.branchDefaultChildAccount.factorySupplies
         context = {
             'new_code': new_code,
             'operational': operationalExpenses,
             'administrative': administrativeExpenses,
-            'directLabor': directLabor
+            'directLabor': directLabor,
+            'factorySupplies': fact,
         }    
         return render(request, 'job-order.html', context)
 
@@ -68,7 +71,6 @@ class CreateJobOrderAPI(APIView):
         request.user.branch.jobOrder.add(jo)
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
-
         if request.user.is_authenticated:
             jo.createdBy = request.user
             jo.save()
@@ -83,6 +85,8 @@ class CreateJobOrderAPI(APIView):
             rawMat.jobOrder = jo
             rawMat.qty = item['qty']
             rawMat.remaining = item['remaining']
+            rawMat.merchInventory.warehouseitems.all()[0].addQty(-(item['qty'])) 
+            rawMat.merchInventory.warehouseitems.all()[0].save2()
             rawMat.purchasingPrice = item['purchasingPrice']
             rawMat.totalCost = item['totalCost']
             rawMat.save()
@@ -156,10 +160,8 @@ class EditJobOrderView(View):
         if request.user.authLevel=='2':
             raise PermissionDenied()
 
-
         operationalExpenses = request.user.branch.accountGroup.filter(name__regex=r"[Oo]peration")
         administrativeExpenses = request.user.branch.accountGroup.filter(name__regex=r"[Aa]dmin")
-
 
         context = {
             'jos': request.user.branch.jobOrder.exclude(status='finished'),
@@ -174,66 +176,176 @@ class EditJobOrder(APIView):
         if request.user.authLevel == '2':
             raise PermissionDenied()
 
-        jo = JobOrder.objects.get(pk=request.data['id'])
-
-        jo.rawmaterials.all().delete()
-        jo.overheadexpenses.all().delete()
-        jo.finalproduct.all().delete()
-        jo.materiallosses.all().delete()
-
-        jo.save()
+        oldJO = JobOrder.objects.get(pk=request.data['id'])
+        newJO = request.data
 
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
+        j = Journal()
+
+        j.code = jo.code
+        j.datetimeCreated = jo.datetimeCreated
+        j.createdBy = jo.createdBy
+        j.journalDate = datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+
         rawmat = Decimal(0)
-        for item in request.data['rawmaterials']:
-            if item['merchInventory']:
-                rawMat = RawMaterials()
-                rawMat.merchInventory = MerchandiseInventory.objects.get(pk=item['merchInventory'])
-                rawMat.jobOrder = jo
-                rawMat.qty = item['qty']
-                rawMat.remaining = item['remaining']
-                rawMat.purchasingPrice = item['purchasingPrice']
-                rawMat.totalCost = item['totalCost']
-                rawMat.save()
-                request.user.branch.rawMaterials.add(rawMat)
-                rawmat += rawMat.totalCost
+        # for item in request.data['rawmaterials']:
+        #     if item['merchInventory']:
+        #         rawMat = RawMaterials()
+        #         rawMat.merchInventory = MerchandiseInventory.objects.get(pk=item['merchInventory'])
+        #         rawMat.jobOrder = jo
+        #         rawMat.qty = item['qty']
+        #         rawMat.remaining = item['remaining']
+        #         rawMat.purchasingPrice = item['purchasingPrice']
+        #         rawMat.totalCost = item['totalCost']
+        #         rawMat.save()
+        #         request.user.branch.rawMaterials.add(rawMat)
+        #         rawmat += rawMat.totalCost
+
+        newRawMatIDS = []
+        for item in newJO['rawmaterials']:
+            if oldJO.rawmaterials.filter(pk=item['id']):
+                oldRawmat = oldJO.rawmaterials.filter(pk=item['id'])[0]
+                diff = Decimal(0)
+                if oldRawmat.qty < Decimal(item['qty']):
+                    diff = abs(oldRawmat.qty - Decimal(item['qty']))
+                    oldRawmat.qty +=  diff
+                    oldRawmat.remaining += diff
+                    oldRawmat.merchInventory.warehouseitems.all()[0].addQty((item['qty'])) 
+                    oldRawmat.merchInventory.warehouseitems.all()[0].save2()
+                    oldRawmat.totalCost = item['totalCost']
+                    oldRawmat.merchInventory.save()
+                    oldRawmat.save()
+                elif oldRawmat.qty > item['qty']:
+                    diff = abs(Decimal(item['qty']) - oldRawmat.qty)
+                    oldRawmat.qty -=  diff
+                    oldRawmat.remaining -= diff
+                    oldRawmat.merchInventory.warehouseitems.all()[0].addQty(-(item['qty'])) 
+                    oldRawmat.merchInventory.warehouseitems.all()[0].save2()
+                    oldRawmat.totalCost = item['totalCost']
+                    oldRawmat.merchInventory.save()
+                    oldRawmat.save()
+
+
+            else:
+                newRawMatIDS.append(item['id'])
+                newRawmat = RawMaterials()
+                newRawmat.merchInventory = MerchandiseInventory.objects.get(pk=item['merchInventory'])
+                newRawmat.jobOrder = oldJO
+                newRawmat.qty = item['qty']
+                newRawmat.merchInventory.warehouseitems.all()[0].addQty(-(item['qty'])) 
+                newRawmat.merchInventory.warehouseitems.all()[0].save2()
+                newRawmat.purchasingPrice = item['purchasingPrice']
+                newRawmat.totalCost = item['totalCost']
+                newRawmat.save()
+                request.user.branch.rawMaterials.add(newRawmat)
+                # JE THEN DELETE
+
+        for item in oldJO.rawmaterials.exclude(pk__in=newRawMatIDS):
+            # JE HERE #
+
+            # JE END  #
+            item.delete()
+
+
 
         labor = Decimal (0)
-        for item in request.data['directlabor']:
-            dl = DirectLabor()
-            try:
-                dl.expenses = AccountChild.objects.get(pk=item['expenses'])
-            except Exception as e:
-                print(e)
-                dl.expenses = None
-            dl.cost = item['cost']
-            dl.jobOrder = jo
-            dl.save()
-            request.user.branch.directLabor.add(dl)
-            labor += dl.cost
+        # for item in request.data['directlabor']:
+            # dl = DirectLabor()
+            # try:
+            #     dl.expenses = AccountChild.objects.get(pk=item['expenses'])
+            # except Exception as e:
+            #     print(e)
+            #     dl.expenses = None
+            # dl.cost = item['cost']
+            # dl.jobOrder = jo
+            # dl.save()
+            # request.user.branch.directLabor.add(dl)
+            # labor += dl.cost
+        for item in newJO['directlabor']:
+            if oldJO.directlabor.filter(pk=item['id']):
+                diff = Decimal(0)
+                oldDirectLabor = oldJO.directlabor.filter(pk=item['id'])[0]
+                if oldDirectLabor.cost > Decimal(item['cost']):
+                    diff += abs(oldDirectLabor.cost - Decimal(item['cost']))
+                    oldDirectLabor.cost -= diff
+                    oldDirectLabor.save()
+
+                elif oldDirectLabor.cost < Decimal(item['cost']):
+                    diff += (abs(oldDirectLabor.cost - Decimal(item['cost'])))
+                    oldDirectLabor.cost += diff
+                    oldDirectLabor.save()
 
         overhead = Decimal(0)
-        for item in request.data['overheadexpenses']:
-            if item['expenses']:
-                ov = OverheadExpenses()
-                ov.expenses = AccountChild.objects.get(pk=item['expenses'])
-                ov.cost = item['cost']
-                ov.jobOrder = jo
-                ov.save()
-                request.user.branch.overheadExpenses.add(ov)
-                overhead += ov.cost
+        # for item in request.data['overheadexpenses']:
+        #     if item['expenses']:
+        #         ov = OverheadExpenses()
+        #         ov.expenses = AccountChild.objects.get(pk=item['expenses'])
+        #         ov.cost = item['cost']
+        #         ov.jobOrder = jo
+        #         ov.save()
+        #         request.user.branch.overheadExpenses.add(ov)
+        #         overhead += ov.cost
+        
+        newOverheadIDS = []
+        for item in newJO['overheadexpenses']:
+            if oldJO.overheadexpenses.filter(pk=item['id']):
+                oldOverhead = oldJO.overheadexpenses.filter(pk=item['id'])[0]
+                diff = Decimal(0)
+                if oldOverhead.cost > Decimal(item['cost']):
+                    diff += abs(oldOverhead.cost - Decimal(item['cost']))
+                    oldOverhead.cost -= diff
+                    oldOverhead.save()
 
-        for item in request.data['finalproduct']:
-            if item['name']:
-                finalProduct = FinalProduct()
-                finalProduct.name = item['name']
-                finalProduct.qty = item['qty']
-                finalProduct.unitCost = item['unitCost']
-                finalProduct.totalCost = item['totalCost']
-                finalProduct.jobOrder = jo
-                finalProduct.save()
-                request.user.branch.finalProduct.add(finalProduct)
+                elif oldOverhead.cost < Decimal(item['cost']):
+                    diff += abs(oldOverhead.cost + Decimal(item['cost']))
+                    oldOverhead.cost += diff
+                    oldOverhead.save()
+
+            else:
+                newOverheadIDS.append(item['id'])
+                newOverhead = OverheadExpenses()
+                try:
+                    newOverhead.expenses = AccountChild.objects.get(pk=item['expenses'])
+                except Exception as e:
+                    print(e)
+                    newOverhead.expenses = None
+                newOverhead.cost = Decimal(item['cost'])
+                newOverhead.jobOrder = oldJO
+                newOverhead.save()
+                request.user.branch.overheadExpenses.add(newOverhead)
+
+                # JE BELOW #
+
+
+        for item in oldJO.overheadexpenses.exclude(pk__in=newOverheadIDS):
+            # JE BELOW #
+
+            # WHAT IS LEFT FROM THE EXCLUDE MUST BE DELETED
+            item.delete()
+
+
+
+        # for item in request.data['finalproduct']:
+        #     if item['name']:
+        #         finalProduct = FinalProduct()
+        #         finalProduct.name = item['name']
+        #         finalProduct.qty = item['qty']
+        #         finalProduct.unitCost = item['unitCost']
+        #         finalProduct.totalCost = item['totalCost']
+        #         finalProduct.jobOrder = jo
+        #         finalProduct.save()
+        #         request.user.branch.finalProduct.add(finalProduct)
+
+        for item in newJO['finalproduct']:
+            if oldJO.finalproduct.filter(pk=item['id']):
+                diff = Decimal(0)
+                oldFinalProduct = oldJO.finalproduct.filter(pk=item['id'])[0]
+                if oldFinalProduct.qty > Decimal(item['qty']):
+                    diff += abs(oldFinalProduct.totalCost - Decimal(item['totalCost']))
+
 
         for item in request.data['materiallosses']:
             if item['name']:
@@ -246,14 +358,7 @@ class EditJobOrder(APIView):
                 losses.save()
                 request.user.branch.materialLosses.add(losses)
 
-        j = Journal()
-
-        j.code = jo.code
-        j.datetimeCreated = jo.datetimeCreated
-        j.createdBy = jo.createdBy
-        j.journalDate = datetime.now()
-        j.save()
-        request.user.branch.journal.add(j)
+        
         
         if not rawmat == Decimal(0):
             jeAPI(request, j, 'Credit', dChildAccount.inventory, rawmat)

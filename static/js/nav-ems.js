@@ -22,12 +22,24 @@ Vue.component('navbar-ems', {
                 emsLogo: '/static/media/icons/EMS.svg',
                 dashboardLogo: '/static/media/icons/Dashboard.svg',
                 hrefProfile: '/static/media/icons/person.png'
-            }
+            },
+            
+            notiCount: 0
         }
     },
     mounted(){
         var x = document.getElementById(this.active);
         x.classList.add('active-ems');
+        this.checkUnreadNoti()
+        setInterval(this.checkUnreadNoti, 30000)
+        
+    },
+
+    methods: {
+        checkUnreadNoti(){
+            axios.get('/notification-unread-checker/')
+            .then(res=>this.notiCount=res.data)
+        }
     },
 
     template: /*javascript*/`

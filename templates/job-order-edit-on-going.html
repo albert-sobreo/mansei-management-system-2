@@ -84,7 +84,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input onkeypress="validate()" @change="onMaterialsCost(index)" v-model="item.purchasingPrice" type="text" class="form-control box-shadow-off">
+                            <input onkeypress="validate()" @change="onMaterialsCost(index)" readonly v-model="item.purchasingPrice" type="text" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="col px-1">
@@ -97,7 +97,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input onkeypress="validate()" readonly  v-model="item.totalCost" type="text" class="form-control box-shadow-off">
+                            <input onkeypress="validate()" readonly  :value="formatPrice(item.totalCost)" type="text" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="px-1 text-right">
@@ -126,9 +126,8 @@
                     <div class="col-9 px-1">
                         <label for="">Account</label>
                         <select name="" id="" v-for="(item, index) in jobOrder.directlabor" v-model="item.expenses" class="form-control">
-                            <optgroup label="Labor Cost">
-                                <option value="{{directLabor.pk}}">{{directLabor.name}}</option>
-                            </optgroup>
+                            <option value="" selected disabled>Select an Account</option>
+                            <option value="{{directLabor.pk}}">{{directLabor.name}}</option>
                         </select>
                     </div>
                     <div class="col px-1">
@@ -161,25 +160,7 @@
                         <label for="">Account</label>
                         <select v-for="(item, index) in jobOrder.overheadexpenses" v-model="item.expenses" name="" id="" class="form-control">
                             <option value="" selected disabled>Select an Account</option>
-                            {% for op in operational %}
-                            {% for sub in op.accountsubgroup.all %}
-                            <optgroup label="{{sub.name}}">
-                                {% for child in sub.accountchild.all %}
-                                <option value="{{child.pk}}">{{child.name}}</option>
-                                {% endfor %}
-                            </optgroup>
-                            {% endfor %}
-                            {% endfor %}
-
-                            {% for op in administrative %}
-                            {% for sub in op.accountsubgroup.all %}
-                            <optgroup label="{{sub.name}}">
-                                {% for child in sub.accountchild.all %}
-                                <option value="{{child.pk}}">{{child.name}}</option>
-                                {% endfor %}
-                            </optgroup>
-                            {% endfor %}
-                            {% endfor %}
+                            <option value="{{factorySupplies.pk}}">{{factorySupplies.name}}</option>
                         </select>
                     </div>
                     <div class="col px-1">
@@ -232,7 +213,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input v-model="item.totalCost" readonly @change="onFinalProductCost(index)" type="text" class="form-control box-shadow-off">
+                            <input :value="formatPrice(item.totalCost)" readonly @change="onFinalProductCost(index)" type="text" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="px-1 text-right">
@@ -267,7 +248,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input v-model="item.totalCost" readonly type="text" class="form-control box-shadow-off">
+                            <input :value="formatPrice(item.totalCost)" readonly type="text" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="px-1 text-right">
@@ -497,9 +478,19 @@
             getMerchRemaining(id, index){
                 axios.get(`/api/merchinventory/${id}/`)
                 .then(res=>{
-                    this.jobOrder.rawmaterials[index].remaining = res.data.qtyA
+                    this.jobOrder.rawmaterials[index].remaining = res.data.qtyA;
+                    this.jobOrder.rawmaterials[index].purchasingPrice = res.data.purchasingPrice
                 })
-            }
+            },
+
+            formatPrice(val){
+                val = Number(val).toFixed(2)
+                var num = val.replace(/,/gi, "");
+                var num1 = num.split('.')
+                var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
+                val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
+                return val
+            },
         }
     })
 </script>

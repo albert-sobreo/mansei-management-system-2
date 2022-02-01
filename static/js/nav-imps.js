@@ -15,13 +15,25 @@ Vue.component('navbar-imps', {
                 emsLogo: '/static/media/icons/EMS.svg',
                 dashboardLogo: '/static/media/icons/Dashboard.svg',
                 hrefProfile: '/static/media/icons/person.png'
-            }
+            },
+
+            notiCount: 0
         }
     },
 
     mounted(){
         var x = document.getElementById(this.active);
         x.classList.add('active-imps');
+        this.checkUnreadNoti()
+        setInterval(this.checkUnreadNoti, 30000)
+        
+    },
+
+    methods: {
+        checkUnreadNoti(){
+            axios.get('/notification-unread-checker/')
+            .then(res=>this.notiCount=res.data)
+        }
     },
 
     template: /*javascript*/`
@@ -56,7 +68,8 @@ Vue.component('navbar-imps', {
             <div class="icon-selector mx-3" onclick="toggleAppCard()">
                 <img :src="this.const.iconSelector" alt="" height="20" id="appToggler">
             </div>
-            <div class="notification mx-3">
+            <div class="notification mx-3" onclick="toggleNotificationCard()">
+                <div v-if="notiCount" class="notification-number position-absolute" style="top:0px;right:0px"></div>
                 <img :src="this.const.bellIcon" alt="" height="20" class="notification-bell" id="notificationToggler">
             </div>
             <div class="profile mx-3" onclick="toggleProfile()">
