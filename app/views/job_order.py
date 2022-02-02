@@ -183,9 +183,9 @@ class EditJobOrder(APIView):
 
         j = Journal()
 
-        j.code = jo.code
-        j.datetimeCreated = jo.datetimeCreated
-        j.createdBy = jo.createdBy
+        j.code = oldJO.code
+        j.datetimeCreated = oldJO.datetimeCreated
+        j.createdBy = oldJO.createdBy
         j.journalDate = datetime.now()
         j.save()
         request.user.branch.journal.add(j)
@@ -345,20 +345,61 @@ class EditJobOrder(APIView):
                 oldFinalProduct = oldJO.finalproduct.filter(pk=item['id'])[0]
                 if oldFinalProduct.qty > Decimal(item['qty']):
                     diff += abs(oldFinalProduct.totalCost - Decimal(item['totalCost']))
+                    oldFinalProduct.cost -= diff
+                    oldFinalProduct.save()
+
+                elif oldFinalProduct.qty < Decimal(item['qty']):
+                    diff += abs(oldFinalProduct.totalCost - Decimal(item['totalCost']))
+                    oldFinalProduct.cost += diff
+                    oldFinalProduct.save()
 
 
-        for item in request.data['materiallosses']:
-            if item['name']:
-                losses = MaterialLosses()
-                losses.name = item['name']
-                losses.qty = item['qty']
-                losses.unitCost = item['unitCost']
-                losses.totalCost = item['totalCost']
-                losses.jobOrder = jo
-                losses.save()
-                request.user.branch.materialLosses.add(losses)
+        # for item in request.data['materiallosses']:
+        #     if item['name']:
+        #         losses = MaterialLosses()
+        #         losses.name = item['name']
+        #         losses.qty = item['qty']
+        #         losses.unitCost = item['unitCost']
+        #         losses.totalCost = item['totalCost']
+        #         losses.jobOrder = jo
+        #         losses.save()
+        #         request.user.branch.materialLosses.add(losses)
 
-        
+        newMatLossesIDS = []
+        for item in newJO['materiallosses']:
+            if oldJO.materiallosses.filter(pk=item['id']):
+                oldMatLosses = oldJO.materiallosses.filter(pk=item['id'])[0]
+                diff = Decimal(0)
+                if oldMatLosses.qty < Decimal(item['qty']):
+                    diff = abs(oldMatLosses.qty - Decimal(item['qty']))
+                    oldMatLosses.qty += diff
+                    oldMatLosses.unitCost = item['unitCost']
+                    oldMatLosses.totalCost = item['totalCost']
+                    oldMatLosses.save()
+
+                elif oldMatLosses.qty > Decimal(item['qty']):
+                    diff = abs(oldMatLosses.qty - Decimal(item['qty']))
+                    oldMatLosses.qty -= diff
+                    oldMatLosses.unitCost = item['unitCost']
+                    oldMatLosses.totalCost = item['totalCost']
+                    oldMatLosses.save()
+
+            else:
+                newMatLossesIDS.append(item['id'])
+                newMatLosses = MaterialLosses()
+                newMatLosses.name = item['name']
+                newMatLosses.qty = item['qty']
+                newMatLosses.unitCost = item['unitCost']
+                newMatLosses.totalCost = item['totalCost']
+                newMatLosses.jobOrder = oldJO
+                newMatLosses.save()
+                request.user.branch.materialLosses.add(newMatLosses)
+
+        for item in oldJO.materiallosses.exclude(pk__in=newMatLossesIDS):
+            # JE HERE #
+
+            # JE END  #
+            item.delete()
         
         if not rawmat == Decimal(0):
             jeAPI(request, j, 'Credit', dChildAccount.inventory, rawmat)
@@ -369,8 +410,8 @@ class EditJobOrder(APIView):
 
         jeAPI(request, j, 'Debit', dChildAccount.workInProgress, rawmat+overhead+labor)
         
-        jo.jobOrderCost = request.data['jobOrderCost']
-        jo.save()
+        oldJO.jobOrderCost = request.data['jobOrderCost']
+        oldJO.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
