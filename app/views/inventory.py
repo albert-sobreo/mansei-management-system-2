@@ -94,7 +94,7 @@ class ImportMerchandiseInventory(View):
             item['Selling-Price'] = item['Selling-Price'].replace(',', '')
             merch.sellingPrice = item['Selling-Price']
 
-            merch.vol = (merch.width / 1000) * (merch.length / 1000) * (merch.thickness / 1000)
+            merch.vol = (merch.width / 1000) * (merch.length / 1000) * (merch.thickness / 1000) * Decimal(item['QtyT'])
 
             item['Price-Per-Cubic'] = str(item['Price-Per-Cubic']).replace('₱', '')
             item['Price-Per-Cubic'] = item['Price-Per-Cubic'].replace(',', '')
