@@ -1,4 +1,5 @@
 {% extends "base-template.html" %}
+{% load mathfilters %}
 {% block title %}Merchandise Inventory{% endblock %}
 
 {% block body %}
@@ -36,6 +37,8 @@
                 <th>Width</th>
                 <th>Thickness</th>
                 <th>Selling Price</th>
+                <th>Unit Vol</th>
+                <th>Total Vol</th>
                 <!-- <th>Qty. (T)</th> -->
                 <th>Qty. (R)</th>
                 <th>Qty. (A)</th>
@@ -60,6 +63,8 @@
                         <span class="inch">[[roundNumber2(convertSize({{item.thickness}}))]] [[iof]]</span>
                     </td>
                     <td class="align-middle">P[[roundNumber2({{item.sellingPrice}})]]</td>
+                    <td class="align-middle">{{item.vol}}</td>
+                    <td class="align-middle">{{item.vol|mul:item.qtyT}}</td>
                     <!-- <td class="align-middle">{{item.qtyT}}</td> -->
                     <td class="align-middle">{{item.qtyR}}</td>
                     <td class="align-middle">{{item.qtyA}}</td>
@@ -559,6 +564,9 @@
         },
 
         methods: {
+            number(num){
+                return Number(num)
+            },
             roundto4(number){
                 return Number(number).toFixed(4)
             },
