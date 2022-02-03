@@ -118,7 +118,7 @@ class DeliveryLogsView(View):
         return render(request, 'logs-deliveries.html')
 
 class ReturnTruck(APIView):
-    def get_object(self, pk):
+    def get_object(self, request, pk):
         if request.user.authLevel == '2':
             raise PermissionDenied()
         try:

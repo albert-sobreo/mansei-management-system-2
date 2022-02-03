@@ -48,10 +48,19 @@ class JobOrderApprovalAPI(APIView):
 
         jo.save()
 
+        j = Journal()
+
+        j.code = jo.code
+        j.datetimeCreated = jo.datetimeCreated
+        j.createdBy = jo.createdBy
+        j.journalDate = datetime.datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+
         rawmat = Decimal(0)
         for material in jo.rawmaterials.all():
             rawmat += material.totalCost
-        
+            jeAPI(request, j, 'Credit', material.merchInventory.childAccountInventory, material.totalCost)
         overhead = Decimal(0)
         for oh in jo.overheadexpenses.all():
             overhead += oh.cost
@@ -60,17 +69,8 @@ class JobOrderApprovalAPI(APIView):
         for work in jo.directlabor.all():
             labor += work.cost
 
-        j = Journal()
-
-        j.code = jo.code
-        j.datetimeCreated = jo.datetimeCreated
-        j.createdBy = jo.createdBy
-        j.journalDate = datetime.now()
-        j.save()
-        request.user.branch.journal.add(j)
         
-        if not rawmat == Decimal(0):
-            jeAPI(request, j, 'Credit', dChildAccount.inventory, rawmat)
+        
         if not overhead == Decimal(0):
             jeAPI(request, j, 'Credit', dChildAccount.factorySupplies, overhead)
         if not labor == Decimal(0):

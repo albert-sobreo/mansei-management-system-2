@@ -8,6 +8,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.aggregates import Min
 from django.db.models.deletion import PROTECT
 from django.db.models.fields.related import OneToOneField
+from decimal import Decimal
 
 #CHOICES
 parties = [
@@ -879,7 +880,9 @@ class Exports(models.Model):
     amountDue = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     amountTotal = models.DecimalField(max_digits=20, decimal_places=5)
     discountPercent = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    ##### DISCOUNT PESO SAVES USD #####
     discountPeso = models.DecimalField(max_digits=20, decimal_places=5,null=True, blank=True, validators=[MinValueValidator(0)])
+    ##### END #####
     forex = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
     paymentMethod = models.CharField(max_length=50, null=True, blank=True)
     paymentPeriod = models.CharField(max_length=50, null=True, blank=True)
@@ -897,7 +900,7 @@ class Exports(models.Model):
     journal = models.ForeignKey(Journal, related_name="exports", on_delete=models.CASCADE, null=True, blank=True)
     fullyPaid = models.BooleanField(null = True, blank=True, default = False)
     runningBalance = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True)
-    
+    runningBalancePeso = models.DecimalField(max_digits=20, decimal_places=5, null = True, blank = True) 
 
     class Meta:
         verbose_name = "Export"
@@ -1752,33 +1755,33 @@ class JobOrder(models.Model):
 class RawMaterials(models.Model):
     merchInventory = models.ForeignKey(MerchandiseInventory, related_name="rawmaterials", on_delete=models.CASCADE, null=True, blank=True)
     jobOrder = models.ForeignKey(JobOrder, related_name="rawmaterials", on_delete=models.CASCADE, null=True, blank=True)
-    qty = models.PositiveIntegerField(blank = True, null = True)
-    totalCost= models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
-    remaining = models.PositiveIntegerField(blank = True, null = True)
-    purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    qty = models.PositiveIntegerField(blank = True, default=0)
+    totalCost= models.DecimalField(max_digits=20, decimal_places=5, default=Decimal(0))
+    remaining = models.PositiveIntegerField(default=0)
+    purchasingPrice = models.DecimalField(max_digits=20, decimal_places=5, default=Decimal(0))
 
 class DirectLabor(models.Model):
     expenses = models.ForeignKey(AccountChild, related_name="directlabor", on_delete=models.CASCADE, null=True, blank=True)
-    cost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    cost = models.DecimalField(max_digits=20, decimal_places=5, default=Decimal(0))
     jobOrder = models.ForeignKey(JobOrder, related_name="directlabor", on_delete=models.CASCADE, null=True, blank=True)
 
 class OverheadExpenses(models.Model):
     expenses = models.ForeignKey(AccountChild, related_name="overheadexpenses", on_delete=models.CASCADE, null=True, blank=True)
-    cost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    cost = models.DecimalField(max_digits=20, decimal_places=5, default = Decimal(0))
     jobOrder = models.ForeignKey(JobOrder, related_name="overheadexpenses", on_delete=models.CASCADE, null=True, blank=True)
 
 class FinalProduct(models.Model):
     name = models.CharField(max_length=256, null = True, blank = True)
-    qty = models.PositiveIntegerField(blank = True, null = True)
-    unitCost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
-    totalCost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    qty = models.PositiveIntegerField(default = Decimal(0))
+    unitCost = models.DecimalField(max_digits=20, decimal_places=5, default = Decimal(0))
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, default = Decimal(0))
     jobOrder = models.ForeignKey(JobOrder, related_name="finalproduct", on_delete=models.CASCADE, null=True, blank=True)
 
 class MaterialLosses(models.Model):
     name = models.CharField(max_length=256, null = True, blank = True)
-    qty = models.PositiveIntegerField(blank = True, null = True)
-    unitCost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
-    totalCost = models.DecimalField(max_digits=20, decimal_places=5, blank = True, null = True)
+    qty = models.PositiveIntegerField(default = Decimal(0))
+    unitCost = models.DecimalField(max_digits=20, decimal_places=5, default = Decimal(0))
+    totalCost = models.DecimalField(max_digits=20, decimal_places=5, default = Decimal(0))
     jobOrder = models.ForeignKey(JobOrder, related_name="materiallosses", on_delete=models.CASCADE, null=True, blank=True)
 
 class ManufacturingInventory(models.Model):
@@ -1836,6 +1839,8 @@ class BranchDefaultChildAccount(models.Model):
     workInProgress = models.ForeignKey(AccountChild, related_name="branchworkinprogress", on_delete=models.CASCADE, blank = True, null = True)
     factorySupplies = models.ForeignKey(AccountChild, related_name="branchfactorysupplies", on_delete=models.CASCADE, blank=True, null=True)
     materialLosses = models.ForeignKey(AccountChild, related_name = "branchmateriallosses", on_delete=models.CASCADE, blank = True, null = True)
+    forexGain = models.ForeignKey(AccountChild, related_name = "branchforexgain", on_delete=models.CASCADE, blank = True, null = True)
+    forexLoss = models.ForeignKey(AccountChild, related_name = "branchforexloss", on_delete=models.CASCADE, blank = True, null = True)
 
 class BranchProfile(models.Model):
     branchDefaultChildAccount = models.ForeignKey(BranchDefaultChildAccount, related_name='branchprofile', on_delete=models.CASCADE, null=True, blank=True)

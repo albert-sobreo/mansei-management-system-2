@@ -1235,12 +1235,12 @@ class SCApprovalAPI(APIView):
             jeAPI(request, j, 'Credit', item.merchInventory.childAccountSales, (item.totalCost)-(sale.discountPeso/sale.scitemsmerch.all().count())-(item.totalCost*(sale.taxRate/100)))
         
         for element in sale.scitemsmerch.all():
-            jeAPI(request, j, 'Credit', element.merchInventory.childAccountInventory, element.totalCost)
+            jeAPI(request, j, 'Credit', element.merchInventory.childAccountInventory, element.merchInventory.purchasingPrice*element.qty)
 
         jeAPI(request, j, 'Debit', sale.party.accountChild.get(name__regex=r"[Rr]eceivable"), sale.amountTotal)
         
         for element in sale.scitemsmerch.all():
-            jeAPI(request, j, 'Debit', element.merchInventory.childAccountCostOfSales, element.totalCost)
+            jeAPI(request, j, 'Debit', element.merchInventory.childAccountCostOfSales, element.merchInventory.purchasingPrice*element.qty)
 
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')

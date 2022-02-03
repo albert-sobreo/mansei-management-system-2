@@ -285,6 +285,7 @@
             </div>
         </div>
     </div>
+    <pre>[[$data]]</pre>
 </div>
 
 {% endblock %}
@@ -311,33 +312,33 @@
                 rawmaterials: [{
                     merchInventory: '',
                     jobOrder: null,
-                    qty: null,
-                    totalCost: null,
+                    qty: 0,
+                    totalCost: 0,
                     remaining: 0,
-                    purchasingPrice: null,
+                    purchasingPrice: 0,
                 }],
                 overheadexpenses: [{
                     expenses: '',
-                    cost: null,
+                    cost: 0,
                     jobOrder: null,
                 }],
                 finalproduct: [{
                     name: null,
-                    qty: null,
-                    unitCost: null,
-                    totalCost: null,
+                    qty: 0,
+                    unitCost: 0,
+                    totalCost: 0,
                     jobOrder: null,
                 }],
                 materiallosses: [{
                     name: null,
-                    qty: null,
-                    unitCost: null,
-                    totalCost: null,
+                    qty: 0,
+                    unitCost: 0,
+                    totalCost: 0,
                     jobOrder: null,
                 }],
                 directlabor: [{
                     expenses: '',
-                    cost: null,
+                    cost: 0,
                     jobOrder: null,
                 }]
             }
@@ -424,37 +425,41 @@
             },
             addMaterials(){
                 this.jobOrder.rawmaterials.push({
+                    id: null,
                     merchInventory: '',
                     jobOrder: null,
-                    qty: null,
-                    totalCost: null,
-                    remaining: null,
-                    purchasingPrice: null,
+                    qty: 0,
+                    totalCost: 0,
+                    remaining: 0,
+                    purchasingPrice: 0,
                 })
             },
 
             addOverhead(){
                 this.jobOrder.overheadexpenses.push({
+                    id: null,
                     expenses: '',
-                    cost: null,
+                    cost: 0,
                     jobOrder: null,
                 })
             },
             addFinalProduct(){
                 this.jobOrder.finalproduct.push({
+                    id: null,
                     name: null,
-                    qty: null,
-                    unitCost: null,
-                    totalCost: null,
+                    qty: 0,
+                    unitCost: 0,
+                    totalCost: 0,
                     jobOrder: null,
                 })
             },
             addLosses(){
                 this.jobOrder.materiallosses.push({
+                    id: null,
                     name: null,
-                    qty: null,
-                    unitCost: null,
-                    totalCost: null,
+                    qty: 0,
+                    unitCost: 0,
+                    totalCost: 0,
                     jobOrder: null,
                 })
             },

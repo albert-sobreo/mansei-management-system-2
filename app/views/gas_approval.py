@@ -246,12 +246,45 @@ class ExportsApprovalAPI(APIView):
             raise PermissionDenied()
 
         data = request.data
-
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         ex = Exports.objects.get(pk=data['id'])
         ex.approved = True
         ex.approvedBy = request.user
         ex.datetimeApproved = datetime.datetime.now()
         ex.save()
+
+        j = Journal()
+
+        j.code = ex.code
+        j.datetimeCreated = ex.datetimeApproved
+        j.createdBy = ex.createdBy
+        j.journalDate = datetime.datetime.now()
+        j.save()
+        request.user.branch.journal.add(j)
+
+        totalFees = Decimal(0.0)
+        num = 0
+        for fees in ex.exportotherfees.all():
+            totalFees += fees.fee
+
+        if totalFees != 0.0:
+            jeAPI(request, j, 'Credit', dChildAccount.otherIncome, (totalFees*ex.forex))
+
+        for item in ex.exportitemsmerch.all():
+            jeAPI(request, j, 'Credit', item.merchInventory.childAccountSales, (item.totalCost*ex.forex)-((ex.discountPeso/ex.exportitemsmerch.all().count())*ex.forex))
+        
+        jeAPI(request, j, 'Debit', ex.party.accountChild.get(name__regex=r"[Rr]eceivable"), (ex.amountTotal*ex.forex))
+
+        for element in ex.exportitemsmerch.all():
+            jeAPI(request, j, 'Credit', element.merchInventory.childAccountInventory, element.merchInventory.purchasingPrice*element.qty)
+
+        for element in ex.exportitemsmerch.all():
+            jeAPI(request, j, 'Debit', element.merchInventory.childAccountCostOfSales, element.merchInventory.purchasingPrice*element.qty)
+
+        for item in ex.exportitemsmerch.all():
+            element.merchInventory.warehouseitems.all()[0].addQty(-item.qty)
+            element.merchInventory.warehouseitems.all()[0].save2()
+            
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

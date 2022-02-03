@@ -85,7 +85,7 @@ class CreateJobOrderAPI(APIView):
             rawMat.jobOrder = jo
             rawMat.qty = item['qty']
             rawMat.remaining = item['remaining']
-            rawMat.merchInventory.warehouseitems.all()[0].addQty(-(item['qty'])) 
+            rawMat.merchInventory.warehouseitems.all()[0].addQty(-(Decimal(item['qty']))) 
             rawMat.merchInventory.warehouseitems.all()[0].save2()
             rawMat.purchasingPrice = item['purchasingPrice']
             rawMat.totalCost = item['totalCost']
@@ -163,10 +163,20 @@ class EditJobOrderView(View):
         operationalExpenses = request.user.branch.accountGroup.filter(name__regex=r"[Oo]peration")
         administrativeExpenses = request.user.branch.accountGroup.filter(name__regex=r"[Aa]dmin")
 
+        try:
+            directLabor = request.user.branch.branchProfile.branchDefaultChildAccount.laborExpense
+        except Exception as e:
+            print(e)
+            directLabor = {'pk': None, 'name': 'Connect Labor Expense first in Branch profile'}
+        
+        fact = request.user.branch.branchProfile.branchDefaultChildAccount.factorySupplies
+
         context = {
             'jos': request.user.branch.jobOrder.exclude(status='finished'),
             'operational': operationalExpenses,
-            'administrative': administrativeExpenses
+            'administrative': administrativeExpenses,
+            'directLabor': directLabor,
+            'factorySupplies': fact,
         }
 
         return render(request, 'job-order-edit-on-going.html', context)
@@ -178,6 +188,7 @@ class EditJobOrder(APIView):
 
         oldJO = JobOrder.objects.get(pk=request.data['id'])
         newJO = request.data
+        print(newJO)
 
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
@@ -186,9 +197,8 @@ class EditJobOrder(APIView):
         j.code = oldJO.code
         j.datetimeCreated = oldJO.datetimeCreated
         j.createdBy = oldJO.createdBy
-        j.journalDate = datetime.now()
-        j.save()
-        request.user.branch.journal.add(j)
+        j.journalDate = datetime.datetime.now()
+        
 
         rawmat = Decimal(0)
         # for item in request.data['rawmaterials']:
@@ -205,32 +215,42 @@ class EditJobOrder(APIView):
         #         rawmat += rawMat.totalCost
 
         newRawMatIDS = []
+        workInProgress = Decimal(0)
         for item in newJO['rawmaterials']:
-            if oldJO.rawmaterials.filter(pk=item['id']):
+            ##### CHANGE IN QUANTITY #####
+            if oldJO.rawmaterials.filter(pk=item['id']).count():
+                print('IF - RAW EXISTS IN BOTH')
                 oldRawmat = oldJO.rawmaterials.filter(pk=item['id'])[0]
                 diff = Decimal(0)
+                newRawMatIDS.append(item['id'])
                 if oldRawmat.qty < Decimal(item['qty']):
                     diff = abs(oldRawmat.qty - Decimal(item['qty']))
                     oldRawmat.qty +=  diff
                     oldRawmat.remaining += diff
-                    oldRawmat.merchInventory.warehouseitems.all()[0].addQty((item['qty'])) 
+                    oldRawmat.merchInventory.warehouseitems.all()[0].addQty(-(Decimal(item['qty']))) 
                     oldRawmat.merchInventory.warehouseitems.all()[0].save2()
                     oldRawmat.totalCost = item['totalCost']
                     oldRawmat.merchInventory.save()
                     oldRawmat.save()
-                elif oldRawmat.qty > item['qty']:
+                    j.save()
+                    jeAPI(request, j, 'Credit', oldRawmat.merchInventory.childAccountInventory, diff)
+                    workInProgress += diff
+                elif Decimal(oldRawmat.qty) > Decimal(item['qty']):
                     diff = abs(Decimal(item['qty']) - oldRawmat.qty)
                     oldRawmat.qty -=  diff
                     oldRawmat.remaining -= diff
-                    oldRawmat.merchInventory.warehouseitems.all()[0].addQty(-(item['qty'])) 
+                    oldRawmat.merchInventory.warehouseitems.all()[0].addQty(Decimal(item['qty'])) 
                     oldRawmat.merchInventory.warehouseitems.all()[0].save2()
                     oldRawmat.totalCost = item['totalCost']
                     oldRawmat.merchInventory.save()
                     oldRawmat.save()
-
-
+                    j.save()
+                    jeAPI(request, j, 'Debit', oldRawmat.merchInventory.childAccountInventory, diff)
+                    workInProgress -= diff
+                oldJO = JobOrder.objects.get(pk=request.data['id'])
+            ##### CREATE NEW RAW MATERIAL #####
             else:
-                newRawMatIDS.append(item['id'])
+                print('IF - RAW ONLY EXISTS IN FRONTEND')
                 newRawmat = RawMaterials()
                 newRawmat.merchInventory = MerchandiseInventory.objects.get(pk=item['merchInventory'])
                 newRawmat.jobOrder = oldJO
@@ -240,14 +260,22 @@ class EditJobOrder(APIView):
                 newRawmat.purchasingPrice = item['purchasingPrice']
                 newRawmat.totalCost = item['totalCost']
                 newRawmat.save()
+                newRawMatIDS.append(newRawmat.pk)
                 request.user.branch.rawMaterials.add(newRawmat)
-                # JE THEN DELETE
+                j.save()
+                jeAPI(request, j, 'Credit', newRawmat.merchInventory.childAccountInventory, newRawmat.totalCost)
+                workInProgress += newRawmat.totalCost
+                oldJO = JobOrder.objects.get(pk=request.data['id'])
 
+        oldJO = JobOrder.objects.get(pk=request.data['id'])
         for item in oldJO.rawmaterials.exclude(pk__in=newRawMatIDS):
             # JE HERE #
-
+            j.save()
+            jeAPI(request, j, 'Debit', item.merchInventory.childAccountInventory, item.totalCost)
+            workInProgress -= item.totalCost
             # JE END  #
             item.delete()
+            
 
 
 
@@ -265,18 +293,25 @@ class EditJobOrder(APIView):
             # request.user.branch.directLabor.add(dl)
             # labor += dl.cost
         for item in newJO['directlabor']:
-            if oldJO.directlabor.filter(pk=item['id']):
+            if oldJO.directlabor.filter(pk=item['id']).count():
                 diff = Decimal(0)
                 oldDirectLabor = oldJO.directlabor.filter(pk=item['id'])[0]
                 if oldDirectLabor.cost > Decimal(item['cost']):
                     diff += abs(oldDirectLabor.cost - Decimal(item['cost']))
                     oldDirectLabor.cost -= diff
                     oldDirectLabor.save()
-
+                    # jeAPI(request, j, 'Debit', oldDirectLabor.expenses, diff)
+                    labor -= diff
+                    workInProgress -= diff
                 elif oldDirectLabor.cost < Decimal(item['cost']):
                     diff += (abs(oldDirectLabor.cost - Decimal(item['cost'])))
                     oldDirectLabor.cost += diff
                     oldDirectLabor.save()
+                    # jeAPI(request, j, 'Credit', oldDirectLabor.expenses, diff)
+                    labor += diff
+                    workInProgress += diff
+                    
+                    
 
         overhead = Decimal(0)
         # for item in request.data['overheadexpenses']:
@@ -291,21 +326,29 @@ class EditJobOrder(APIView):
         
         newOverheadIDS = []
         for item in newJO['overheadexpenses']:
-            if oldJO.overheadexpenses.filter(pk=item['id']):
+            if oldJO.overheadexpenses.filter(pk=item['id']).count():
+                print('IF - OVERHEAD EXISTS IN BOTH')
+                newOverheadIDS.append(item['id'])
                 oldOverhead = oldJO.overheadexpenses.filter(pk=item['id'])[0]
                 diff = Decimal(0)
                 if oldOverhead.cost > Decimal(item['cost']):
                     diff += abs(oldOverhead.cost - Decimal(item['cost']))
                     oldOverhead.cost -= diff
                     oldOverhead.save()
+                    # jeAPI(request, j, 'Debit', oldOverhead.expenses, diff)
+                    overhead -= diff
+                    workInProgress -= diff
 
                 elif oldOverhead.cost < Decimal(item['cost']):
                     diff += abs(oldOverhead.cost + Decimal(item['cost']))
                     oldOverhead.cost += diff
                     oldOverhead.save()
+                    # jeAPI(request, j, 'Credit', oldOverhead.expenses, diff)
+                    overhead += diff
+                    workInProgress += diff
 
             else:
-                newOverheadIDS.append(item['id'])
+                print('IF - OVERHEAD EXISTS IN FRONTEND')
                 newOverhead = OverheadExpenses()
                 try:
                     newOverhead.expenses = AccountChild.objects.get(pk=item['expenses'])
@@ -315,14 +358,20 @@ class EditJobOrder(APIView):
                 newOverhead.cost = Decimal(item['cost'])
                 newOverhead.jobOrder = oldJO
                 newOverhead.save()
+                newOverheadIDS.append(newOverhead.pk)
                 request.user.branch.overheadExpenses.add(newOverhead)
+                # jeAPI(request, j, 'Credit', newOverhead.expenses, newOverhead.cost)
+                overhead += newOverhead.cost
+                workInProgress += newOverhead.cost
 
                 # JE BELOW #
 
 
         for item in oldJO.overheadexpenses.exclude(pk__in=newOverheadIDS):
+            print('IF - OVERHEAD DOESNT EXISTS')
             # JE BELOW #
-
+            jeAPI(request, j, 'Debit', item.expenses, item.cost)
+            workInProgress -= item.cost
             # WHAT IS LEFT FROM THE EXCLUDE MUST BE DELETED
             item.delete()
 
@@ -340,13 +389,14 @@ class EditJobOrder(APIView):
         #         request.user.branch.finalProduct.add(finalProduct)
 
         for item in newJO['finalproduct']:
-            if oldJO.finalproduct.filter(pk=item['id']):
+            if oldJO.finalproduct.filter(pk=item['id']).count():
                 diff = Decimal(0)
                 oldFinalProduct = oldJO.finalproduct.filter(pk=item['id'])[0]
                 if oldFinalProduct.qty > Decimal(item['qty']):
                     diff += abs(oldFinalProduct.totalCost - Decimal(item['totalCost']))
                     oldFinalProduct.cost -= diff
                     oldFinalProduct.save()
+                    jeAPI(request, j, 'Credit', newOverhead.expenses, newOverhead.cost)
 
                 elif oldFinalProduct.qty < Decimal(item['qty']):
                     diff += abs(oldFinalProduct.totalCost - Decimal(item['totalCost']))
@@ -367,7 +417,8 @@ class EditJobOrder(APIView):
 
         newMatLossesIDS = []
         for item in newJO['materiallosses']:
-            if oldJO.materiallosses.filter(pk=item['id']):
+            if oldJO.materiallosses.filter(pk=item['id']).count():
+                newMatLossesIDS.append(item['id'])
                 oldMatLosses = oldJO.materiallosses.filter(pk=item['id'])[0]
                 diff = Decimal(0)
                 if oldMatLosses.qty < Decimal(item['qty']):
@@ -385,7 +436,6 @@ class EditJobOrder(APIView):
                     oldMatLosses.save()
 
             else:
-                newMatLossesIDS.append(item['id'])
                 newMatLosses = MaterialLosses()
                 newMatLosses.name = item['name']
                 newMatLosses.qty = item['qty']
@@ -394,25 +444,41 @@ class EditJobOrder(APIView):
                 newMatLosses.jobOrder = oldJO
                 newMatLosses.save()
                 request.user.branch.materialLosses.add(newMatLosses)
+                newMatLossesIDS.append(newMatLosses.pk)
 
         for item in oldJO.materiallosses.exclude(pk__in=newMatLossesIDS):
             # JE HERE #
 
             # JE END  #
             item.delete()
+   
         
-        if not rawmat == Decimal(0):
-            jeAPI(request, j, 'Credit', dChildAccount.inventory, rawmat)
-        if not overhead == Decimal(0):
-            jeAPI(request, j, 'Credit', dChildAccount.factorySupplies, overhead)
-        if not labor == Decimal(0):
-            jeAPI(request, j, 'Credit', dChildAccount.laborExpense, labor)
 
-        jeAPI(request, j, 'Debit', dChildAccount.workInProgress, rawmat+overhead+labor)
+        if not overhead == Decimal(0):
+            j.save()
+            if overhead > 0:
+                jeAPI(request, j, 'Credit', dChildAccount.factorySupplies,abs(overhead))
+            else:
+                jeAPI(request, j, 'Debit', dChildAccount.factorySupplies,abs(overhead))
+        if not labor == Decimal(0):
+            j.save()
+            if labor > 0:
+                jeAPI(request, j, 'Credit', dChildAccount.laborExpense, abs(labor))
+            else:
+                jeAPI(request, j, 'Debit', dChildAccount.laborExpense, abs(labor))
+
+        if workInProgress > 0:
+            j.save()
+            jeAPI(request, j, 'Debit', dChildAccount.workInProgress, abs(workInProgress))
+        else:
+            jeAPI(request, j, 'Credit', dChildAccount.workInProgress,abs(workInProgress))
         
         oldJO.jobOrderCost = request.data['jobOrderCost']
         oldJO.save()
-
+        try:
+            request.user.branch.journal.add(j)
+        except:
+            pass
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 

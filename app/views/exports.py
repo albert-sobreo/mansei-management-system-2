@@ -79,6 +79,7 @@ class SaveExports(APIView):
         exp.bank = export['bank']
         exp.remarks = export['remarks']
         exp.forex = export['exchangeRate']
+        exp.runningBalancePeso = Decimal(exp.amountTotal) * Decimal(exp.forex)
 
         if request.user.is_authenticated:
             exp.createdBy = request.user
@@ -197,75 +198,41 @@ class SaveReceivePaymentsUSD(APIView):
                 sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
                 return JsonResponse(0, safe=False)
                 
+            
+
+            j = Journal()
+            j.code = rp.code
+            j.datetimeCreated = rp.datetimeCreated
+            j.createdBy = rp.createdBy
+            j.journalDate = datetime.now()
+            j.save()
+            rp.journal = j
+            rp.save()
+            request.user.branch.journal.add(j)
+
             rp.exports.runningBalance -= (rp.amountPaid)
+            rp.exports.runningBalancePeso -= (rp.amountPaid*rp.forex)
             if rp.exports.runningBalance == 0:
                 rp.exports.fullyPaid = True
-            rp.exports.save()
 
-        #     j = Journal()
-        #     j.code = rp.code
-        #     j.datetimeCreated = rp.datetimeCreated
-        #     j.createdBy = rp.createdBy
-        #     j.journalDate = datetime.now()
-        #     j.save()
-        #     rp.journal = j
-        #     rp.save()
-        #     request.user.branch.journal.add(j)
-        #     ################# CREDIT SIDE #################
-        #     # jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
-        #     ################# DEBIT SIDE #################
-        #     if rp.paymentMethod == dChildAccount.cashOnHand.name:
-        #         jeAPI(request, j, 'Credit', rp.exports.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid))
-        #         jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, rp.amountPaid)
-        #     elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
-        #         jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid))
-        #         jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
+            if rp.paymentPeriod == "Partial Payment":
+                jeAPI(request, j, 'Credit', rp.exports.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid*rp.forex))
+                jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid*rp.forex)
+            elif rp.paymentPeriod == "Full Payment":
+                if rp.exports.runningBalancePeso < 0:
+                    jeAPI(request, j, 'Credit', rp.exports.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid*rp.forex))
+                    jeAPI(request, j, 'Credit', dChildAccount.forexGain, abs(rp.exports.runningBalancePeso))
+                    jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid*rp.forex + abs(rp.exports.runningBalancePeso))
+                elif rp.exports.runningBalancePeso > 0:
+                    jeAPI(request, j, 'Credit', rp.exports.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid*rp.forex))
+                    jeAPI(request, j, 'Debit', dChildAccount.forexLoss, abs(rp.exports.runningBalancePeso))
+                    jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid*rp.forex - abs(rp.exports.runningBalancePeso))
+                elif rp.exports.runningBalancePeso== 0:
+                    jeAPI(request, j, 'Credit', rp.exports.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid*rp.forex))
+                    jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid*rp.forex)
             
-        #     rp.exports.runningBalance -= (rp.amountPaid)
-        #     if rp.exports.runningBalance == 0:
-        #         rp.exports.fullyPaid = True
-        #     rp.exports.save()
 
-        # ##### END OF RECEIVED PAYMENT DEFAULT #####
-        # elif receivePaymentUSD['rpType'] == 'Custom':
-        #     rp = receivePaymentUSD()
-        #     rp.code = receivePaymentUSD['code']
-        #     rp.datetimeCreated = datetime.now()
-        #     rp.remarks = receivePaymentUSD['remarks']
-        #     if receivePaymentUSD['retroactive']:
-        #         rp.paymentDate = receivePaymentUSD['retroactive']
-        #     else:
-        #         rp.paymentDate = receivePaymentUSD['date']
-
-        #     if request.user.is_authenticated:
-        #         rp.createdBy = request.user
-
-        #     rp.party = Party.objects.get(pk=receivePaymentUSD['party'])
-
-        #     rp.save()
-
-        #     for item in receivePaymentUSD['debit']:
-        #         crpe = CustomRPEntries()
-        #         crpe.receivePaymentUSD = rp
-        #         crpe.normally = item['normally']
-        #         crpe.accountChild = AccountChild.objects.get(pk=item['accountChild'])
-        #         crpe.amount = item['amount']
-        #         crpe.save()
-                
-        #         request.user.branch.customRPEntries.add(crpe)
-
-        #     for item in receivePaymentUSD['credit']:
-        #         crpe = CustomRPEntries()
-        #         crpe.receivePaymentUSD = rp
-        #         crpe.normally = item['normally']
-        #         crpe.accountChild = AccountChild.objects.get(pk=item['accountChild'])
-        #         crpe.amount = item['amount']
-        #         crpe.save()
-                
-        #         request.user.branch.customRPEntries.add(crpe)
-
-        #     ##### CUSTOME RP NEEDS JOURNAL ENTRIES #####
-
+            rp.exports.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
