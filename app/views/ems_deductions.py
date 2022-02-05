@@ -1,14 +1,8 @@
-from rest_framework.views import APIView
 from ..models import *
-from django.http.response import JsonResponse
-from django.shortcuts import redirect, render, HttpResponse
+from django.shortcuts import render
 from django.views import View
 from ..forms import *
-import sweetify
-from decimal import Decimal
-from datetime import datetime, date
-import re
-from .journalAPI import jeAPI
+from datetime import datetime
 from django.core.exceptions import PermissionDenied
 
 class EMS_SSSDeductionView(View):

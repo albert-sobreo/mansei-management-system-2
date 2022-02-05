@@ -14,6 +14,7 @@ import io
 import xlsxwriter
 import string
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class EMS_PayrollView(View):
     def get(self, request):
@@ -570,6 +571,8 @@ class EMS_GeneratePayroll(APIView):
                
             payroll.save()
 
+        notify(request, 'New Payroll', f'Payroll for the period {dateStart} - {dateEnd} has been generated and waiting for approval', '/ems-payroll/', 1)
+
         return JsonResponse(0, safe=False)
 
 class EMS_EditPayrollSave(APIView):
@@ -692,6 +695,8 @@ class EMS_EditPayrollSave(APIView):
                 deminimisPay.save()
 
         payroll.save()
+
+        notify(request, 'Payroll Edited', f'Payroll for the period {payroll.dateStart} - {payroll.dateEnd} has been edited', '/ems-payroll/',1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

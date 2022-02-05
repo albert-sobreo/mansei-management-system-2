@@ -111,6 +111,18 @@
                         html: err.message
                     })
                 })
+            },
+
+            decline(id){
+                axios.put(`/ems-overtime-disapproval/${id}/`, '', this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: 'Something went wrong.',
+                        icon: "error",
+                        html: err.message
+                    })
+                })
             }
         }
     })

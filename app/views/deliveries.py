@@ -11,6 +11,7 @@ from datetime import date as now
 from django.http.response import Http404
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class DeliveriesView(View):
     def get(self, request, format=None):
@@ -136,6 +137,7 @@ class ReturnTruck(APIView):
         truck.driver = None
         truck.currentDelivery = None
         truck.save()
+        notify(request, 'Truck Returned', f'{truck.plate} has returned', '/trucks/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -191,6 +193,6 @@ class SaveDelivery(APIView):
             destination.destination = dest['destination']
             destination.save()
             request.user.branch.deliveriesDestination.add(destination)
-        
+        notify(request, 'New Deliveries', d.code, '/deliveriesnonapproved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

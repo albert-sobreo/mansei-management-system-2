@@ -11,6 +11,7 @@ from datetime import datetime
 from datetime import timedelta
 from .journalAPI import jeAPI, voidJournal
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class JournalView(View):
     def get(self, request):

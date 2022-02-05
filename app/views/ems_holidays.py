@@ -10,6 +10,7 @@ import pandas as pd
 import json
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class EMS_HolidaysView(APIView):
     def get(self, request):
@@ -41,6 +42,8 @@ class EMS_HolidaysView(APIView):
             holiday.save()
             request.user.branch.holiday.add(holiday)
 
+        notify(request, 'New Holidays', 'New holidays have been added', '/ems-holidays/', 2)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -71,6 +74,8 @@ class EMS_ImportHolidays(APIView):
             h.save()
             request.user.branch.holiday.add(h)
 
+        notify(request, 'New Holidays', 'New holidays have been imported', '/ems-holidays/', 2)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return redirect('/ems-holidays/')
 
@@ -89,6 +94,8 @@ class EMS_SaveEditHoliday(APIView):
         h.type = data['newType']
 
         h.save()
+
+        notify(request, 'Holiday edited', f'{h.description} has been edited', '/ems-holidays/', 2)
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

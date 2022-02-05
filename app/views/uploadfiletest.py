@@ -6,6 +6,7 @@ from django.views import View
 from ..forms import *
 import sweetify
 from ..models import *
+from .notificationCreate import *
 
 class UploadView(View):
     def get(self, request):

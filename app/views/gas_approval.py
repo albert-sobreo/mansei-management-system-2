@@ -11,6 +11,7 @@ import re
 from .journalAPI import jeAPI
 from .petty_cash_api import *
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class ADVapproved(View):
     def get(self, request):
@@ -78,6 +79,8 @@ class ADVapprovalAPI(APIView):
             request.user.branch.accountChild.add(emploAcc)
             adv.requestor.employeeAccounts.add(emploAcc)
             jeAPI(request, j, 'Debit',emploAcc, adv.amount)
+
+        notify(request, 'Advancement approved', adv.code, '/adv-approved/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -215,6 +218,7 @@ class LiquidationApprovalAPI(APIView):
                 jeAPI(request, j, 'Debit', l.expense, l.amount)
             jeAPI(request, j, 'Credit', dChildAccount.pettyCash, lqd.totalAmount)
 
+        notify(request, 'Liquidation approved', lqd.code, '/lqd-approved/', 1)
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -285,6 +289,6 @@ class ExportsApprovalAPI(APIView):
             element.merchInventory.warehouseitems.all()[0].addQty(-item.qty)
             element.merchInventory.warehouseitems.all()[0].save2()
             
-
+        notify(request, 'Exports approved', ex.code, '/exports-approved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

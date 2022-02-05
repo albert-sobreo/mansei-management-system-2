@@ -10,6 +10,7 @@ import pandas as pd
 import json
 from datetime import datetime, date
 from ..models import*
+from .notificationCreate import *
 
 class MyProfileView(View):
     def get(self, request):

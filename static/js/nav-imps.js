@@ -68,7 +68,7 @@ Vue.component('navbar-imps', {
             <div class="icon-selector mx-3" onclick="toggleAppCard()">
                 <img :src="this.const.iconSelector" alt="" height="20" id="appToggler">
             </div>
-            <div class="notification mx-3" onclick="toggleNotificationCard()">
+            <div class="notification mx-3 position-relative" onclick="toggleNotificationCard()">
                 <div v-if="notiCount" class="notification-number position-absolute" style="top:0px;right:0px"></div>
                 <img :src="this.const.bellIcon" alt="" height="20" class="notification-bell" id="notificationToggler">
             </div>

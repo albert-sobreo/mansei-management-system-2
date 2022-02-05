@@ -11,6 +11,7 @@ import re
 from .journalAPI import jeAPI
 from .petty_cash_api import *
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class JobOrdernonapproved(View):
     def get(self, request):
@@ -79,6 +80,6 @@ class JobOrderApprovalAPI(APIView):
         jeAPI(request, j, 'Debit', dChildAccount.workInProgress, rawmat+overhead+labor)
 
 
-
+        notify(request, 'Job Order approved', jo.code, '/job-order-approved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

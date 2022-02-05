@@ -10,6 +10,7 @@ from datetime import datetime, date
 import re
 from .journalAPI import jeAPI
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class EMS_OvertimePendingView(View):
     def get(self, request):
@@ -40,6 +41,8 @@ class EMS_OvertimeApproval(APIView):
         ot.status = "Approved"
         ot.save()
 
+        notify(request, 'OT Request approved', 'Your overtime request has been approved', '/ems-overtime-request/', 2, ot.requestedBy)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -51,6 +54,9 @@ class EMS_OvertimeDisapproval(APIView):
         ot.datetimeApproved = datetime.now()
         ot.status = "Declined"
         ot.save()
+
+
+        notify(request, 'OT Request declined', 'Your overtime request has been declined', '/ems-overtime-request/', 2, ot.requestedBy)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -85,6 +91,8 @@ class EMS_UndertimeApproval(APIView):
         ut.status = "Approved"
         ut.save()
 
+        notify(request, 'UT Request approved', 'Your overtime request has been approved', '/ems-undertime-request/', 2, ut.requestedBy)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -96,6 +104,8 @@ class EMS_UndertimeDisapproval(APIView):
         ut.datetimeApproved = datetime.now()
         ut.status = "Declined"
         ut.save()
+
+        notify(request, 'UT Request declined', 'Your overtime request has been declined', '/ems-undertime-request/', 2, ut.requestedBy)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -164,6 +174,8 @@ class EMS_LeaveApproval(APIView):
         leave.status = "Approved"
         leave.save()
 
+        notify(request, 'Leave Request approved', 'Your leave request has been approved', '/ems-leave-request/', 2, leave.requestedBy)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -177,6 +189,7 @@ class EMS_LeaveDisapproval(APIView):
         leave.status = "Declined"
         leave.save()
 
+        notify(request, 'Leave Request decline', 'Your leave request has been decline', '/ems-leave-request/', 2, leave.requestedBy)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -263,5 +276,6 @@ class EMS_PayrollApprovalAll(APIView):
         jeAPI(request, j, "Credit", dChildAccount.hdmfPayable, hdmfPayable)
         jeAPI(request, j, "Credit", dChildAccount.withholdingTaxPayable, withholdingTax)
 
+        notify(request, 'Payroll Approved', f'Payroll for the period {dateStart} - {dateEnd} has been approved', '/payroll/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return redirect('/ems-payroll/?year={}&period=semi&dateRange={}%20{}'.format(y, dateStart, dateEnd))

@@ -6,6 +6,7 @@ from django.views import View
 from ..forms import *
 import sweetify
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class WarehouseView(View):
     def get(self, request, format=None):

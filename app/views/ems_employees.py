@@ -1,17 +1,13 @@
 from rest_framework.views import APIView
-from ..models import MerchandiseInventory, Warehouse, WarehouseItems
 from django.http.response import JsonResponse
-from django.shortcuts import redirect, render, HttpResponse
+from django.shortcuts import render
 from django.views import View
-from ..forms import *
 import sweetify
 from decimal import Decimal
-import pandas as pd
-import json
-from datetime import datetime, date
+from datetime import date
 from ..models import*
 from django.core.exceptions import PermissionDenied
-
+from .notificationCreate import *
 
 class EMS_EmployeesView(View):
     def get(self, request):
@@ -32,6 +28,8 @@ class EMS_AddEmployee(APIView):
 
         newHire.branch = request.user.branch
         newHire.save()
+
+        notify(request, 'New employee', f"{request.data['first_name']} {request.data['last_name']} has been added as employee", '/ems-employees/', 2)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -55,6 +53,7 @@ class AddBonus(APIView):
             bonus.amount = benefit['amount']
             bonus.save()
             request.user.branch.bonusOfUser.add()
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -68,6 +67,8 @@ class GiveDeMinimis(APIView):
             dm.name = DeMinimis.objects.get(pk=benefits['pk'])
             dm.amount = Decimal(benefits['amount'])
             dm.save()
+
+        notify(request, 'New Benefits', 'You have received new benefits', '/ems-employees/', 2, User.objects.get(pk=request.data['user']))
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -106,6 +107,8 @@ class EMS_GiveRaise(APIView):
 
         user.rate = data['newRate']
         user.save()
+        
+        notify(request, 'You received a raise', f'Your new rate is {r.newRate}/day', '/ems-employees/', 2, r.user)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -122,6 +125,8 @@ class EMS_GivePromotion(APIView):
         user.position = data['newPosition']
         user.rate = data['newRate']
         user.save()
+
+        notify(request, 'You received a promotion', f'Your new position is {data["newPosition"]} and your new rate is {user.rate}/day', '/ems-employees/', 2, user)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

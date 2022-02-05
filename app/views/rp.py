@@ -12,6 +12,7 @@ from datetime import datetime
 from .journalAPI import jeAPI
 import re
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class ReceivedPaymentView(View):
     def get(self, request, format=None):

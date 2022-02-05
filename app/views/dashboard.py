@@ -8,6 +8,7 @@ from ..models import *
 from decimal import Decimal
 from time import sleep
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class DashboardView(View):
     def get(self, request):
@@ -65,6 +66,8 @@ class SaveAnnouncement(APIView):
         announce.branch = request.user.branch
 
         announce.save()
+
+        notify(request, 'New Announcement', '', '/dashboard/', 1)
 
         return JsonResponse(0, safe=False)
 
@@ -390,7 +393,7 @@ class CreateBranchInDashboard(APIView):
         
 
 
-
+        notify(request, 'New Branch/Company', f'{b.name} has been created', '/dashboard/', 0)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 

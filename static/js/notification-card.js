@@ -53,7 +53,7 @@ Vue.component('notification-card', {
         <div class="row my-2" v-for="item in notifications">
             <div class="col mx-2 pr-0 notification-item b-radius-5 box-shadow-small" v-if="item.read">
                 <div class="d-flex justify-content-between">
-                    <div class="" v-on:click="onclick(item.id)">
+                    <div class="my-1" v-on:click="onclick(item.id)">
                         <span class="font-bold soft-text">[[item.title]]</span><br>
                         <span class="font-regular softer-text">[[item.subject]]</span><br>
                     </div>
@@ -64,7 +64,7 @@ Vue.component('notification-card', {
             </div>
             <div class="col mx-2 pr-0 notification-item b-radius-5 box-shadow-small notification-item-new" v-else>
                 <div class="d-flex justify-content-between">
-                    <div class="" v-on:click="onclick(item.id)">
+                    <div class="my-1" v-on:click="onclick(item.id)">
                         <span class="font-bold soft-text">[[item.title]]</span><br>
                         <span class="font-regular softer-text">[[item.subject]]</span><br>
                     </div>

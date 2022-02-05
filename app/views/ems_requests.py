@@ -11,6 +11,7 @@ import pandas as pd
 import json
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class EMS_OvertimeRequestsView(APIView):
     def get(self, request):
@@ -29,6 +30,7 @@ class EMS_OvertimeRequestsView(APIView):
         ot.save()
         request.user.branch.otRequest.add(ot)
 
+        notify(request, 'New OT Request', f"{ot.requestedBy.first_name} {ot.requestedBy.last_name} has requested an overtime", '/ems-overtime-pending/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -48,6 +50,7 @@ class EMS_UndertimeRequestsView(APIView):
         ut.save()
         request.user.branch.utRequest.add(ut)
 
+        notify(request, 'New UT Request', f"{ut.requestedBy.first_name} {ut.requestedBy.last_name} has requested an undertime", '/ems-undertime-pending/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -68,6 +71,8 @@ class EMS_LeaveRequestsView(APIView):
         lr.status = "Pending"
         lr.save()
         request.user.branch.leaveRequest.add(lr)
+
+        notify(request, 'New Leave Request', f"{lr.requestedBy.first_name} {lr.requestedBy.last_name} has requested a leave", '/ems-leave-pending/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

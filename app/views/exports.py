@@ -13,6 +13,7 @@ from django.core.exceptions import PermissionDenied
 from .journalAPI import jeAPI
 import re
 import openpyxl as op
+from .notificationCreate import *
 
 
 ########## EXPORTS ##########
@@ -118,6 +119,8 @@ class SaveExports(APIView):
             f.description = fee['description']
             f.save()
             request.user.branch.exportOtherFees.add(f)
+
+        notify(request, 'New Exports Request', exp.code, '/exports-nonapproved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 

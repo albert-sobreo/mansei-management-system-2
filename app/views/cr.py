@@ -11,6 +11,7 @@ from decimal import Decimal
 from datetime import datetime
 import json
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class CompletionReportView(View):
     def get(self, request):
@@ -81,6 +82,8 @@ class CompletionReportView(View):
             crsp.receivingReport = ReceivingReport.objects.get(pk=rr['receivingReport'])
             crsp.save()
             request.user.branch.crSpareParts.add(crsp)
+
+        notify(request, 'New Completion Report', cr.code, '/cr-nonapproved/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

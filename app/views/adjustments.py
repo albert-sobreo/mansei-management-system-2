@@ -9,6 +9,7 @@ import sweetify
 from datetime import date as now
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class AdjustmentsView(View):
     def get(self, request, format=None):
@@ -76,6 +77,9 @@ class SaveAdjustments(APIView):
             
             aditem.save()
             request.user.branch.adjustmentItems.add(aditem)
+
+
+        notify(request, 'New PR Request', ad.code, '/ad-nonapproved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 

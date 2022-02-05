@@ -9,6 +9,7 @@ import pandas as pd
 import json
 from decimal import Decimal
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 class ChartOfAccountsView(View):
     def get(self, request):
@@ -74,6 +75,8 @@ class ImportChartOfAccounts(View):
                 aChi.save()
                 branch.accountChild.add(aChi)
 
+        notify(request, 'New journal accounts has been imported to the system', '', '/chart-of-accounts/', 1)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return redirect('/chart-of-accounts/')
 
@@ -101,10 +104,13 @@ class SaveAccountChild(APIView):
 
         request.user.branch.accountChild.add(accountChild)
 
+        notify(request, 'New Journal Account', f'{accountChild.name} has been created', '/chart-of-accounts/', 1)
+
         sweetify.sweetalert(request, icon='success', title='Success!', text='{} has added to {}'.format(accountChild.name, accountChild.accountSubGroup.name), persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
 class SaveAccountGroup(APIView):
+    """ WARNING ::: THIS IS A FUNCTION TO SAVE SUB GROUP NOT ACCOUNT GROUP """
     def post(self, request, format=None):
         if request.user.authLevel == '2' or request.user.authLevel == '1':
             raise PermissionDenied()
@@ -120,6 +126,8 @@ class SaveAccountGroup(APIView):
         subGroup.save()
 
         request.user.branch.subGroup.add(subGroup)
+
+        notify(request, 'New Journal Sub-Group Account', f'{subGroup.name} has been created', '/chart-of-accounts-subgroup//', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', text="{} has added to {}".format(subGroup.name, subGroup.accountGroup.name), persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -135,6 +143,8 @@ class EditSubGroup(APIView):
         subGroup.description = edit['description']
 
         subGroup.save()
+
+        notify(request, 'Journal Sub-Group Account Edited', f"{subGroup.name} has been edited", '/chart-of-accounts-subgroup/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!',  persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -155,6 +165,7 @@ class EditChildGroup(APIView):
         except Exception as e:
             print(e)
 
+        notify(request, 'Journal Account Edited', f"{childAccount.name} has been edited", '/chart-of-accounts/', 1)
         childAccount.save()
         sweetify.sweetalert(request, icon='success', title='Success!',  persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -182,6 +193,8 @@ class EditGroup(APIView):
         group.permanence = g['permanence']
         group.normally = g['normally']
         group.save()
+
+        notify(request, 'Journal Group Account Edited' f"{group.name} has been edited", '/chart-of-accounts-group/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!',  persistent='Dismiss')
         return JsonResponse(0, safe=False)

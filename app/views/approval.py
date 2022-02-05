@@ -10,6 +10,7 @@ from datetime import datetime
 import re
 from .journalAPI import jeAPI
 from django.core.exceptions import PermissionDenied
+from .notificationCreate import *
 
 ################# PURCHASE REQUEST #################
 class PRapprovedView(View):
@@ -43,6 +44,9 @@ class PRApprovalAPI(APIView):
         prequest.approved = True
         prequest.approvedBy = request.user
         prequest.save()
+
+
+        notify(request, 'Purchase Request approved', prequest.code, '/pr-approved/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -129,6 +133,8 @@ class POApprovalAPI(APIView):
 
                 if purchase.taxPeso != 0:
                     jeAPI(request, j, "Debit", dChildAccount.inputVat, purchase.taxPeso)
+
+        notify(request, 'Purchase Order approved', purchase.code, '/po-approved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -293,6 +299,9 @@ class RRApprovalAPI(APIView):
                         jeAPI(request, j, 'Debit', AccountChild.objects.get(pk=key), (val/(1+(receive.taxRate/100))))
 
                 jeAPI(request, j, 'Credit', dChildAccount.prepaidExpense, (receive.amountDue - receive.taxPeso))
+
+        
+        notify(request, 'Receiving Report approved', receive.code, '/rr-approved/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -464,6 +473,8 @@ class IIApprovalAPI(APIView):
 
         jeAPI(request, j, 'Credit', ii.party.accountChild.get(name__regex=r"[Pp]ayable"), ii.amountTotal)
 
+
+        notify(request, 'Inward Inventory approved', ii.code, '/ii-approved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -810,6 +821,7 @@ class PVApprovalAPI(APIView):
         
 
 
+        notify(request, 'Payment Voucher approved', voucher.code, '/pv-approved/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -1084,6 +1096,9 @@ class QQApprovalAPI(APIView):
         quotes.approvedBy = request.user
         quotes.save()
 
+
+        notify(request, 'Quotations approved', quotes.code, '/qq-approved/', 1)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -1134,6 +1149,8 @@ class SOApprovalAPI(APIView):
             # element.merchInventory.save()
 
         salesOrder.save()
+
+        notify(request, 'Sales Order approved', salesOrder.code, '/so-approved/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -1242,6 +1259,8 @@ class SCApprovalAPI(APIView):
         for element in sale.scitemsmerch.all():
             jeAPI(request, j, 'Debit', element.merchInventory.childAccountCostOfSales, element.merchInventory.purchasingPrice*element.qty)
 
+
+        notify(request, "Sales Contract approved", sale.code, '/sc-approved/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -1467,6 +1486,8 @@ class DeliveriesApprovalAPI(APIView):
                 for element in sc.scitemsmerch.all():
                     jeAPI(request, j, 'Debit', element.merchInventory.childAccountCostOfSales, element.totalCost)
 
+        notify(request, 'Deliveries Approved', d.code, '/deliveriesapproved/', 1)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -1583,6 +1604,8 @@ class TransferApproval(APIView):
             # element.merchInventory.save()
 
         tr.save()
+
+        notify(request, 'Transfer approved', tr.code, '/tr-approved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -1626,6 +1649,7 @@ class AdjustmentApproval(APIView):
             element.merchInventory.save()
 
         ad.save()
+        notify(request, 'Adjustments approved', ad.code, '/ad-approved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -1690,6 +1714,8 @@ class BankReconApprovalAPI(APIView):
             cheque.receivePayment.salesContract.fullyPaid = True
         cheque.receivePayment.salesContract.save()
 
+        notify(request, 'Bank Recon approved', cheque.code, '/br-approved/', 1)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -1728,5 +1754,6 @@ class CRApproval(View):
         cr.status = 'Pending'
         cr.save()
 
+        notify(request, 'Completion Report approved', cr.code, '/cr-approved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
