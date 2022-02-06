@@ -14,6 +14,17 @@ class DeMinimisOfUserSZ(serializers.ModelSerializer):
 
 
 
+########## USER SCHEDULE ##########
+class ScheduleSZ(MS):
+    class Meta:
+        model = Schedule
+        fields = "__all__"
+
+
+
+
+
+
 ########## USER LEAVE ##########
 class UserLeaveSZ(MS):
     class Meta:
@@ -31,6 +42,7 @@ class UserSZ(serializers.ModelSerializer):
         fields = '__all__'
 
 class UserNameOnlySZ(serializers.ModelSerializer):
+    schedule = ScheduleSZ(read_only=True)
     class Meta:
         model = User
         fields = [
@@ -40,17 +52,20 @@ class UserNameOnlySZ(serializers.ModelSerializer):
             'id',
             'position',
             'sss',
-            'image'
+            'image',
+            'schedule'
         ]
 
 class UserNameIDRateSZZ(serializers.ModelSerializer):
+    schedule = ScheduleSZ(read_only=True)
     class Meta:
         model = User
         fields = [
             'first_name',
             'last_name',
             'idUser',
-            'rate'
+            'rate',
+            'schedule'
         ]
 
 class RaiseSZ(MS):
@@ -71,6 +86,7 @@ class UserNestedSZ(serializers.ModelSerializer):
     userleave = UserLeaveSZ(read_only=True)
     raisse = RaiseSZ(read_only=True, many=True)
     branch = BranchSZ(read_only=True)
+    schedule = ScheduleSZ(read_only=True)
     class Meta:
         model = User
         fields = [
@@ -103,6 +119,7 @@ class UserNestedSZ(serializers.ModelSerializer):
             "email",
             "raisse",
             'username',
+            'schedule'
         ]
 
 
@@ -835,13 +852,15 @@ class DTRSZ(serializers.ModelSerializer):
 
 class UserWithDTRSZ(serializers.ModelSerializer):
     dtr = DTRSZ(read_only=True, many=True, context='what')
+    schedule = ScheduleSZ(read_only=True)
     class Meta:
         model = User
         fields = [
             'first_name',
             'last_name',
             'idUser',
-            'dtr'
+            'dtr',
+            'schedule'
         ]
         depth = 1
 
@@ -1162,6 +1181,7 @@ class NotepadSZ(MS):
 
 class UserDashboardSZ(MS):
     notepad = NotepadSZ(read_only=True)
+    schedule = ScheduleSZ(read_only=True)
     class Meta:
         model = User
         fields = [
@@ -1170,6 +1190,7 @@ class UserDashboardSZ(MS):
             'id',
             'notepad',
             'authLevel',
+            'schedule'
         ]
 
 ########## ANNOUNCEMENT ##########
@@ -1377,4 +1398,14 @@ class JobOrderSZ2(MS):
 class NotificationsSZ(MS):
     class Meta:
         model = Notifications
+        fields = "__all__"
+
+
+
+
+
+########## MANUFACTURING INVENTORY ##########
+class ManufacturingInventorySZ(MS):
+    class Meta:
+        model = ManufacturingInventory
         fields = "__all__"

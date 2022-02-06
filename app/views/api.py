@@ -889,3 +889,13 @@ class JobOrderAPI2(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = JobOrderSZ2
     queryset = JobOrder.objects.all()
+
+
+
+
+
+########## MANUFACTURING INVENTORY ##########
+class ManufacturingInventoryAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ManufacturingInventorySZ
+    queryset = ManufacturingInventory.objects.all()

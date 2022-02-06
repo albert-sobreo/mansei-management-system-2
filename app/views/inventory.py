@@ -176,3 +176,26 @@ class DeleteMerchInventory(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class ManuInventoryView(View):
+    def get(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+
+        return render(request, 'manuInventory.html')
+
+class SaveEditManuInventoryAPI(APIView):
+    def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+
+        data = request.data
+
+        manu = ManufacturingInventory.objects.get(pk=data['id'])
+        manu.code = data['code']
+        manu.name = data['name']
+        manu.sellingPrice = data['sellingPrice']
+        manu.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)

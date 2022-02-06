@@ -112,6 +112,8 @@ class SaveLiquidationForm(View):
 
             l.save()
             request.user.branch.liquidationEntries.add(l)
+
+        notify(request, 'New Liquidation Request', lqd.code, '/lqd-nonapproved/', 1)
         
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

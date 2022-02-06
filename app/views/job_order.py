@@ -136,7 +136,7 @@ class CreateJobOrderAPI(APIView):
             losses.save()
             request.user.branch.materialLosses.add(losses)
         
-
+        notify(request, 'New Job Order request', jo.code, '/job-order-nonapproved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -480,6 +480,8 @@ class EditJobOrder(APIView):
             request.user.branch.journal.add(j)
         except:
             pass
+
+        notify(request, 'Job Order Adjusted', oldJO.code, '/job-order-ongoing/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -495,28 +497,46 @@ class JobOrderFinish(APIView):
         jo.status = 'finished'
         jo.save()
 
-        j = Journal()
-
-        j.code = jo.code
-        j.datetimeCreated = jo.datetimeCreated
-        j.createdBy = jo.createdBy
-        j.journalDate = datetime.now()
-        j.save()
-        request.user.branch.journal.add(j)
+        finalProduct = jo.finalproduct.all()[0]
+        manu = ManufacturingInventory()
+        manu.code = "##"
+        manu.name = finalProduct.name
+        manu.length = Decimal(0)
+        manu.width = Decimal(0)
+        manu.height = Decimal(0)
+        manu.purchasingPrice = finalProduct.unitCost
+        manu.sellingPrice = Decimal(0)
+        manu.vol = Decimal(0)
+        manu.inventoryDate = datetime.datetime.now()
+        manu.qtyT = finalProduct.qty
+        manu.qtyA = finalProduct.qty
+        manu.save()
+        request.user.branch.manufacturingInventory.add(manu)
         
-        addloss = Decimal(0)
-        for loss in jo.materiallosses.all():
-            addloss += loss.totalCost
 
-        if jo.method == 'Absorption':
-            jeAPI(request, j, 'Credit', dChildAccount.workInProgress, jo.jobOrderCost)
-            jeAPI(request, j, 'Credit', dChildAccount.materialLosses, addloss)
-            jeAPI(request, j, 'Debit', dChildAccount.manuInventory, (jo.jobOrderCost + addloss))
-        elif jo.method == 'Direct':
-            jeAPI(request, j, 'Credit', dChildAccount.workInProgress, jo.jobOrderCost)
-            jeAPI(request, j, 'Debit', dChildAccount.manuInventory, jo.jobOrderCost)
-            jeAPI(request, j, 'Credit', dChildAccount.materialLosses, addloss)
-            jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, addloss)
+
+        # j = Journal()
+
+        # j.code = jo.code
+        # j.datetimeCreated = jo.datetimeCreated
+        # j.createdBy = jo.createdBy
+        # j.journalDate = datetime.now()
+        # j.save()
+        # request.user.branch.journal.add(j)
+        
+        # addloss = Decimal(0)
+        # for loss in jo.materiallosses.all():
+        #     addloss += loss.totalCost
+
+        # if jo.method == 'Absorption':
+        #     jeAPI(request, j, 'Credit', dChildAccount.workInProgress, jo.jobOrderCost)
+        #     jeAPI(request, j, 'Credit', dChildAccount.materialLosses, addloss)
+        #     jeAPI(request, j, 'Debit', dChildAccount.manuInventory, (jo.jobOrderCost + addloss))
+        # elif jo.method == 'Direct':
+        #     jeAPI(request, j, 'Credit', dChildAccount.workInProgress, jo.jobOrderCost)
+        #     jeAPI(request, j, 'Debit', dChildAccount.manuInventory, jo.jobOrderCost)
+        #     jeAPI(request, j, 'Credit', dChildAccount.materialLosses, addloss)
+        #     jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, addloss)
 
         # exp= Decimal(0)
         # for expense in jo.overheadexpenses.all():
@@ -525,7 +545,7 @@ class JobOrderFinish(APIView):
         # jeAPI(request, j, 'Debit', dChildAccount.factorySupplies, exp)
 
 
-
+        notify(request, 'Job Order Finished', jo.code, '/job-order-finished/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 

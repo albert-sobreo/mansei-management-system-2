@@ -279,7 +279,8 @@
                         </div>
                     </div>
                     <div>
-                        <button @click="submit()" class="btn btn-primary">Request Job Order</button>
+                        <button @click="submit()" class="btn btn-primary">Save</button>
+                        <button @click="finished()" class="btn btn-danger">Finish Job Order</button>
                     </div>
                 </div>
             </div>
@@ -408,6 +409,12 @@
                 }
             },
             submit(){
+                message = "Saving Edit Job Order"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/edit-job-order/', this.jobOrder, this.config)
                 .then(res=>res.data==0?location.reload():'')
             },
@@ -495,6 +502,36 @@
                 var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
+            },
+
+            finished(){
+                Swal.fire({
+                    title: "Are you sure?",
+                    icon: "warning",
+                    html: "Are you sure that this job order is finished? <br> <b>This action cannot be undone.</b>",
+                    showCancelButton: true,
+                    confirmButtonText: 'I am sure.'
+                })
+                .then(result=>{
+                    if(this.jobOrder.code){
+                        if(result.isConfirmed){
+                            message = "Finishing Job Order"
+                            Swal.fire({
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                            })
+                            axios.post('/finish-job-order/', this.jobOrder, this.config)
+                            .then(res=>res.data==0?location.reload():'')
+                        }
+                    } else {
+                        Swal.fire({
+                            title: "No Selected Job Order",
+                            icon: "error",
+                            html: "Please select job order from the <b>Reference No.</b> dropdown"
+                        })
+                    }
+                })
             },
         }
     })

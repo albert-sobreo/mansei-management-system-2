@@ -138,5 +138,6 @@ class SaveReceivingReport(APIView):
                 rritemsother.save()
                 request.user.branch.rrItemsOther.add(rritemsother)
 
+        notify(request, 'New RR Request', rr.code, '/rr-nonapproved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

@@ -109,6 +109,7 @@ class ImportInwardInventory(View):
         ii.save()
         request.user.branch.inwardInventory.add(ii)
 
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return redirect('/inward-inventory/')
 
@@ -143,6 +144,6 @@ class InwardAdjustmentSave(APIView):
         inwardInventory.amountTotal = inward['amountTotal']
         inwardInventory.runningBalance = inward['amountTotal']
         inwardInventory.save()
-
+        
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

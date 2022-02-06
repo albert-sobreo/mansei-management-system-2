@@ -75,10 +75,17 @@
                                         <br>
                                         <span class="font-size-14 font-bold">[[modal.dateEmployed]]</span>
                                     </div>
+                                    <div class="col-6 my-1">
+                                        <label for="" class="gray">Schedule</label>
+                                        <br>
+                                        <span class="font-size-14 font-bold">[[formatTime(modal.schedule.timeIn)]] - [[formatTime(modal.schedule.timeOut)]]</span><br>
+                                        <span class="font-size-14 font-bold">[[convertToDays(modal.schedule.workDays)]]</span><br>
+                                        <a @click="fetchChangeSchedule()" class="link" data-toggle="modal" data-target="#changeSchedule" href="#">Change Schedule</a>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col">
-                                <img :src="modal.image" class="border b-radius-5" alt="" height="100%" width="100%">
+                                <img :src="modal.image" class="border b-radius-5" alt="" height="90px" width="90px">
                             </div>
                         </div>
 
@@ -187,6 +194,50 @@
                             </div>
                         </div>
 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- CHANGE SCHEDULE MODAL -->
+        <div class="modal fade" id="changeSchedule">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Change Schedule</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="row mb-2 order-card">
+                            <div class="col my-2">
+                                <label for="" class="gray">Employee</label><br>
+                                <span class="font-size-14 font-bold">[[changeScheduleModal.first_name]] [[changeScheduleModal.last_name]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="">Schedule</label>
+                                    <select v-model="changeScheduleModal.schedule" name="" id="" class="form-control">
+                                        <option value="" selected disabled>Select a schedule</option>
+                                        {% for item in request.user.branch.schedule.all %}
+                                        <option value="{{item.pk}}">{{item.timeIn}}-{{item.timeOut}} [[convertToDays('{{item.workDays}}')]]</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <button @click="saveChangeSchedule()" class="btn btn-primary col">Save</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -479,7 +530,47 @@
         </div>
 
         <!-- GIVE BONUS MODAL -->
-        
+        <!-- ADD SCHEDULE -->
+        <div class="modal fade" id="createSchedule">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Create a Schedule</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label for="">Time In</label>
+                                <input v-model="createSchedule.timeIn" type="time" class="form-control">
+                            </div>
+                            <div class="col">
+                                <label for="">Time Out</label>
+                                <input v-model="createSchedule.timeOut" type="time" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label for="">Work Days</label>
+                                <select v-model="createSchedule.workDays" name="" id="" class="form-control">
+                                    <option value="" selected disabled>Select Workday</option>
+                                    <option value="01234">M T W Th F</option>
+                                    <option value="012345">M T W Th F Sat</option>
+                                    <option value="0123456">M T W Th F Sat Sun</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col">
+                                <button @click="submitCreateSchedule()" class="btn btn-primary col">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- ADD EMPLOYEE MODAL -->
         <div class="modal fade" id="addModal">
@@ -692,6 +783,13 @@
                 phic: null,
                 hdmf: null,
             },
+
+            changeScheduleModal: {
+                id: null,
+                first_name: null,
+                last_name: null,
+                schedule: '',
+            },
             
             givePromotion:{
                 user: null,
@@ -713,6 +811,12 @@
                     pk: '',
                     amount: null,
                 }]
+            },
+
+            createSchedule:{
+                timeIn: null,
+                timeOut: null,
+                workDays: ''
             },
 
             giveBonus: {
@@ -767,6 +871,30 @@
                 axios.get(`/api/user/${id}/`)
                 .then(res=>{
                     this.modal = res.data
+                })
+            },
+
+            saveChangeSchedule(){
+                axios.post('/save-change-schedule/', this.changeScheduleModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        icon: "error",
+                        html: err.message
+                    })
+                })
+            },
+
+            submitCreateSchedule(){
+                axios.post('/create-schedule/', this.createSchedule, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong.",
+                        html: err.message,
+                        icon: 'error'
+                    })
                 })
             },
 
@@ -901,6 +1029,33 @@
                 return formatted
             },
 
+            formatTime(value){
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                h = value.split(':')[0]
+                m = value.split(':')[1]
+
+                value = new Date(null, null, null, h, m)
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
+
+            fetchChangeSchedule(){
+                this.changeScheduleModal = this.modal
+            },
+
             initGiveRaise(){
                 this.giveRaise.user = this.modal.id
                 this.giveRaise.position = this.modal.position
@@ -908,6 +1063,28 @@
                 this.giveRaise.rate = this.modal.rate
                 this.giveRaise.first_name = this.modal.first_name
                 this.giveRaise.last_name = this.modal.last_name
+            },
+
+            convertToDays(value){
+                //CONVERTS 012345 to M T W TH F SAT SUN
+                data = {
+                    0: 'M',
+                    1: 'T',
+                    2: 'W',
+                    3: 'Th',
+                    4: 'F',
+                    5: 'Sat',
+                    6: 'Sun'
+                }
+
+                let reformatted = ''
+
+                arr = value.split('')
+                arr.forEach(item=>{
+                    reformatted += (data[item])
+                })
+
+                return reformatted
             },
 
             submitGiveRaise(){
@@ -980,6 +1157,14 @@
                     titleAttr: 'Add Employee',
                     action: function(){
                         $("#addModal").modal('show')
+                    }
+                },
+                {
+                    text: 'Create New Schedule',
+                    className: "btn btt-warning",
+                    titleAttr: 'Create New Schedule',
+                    action: function(){
+                        $('#createSchedule').modal('show')
                     }
                 },
                 {

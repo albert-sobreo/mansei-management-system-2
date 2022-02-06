@@ -71,6 +71,8 @@ class SaveAdvancement(APIView):
 
         adv.save()
         request.user.branch.advancementThruPettyCash.add(adv)
+
+        notify(request, 'New Advancement Request', adv.code, '/adv-nonapproved/', 1)
     
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
@@ -105,6 +107,8 @@ class PettyCashReplenish(APIView):
 
         jeAPI(request, j, "Debit", dChildAccount.pettyCash, normalAmount - currentAmount)
         jeAPI(request, j, "Credit", paymentMethod, normalAmount - currentAmount)
+
+        notify(request, 'Petty Cash', "Petty cash has been replenished", '/petty-cash/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

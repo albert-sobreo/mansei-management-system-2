@@ -148,5 +148,7 @@ class SavePurchaseOrder(APIView):
                 poitemsother.save()
                 request.user.branch.poItemsOther.add(poitemsother)
 
+        notify(request, 'New PO Request', po.code, '/po-nonapproved/', 1)
+
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

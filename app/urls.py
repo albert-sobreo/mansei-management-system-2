@@ -163,6 +163,9 @@ router.register(r"receivepaymentsUSD", views.ReceivedPaymentsUSDAPI, 'receivepay
 router.register(r"job-order", views.JobOrderAPI, 'job-order')
 router.register(r"job-order-2", views.JobOrderAPI2, 'job-order-2')
 
+########## MANUFACTURING INVENTORY ##########
+router.register(r'manufacturing-inventory', views.ManufacturingInventoryAPI, 'manufacturing-inventory')
+
 urlpatterns = [
     path('api/', include(router.urls)),
     path('login/', views.LoginView.as_view()),
@@ -492,4 +495,9 @@ urlpatterns = [
     path('export-packing-list/<int:pk>/', login_required(views.ExportPackingList.as_view())),
     path('notifications/<int:pk>/', login_required(views.NotificationReceiver.as_view())),
     path('notification-unread-checker/', login_required(views.NotificationUnreadChecker.as_view())),
+
+    path('manuInventory/', login_required(views.ManuInventoryView.as_view())),
+    path('save-edit-manu-inventory/', login_required(views.SaveEditManuInventoryAPI.as_view())),
+    path('save-change-schedule/', login_required(views.SaveChangeSchedule.as_view())),
+    path('create-schedule/', login_required(views.CreateScheduleAPI.as_view()))
 ]   

@@ -151,3 +151,32 @@ class EMS_SaveEditBenefits(APIView):
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
+
+class SaveChangeSchedule(APIView):
+    def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+
+        data = request.data
+        user = User.objects.get(pk=data['id'])
+        user.schedule = Schedule.objects.get(pk=data['schedule'])
+        user.save()
+        
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+class CreateScheduleAPI(APIView):
+    def post(self, request):
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+
+        data = request.data
+        sched = Schedule()
+        sched.timeIn = data['timeIn']
+        sched.timeOut = data['timeOut']
+        sched.workDays = data['workDays']
+        sched.save()
+        request.user.branch.schedule.add(sched)
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)

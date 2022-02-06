@@ -134,6 +134,8 @@ class SaveSalesContract(APIView):
             f.description = fee['description']
             f.save()
             request.user.branch.tempSCOtherFees.add(f)
+
+        notify(request, 'New SC Request', sc.code, '/sc-nonapproved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -245,6 +247,8 @@ class SaveQuotations(APIView):
             f.description = fee['description']
             f.save()
             request.user.branch.qqOtherFees.add(f)
+
+        notify(request, 'New Quotation Request', qq.code, '/qq-nonapproved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -374,6 +378,7 @@ class SaveSalesOrder(APIView):
             f.save()
             request.user.branch.soOtherFees.add(f)
 
+        notify(request, 'New SO Request', so.code, '/so-nonapproved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 

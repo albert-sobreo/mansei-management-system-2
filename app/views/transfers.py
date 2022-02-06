@@ -77,6 +77,8 @@ class SaveTransfer(APIView):
             
             tritem.save()
             request.user.branch.transferItems.add(tritem)
+
+        notify(request, 'New Transfer Request', tr.code, '/tr-nonapproved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
