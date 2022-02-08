@@ -11,6 +11,7 @@ import json
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
+from .journalAPI import jeAPI
 
 class MerchInventoryView(View):
     def get(self, request, format=None):

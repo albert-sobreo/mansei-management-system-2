@@ -154,6 +154,10 @@ class CreateBranchInDashboard(APIView):
         request.user.branch.accountGroup.add(otherLoss)
         
         # SUB GROUP
+        costOfSalesSubGroup = AccountSubGroup(code="##", name="Cost of Sales", accountGroup=costOfSales, amount=Decimal(0))
+        costOfSalesSubGroup.save()
+        request.user.branch.subGroup.add(costOfSalesSubGroup)
+
         cash = AccountSubGroup(code="##", name="Cash", accountGroup=currentAsset, amount=Decimal(0))
         cash.save()
         request.user.branch.subGroup.add(cash)
@@ -204,6 +208,12 @@ class CreateBranchInDashboard(APIView):
 
 
         # CHILD ACCOUNT GROUP
+        costOfSalesChild = AccountChild(code="##", name="Cost of Sales", accountSubGroup=costOfSalesSubGroup, amount=Decimal(0))
+        costOfSalesChild.save()
+        request.user.branch.accountChild.add(costOfSalesChild)
+        bdca.costOfSales = costOfSalesChild
+        bdca.save()
+
         cashOnHand = AccountChild(code="##", name="Cash on Hand", accountSubGroup=cash, amount=Decimal(0))
         cashOnHand.save()
         request.user.branch.accountChild.add(cashOnHand)
