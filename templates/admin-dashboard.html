@@ -68,7 +68,7 @@
                     <span class="gray font-size-18 font-bold">not connected to a branch</span>
                     <div class="d-flex flex-column align-items-center justify-content-center">
                         <span>It seems your user profile is not connected to a Branch</span>
-                        <span><a href="#" data-toggle="modal" data-target="#branchModal">Click here</a> to create or select one.</span>
+                        <span><span data-toggle="modal" data-target="#branchModal" class="link">Click here</span> to create or select one.</span>
                     </div>
                     {% endif %}
                 </div>
@@ -366,6 +366,63 @@
                         <div class="row mt-2">
                             <div class="col">
                                 <button @click="submitAnnouncement()" class="btn btn-primary col">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CREATE BRANCH OR CONNECT TO A BRANCH -->
+        <div class="modal fade" id="branchModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Add or Connect to a Branch</span>
+                            <div class="form-group d-flex align-items-center">
+                                <input @change="changeModalContent" v-model="type" type="radio" name="type" value="createBranch">
+                                <label class="font-medium" for="">Create a branch</label>
+                                &nbsp;
+                                <input @change="changeModalContent" v-model="type" type="radio" name="type" value="connectToBranch">
+                                <label class="font-medium" for="">Connect to a branch</label>
+                            </div>
+                        </div>
+
+                        <!-- CREATE BRANCH -->
+                        <div id="createBranch">
+                            <h5 class="font-bold">Create a Branch</h5>
+                            <div class="row">
+                                <div class="col form-group">
+                                    <label for="">Branch Name</label>
+                                    <input v-model="create.branchName" type="text" class="form-control" placeholder="Enter branch name">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button @click="createBranch()" class="btn btn-primary col">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONNECT TO A BRANCH -->
+                        <div id="connectToBranch" style="display: none;">
+                            <h5 class="font-bold">Connect to a Branch</h5>
+                            <div class="row">
+                                <div class="col form-group">
+                                    <label for="">Branch Name</label>
+                                    <select v-model="connect.branchID" class="form-control">
+                                        <option value="" disabled selected>Choose a branch</option>
+                                        {% for branch in branches %}
+                                        <option value="{{branch.pk}}">{{branch.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button @click="connectBranch()" class="btn btn-primary col">Submit</button>
+                                </div>
                             </div>
                         </div>
                     </div>

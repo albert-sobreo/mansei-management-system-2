@@ -198,9 +198,9 @@ class CreateBranchInDashboard(APIView):
         adminExpenseSubGroup.save()
         request.user.branch.subGroup.add(adminExpenseSubGroup)
 
-        otherLossSubGroup = AccountSubGroup(code="##", name="Other Losses", normally="Credit", permanence="Real", amount=Decimal(0))
+        otherLossSubGroup = AccountSubGroup(code="##", name="Other Losses", accountGroup=otherLoss, amount=Decimal(0))
         otherLossSubGroup.save()
-        request.user.branch.accountGroup.add(otherLossSubGroup)
+        request.user.branch.subGroup.add(otherLossSubGroup)
 
 
         # CHILD ACCOUNT GROUP
