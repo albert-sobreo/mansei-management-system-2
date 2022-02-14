@@ -10,6 +10,7 @@ from datetime import date as now
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
+import json
 
 class AdjustmentsView(View):
     def get(self, request, format=None):
@@ -50,7 +51,8 @@ class AdjustmentList(View):
 
 class SaveAdjustments(APIView):
     def post(self, request, format = None):
-        adjust = request.data
+        adjust = json.loads(request.POST['postData'])
+        adjustPhotos = request.FILES
 
         ad = Adjustments()
 
@@ -77,6 +79,14 @@ class SaveAdjustments(APIView):
             
             aditem.save()
             request.user.branch.adjustmentItems.add(aditem)
+
+        for i in range(0, len(adjustPhotos)):
+            adjPhoto = AdjustmentsPhotos()
+            adjPhoto.adjustments = ad
+            adjPhoto.picture = adjustPhotos[f"photos{i}"]
+            adjPhoto.save()
+            request.user.branch.adjustmentPhotos.add(adjPhoto)
+
 
 
         notify(request, 'New PR Request', ad.code, '/ad-nonapproved/', 1)

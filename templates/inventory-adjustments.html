@@ -145,8 +145,7 @@
                               </select>
                           </div>
                           <div class="col-3 px-1">
-                            <input type="file" class="form-control-file" id="exampleFormControlFile1">
-                            <span class="font-size-10" style="color: red;">*not working yet</span>
+                            <input multiple ref="adjFile" @change="adjPhotoHandler()" type="file" class="form-control-file" id="exampleFormControlFile1">
                           </div>
                           <div class="col-3 px-1 ml-auto">
                             <div class="input-group">
@@ -191,9 +190,11 @@
         data: {
             config:{
                 headers: {
-                    "X-CSRFToken": getCookie('csrftoken')
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    "content-type": "multipart/form-data"
                 }
             },
+            adjPhotoUrl: null,
             order: {
                 code: '{{new_code}}',
                 date: new Date().toISOString().split('T')[0],
@@ -205,6 +206,7 @@
                     totalLost: null,
                     oldWarehouse: ''
                 }],
+                adjPhoto: null,
                 type: '',
                 totalLost: null,
             },
@@ -285,7 +287,15 @@
                 })
             },
             submit(){
-                axios.post('/save-adjustments/', this.order, this.config)
+                let formData = new FormData()
+                for (let i = 0; i<this.order.adjPhoto.length; i++){
+                    formData.append(`photos${i}`, this.order.adjPhoto[i])
+                }
+
+                let postData = JSON.stringify(this.order)
+                formData.append('postData', postData)
+
+                axios.post('/save-adjustments/', formData, this.config)
                 .then(res=>res.data==0?location.reload():'')
             },
             formatPrice(val){
@@ -325,6 +335,16 @@
             removeLine(index){
                 this.$delete(this.order.items, index)
             },
+            adjPhotoHandler(){
+                this.order.adjPhoto = []
+                for (let i = 0; i < this.$refs.adjFile.files.length; i++){
+                    this.order.adjPhoto.push(this.$refs.adjFile.files[i])
+                }
+                this.adjPhotoUrl = []
+                for (let i = 0; i < this.order.adjPhoto.length; i++){
+                    this.adjPhotoUrl.push(URL.createObjectURL(this.order.adjPhoto[i]))
+                }
+            }
         }
     })
 </script>

@@ -1566,7 +1566,7 @@ class TransferApproved(View):
         if request.user.authLevel == '2' or request.user.authLevel == '1':
             raise PermissionDenied()
         context = {
-            'transfer': request.user.branch.transfer.filter(approved=True)
+            'transfers': request.user.branch.transfer.filter(approved=True)
         }
         return render(request, 'tr-approved.html', context)
 

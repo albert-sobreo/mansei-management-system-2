@@ -27,15 +27,104 @@
         </div>
         <!-- END TITLE AND BUTTONS -->
 
+        <!-- MODAL -->
         <div class="modal fade" id="trModal">
             <div class="modal-dialog">
                 <div class="modal-content b-radius-15">
                     <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <div class="row my-2 order-card">
+                            <!-- LVL 1 -->
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Reference No.</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.code]]</span>
+                            </div>
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Datetime Created</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[formatDateTime(modal.datetimeCreated)]]</span>
+                            </div>
+
+                            <!-- LVL 2 -->
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">Approved</label>
+                                <br>
+                                <span class="font-size-14 font-bold approved" v-if="modal.approved == 'approved'">Approved</span>
+                                <span class="font-size-14 font-bold pending" v-else>Pending</span>
+                            </div>
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">Datetime Approved</label>
+                                <br>
+                                <span class="font-size-14 font-bold" v-if="modal.datetimeApproved">[[formatDateTime(modal.datetimeApproved)]]</span>
+                            </div>
+                        </div>
+
+                        <div class="row my-2">
+                            <!-- LVL 1 -->
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Created By</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.createdBy.first_name]] [[modal.createdBy.last_name]]</span>
+                            </div>
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Approved By</label>
+                                <br>
+                                <span class="font-size-14 font-bold" v-if="modal.approvedBy">[[modal.approvedBy.first_name]] [[modal.approvedBy.last_name]]</span>
+                            </div>
+
+                            <!-- LVL 2 -->
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">New Warehouse</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[modal.newWarehouse.name]]</span>
+                            </div>
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">Photos</label>
+                                <br>
+                                <span class="link" data-toggle="modal" data-target="#photoModal">View Photos</span>
+                            </div>
+                        </div>
+
+                        <!-- ITEMS -->
+                        <div class="row mt-4">
+                            <div class="col">
+                                <span class="font-bold">Transfer Items</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <th><span class="font-bold gray pl-2">Item</span></th>
+                                    <th><span class="font-bold gray">Qty</span></th>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in modal.tritems">
+                                        <td><span class="pl-2">[[item.merchInventory.classification]] [[item.merchInventory.type]] [[item.merchInventory.name]]</span></td>
+                                        <td>[[item.qtyTransfered]]</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                         <div class="row">
                             <div class="col">
                                 <button class="col btn btn-primary" @click="approveTR(modal.id)">Approve</button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHOTOS -->
+        <div class="modal fade" id="photoModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <img v-for="photo in modal.transferphotos" :src="photo.picture" alt="" width="100%" class="b-radius-10 my-1">
                     </div>
                 </div>
             </div>
@@ -59,7 +148,6 @@
                 {% endfor %}
             </tbody>
         </table>
-        <pre>[[$data]]</pre>
     </div>
 </div>
 
@@ -140,7 +228,35 @@
                 }
             },
             modal: {
-                id: null,
+                code: null,
+                datetimeCreated: null,
+                remarks: null,
+                createdBy: {
+                    first_name: null,
+                    last_name: null,
+                },
+                approvedBy: {
+                    first_name: null,
+                    last_name: null,
+                },
+                approved: null,
+                datetimeApproved: null,
+                newWarehouse: {
+                    name: null,
+                },
+                tritems: [{
+                    merchInventory: {
+                        type: null,
+                        name: null,
+                        classification: null,
+                    },
+                    qtyTransfered: null,
+                    //TRANSFERRED WITH ONE R
+                }],
+
+                transferphotos: [{
+                    picture: null,
+                }]
             }
         },
         methods: {
@@ -165,7 +281,53 @@
                 $("#poModal").modal('hide')
                 axios.put(`/tr-approval/${id}/`, '', this.config)
                 .then(res=>res.data==0?location.reload():'')
-            }
+            },
+
+            fetchTransfer(id){
+                axios.get(`/api/transfer/${id}/`)
+                .then(res=>{
+                    this.modal = res.data
+                    console.log(this.modal)
+                })
+            },
+            formatDateTime(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                const days = [
+                    'Sun',
+                    'Mon',
+                    'Tue',
+                    'Wed',
+                    'Thu',
+                    'Fri',
+                    'Sat'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                hour = (value.getHours() + 24) % 12 || 12; 
+                minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+                day = days[value.getDay()]
+                meridian = value.getHours() >= 12 ? 'pm' : 'am'
+                formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+                return formatted
+            },
         }
     })
 </script>

@@ -151,8 +151,7 @@
                     <div class="col-12">
                         <label>Attach a Photo</label>
                         <div>
-                        <input type="file" multiple> <br>
-                        <span class="font-size-10" style="color: red;">*not working yet</span>
+                        <input type="file" ref="transferFile" @change="transferPhotoHandler()" multiple> <br>
                         </div>
                     </div>
                 </div>
@@ -190,9 +189,11 @@
         data: {
             config:{
                 headers: {
-                    "X-CSRFToken": getCookie('csrftoken')
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    "content-type": "multipart/form-data"
                 }
             },
+            transferPhotoUrl: [],
             order: {
                 code: '{{new_code}}',
                 date: new Date().toISOString().split('T')[0],
@@ -205,6 +206,7 @@
                     totalCost: null,
                     warehouseList: [],
                 }],
+                transferPhoto: null,
                 newWarehouse: '',
                 remarks: null,
                 totalCost: null,
@@ -225,7 +227,15 @@
 
         methods: {
             submit(){
-                axios.post('/save-transfer/', this.order, this.config)
+                var formdata = new FormData()
+                for (var i = 0; i < this.order.transferPhoto.length; i++){
+                    formdata.append(`photos${i}`, this.order.transferPhoto[i])
+                }
+
+                var postData = JSON.stringify(this.order)
+                formdata.append("postData", postData)
+
+                axios.post('/save-transfer/', formdata, this.config)
                 .then(res=>res.data==0?location.reload():'')
             },
             checkForm(){
@@ -404,6 +414,16 @@
 
                 return formatted
             },
+            transferPhotoHandler(){
+                this.order.transferPhoto = []
+                for (var i = 0; i < this.$refs.transferFile.files.length; i++){
+                    this.order.transferPhoto.push(this.$refs.transferFile.files[i])
+                }
+                this.transferPhotoUrl = []
+                for (var i = 0; i < this.order.transferPhoto.length; i++){
+                    this.transferPhotoUrl.push(URL.createObjectURL(this.order.transferPhoto[i]))
+                }
+            }
         },
 
     })

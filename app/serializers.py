@@ -794,10 +794,16 @@ class TransferItemsSZ(serializers.ModelSerializer):
     class Meta:
         model = TransferItems
         fields = '__all__'
-        depth = 1
+
+class TransferPhotosSZ(serializers.ModelSerializer):
+    class Meta:
+        model = TransferPhotos
+        fields = "__all__"
 
 class TransferSZ(serializers.ModelSerializer):
-    transferItems = TransferItemsSZ(read_only = True)
+    transferphotos = TransferPhotosSZ(many=True, read_only=True)
+    tritems = TransferItemsSZ(many=True, read_only = True)
+    newWarehouse = WarehouseSZ(read_only=True)
     class Meta:
         model = Transfer
         fields = '__all__'
@@ -810,8 +816,14 @@ class AdjustmentItemsSZ(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+class AdjustmentsPhotosSZ(MS):
+    class Meta:
+        model = AdjustmentsPhotos
+        fields = '__all__'
+
 class AdjustmentSZ(serializers.ModelSerializer):
     aditems = AdjustmentItemsSZ(read_only = True, many=True)
+    adjustmentsphotos = AdjustmentsPhotosSZ(read_only=True, many=True)
     class Meta:
         model = Adjustments
         fields = '__all__'

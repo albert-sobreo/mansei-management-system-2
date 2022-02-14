@@ -205,7 +205,10 @@ class AccountChild(models.Model):
         verbose_name_plural = "Child Accounts"
 
     def __str__(self):
-        return self.name + " " + self.code
+        try:
+            return self.name + " " + self.code + " --- " + self.branch_set.all()[0].name
+        except:
+            return self.name + " " + self.code
 
     def me_too(self):
         return (self.accountchild.all())
@@ -1195,6 +1198,10 @@ class TransferItems(models.Model):
     qtyTransfered = models.IntegerField(null = True, blank = True)
     oldWarehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, null = True, blank = True, related_name= "tritems")
 
+class TransferPhotos(models.Model):
+    transfer = models.ForeignKey(Transfer, related_name="transferphotos", on_delete=models.CASCADE, blank=True)
+    picture = models.ImageField(null=True, blank=True, upload_to="trasfer_photos")
+
 
 class Adjustments(models.Model):
     code = models.CharField(max_length=50)
@@ -1217,7 +1224,7 @@ class AdjustmentsItems(models.Model):
     oldWarehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, null = True, blank = True, related_name= "aditems")
 
 class AdjustmentsPhotos(models.Model):
-    adjustments = models.ForeignKey(Deliveries, related_name="adjustmentsphotos", on_delete=models.CASCADE, null=True, blank=True)
+    adjustments = models.ForeignKey(Adjustments, related_name="adjustmentsphotos", on_delete=models.CASCADE, null=True, blank=True)
     picture = models.ImageField(null=True, blank=True, upload_to="adjustment_photos")
 
 class PPE(models.Model):
@@ -1936,6 +1943,7 @@ class Branch(models.Model):
     #### TRANSFER AND ADJUSTMENTS ####
     transfer = models.ManyToManyField(Transfer, blank = True)
     transferItems = models.ManyToManyField(TransferItems, blank = True)
+    transferPhotos = models.ManyToManyField(TransferPhotos, blank=True)
     adjustments = models.ManyToManyField(Adjustments, blank = True)
     adjustmentItems = models.ManyToManyField(AdjustmentsItems, blank = True)
     adjustmentPhotos = models.ManyToManyField(AdjustmentsPhotos, blank = True)

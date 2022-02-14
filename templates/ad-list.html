@@ -70,14 +70,23 @@
                                 <label for="" class="gray">Total Lost</label><br>
                                 <span class="font-size-14 font-bold">₱[[formatPrice(modal.totalLost)]]</span>
                             </div>
-                            <!-- LVL 3 -->
-                            <div class="col-6 my-3">
+                        </div>
+
+                        <div class="row my-2">
+                            <!-- LVL 1 -->
+                            <div class="col-6 mt-3">
                                 <label for="" class="gray">Datetime Created</label><br>
                                 <span class="font-size-14 font-bold">[[formatDateTime(modal.datetimeCreated)]]</span>
                             </div>
-                            <div class="col-6 my-3">
+                            <div class="col-6 mt-3">
                                 <label for="" class="gray">Created By</label><br>
                                 <span class="font-size-14 font-bold">[[modal.createdBy.first_name]] [[modal.createdBy.last_name]]</span>
+                            </div>
+
+                            <!-- LVL 2 -->
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Photos</label><br>
+                                <span class="link" data-toggle="modal" data-target="#photoModal">View photos</span>
                             </div>
                         </div>
 
@@ -123,6 +132,19 @@
                 </div>
             </div>
         </div>
+
+        <!-- PHOTOS -->
+        <div class="modal fade" id="photoModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <img v-for="photo in modal.adjustmentsphotos" :src="photo.picture" alt="" width="100%" class="b-radius-10 my-1">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <pre>[[$data]]</pre>
     </div>
 </div>
@@ -215,7 +237,6 @@
             getAd(id){
                 axios.get(`/api/adjustments/${id}`)
                 .then(res=>{
-                    console.log(res.data)
                     this.modal = res.data
                 })
             },

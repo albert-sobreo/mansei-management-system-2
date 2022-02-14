@@ -46,13 +46,7 @@ class CompletionReportView(View):
     def post(self, request):
         if request.user.authLevel == '2':
             raise PermissionDenied()
-        print(request.FILES)
-        print(request.POST)
-        print(request.POST['postDATA'])
-        print()
         crJson = json.loads(request.POST['postDATA'])
-        print(crJson['code'])
-        print(crJson['reportDate'])
 
         cr = CompletionReport()
         cr.code = crJson['code']

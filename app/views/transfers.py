@@ -10,6 +10,7 @@ from datetime import date as now
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
+import json
 
 class TransferView(View):
     def get(self, request, format=None):
@@ -52,7 +53,9 @@ class SaveTransfer(APIView):
     def post(self, request, format = None):
         if request.user.authLevel == '2':
             raise PermissionDenied()
-        transfer = request.data
+
+        transfer = json.loads(request.POST['postData'])
+        transferPhotos = request.FILES
 
         tr = Transfer()
 
@@ -77,6 +80,13 @@ class SaveTransfer(APIView):
             
             tritem.save()
             request.user.branch.transferItems.add(tritem)
+
+        for i in range(0, len(transferPhotos)):
+            trPhotos = TransferPhotos()
+            trPhotos.transfer = tr
+            trPhotos.picture = transferPhotos[f'photos{i}']
+            trPhotos.save()
+            request.user.branch.transferPhotos.add(trPhotos)
 
         notify(request, 'New Transfer Request', tr.code, '/tr-nonapproved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
