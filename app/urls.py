@@ -16,6 +16,7 @@ router.register(r"notifications", views.NotificationsAPI, 'notifications')
 ########## CHART OF ACCOUNTS ##########
 router.register(r"group", views.AccountGroupAPI, 'group')
 router.register(r"sub-group", views.AccountSubGroupAPI, 'sub-group')
+router.register(r"sub-group-nested", views.AccountSubGroupNestedAPI, 'sub-group-nested')
 router.register(r"child", views.AccountChildAPI, 'child')
 router.register(r"child-nested", views.AccountChildNestedAPI, 'child-nested')
 

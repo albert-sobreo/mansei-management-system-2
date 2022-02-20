@@ -37,7 +37,7 @@
             <tbody>
                 {% for sub in request.user.branch.subGroup.all %}
                 <tr>
-                    <td class="link" data-toggle="modal" data-target="#modal">{{sub.code}}</td>
+                    <td @click="fetchSubGroup('{{sub.id}}')" class="link" data-toggle="modal" data-target="#subGroupModal">{{sub.code}}</td>
                     <td>{{sub.name}}</td>
                     <td>{{sub.accountGroup.name}}</td>
                     <td>₱[[formatPrice('{{sub.amount}}')]]</td>
@@ -45,6 +45,105 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- SUB GROUP MODAL -->
+        <div class="modal fade" id="subGroupModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15">
+                    <div class="modal-body">
+                        <!-- TOP CARD -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <span class="font-size-18 font-bold">[[subGroupModal.name]]</span>&nbsp;
+                                <span class="font-size-14 font-bold gray">[[subGroupModal.accountGroup.code]]-[[subGroupModal.code]]</span>
+                            </div>
+                        </div>
+                        <div class="order-card row my-2">
+                            <!-- LVL 1 -->
+                            <div class="col-6 mt-3">
+                                <label for="" class="gray">Account Group</label>
+                                <br>
+                                <span class="font-size-14 font-bold">[[subGroupModal.accountGroup.name]]</span>
+                            </div>
+                            <!-- LVL 2 -->
+                            <div class="col-6 my-3">
+                                <label for="" class="gray">Balance</label>
+                                <br>
+                                <span class="font-size-18 font-bold">₱[[formatPrice(subGroupModal.amount)]]</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <a href="#" data-toggle="modal" data-target="#editSubGroupModal" @click="copySubGroup(subGroupModal.id)">Edit Sub-Group Account</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT SUBGROUP MODAL -->
+        <div class="modal fade" id="editSubGroupModal">
+            <div class="modal-dialog">
+                <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <span class="modal-title">Edit Sub-Group Account</span>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="sub-group">Choose Account Group</label>
+                                    <select v-model="editSubGroup.accountGroup" name="group" class="form-control py-0">
+                                        <option value="" selected disabled class="gray">Choose Account Group</option>
+                                        {% for group in request.user.branch.accountGroup.all %}
+                                        <option value="{{group.pk}}">{{group.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-5 pr-2 form-group">
+                                <label for="code">Code</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">[[editSubGroup.groupCode]]</span>
+                                    </div>
+                                    <input v-model="editSubGroup.code" type="text" class="form-control box-shadow-off" name="code" placeholder="Enter Code" style="margin-top: 0px;">
+                                </div>
+                            </div>
+                            <div class="col col-7 pl-2">
+                                <div class="form-group">
+                                    <label for="name">Name</label>
+                                    <input v-model="editSubGroup.name" type="text" class="form-control" name="name" placeholder="Enter Name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col col-12">
+                                <div class="form-group">
+                                    <label for="description">description</label>
+                                    <input v-model="editSubGroup.description" type="text" name="description" class="form-control" placeholder="Enter Description">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col">
+                                <button class="btn btn-primary mt-2" @click="submitEditSubGroup(editSubGroup.id)">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
     </div>
 </div>
 
@@ -57,7 +156,29 @@
         delimiters: ['[[', ']]'],
         el: "#app",
         data: {
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
 
+            subGroupModal:{
+                accountGroup: '',
+                code: null,
+                name: null,
+                description: null,
+                amount: null,
+                groupCode: ''
+            },
+
+            editSubGroup:{
+                accountGroup: {},
+                amount: 0,
+                code: null,
+                description: null,
+                id: null,
+                name: null,
+            }
         },
         methods: {
             formatPrice(value) {
@@ -68,6 +189,32 @@
                     return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 }
             },
+
+            fetchSubGroup(id){
+                axios.get(`/api/sub-group-nested/${id}/`)
+                .then(res=>{
+                    this.subGroupModal = {...res.data}
+                })
+            },
+
+            copySubGroup(id){
+                axios.get(`/api/sub-group-nested/${id}/`)
+                .then(res=>{
+                    this.editSubGroup = {...res.data}
+                    console.log(res.data)
+                    this.editSubGroup.accountGroup = res.data.accountGroup.id
+                    this.editSubGroup.groupCode = `${res.data.accountGroup.code}-`
+                })
+            },
+
+            submitEditSubGroup(id){
+                axios.put(`/edit-sub-group/${id}/`, this.editSubGroup, this.config)
+                .then(res=>{
+                    res.data==0?location.reload():0
+                })
+            },
+
+
         }
     })
 </script>

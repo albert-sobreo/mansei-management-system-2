@@ -61,6 +61,13 @@ class AccountSubGroupAPI(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.request.user.branch.subGroup.all()
 
+class AccountSubGroupNestedAPI(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SubGroupNestedSZ
+
+    def get_queryset(self):
+        return self.request.user.branch.subGroup.all()
+
 
 
 

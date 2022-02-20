@@ -497,10 +497,13 @@
         },
         methods:{
             copyChildAccount(id){
-                axios.get(`/api/child/${id}/`)
+                axios.get(`/api/child-nested/${id}`)
                 .then(res=>{
-                    this.editChild = res.data
+                    this.editChild = {...res.data}
+                    this.editChild.accountSubGroup = res.data.accountSubGroup.id
+                    this.editChild.groupCode = `${res.data.accountSubGroup.accountGroup.code}-${res.data.accountSubGroup.code}-`
                 })
+                
             },
             submitEditAccount(id){
                 axios.put(`/edit-account-child/${id}/`, this.editChild, this.config)

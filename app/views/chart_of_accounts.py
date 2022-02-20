@@ -137,6 +137,7 @@ class EditSubGroup(APIView):
             raise PermissionDenied()
         subGroup = AccountSubGroup.objects.get(pk=pk)
         edit = request.data
+        print(request.data)
 
         subGroup.code = edit['code']
         subGroup.name = edit['name']
@@ -194,7 +195,7 @@ class EditGroup(APIView):
         group.normally = g['normally']
         group.save()
 
-        notify(request, 'Journal Group Account Edited' f"{group.name} has been edited", '/chart-of-accounts-group/', 1)
+        notify(request, 'Journal Group Account Edited', f"{group.name} has been edited", '/chart-of-accounts-group/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!',  persistent='Dismiss')
         return JsonResponse(0, safe=False)
