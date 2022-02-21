@@ -19,6 +19,7 @@ router.register(r"sub-group", views.AccountSubGroupAPI, 'sub-group')
 router.register(r"sub-group-nested", views.AccountSubGroupNestedAPI, 'sub-group-nested')
 router.register(r"child", views.AccountChildAPI, 'child')
 router.register(r"child-nested", views.AccountChildNestedAPI, 'child-nested')
+router.register(r"child-nested-2", views.AccountChildNested2API, 'child-nested-2')
 
 ########## LEDGER URLS ##########
 router.register(r"ledger", views.LedgerAPI, 'ledger')

@@ -54,6 +54,13 @@ class AccountChildNestedAPI(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.request.user.branch.accountChild.all()
 
+class AccountChildNested2API(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AccountChildNested2SZ
+
+    def get_queryset(self):
+        return self.request.user.branch.accountChild.all()
+
 class AccountSubGroupAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = SubGroupSZ

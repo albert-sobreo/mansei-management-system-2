@@ -99,6 +99,22 @@
                             <span class="font-size-18 font-bold">₱[[formatPrice(viewChildModal.amount)]]</span>
                         </div>
                     </div>
+                    <div class="row mt-2" v-if="viewChildModal.accountChild">
+                        <div class="col-9">
+                            <span class="font-bold gray font-size-12">Account Name</span>
+                        </div>
+                        <div class="col-3">
+                            <span class="font-bold gray font-size-12">Amount</span>
+                        </div>
+                    </div>
+                    <div class="row" v-for="item in viewChildModal.accountchild">
+                        <div class="col-9">
+                            <span >[[item.name]]</span>
+                        </div>
+                        <div class="col-3">
+                            <span>₱[[formatPrice(item.amount)]]</span>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col">
                             <a href="#" data-toggle="modal" data-target="#editAccountModal" @click="copyChildAccount(viewChildModal.id)">Edit Child Account</a>
@@ -313,10 +329,10 @@
                             </div>
                         </div>
 
-                        <div class="col col-12" id="linkToAccountContainer" style="display: none;">
+                        <div class="col col-12" id="linkToAccountContainer2" style="display: none;">
                             <div class="form-group mt-2">
                                 <label for="specificAccount">Specific Account</label>
-                                <select v-model="editChild.me" name="specificAccount" class="form-control py-0" >
+                                <select v-model="editChild.me" name="specificAccount" class="form-control py-0">
                                     <option value="" selected disabled class="gray">Choose Account</option>
                                     {% for subgroup in request.user.branch.subGroup.all %}
                                     <optgroup label="{{subgroup.name}}">
@@ -467,6 +483,9 @@
             linkToAccount(){
                 return this.accountModal.linkToAccount
             },
+            linkToAccount2(){
+                return this.editChild.linkToAccount
+            },
             groupCodeAccount(){
                 return this.accountModal.accountSubGroup
             },
@@ -480,6 +499,15 @@
                 if(this.accountModal.linkToAccount == false){
                     x.style.display = 'none'
                     this.accountModal.me = null
+                } else {
+                    x.style.display = 'block'
+                }
+            },
+            linkToAccount2(){
+                var x = document.getElementById('linkToAccountContainer2')
+                if(this.editChild.linkToAccount == false){
+                    x.style.display = 'none'
+                    this.editChild.me = null
                 } else {
                     x.style.display = 'block'
                 }
@@ -517,7 +545,7 @@
                 axios.get('/api/child/').then(res=>this.child=res.data)
             },
             viewChildmodal(id){
-                axios.get(`/api/child-nested/${id}/`)
+                axios.get(`/api/child-nested-2/${id}/`)
                 .then(res=>{
                     this.viewChildModal = res.data
                 })

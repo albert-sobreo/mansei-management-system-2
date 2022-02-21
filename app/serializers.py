@@ -164,6 +164,14 @@ class AccountChildNestedSZ(serializers.ModelSerializer):
         model = AccountChild
         fields = "__all__"
         depth = 1
+    
+class AccountChildNested2SZ(serializers.ModelSerializer):
+    accountSubGroup = SubGroupNestedSZ(read_only=True)
+    accountchild = AccountChildSZ(read_only=True, many = True)
+    class Meta:
+        model = AccountChild
+        fields = "__all__"
+        depth = 1
 
 
 
