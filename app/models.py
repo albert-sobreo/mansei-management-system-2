@@ -316,11 +316,11 @@ class MerchandiseInventory(models.Model):
         sales = '{} - {} {}'.format(dChildAccount.sales.name, name, classification)
         cos = '{} - {} {}'.format(dChildAccount.costOfSales.name, name, classification)
 
-        if AccountChild.objects.filter(name = inv):
+        if request.user.branch.accountChild.filter(name = inv):
             objects = {
-                'inv': AccountChild.objects.get(name=inv),
-                'sales': AccountChild.objects.get(name=sales),
-                'cos': AccountChild.objects.get(name=cos),
+                'inv': request.user.branch.accountChild.get(name=inv),
+                'sales': request.user.branch.accountChild.get(name=sales),
+                'cos': request.user.branch.accountChild.get(name=cos),
             }
             self.childAccountInventory = objects['inv']
             self.childAccountSales = objects['sales']
