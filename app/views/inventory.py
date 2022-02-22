@@ -77,7 +77,7 @@ class ImportMerchandiseInventory(View):
         for item in jsonDF:
             merch = MerchandiseInventory()
 
-            if MerchandiseInventory.objects.filter(code=item['Code']):
+            if request.user.branch.merchInventory.filter(code=item['Code']):
                 print('it exists')
                 continue
             merch.code = item['Code']
