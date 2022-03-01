@@ -623,7 +623,6 @@ class DeliveriesSZ(serializers.ModelSerializer):
     class Meta:
         model = Deliveries
         fields = '__all__'
-        depth = 1
 
 
 

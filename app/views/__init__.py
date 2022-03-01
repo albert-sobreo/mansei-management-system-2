@@ -53,3 +53,4 @@ from .prototypes import *
 from .job_order import *
 from .imps_approval import *
 from .notifications import *
+from .inventory_reports import *

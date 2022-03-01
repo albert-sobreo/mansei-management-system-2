@@ -501,5 +501,7 @@ urlpatterns = [
     path('manuInventory/', login_required(views.ManuInventoryView.as_view())),
     path('save-edit-manu-inventory/', login_required(views.SaveEditManuInventoryAPI.as_view())),
     path('save-change-schedule/', login_required(views.SaveChangeSchedule.as_view())),
-    path('create-schedule/', login_required(views.CreateScheduleAPI.as_view()))
+    path('create-schedule/', login_required(views.CreateScheduleAPI.as_view())),
+    path('inventory-summary/', login_required(views.InventorySummaryView.as_view())),
+    path('inventory-summary-api/', login_required(views.InventorySummaryAPI.as_view()))
 ]   

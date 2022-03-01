@@ -321,7 +321,7 @@ class DeliveriesAPI(viewsets.ModelViewSet):
     serializer_class = DeliveriesSZ
 
     def get_queryset(self):
-        return self.request.user.branch.accountChild.all()
+        return self.request.user.branch.deliveries.all()
 
 
 

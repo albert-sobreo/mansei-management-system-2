@@ -130,7 +130,7 @@ class ReturnTruck(APIView):
     def put(self, request, pk, format=None):
         if request.user.authLevel == '2':
             raise PermissionDenied()
-        truck = self.get_object(pk)
+        truck = self.get_object(request, pk)
         truck.status = "Available"
         truck.driver.status = truck.status
         truck.driver.save()

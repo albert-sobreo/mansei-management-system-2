@@ -1,0 +1,35 @@
+{% extends 'base-template.html' %}
+{% block title %} <!-- ADD TITLE HERE --> {% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <pre>[[$data]]</pre>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: "#app",
+        data: {
+            inv:[]
+        },
+
+        methods: {
+            onload(){
+                axios.get('/inventory-summary-api/')
+                .then(res=>this.inv = res.data)
+            }
+        },
+
+        mounted(){
+            this.onload()
+        }
+    })
+</script>
+
+{% endblock %}

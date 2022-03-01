@@ -256,7 +256,7 @@
                         <!-- V-IF ELSE FOR DIFFERENT INVENTORY LIST -->
                         <select @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control" v-if="item.type == 'Merchandise'">
                             <option value="" selected disabled>Choose Merchandise Inventory</option>
-                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]] --- [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
+                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.name]] [[item.classification]] [[item.type]] --- [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
                         </select>
                         <input @blur="getMerchRemaining2(item.other, index)" placeholder="Type or select the item from the datalist" list="others" v-model="item.other" class="form-control" v-else-if="item.type!='Merchandise' && item.type!='Manufacturing' && item.type!=''">
                         <select class="form-control" v-else>
