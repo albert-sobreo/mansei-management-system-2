@@ -1,10 +1,128 @@
 {% extends 'base-template.html' %}
-{% block title %} <!-- ADD TITLE HERE --> {% endblock %}
+{% block title %} Inventory Summary {% endblock %}
 
 {% block body %}
 
 <div id="app" v-cloak>
-    <pre>[[$data]]</pre>
+    <!-- NAVIGATION BAR -->
+    <navbar-imps active="nav-reports" photo="/static/media/{{request.user.image}}"></navbar-imps>
+    <app-card></app-card>
+    <notification-card></notification-card>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- NAV 2 -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links imps-nav">
+                <a href="/inventory-summary/" class="active-imps mx-2">Inventory Summary</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS-->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Inventory Summary</span>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+            <div class="mr-1 d-flex align-items-center">
+                <label for="">Start Date</label>
+                <input v-model="startDate" type="date" name="startDate" class="form-control" style="width:200px">
+            </div>
+            <div class="mx-1 d-flex align-items-center">
+                <label for="">End Date</label>
+                <input @change="onload()" v-model="endDate" type="date" name="endDate" class="form-control" style="width:200px">
+            </div>
+            <div class="mx-1 d-flex align-items-center">
+                <button class="btn btn-warning" @click="onload()">Set Date</button>
+            </div>
+        </div>
+
+        <!-- THE TABLE -->
+        <div class="row">
+            <div class="col-1">
+                <label for="">Name</label>
+            </div>
+            <div class="col-2">
+                <label for="">Class</label>
+            </div>
+            <div class="col-9">
+                <div class="row">
+                    <div class="col-2">
+                        <label for="">Barcode</label>
+                    </div>
+                    <div class="col-2">
+                        <label for="">T x W x L</label>
+                    </div>
+                    <div class="col-2">
+                        <label for="">Qty Beg</label>
+                    </div>
+                    <div class="col-2">
+                        <label for="">Qty End</label>
+                    </div>
+                    <div class="col-2">
+                        <label for="">Qty Sold</label>
+                    </div>
+                    <div class="col-2">
+                        <label for="">Vol Sold</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="b-radius-15 b-radius-15 row box-shadow-medium" v-if="inv.length">
+            <div class="col-12">
+                <div class="row py-4 position-relative" v-for="i in inv">
+                    <!-- ITEM NAME -->
+                    <div class="col-1">
+                        <span class="font-semibold">[[i.name]]</span>
+                    </div>
+
+                    <!-- ITEM CLASS -->
+                    <div class="col-2">
+                        <span class="font-semibold">[[i.classification]]</span>
+                    </div>
+                    
+                    <!-- THE ITEMS -->
+                    <div class="col-9">
+                        <div class="row border-bottom mb-2" v-for="item in i.items">
+                            <div class="col-2">
+                                <span class="font-semibold">[[item.barcode]]</span>
+                            </div>
+
+                            <div class="col-2">
+                                <span class="font-semibold">[[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]]</span>
+                            </div>
+
+                            <div class="col-2">
+                                <span class="font-semibold">[[item.qtyBeg]]</span>
+                            </div>
+
+                            <div class="col-2">
+                                <span class="font-semibold">[[item.qtyEnd]]</span>
+                            </div>
+
+                            <div class="col-2">
+                                <span class="font-semibold">[[item.qtySold]]</span>
+                            </div>
+
+                            <div class="col-2">
+                                <span class="font-semibold">[[item.vol]]</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="b-radius-15 b-radius-15 row box-shadow-medium" v-else>
+            <div class="col">
+                <div class="d-flex align-items-center justify-content-center p-4">
+                    <span class="font-bold">No Data</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
@@ -16,14 +134,30 @@
         delimiters: ['[[', ']]'],
         el: "#app",
         data: {
+            startDate: '{{startDate|date:"c"}}',
+            endDate: '{{endDate|date:"c"}}',
             inv:[]
         },
 
         methods: {
             onload(){
-                axios.get('/inventory-summary-api/')
+                message = "Fetching Data"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.get('/inventory-summary-api/', {params: {
+                    startDate: this.startDate,
+                    endDate: this.endDate
+                }})
                 .then(res=>this.inv = res.data)
-            }
+                setTimeout(()=>Swal.close(), 500)
+            },
+
+        roundNumber0(val){
+            return Number(val).toFixed(0)
+        }
         },
 
         mounted(){

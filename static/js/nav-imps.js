@@ -51,6 +51,7 @@ Vue.component('navbar-imps', {
             <a href="/adjustments/" class="mx-3" id="nav-adjustments">Adjustments</a>
             <a href="/deliveries/" class="mx-3" id="nav-deliveries">Deliveries</a>
             <a href="/warehouse/" class="mx-3" id="nav-warehouse">Warehouse</a>
+            <a href="/inventory-summary/" class="mx-3" id="nav-reports">Reports</a>
             <div class="btn-group mx-3">
                 <a id="nav-approvals" href="#" data-toggle="dropdown">Approvals</a>
                 <div class="dropdown-menu b-radius-5 py-0">

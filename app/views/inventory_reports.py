@@ -7,7 +7,7 @@ from ..serializers import *
 from ..models import *
 import sweetify
 from datetime import date as now
-from datetime import datetime
+import datetime
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
 import json
@@ -20,17 +20,27 @@ class DecimalEncoder(json.JSONEncoder):
 
 class InventorySummaryView(View):
     def get(self, request):
-        return render(request, 'inventory-summary.html')
+        startDate = datetime.date.today().replace(day=1)
+        try:
+            nextMonth = datetime.date.today().replace(month=startDate.month+1, day=1)
+        except Exception as e:
+            print(e)
+            nextMonth = datetime.date.today().replace(month=1, day=1)
+        endDate = nextMonth - datetime.timedelta(days=1)
+        context = {
+            'startDate': startDate,
+            'endDate': endDate
+        }
+        return render(request, 'inventory-summary.html', context)
 
 class InventorySummaryAPI(APIView):
     def get(self, request):
-        data = request.data
-        # startDate = data['startDate']
-        # endDate = data['endDate']
+        startDate = request.GET['startDate']
+        endDate = request.GET['endDate']
 
         # request.user.branch.journal.filter(journalDate__range=[startDate, endDate]).order_by('pk').reverse(),
 
-        salesContracts = request.user.branch.salesContract.filter(dateSold__range=['2020-01-01', '2023-01-01'], approved=True).order_by('pk')
+        salesContracts = request.user.branch.salesContract.filter(dateSold__range=[startDate, endDate], approved=True).order_by('pk')
 
         lst = []
 
