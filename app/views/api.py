@@ -163,7 +163,7 @@ class MerchandiseInventoryAPI(viewsets.ModelViewSet):
     serializer_class = MerchandiseInventorySZ
 
     def get_queryset(self):
-        return self.request.user.branch.merchInventory.all().order_by('name')
+        return self.request.user.branch.merchInventory.all().order_by('code')
 
 class MerchandiseInventoryNestedAPI(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]

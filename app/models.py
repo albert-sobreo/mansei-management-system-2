@@ -750,7 +750,7 @@ class QQItemsMerch(models.Model):
     qty = models.PositiveIntegerField()
     cbm = models.CharField(max_length=10, null = True)
     vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
-    pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    sellingPrice = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5)
 
     class Meta:
@@ -812,7 +812,7 @@ class SOItemsMerch(models.Model):
     qty = models.IntegerField()
     cbm = models.CharField(max_length=10, null = True)
     vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
-    pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    sellingPrice = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     delivered = models.BooleanField(null = True, default = False)
 
@@ -925,7 +925,7 @@ class ExportItemsMerch(models.Model):
     cbm = models.CharField(max_length=10, null = True)
     pallet = models.IntegerField(default = 0, blank = True, null = True)
     vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
-    pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    sellingPrice = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     delivered = models.BooleanField(null = True, default = False)
 
@@ -1004,7 +1004,7 @@ class SCItemsMerch(models.Model):
     qty = models.IntegerField()
     cbm = models.CharField(max_length=10, null = True)
     vol = models.DecimalField(max_digits=20, decimal_places=5, null = True)
-    pricePerCubic = models.DecimalField(max_digits=20, decimal_places=5, null = True)
+    sellingPrice = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     totalCost = models.DecimalField(max_digits=20, decimal_places=5, null = True)
     delivered = models.BooleanField(null = True, default = False)
 

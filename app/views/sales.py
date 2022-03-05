@@ -119,10 +119,10 @@ class SaveSalesContract(APIView):
             scitemsmerch.qty = item['quantity']
             scitemsmerch.cbm = item['cbm']
             scitemsmerch.vol = item['vol']
-            scitemsmerch.pricePerCubic = Decimal(item['pricePerCubic'])
+            scitemsmerch.sellingPrice = Decimal(item['sellingPrice'])
             scitemsmerch.totalCost = Decimal(item['totalCost'])
 
-            print(item['pricePerCubic'], item['totalCost'])
+            print(item['sellingPrice'], item['totalCost'])
             
             scitemsmerch.save()
             request.user.branch.scitemsMerch.add(scitemsmerch)
@@ -225,7 +225,7 @@ class SaveQuotations(APIView):
         for item in quotes['items']:
             qqitemsmerch = QQItemsMerch()
             qqitemsmerch.quotations = qq
-            qqitemsmerch.pricePerCubic = item['pricePerCubic']
+            qqitemsmerch.sellingPrice = item['sellingPrice']
             qqitemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
             qqitemsmerch.warehouse = qqitemsmerch.merchInventory.warehouseitems.all()[0].warehouse
             qqitemsmerch.remaining = item['remaining']
@@ -362,7 +362,7 @@ class SaveSalesOrder(APIView):
             soitemsmerch.qty = item['quantity']
             soitemsmerch.cbm = item['cbm']
             soitemsmerch.vol = item['vol']
-            soitemsmerch.pricePerCubic = item['pricePerCubic']
+            soitemsmerch.sellingPrice = item['sellingPrice']
             soitemsmerch.totalCost = Decimal(item['totalCost'])
 
             print(soitemsmerch.totalCost)
@@ -431,7 +431,7 @@ class ExportSO(APIView):
             qty.value=i.qty
             amount.value=round(i.totalCost, 2)
             vol.value=i.vol
-            unitCost.value=(vol.value/qty.value)*i.pricePerCubic
+            unitCost.value=(vol.value/qty.value)*i.sellingPrice
 
             gTotalPiecesQty.value += qty.value
             gTotalPiecesUnitPrice.value += unitCost.value
@@ -467,7 +467,7 @@ class ExportSC(APIView):
             width = ws.cell(row=15+ctr, column=5)
             thick = ws.cell(row=15+ctr, column=7)
             qty = ws.cell(row=15+ctr, column=8)
-            pricePerCubic = ws.cell(row=15+ctr, column=9)
+            sellingPrice = ws.cell(row=15+ctr, column=9)
             unitCost = ws.cell(row=15+ctr, column=10)
 
             invName.value=f"{i.merchInventory.name} {i.merchInventory.classification}"
@@ -475,7 +475,7 @@ class ExportSC(APIView):
             width.value=f"{round(i.merchInventory.width, 0)}"
             thick.value=f"{round(i.merchInventory.thickness, 0)}"
             qty.value=i.qty
-            pricePerCubic.value=round(i.pricePerCubic, 2)
+            sellingPrice.value=round(i.sellingPrice, 2)
 
             ctr+=1
         

@@ -218,8 +218,10 @@
 
             <!-- PURCHASE ITEMS AND DETAILS -->
             <div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
+
+
                 <div class="row">
-                    <div class="col px-1">
+                    <div class="col-3 px-1">
                         <label for="warehouse" class="m-0">Code - Name Type --- T x W x L mm <span class="gray font-size-12">format</span></label>
                     </div>
                     <div class="col-1 px-1">
@@ -234,20 +236,22 @@
                     <div class="col-1 px-1">
                         <label class="m-0">Vol.</label>
                     </div>
-                    <div class="col-2 px-1">
-                        <label for="order-quantity" class="m-0">Price Per Cubic</label>
+                    <div class="col px-1">
+                        <label for="" class="m-0">Selling Price</label>
                     </div>
-                    <div class="col-2 px-1">
-                        <label for="Total Cost" class="m-0">Total Cost</label>
+                    <div class="col px-1">
+                        <label for="Total Cost" class="m-0">Total Cost <span class="gray font-size-10">Vol x Selling Price</span></label>
                     </div>
                     <i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
                 </div>
+
+
                 <!-- V-FOR ITEMS -->
                 <div class="row" v-for="(item, index) in order.items">
-                    <div class="col px-1">
+                    <div class="col-3 px-1">
                         <select @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control">
                             <option value="" selected disabled>Choose Merchandise Inventory</option>
-                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.name]] [[item.classification]] [[item.type]] - [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]]  -- [[item.code]]</option>
+                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.name]] [[item.classification]] [[item.type]] - [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]]</option>
                         </select>
                     </div>
                     <div class="col-1 px-1">
@@ -262,17 +266,17 @@
                         </select>
                     </div>
                     <div class="col-1 px-1">
-                        <input v-model="item.vol" @change="onForTotalCost(index)" class="form-control" type="number" step="0.00001" readonly>
+                        <input v-model="item.vol" @change="onForTotalCost(index)" class="form-control" type="number" readonly>
                     </div>
-                    <div class="col-2 px-1">
+                    <div class="col px-1">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input v-model="item.pricePerCubic" @change="onForTotalCost(index)" type="text" class="form-control box-shadow-off" min="0">
+                            <input type="text" v-model="item.sellingPrice" @change="onForTotalCost(index)" class="form-control box-shadow-off">
                         </div>
                     </div>
-                    <div class="col-2 pl-1">
+                    <div class="col pl-1">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
@@ -515,6 +519,7 @@
                     vol: null,
                     refVol: null,
                     pricePerCubic: 0.00,
+                    sellingPrice: 0.00,
                     totalCost: null
                 }],
                 atc: [{
@@ -895,7 +900,7 @@
             getMerchRemaining(id, index){
                 item = this.merchandiseInventory.find(x=>x.id==id)
                 this.order.items[index].remaining = item.qtyA
-                this.order.items[index].pricePerCubic = Number(item.pricePerCubic).toFixed(2)
+                this.order.items[index].sellingPrice = Number(item.sellingPrice).toFixed(2)
                 this.order.items[index].vol = item.vol
                 this.order.items[index].refVol = item.vol
 
@@ -904,13 +909,13 @@
 
             onForVol(index){
                 row = this.order.items[index]
-                row.vol = Number(row.refVol * row.quantity).toFixed(4)
+                row.vol = Number(row.refVol * row.quantity)
                 this.onForTotalCost(index)
             },
 
             onForTotalCost(index){
                 row = this.order.items[index]
-                row.totalCost = Number(row.pricePerCubic * row.vol).toFixed(4)
+                row.totalCost = Number(row.sellingPrice * row.vol)
             },
 
             remove (index) {

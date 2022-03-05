@@ -104,10 +104,10 @@ class SaveExports(APIView):
             exportitemsmerch.pallet = item['pallet']
             exportitemsmerch.cbm = item['cbm']
             exportitemsmerch.vol = item['vol']
-            exportitemsmerch.pricePerCubic = Decimal(item['pricePerCubic'])
+            exportitemsmerch.sellingPrice = Decimal(item['sellingPrice'])
             exportitemsmerch.totalCost = Decimal(item['totalCost'])
 
-            print(item['pricePerCubic'], item['totalCost'])
+            print(item['sellingPrice'], item['totalCost'])
             
             exportitemsmerch.save()
             request.user.branch.exportItemsMerch.add(exportitemsmerch)
@@ -290,7 +290,7 @@ class ExportCompercialInvoice(APIView):
             qtyPCS.value = i.qty
             qtyPallet.value = i.pallet
             cubic.value = i.vol
-            cubicPrice.value = i.pricePerCubic
+            cubicPrice.value = i.sellingPrice
             amount.value = i.totalCost
             qty += i.qty
             pallet += i.pallet
