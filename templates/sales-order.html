@@ -247,7 +247,7 @@
                     <div class="col px-1">
                         <select @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control">
                             <option value="" selected disabled>Choose Merchandise Inventory</option>
-                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.name]] [[item.classification]] [[item.type]] --- [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
+                            <option v-for="item in merchandiseInventory" :value="item.id">[[item.name]] [[item.classification]] [[item.type]] - [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]]  -- [[item.code]]</option>
                         </select>
                     </div>
                     <div class="col-1 px-1">
