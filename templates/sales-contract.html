@@ -232,7 +232,7 @@
                     <div class="col-1 px-1">
                         <label class="m-0">CBM</label>
                     </div>
-                    <div class="col-1 px-1">
+                    <div class="col px-1">
                         <label class="m-0">Vol.</label>
                     </div>
                     <div class="col px-1">
@@ -262,7 +262,7 @@
                             <option value="m3">M3</option>
                         </select>
                     </div>
-                    <div class="col-1 px-1">
+                    <div class="col px-1">
                         <input v-model="item.vol" @change="onForTotalCost(index)" class="form-control" type="number" step="0.00001" readonly>
                     </div>
                     <div class="col px-1">
@@ -906,7 +906,7 @@
 
             onForVol(index){
                 row = this.order.items[index]
-                row.vol = Number(row.refVol * row.quantity).toFixed(5)
+                row.vol = Number(row.refVol * row.quantity)
                 this.onForTotalCost(index)
             },
 
