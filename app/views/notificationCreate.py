@@ -14,6 +14,7 @@ def notify(request, title, subject, url, authLevel, *user):
         return
 
     for branchUser in request.user.branch.user.all():
+        print(int(branchUser.authLevel), authLevel, branchUser, request.user)
         if int(branchUser.authLevel) <= authLevel and branchUser != request.user:
             noti = Notifications()
             noti.user = branchUser

@@ -194,13 +194,12 @@ class SaveDefaultAccounts(APIView):
             print(e)
             bdacct.otherLosses = None
 
-
+        bdacct.cashInBank.clear()
         for item in items['cashInBank']:
-            bdacct.cashInBank.clear()
             bdacct.cashInBank.add(AccountChild.objects.get(pk=item))
 
+        bdacct.advancesToSupplier.clear()
         for item in items['advancesToSupplier']:
-            bdacct.advancesToSupplier.clear()
             bdacct.advancesToSupplier.add(AccountChild.objects.get(pk=item))
 
         

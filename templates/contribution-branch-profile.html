@@ -30,7 +30,8 @@
         <div>
             <form action="/import-sss/" method="POST" class="form-group" enctype="multipart/form-data">{% csrf_token %}
                 <label for="">SSS Contribution Rate</label>
-                <input type="file" name="sss">
+                <input type="file" name="sss"><br>
+                <a href="/static/files/2021 SSS Contribution Template.xlsx">Download Excel Template</a>
                 <input type="text" placeholder="Name of SSS Contribution Rate" name="sssName" class="form-control">
                 <button type="submit" class="btn btn-primary">Import</button>
             </form>
@@ -38,7 +39,8 @@
         <div>
             <form action="/import-phic/" method="POST" class="form-group" enctype="multipart/form-data">{% csrf_token %}
                 <label for="">PHIC Contribution Rate</label>
-                <input type="file" name="phic">
+                <input type="file" name="phic"><br>
+                <a href="/static/files/2021 PhilHealth Contribution Rate.xlsx">Download Excel Template</a>
                 <input type="text" placeholder="Name of the PHIC Rate" name="phicName" class="form-control">
                 <button type="submit" class="btn btn-primary">Import</button>
             </form>

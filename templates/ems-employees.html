@@ -78,8 +78,8 @@
                                     <div class="col-6 my-1">
                                         <label for="" class="gray">Schedule</label>
                                         <br>
-                                        <span class="font-size-14 font-bold">[[formatTime(modal.schedule.timeIn)]] - [[formatTime(modal.schedule.timeOut)]]</span><br>
-                                        <span class="font-size-14 font-bold">[[convertToDays(modal.schedule.workDays)]]</span><br>
+                                        <span class="font-size-14 font-bold" v-if="modal.schedule">[[formatTime(modal.schedule.timeIn)]] - [[formatTime(modal.schedule.timeOut)]]</span><br>
+                                        <span class="font-size-14 font-bold" v-if="modal.schedule">[[convertToDays(modal.schedule.workDays)]]</span><br>
                                         <a @click="fetchChangeSchedule()" class="link" data-toggle="modal" data-target="#changeSchedule" href="#">Change Schedule</a>
                                     </div>
                                 </div>
@@ -764,7 +764,11 @@
 			},
 
             modal: {
-
+                schedule: {
+                    timeIn: '00:00:00',
+                    timeOut: '00:00:00',
+                    workDays: '0'
+                }
             },
 
             addE:{
@@ -861,7 +865,6 @@
                     name: null,
                     amount: null,
                 }]
-                
             }
         },
 
@@ -870,6 +873,7 @@
                 axios.get(`/api/user/${id}/`)
                 .then(res=>{
                     this.modal = res.data
+                    console.log(res.data)
                 })
             },
 

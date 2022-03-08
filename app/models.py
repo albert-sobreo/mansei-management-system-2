@@ -39,7 +39,7 @@ class Schedule(models.Model):
 
 class User(AbstractUser):
     address = models.CharField(max_length=1024, null=True, blank=True)
-    authLevel = models.CharField(max_length=50, null = True, blank = True)
+    authLevel = models.CharField(max_length=50, null = True, blank = True, default=2)
     position = models.CharField(max_length=20, null = True, blank = True) 
     bloodType = models.CharField(max_length=10, null=True, blank=True)
     image = models.ImageField(default='profile-pictures/person.png', upload_to='profile-pictures/', null = True, blank = True)
