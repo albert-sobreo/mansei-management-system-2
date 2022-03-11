@@ -85,9 +85,9 @@
                                 <span class="font-size-14 font-bold">[[orderModal.createdBy.first_name]] [[orderModal.createdBy.last_name]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label for="" class="gray">Date Created</label>
+                                <label for="" class="gray">Date of Transaction</label>
                                 <br>
-                                <span class="font-size-14 font-bold">[[formatDateTime(orderModal.datetimeCreated)]]</span>
+                                <span class="font-size-14 font-bold">[[formatDate(orderModal.dateSold)]]</span>
                             </div>
 
                             <!-- LVL 2 -->
@@ -490,6 +490,32 @@
 
                 return formatted
             },
+
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
+
             formatPrice(val){
                 val = Number(val).toFixed(2)
                 var num = val.replace(/,/gi, "");

@@ -193,6 +193,14 @@ class SaveQuotations(APIView):
         qq.code = quotes['code']
         qq.datetimeCreated = datetime.now()
         qq.dateQuoted = quotes['date']
+
+
+        if quotes['retroactive']:
+            qq.dateQuoted = quotes['retroactive']
+        else:
+            qq.dateQuoted = quotes['date']
+
+
         qq.party = Party.objects.get(pk=quotes['customer'])
         qq.amountDue = Decimal(quotes['amountDue'])
         qq.amountTotal = Decimal(quotes['amountTotal'])
