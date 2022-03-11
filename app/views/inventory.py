@@ -78,7 +78,6 @@ class ImportMerchandiseInventory(View):
             merch = MerchandiseInventory()
 
             if request.user.branch.merchInventory.filter(code=item['Code']):
-                print('it exists')
                 continue
             merch.code = item['Code']
             merch.name = item['Name']
@@ -116,8 +115,7 @@ class ImportMerchandiseInventory(View):
             wi = WarehouseItems()
             wi.merchInventory = merch
             try:
-                wi.warehouse = Warehouse.objects.get(name=item['Warehouse'])
-
+                wi.warehouse = request.user.branch.warehouse.get(name=item['Warehouse'])
             except:
                 w = Warehouse()
                 w.name = item['Warehouse']
@@ -152,6 +150,7 @@ class EditInventory(APIView):
         merch.pricePerCubic = edit['pricePerCubic']
         merch.um = edit['um']
         merch.inventoryDate = edit['inventoryDate']
+        merch.sellingPrice = edit['sellingPrice']
 
         merch.save()
 

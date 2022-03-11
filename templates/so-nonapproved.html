@@ -75,9 +75,9 @@
                                 <span class="font-size-14 font-bold">[[orderModal.createdBy.first_name]] [[orderModal.createdBy.last_name]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label for="" class="gray">Date Created</label>
+                                <label for="" class="gray">Date of Transaction</label>
                                 <br>
-                                <span class="font-size-14 font-bold">[[formatDateTime(orderModal.datetimeCreated)]]</span>
+                                <span class="font-size-14 font-bold">[[formatDate(orderModal.dateSold)]]</span>
                             </div>
 
                             <!-- LVL 2 -->
@@ -148,7 +148,7 @@
                                     <th><span class="font-bold gray">Item Code - Item Classifcation</span></th>
                                     <th><span class="font-bold gray">Qty</span></th>
                                     <th><span class="font-bold gray">Vol</span></th>
-                                    <th><span class="font-bold gray">Price Per Cubic</span></th>
+                                    <th><span class="font-bold gray">Selling Price</span></th>
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
@@ -157,7 +157,7 @@
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.qty]]</td>
                                         <td>[[item.vol]]</td>
-                                        <td>₱[[formatPrice(item.pricePerCubic)]]</td>
+                                        <td>₱[[formatPrice(item.sellingPrice)]]</td>
                                         <td>₱[[formatPrice(item.totalCost)]]</td>
                                     </tr>
                                 </tbody>
@@ -377,7 +377,32 @@
 
                 axios.put(`/so-approval/${id}/`, '', this.config)
                 .then(res=>res.data==0?location.reload():'')
-            }
+            },
+
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
         },
     })
 </script>

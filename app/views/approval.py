@@ -266,9 +266,9 @@ class RRApprovalAPI(APIView):
             j = Journal()
 
             j.code = receive.code
-            j.datetimeCreated = receive.datetimeApproved
+            j.datetimeCreated = datetime.now()
             j.createdBy = receive.createdBy
-            j.journalDate = datetime.now()
+            j.journalDate = receive.dateReceived
             j.save()
             request.user.branch.journal.add(j)
 
@@ -562,9 +562,9 @@ class PVApprovalAPI(APIView):
         if voucher.purchaseOrder.poitemsother.all():
             j = Journal()
             j.code = voucher.code
-            j.datetimeCreated = voucher.datetimeApproved
+            j.datetimeCreated = datetime.now()
             j.createdBy = voucher.createdBy
-            j.journalDate = datetime.now()
+            j.journalDate = voucher.paymentDate
             j.save()
             request.user.branch.journal.add(j)
 
@@ -670,9 +670,9 @@ class PVApprovalAPI(APIView):
             if voucher.purchaseOrder == None:
                 j = Journal()
                 j.code = voucher.code
-                j.datetimeCreated = voucher.datetimeApproved
+                j.datetimeCreated = datetime.now()
                 j.createdBy = voucher.createdBy
-                j.journalDate = datetime.now()
+                j.journalDate = voucher.paymentDate
                 j.save()
                 request.user.branch.journal.add(j)
 
@@ -724,9 +724,9 @@ class PVApprovalAPI(APIView):
             else:
                 j = Journal()
                 j.code = voucher.code
-                j.datetimeCreated = voucher.datetimeApproved
+                j.datetimeCreated = datetime.now()
                 j.createdBy = voucher.createdBy
-                j.journalDate = datetime.now()
+                j.journalDate = voucher.paymentDate
                 j.save()
                 request.user.branch.journal.add(j)
 
@@ -937,9 +937,9 @@ class PVVoid(APIView):
                 if voucher.inwardInventory.paymentvoucher.all().latest('pk') == voucher:
                     j = Journal()
                     j.code = voucher.code
-                    j.datetimeCreated = voucher.datetimeApproved
+                    j.datetimeCreated = datetime.now()
                     j.createdBy = voucher.createdBy
-                    j.journalDate = datetime.now()
+                    j.journalDate = voucher.paymentDate
                     j.save()
                     request.user.branch.journal.add(j)
 
@@ -993,9 +993,9 @@ class PVVoid(APIView):
                 if voucher.purchaseOrder.paymentvoucher.all().latest('pk') == voucher:
                     j = Journal()
                     j.code = voucher.code
-                    j.datetimeCreated = voucher.datetimeApproved
+                    j.datetimeCreated = datetime.now()
                     j.createdBy = voucher.createdBy
-                    j.journalDate = datetime.now()
+                    j.journalDate = voucher.paymentDate
                     j.save()
                     request.user.branch.journal.add(j)
 
@@ -1428,30 +1428,30 @@ class DeliveriesApprovalAPI(APIView):
         d = Deliveries.objects.get(pk=pk)
 
         
-        for item in d.deliveryitemsgroup.all():
-            if item.deliveryType == 'Sales Contract':
-                sc = SalesContract.objects.get(pk=item.referenceNo)
-                for element in sc.scitemsmerch.all():
+        # for item in d.deliveryitemsgroup.all():
+        #     if item.deliveryType == 'Sales Contract':
+        #         sc = SalesContract.objects.get(pk=item.referenceNo)
+        #         for element in sc.scitemsmerch.all():
                     # element.merchInventory.qtyA -= element.qty
                     # element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
 
-                    wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
-                    if sc.salesOrder:
-                        if wi.salesWSO(element.qty):
-                            wi.save2()
-                        else:
-                            sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
-                            return JsonResponse(0, safe=False)
-                    else:
-                        if wi.salesWSO(element.qty):
-                            wi.save2()
-                        else:
-                            sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
-                            return JsonResponse(0, safe=False)
-                    element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
-                    element.merchInventory.totalCost -= element.totalCost                
-                    # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
-                    element.merchInventory.save()
+                    # wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
+                    # if sc.salesOrder:
+                    #     if wi.salesWSO(element.qty):
+                    #         wi.save2()
+                    #     else:
+                    #         sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                    #         return JsonResponse(0, safe=False)
+                    # else:
+                    #     if wi.salesWSO(element.qty):
+                    #         wi.save2()
+                    #     else:
+                    #         sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                    #         return JsonResponse(0, safe=False)
+                    # element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
+                    # element.merchInventory.totalCost -= element.totalCost                
+                    # # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
+                    # element.merchInventory.save()
         
         d.datetimeApproved = datetime.now()
 
@@ -1465,26 +1465,26 @@ class DeliveriesApprovalAPI(APIView):
         d.driver.save()
         d.save()
 
-        j = Journal()
+        # j = Journal()
 
-        j.code = d.code
-        j.datetimeCreated = d.datetimeApproved
-        j.createdBy = d.createdBy
-        j.journalDate = datetime.now()
-        j.save()
-        request.user.branch.journal.add(j)
+        # j.code = d.code
+        # j.datetimeCreated = d.datetimeApproved
+        # j.createdBy = d.createdBy
+        # j.journalDate = datetime.now()
+        # j.save()
+        # request.user.branch.journal.add(j)
 
-        for item in d.deliveryitemsgroup.all():
-            if item.deliveryType == 'Sales Contract':
-                sc = SalesContract.objects.get(pk=item.referenceNo)
-                for element in sc.scitemsmerch.all():
-                    jeAPI(request, j, 'Credit', element.merchInventory.childAccountInventory, element.totalCost)
+        # for item in d.deliveryitemsgroup.all():
+        #     if item.deliveryType == 'Sales Contract':
+        #         sc = SalesContract.objects.get(pk=item.referenceNo)
+        #         for element in sc.scitemsmerch.all():
+        #             jeAPI(request, j, 'Credit', element.merchInventory.childAccountInventory, element.totalCost)
 
-        for item in d.deliveryitemsgroup.all():
-            if item.deliveryType == 'Sales Contract':
-                sc = SalesContract.objects.get(pk=item.referenceNo)
-                for element in sc.scitemsmerch.all():
-                    jeAPI(request, j, 'Debit', element.merchInventory.childAccountCostOfSales, element.totalCost)
+        # for item in d.deliveryitemsgroup.all():
+        #     if item.deliveryType == 'Sales Contract':
+        #         sc = SalesContract.objects.get(pk=item.referenceNo)
+        #         for element in sc.scitemsmerch.all():
+        #             jeAPI(request, j, 'Debit', element.merchInventory.childAccountCostOfSales, element.totalCost)
 
         notify(request, 'Deliveries Approved', d.code, '/deliveriesapproved/', 1)
 

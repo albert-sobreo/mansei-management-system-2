@@ -32,7 +32,7 @@ Vue.component('navbar-pps', {
     },
 
     template: /*javascript*/`
-    <div class="c-nav d-flex mb-3 font-bold" id="main-nav">
+    <div class="c-nav d-flex mb-3 font-bold sticky-top" id="main-nav">
         <!-- LOGO CONTAINER -->
         <div class="c-nav-item justify-content-start">
             <img :src="this.const.ppsLogo" class="logo">

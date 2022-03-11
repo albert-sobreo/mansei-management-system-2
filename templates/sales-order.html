@@ -983,6 +983,7 @@
                     this.order.customer = item.party.id
                     this.order.taxType = item.taxType
                     this.order.taxRate = Number(item.taxRate).toFixed(0)
+                    this.order.discount = Number(item.discountPeso).toFixed(2)
                     this.order.items = [{
                         type: '',
                         code: '',
@@ -990,7 +991,7 @@
                         quantity: 0,
                         cbm: 'm3',
                         vol: null,
-                        pricePerCubic: 0.00,
+                        sellingPrice: 0.00,
                         totalCost: null
                     }]
                     item.qqitemsmerch.forEach((el,index)=>{
@@ -1000,7 +1001,7 @@
                             this.order.items[index].remaining = el.merchInventory.qtyA
                             this.order.items[index].quantity = el.qty
                             this.order.items[index].vol = el.merchInventory.vol
-                            this.order.items[index].pricePerCubic = el.pricePerCubic
+                            this.order.items[index].sellingPrice = el.sellingPrice
                             this.order.items[index].totalCost = el.totalCost
                         } else {
                             this.order.items.push({
@@ -1009,7 +1010,7 @@
                                 remaining: el.merchInventory.qtyA,
                                 quantity: el.qty,
                                 vol: el.merchInventory.vol,
-                                pricePerCubic: el.pricePerCubic,
+                                sellingPrice: el.sellingPrice,
                                 totalCost: el.totalCost,
                                 cbm: 'm3',
                             })
@@ -1021,6 +1022,17 @@
                             this.order.atc[0].amount = item.amountDue
                             this.order.atc[0].taxRate = (el.code.rate*100)
                             this.order.atc[0].amountWithheld = el.amountWithheld
+                        }
+                    })
+                    item.qqotherfees.forEach((el,index)=>{
+                        if(index==0){
+                            this.order.otherFees[0].fee = el.fee
+                            this.order.otherFees[0].description = el.description
+                        } else {
+                            this.order.otherFees.push({
+                                fee: el.fee,
+                                description: el.description
+                            })
                         }
                     })
                     this.order.taxPeso = item.taxPeso

@@ -25,9 +25,9 @@ class JournalView(View):
             endDate = request.GET['endDate']
         
         except:
-            startDate = now.today().replace(day=1)
+            startDate = now(now.today().year, 1,1)
             try:
-                nextMonth = now.today().replace(month=startDate.month+1, day=1)
+                nextMonth = now.today().replace(month=now.today().replace(day=1).month+1, day=1)
             except Exception as e:
                 print(e)
                 nextMonth = now.today().replace(month=1, day=1)

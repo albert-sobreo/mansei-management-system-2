@@ -68,8 +68,8 @@
                             </div>
                             <!-- LVL 2 -->
                             <div class="col-6 my-3">
-                                <label for="" class="gray">Datetime Created</label><br>
-                                <span class="font-size-14 font-bold">[[formatDateTime(this.prModal.datetimeCreated)]]</span>
+                                <label for="" class="gray">Date Requested</label><br>
+                                <span class="font-size-14 font-bold">[[formatDate(this.prModal.dateRequested)]]</span>
                             </div>
                             <div class="col-6 my-3">
                                 <label for="" class="gray">Date Needed</label><br>
@@ -392,6 +392,31 @@
                 var num2 = num1[0].split(/(?=(?:\d{3})+$)/).join(",");
                 val = (num1[1] === undefined ? num2 : num2 + "." + num1[1])
                 return val
+            },
+
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
             },
         },
     })

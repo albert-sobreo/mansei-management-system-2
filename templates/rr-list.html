@@ -411,7 +411,6 @@
         },
         methods: {
             viewPO(code){
-                console.log(code)
                 axios.get(`/api/receiving-report/${code}/`)
                 .then(res=>this.poModal=res.data)
             },

@@ -262,7 +262,7 @@ class ExportsApprovalAPI(APIView):
         j.code = ex.code
         j.datetimeCreated = ex.datetimeApproved
         j.createdBy = ex.createdBy
-        j.journalDate = datetime.datetime.now()
+        j.journalDate = ex.dateSold
         j.save()
         request.user.branch.journal.add(j)
 

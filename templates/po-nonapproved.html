@@ -75,8 +75,8 @@
                                 <span class="font-size-14 font-bold" v-if="this.poModal.createdBy!==null">[[this.poModal.createdBy.first_name]] [[this.poModal.createdBy.last_name]]</span>
                             </div>
                             <div class="col-3 mt-3">
-                                <label class="gray">Date Created</label><br>
-                                <span class="font-size-14 font-bold">[[formatDateTime(this.poModal.datetimeCreated)]]</span>
+                                <label class="gray">Date of Transaction</label><br>
+                                <span class="font-size-14 font-bold">[[formatDateTime(this.poModal.datePurchased)]]</span>
                             </div>
                             
                             <!-- LVL2 -->
@@ -388,7 +388,32 @@
 
                 axios.put(`/po-approval/${id}/`, this.updatePO, this.config)
                 .then(res=>res.data==0?location.reload():'')
-            }
+            },
+
+            formatDate(value){
+                const months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ]
+
+                value = new Date(value)
+                year = value.getFullYear()
+                month = months[value.getMonth()]
+                date = value.getDate()
+                formatted = `${month}. ${date}, ${year}`
+
+                return formatted
+            },
         },
     })
 </script>
