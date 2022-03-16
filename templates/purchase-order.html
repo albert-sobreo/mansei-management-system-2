@@ -486,7 +486,7 @@
 				</tr>
 			</tbody>
 		</table>
-        <form hidden action="/import-atc/" enctype="multipart/form-data" method="POST">{%csrf_token%}
+        <form action="/import-atc/" enctype="multipart/form-data" method="POST">{%csrf_token%}
             <label>import atc list</label><br>
             <input type="file" name="excel"><br>
             <button>Import</button>
