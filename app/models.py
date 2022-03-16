@@ -2051,3 +2051,4 @@ class Announcement(models.Model):
     contents = models.TextField(null = True, blank=True)
     branch = models.ForeignKey(Branch, related_name="branchannouncement", on_delete=models.CASCADE)
 
+
