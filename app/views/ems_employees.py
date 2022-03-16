@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework.views import APIView
 from django.http.response import JsonResponse
 from django.shortcuts import render
@@ -8,6 +9,7 @@ from datetime import date
 from ..models import*
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
+import json
 
 class EMS_EmployeesView(View):
     def get(self, request):
@@ -21,10 +23,15 @@ class EMS_EmployeesView(View):
 
 class EMS_AddEmployee(APIView):
     def post(self, request):
-        newHire = User.objects.create_user(idUser = request.data['idUser'], username=request.data['idUser'], password = "ManseiTechno", first_name = request.data['first_name'], 
-        last_name = request.data['last_name'], position = request.data['position'], authLevel = request.data['authLevel'], 
-        mobile = request.data['mobile'], email = request.data['email'], bloodType = request.data['bloodType'], rate = request.data['dailyRate'],
-        tin = request.data['tin'], sss = request.data['sss'], phic = request.data['phic'], hdmf = request.data['hdmf'])
+        try:
+            newHire = User.objects.create_user(idUser = request.data['idUser'], username=request.data['idUser'], password = "ManseiTechno", first_name = request.data['first_name'], 
+            last_name = request.data['last_name'], position = request.data['position'], authLevel = request.data['authLevel'], 
+            mobile = request.data['mobile'], email = request.data['email'], bloodType = request.data['bloodType'], rate = request.data['dailyRate'],
+            tin = request.data['tin'], sss = request.data['sss'], phic = request.data['phic'], hdmf = request.data['hdmf'])
+        except Exception as e:
+            print(str(e))
+            return JsonResponse(str(e), safe=False)
+
 
         newHire.branch = request.user.branch
         newHire.save()

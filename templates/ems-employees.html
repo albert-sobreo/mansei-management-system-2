@@ -912,7 +912,18 @@
                 .then(result=>{
                     if(result.isConfirmed){
                         axios.post('/add-employee/', this.addE, this.config)
-                        .then(res=>res.data==0?location.reload():'')
+                        .then(res=>res.data==0?location.reload():Swal.fire({
+                            title: "Something went wrong.",
+                            html: res.data,
+                            icon: 'error'
+                        }))
+                        .catch(err=>{
+                            Swal.fire({
+                                title: "Something went wrong.",
+                                html: err.message,
+                                icon: 'error'
+                            })
+                        })
                     }
                 })
             },
@@ -1100,6 +1111,13 @@
                     if(result.isConfirmed){
                         axios.post('/ems-give-raise/', this.giveRaise, this.config)
                         .then(res=>res.data==0?location.reload():'')
+                        .catch(err=>{
+                            Swal.fire({
+                                title: "Something went wrong.",
+                                html: err.message,
+                                icon: 'error'
+                            })
+                        })
                     }
                 })
             },
@@ -1135,6 +1153,13 @@
                     if(result.isConfirmed){
                         axios.post('/ems-give-promotion/', this.givePromotion, this.config)
                         .then(res=>res.data==0?location.reload():'')
+                        .catch(err=>{
+                            Swal.fire({
+                                title: "Something went wrong.",
+                                html: err.message,
+                                icon: 'error'
+                            })
+                        })
                     }
                 })
             }
