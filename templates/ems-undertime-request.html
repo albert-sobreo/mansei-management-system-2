@@ -126,6 +126,12 @@
 
         methods: {
             submit(){
+                message = "Requesting Undertime"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/ems-undertime-request/', this.modal, this.config)
                 .then(res=>res.data==0?location.reload():'')
                 .catch(err=>{

@@ -28,6 +28,7 @@ class EMS_SSSLoansView(View):
             'employees': request.user.branch.user.filter(payrollable=True),
             'loans': request.user.branch.loans.filter(user=user, year=y, loanFrom="SSS")
         }
+        print(context)
         return render(request, 'ems-sss-loans.html', context)
 
 class EMS_HDMFLoansView(View):

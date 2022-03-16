@@ -416,6 +416,13 @@
                 })
                 axios.post('/edit-job-order/', this.jobOrder, this.config)
                 .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        icon: "error",
+                        html: err.message
+                    })
+                })
             },
             onMaterialsCost(index){
                 row = this.jobOrder.rawmaterials[index]
@@ -522,6 +529,13 @@
                             })
                             axios.post('/finish-job-order/', this.jobOrder, this.config)
                             .then(res=>res.data==0?location.reload():'')
+                            .catch(err=>{
+                                Swal.fire({
+                                    title: "Something went wrong",
+                                    icon: 'error',
+                                    html: err.message
+                                })
+                            })
                         }
                     } else {
                         Swal.fire({

@@ -281,6 +281,13 @@
                 })
                 axios.post('/delete-advancement/', this.advModal, this.config)
                 .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        icon: 'error',
+                        title: "Something went wrong",
+                        html: err.message
+                    })
+                })
             }
         },
 

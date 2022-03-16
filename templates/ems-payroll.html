@@ -583,9 +583,22 @@
             },
 
             submitGiveBonus(){
+                message = "Adding Bonus"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/add-bonus/', this.giveBonusModal, this.config)
                 .then(res=>{
                     res.data==0?location.reload():''
+                })
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        icon: "error",
+                        html: err.message
+                    })
                 })
             },
 
@@ -748,6 +761,13 @@
                             .then(res=>{
                                 res.data==0?location.reload():''
                             })
+                            .catch(err=>{
+                                Swal.fire({
+                                    title: "Something went wrong",
+                                    icon: 'error',
+                                    html: err.message
+                                })
+                            })
                         }
                     })
                 } else {
@@ -773,6 +793,12 @@
                 })
                 .then(result=>{
                     if(result.isConfirmed){
+                        message = "Generating 13th Month Pay"
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
                         axios.post('/generate-13th/', {year: this.year}, this.config)
                         .then(res=>res.data==0?location.reload():'')
                         .catch(err=>{

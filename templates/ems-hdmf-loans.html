@@ -365,6 +365,13 @@
                 })
                 axios.post('/ems-loan-create/', this.createModal, this.config)
                 .then(res=>location.reload())
+                .catch(err=>{
+                    Swal.fire({
+                        title: 'Something went wrong',
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
             }
         },
 

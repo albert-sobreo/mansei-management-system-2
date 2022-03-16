@@ -474,6 +474,12 @@
                 var formdata = new FormData()
                 formdata.append('profilePicture', this.editProfilePicture.profilePicture)
 
+                message = "Saving Profile Picture"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/save-my-profile-picture/', formdata, this.config)
                 .then(res=>res.data==0?location.reload():"")
                 .catch(err=>{
@@ -507,6 +513,12 @@
             },
 
             submitEditPersonalModal(){
+                message = "Saving Personal Info"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/save-my-profile-personal-info/', this.editPersonalInfo, this.config2)
                 .then(res=>res.data==0?location.reload():"")
                 .catch(err=>{
@@ -531,6 +543,12 @@
             },
 
             submitChangePassword(){
+                message = "Saving Password"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/save-my-profile-password/', this.changePassword, this.config2)
                 .then(res=>res.data==0?location.reload():"")
                 .catch(err=>{
@@ -543,6 +561,12 @@
             },
 
             submitChangeEmail(){
+                message = "Saving Email"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/save-my-profile-email/', this.changeEmail, this.config2)
                 .then(res=>res.data==0?location.reload():"")
                 .catch(err=>{

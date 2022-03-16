@@ -30,16 +30,22 @@
         <table id="table" class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-3">
             <thead class="gray">
                 <th>Employee</th>
-                <th>Email</th>
-                <th>Mobile</th>
+                <th>SSS</th>
+                <th>PHIC</th>
+                <th>HDMF</th>
+                <th>TIN</th>
+                <th>Daily Rate</th>
                 <th>Position</th>
             </thead>
             <tbody>
                 {% for employee in employees %}
                 <tr>
                     <td @click="fetchUser('{{employee.id}}')" class="link" data-toggle="modal" data-target="#modal">{{employee.first_name}} {{employee.last_name}}</td>
-                    <td>{{employee.email}}</td>
-                    <td>{{employee.mobile}}</td>
+                    <td>{{employee.sss}}</td>
+                    <td>{{employee.phic}}</td>
+                    <td>{{employee.hdmf}}</td>
+                    <td>{{employee.tin}}</td>
+                    <td>₱{{employee.rate}}</td>
                     <td>{{employee.position}}</td>
                 </tr>
                 {% endfor %}
@@ -890,6 +896,12 @@
             },
 
             submitCreateSchedule(){
+                message = "Creating Schedule"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/create-schedule/', this.createSchedule, this.config)
                 .then(res=>res.data==0?location.reload():'')
                 .catch(err=>{
@@ -911,6 +923,12 @@
                 })
                 .then(result=>{
                     if(result.isConfirmed){
+                        message = "Adding Employee"
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
                         axios.post('/add-employee/', this.addE, this.config)
                         .then(res=>res.data==0?location.reload():Swal.fire({
                             title: "Something went wrong.",
@@ -995,6 +1013,12 @@
             },
 
             submitEditLeave(){
+                message = "Saving Leave"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/ems-save-edit-leave/', this.editLeave, this.config)
                 .then(res=>res.data==0?location.reload():"")
                 .catch(err=>{
@@ -1007,6 +1031,12 @@
             },
 
             submitEditBenefits(){
+                message = "Saving Benefits"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/ems-save-edit-benefits/', this.editBenefits, this.config)
                 .then(res=>res.data==0?location.reload():"")
                 .catch(err=>{
@@ -1109,6 +1139,12 @@
                 })
                 .then(result=>{
                     if(result.isConfirmed){
+                        message = "Giving Raise"
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
                         axios.post('/ems-give-raise/', this.giveRaise, this.config)
                         .then(res=>res.data==0?location.reload():'')
                         .catch(err=>{
@@ -1132,6 +1168,12 @@
             },
 
             submitGiveBenefits(){
+                message = "Giving Benefits"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/give-deminimis/', this.giveBenefits, this.config)
                 .then(res=>res.data==0?location.reload():'')
                 .catch(err=>{
@@ -1151,6 +1193,12 @@
                 })
                 .then(result=>{
                     if(result.isConfirmed){
+                        message = "Giving Promotion"
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
                         axios.post('/ems-give-promotion/', this.givePromotion, this.config)
                         .then(res=>res.data==0?location.reload():'')
                         .catch(err=>{
