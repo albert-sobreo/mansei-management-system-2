@@ -138,12 +138,38 @@
                 return val
             },
             submitReplenish(){
+                message = "Replenishing Petty Cash"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/replenish-petty-cash/', this.replenish, this.config)
                 .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
             },
             submitEditDefault(){
+                message = "Saving Default Petty Cash"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/save-edit-default-petty-cash-fund/', this.editDefaultFund, this.config)
                 .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        icon: "error",
+                        html: err.message
+                    })
+                })
             },
             formatPrice(val){
                 val = Number(val).toFixed(2)

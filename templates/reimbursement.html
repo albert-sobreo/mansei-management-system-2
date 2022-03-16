@@ -243,8 +243,21 @@
                 })
                 .then(result=>{
                     if (result.isConfirmed){
+                        message = "Reimbursing"
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
                         axios.post('/reimburse-process/', this.modal, this.config)
                         .then(res=>res.data==0?location.reload():'')
+                        .catch(err=>{
+                            Swal.fire({
+                                title: "Something went wrong",
+                                icon: "error",
+                                html: err.message
+                            })
+                        })
                     }
                 })
             },

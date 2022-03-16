@@ -853,8 +853,21 @@
                 this.roundToggle = !this.roundToggle
             },
             submit(){
+                message = "Saving Payment Voucher"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post('/save-payment-voucher/', this.create, this.config)
                 .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
             },
             getPO2(id){
                 axios.get(`/api/payment-voucher/${id}/`)
@@ -901,8 +914,21 @@
                 this.$delete(this.addJournalModal.credit, index)
             },
             submitCustomPV(){
+                message = "Saving Custom PV"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.post(`/save-custom-pv/`, this.addJournalModal, this.config)
                 .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    Swal.fire({
+                        title: "Something went wrong",
+                        icon: 'error',
+                        html: err.message
+                    })
+                })
             }
         },
     })
