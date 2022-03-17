@@ -37,7 +37,7 @@
             <tbody>
                 {% for item in quotes %}
                 <tr>
-                    <td @click="viewPO({{item.pk}})" class="link" data-toggle="modal" data-target="#orderModal">{{item.code}}</td>
+                    <td @click="viewPO({{item.pk}})" id="{{item.pk}}" class="link" data-toggle="modal" data-target="#orderModal">{{item.code}}</td>
                     <td>{{item.party.name}}</td>
                     <td>₱[[formatPrice('{{item.amountTotal}}')]]</td>
                     <td>{{item.datetimeCreated}}</td>
@@ -154,8 +154,8 @@
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.qty]]</td>
                                         <td>[[item.merchInventory.vol]]</td>
-                                        <td>₱[[formatPrice(item.sellingPrice)]]</td>
-                                        <td>₱[[formatPrice(item.amountTotal)]]</td>
+                                        <td>₱[[formatPrice(item.sellingPrice)]]/m³</td>
+                                        <td>₱[[formatPrice(item.totalCost)]]</td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -386,93 +386,95 @@
             <div class="modal-dialog">
                 <div class="modal-content b-radius-15 px-3 pt-2 position-relative">
                     <div class="modal-body">
-                        <div class="mb-4">
-                            <span class="modal-title">Initialize Item</span>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="row">
-                            <div class="col px-1">
-                                <div class="form-group">
-                                    <label>Item Code</label>
-                                    <input v-model="invModal.code" type="text" class="form-control" placeholder="Enter Code">
+                        <form @submit.prevent="submit">
+                            <div class="mb-4">
+                                <span class="modal-title">Initialize Item</span>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <div class="col px-1">
+                                    <div class="form-group">
+                                        <label>Item Code</label>
+                                        <input id="id_code" v-model="invModal.code" type="text" class="form-control" placeholder="Enter Code" required>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col px-1">
-                                <div class="form-group">
-                                    <label>Item Name</label>
-                                    <input v-model="invModal.name" type="text" class="form-control" placeholder="Enter Name">
+                            <div class="row">
+                                <div class="col px-1">
+                                    <div class="form-group">
+                                        <label>Item Name</label>
+                                        <input id="id_name" v-model="invModal.name" type="text" class="form-control" placeholder="Enter Name" required>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6 px-1">
-                                <div class="form-group">
-                                    <label>Item Classification</label>
-                                    <input v-model="invModal.classification" type="text" class="form-control" placeholder="Enter Classification">
+                            <div class="row">
+                                <div class="col-6 px-1">
+                                    <div class="form-group">
+                                        <label>Item Classification</label>
+                                        <input id="id_classification" v-model="invModal.classification" type="text" class="form-control" placeholder="Enter Classification" required>
+                                    </div>
+                                </div>
+                                <div class="col-6 px-1">
+                                    <div class="form-group">
+                                        <label for="Item type">Item Type</label>
+                                        <input id="id_type" v-model="invModal.type" type="text" class="form-control" placeholder="Enter Type" required>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-6 px-1">
-                                <div class="form-group">
-                                    <label for="Item type">Item Type</label>
-                                    <input v-model="invModal.type" type="text" class="form-control" placeholder="Enter Type">
+                            <div class="row">
+                                <div class="col-4 px-1">
+                                    <div class="form-group">
+                                        <label>Length</label>
+                                        <input id="id_length" v-model="invModal.length" type="text" onkeypress="validate()" class="form-control" placeholder="Enter Length" required>
+                                    </div>
+                                </div>
+                                <div class="col-4 px-1">
+                                    <div class="form-group">
+                                        <label>Width</label>
+                                        <input id="id_width" v-model="invModal.width" type="text" onkeypress="validate()" class="form-control" placeholder="Enter Width" required>
+                                    </div>
+                                </div>
+                                <div class="col-4 px-1">
+                                    <div class="form-group">
+                                        <label>Thickness</label>
+                                        <input id="id_thickness" v-model="invModal.thickness" type="text" onkeypress="validate()" class="form-control" placeholder="Enter Thickness" required>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4 px-1">
-                                <div class="form-group">
-                                    <label>Length</label>
-                                    <input v-model="invModal.length" type="text" onkeypress="validate()" class="form-control" placeholder="Enter Length">
+                            <div class="row">
+                                <div class="col px-1">
+                                    <div class="form-group">
+                                        <label>Price per Cubic</label>
+                                        <input id="id_pricePerCubic" v-model="invModal.pricePerCubic" type="number" step="0.01" class="form-control" placeholder="EnterPrice per Cubic">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-4 px-1">
-                                <div class="form-group">
-                                    <label>Width</label>
-                                    <input v-model="invModal.width" type="text" onkeypress="validate()" class="form-control" placeholder="Enter Width">
+                            <div class="row">
+                                <div class="col px-1">
+                                    <div class="form-group">
+                                        <label>Choose Warehouse</label>
+                                        <select id="id_warehouse" v-model="invModal.warehouse" class="form-control" required>
+                                            <option v-for="item in warehouse" :value="item.id">[[item.name]]</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-4 px-1">
-                                <div class="form-group">
-                                    <label>Thickness</label>
-                                    <input v-model="invModal.thickness" type="text" onkeypress="validate()" class="form-control" placeholder="Enter Thickness">
+                            <div class="row">
+                                <div class="col px-1">
+                                    <div class="form-group">
+                                        <label for="">Date of Inventory</label>
+                                        <input id="id_inventoryDate" v-model="invModal.inventoryDate" type="date" class="form-control">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col px-1">
-                                <div class="form-group">
-                                    <label>Price per Cubic</label>
-                                    <input v-model="invModal.pricePerCubic" type="number" step="0.01" class="form-control" placeholder="EnterPrice per Cubic">
+                            <div class="row">
+                                <div class="col px-1">
+                                    <button type="submit" id="id_submit_add" class="btn btn-primary col">Save Item</button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col px-1">
-                                <div class="form-group">
-                                    <label>Choose Warehouse</label>
-                                    <select v-model="invModal.warehouse" class="form-control">
-                                        <option v-for="item in warehouse" :value="item.id">[[item.name]]</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col px-1">
-                                <div class="form-group">
-                                    <label for="">Date of Inventory</label>
-                                    <input v-model="invModal.inventoryDate" type="date" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col px-1">
-                                <button @click="submit()" class="btn btn-primary col">Save Item</button>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -706,6 +708,9 @@
                     text: '<i class="fas fa-plus"></i>',
                     className: 'btn btn-warning btn-table',
                     titleAttr: 'Add Inventory',
+                    attr: {
+                        id: 'addInventoryBtn',
+                    },
                     action: function(){
                         $("#addInventory").modal('show')
                     }

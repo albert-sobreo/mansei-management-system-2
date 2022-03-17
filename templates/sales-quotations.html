@@ -162,12 +162,12 @@
 
 
         <!-- SALES -->
-        <div>
+        <form @submit.prevent="submit">
             <!-- REFERENCE NO AND DATES -->
             <div class="row">
                 <div class="col col-3 pr-2">
                     <label>Reference No.</label>
-                    <input v-model="order.code" type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
+                    <input readonly v-model="order.code" type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
                 </div>
                 <div class="col col-2 px-2">
                     <label>Date</label>
@@ -182,7 +182,7 @@
             <div class="row mt-2 mb-4">
                 <div class="col col-3 pr-2">
                     <label>Customer</label><button data-toggle="modal" data-target="#addCustomerModal" title="Add Customer" class="btn btn-warning btn-sm b-radius-5 ml-1 p-0 font-size-14" style="height: 18px; width: 18px">+</button>
-                    <select @change="checkCRTE(order.customer)" v-model="order.customer" class="form-control">
+                    <select id="id_customer" required @change="checkCRTE(order.customer)" v-model="order.customer" class="form-control">
                         <option value="" selected disabled>Choose Customer</option>
                         <option v-for="customer in customers" :value="customer.id">[[customer.name]]</option>
                     </select>
@@ -237,31 +237,31 @@
                 <!-- V-FOR ITEMS -->
                 <div class="row" v-for="(item, index) in order.items">
                     <div class="col-3 px-1">
-                        <select @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control">
+                        <select :id="'id_merchInventory_' + index" required @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control">
                             <option value="" selected disabled>Choose Merchandise Inventory</option>
                             <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.name]] [[item.classification]] [[item.type]] --- [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
                         </select>
                     </div>
                     <div class="col-1 px-1">
-                        <input v-model="item.remaining" type="number" class="form-control" readonly>
+                        <input :id="'id_remaining_' + index" v-model="item.remaining" type="number" class="form-control" readonly>
                     </div>
                     <div class="col-1 px-1">
-                        <input v-model="item.quantity" @change="onForVol(index)" type="number" class="form-control" min="0">
+                        <input :id="'id_quantity_' + index" required v-model="item.quantity" @change="onForVol(index)" type="number" class="form-control" min="0">
                     </div>
                     <div class="col-1 px-1">
-                        <select v-model="item.cbm" class="form-control">
+                        <select :id="'id_cbm' + index" v-model="item.cbm" class="form-control">
                             <option value="m3">M3</option>
                         </select>
                     </div>
                     <div class="col px-1">
-                        <input v-model="item.vol" @change="onForTotalCost(index)" class="form-control" type="number" step="0.00001" readonly>
+                        <input :id="'id_vol_' + index" v-model="item.vol" @change="onForTotalCost(index)" class="form-control" type="number" step="0.00001" readonly>
                     </div>
                     <div class="col px-1">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input type="text" v-model="item.sellingPrice" @change="onForTotalCost(index)" class="form-control box-shadow-off">
+                            <input :id="'id_sellingPrice_' + index" required type="text" v-model="item.sellingPrice" @change="onForTotalCost(index)" class="form-control box-shadow-off">
                         </div>
                     </div>
                     <div class="col pl-1">
@@ -269,7 +269,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">₱</span>
                             </div>
-                            <input type="text" :value="formatPrice(item.totalCost)" class="form-control box-shadow-off" readonly>
+                            <input :id="'id_totalCost_' + index" type="text" :value="formatPrice(item.totalCost)" class="form-control box-shadow-off" readonly>
                         </div>
                     </div>
                     <i @click="remove(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
@@ -277,7 +277,7 @@
                 <!-- ADD NEW LINE -->
                 <div class="row">
                     <div class="col px-1">
-                        <button @click="addLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
+                        <button id="addNewLine" @click="addLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
                     </div>
                 </div>
 
@@ -302,7 +302,7 @@
                             </div>
                             <div class="row" v-for="(line, index) in order.atc">
                                 <div class="col-3 px-1">
-                                    <select v-model="line.code" class="form-control" @change="setATCRate(line.code, index)">
+                                    <select id="id_atc" required v-model="line.code" class="form-control" @change="setATCRate(line.code, index)">
                                         <optgroup v-for="atcGroup in formattedATCList" :label="atcGroup.name">
                                             <option v-for="atc in atcGroup.list" :value="atc.id">[[atc.code]]</option>
                                         </optgroup>
@@ -337,7 +337,7 @@
                             <div class="row mt-2">
                                 <div class="col-12 px-1">
                                     <label>Remarks</label>
-                                    <textarea v-model="order.remarks" cols="30" rows="2" class="form-control" placeholder="Enter Remarks (Optional)"></textarea>
+                                    <textarea id="id_remarks" v-model="order.remarks" cols="30" rows="2" class="form-control" placeholder="Enter Remarks (Optional)"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -413,14 +413,14 @@
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text" v-if="order.discountType=='peso'">₱</span>
-                                    <span class="input-group-text" v-else>%</span>
+                                            <span class="input-group-text" v-else>%</span>
                                         </div>
-                                        <input v-model="order.discount" type="number" min='0' class="form-control box-shadow-off">
+                                        <input id="id_discount" v-model="order.discount" type="number" min='0' class="form-control box-shadow-off">
                                     </div>
                                     <div class="ml-2 form-check form-check-inline">
-                                        <input v-model="order.discountType" value="percent" name="discount" type="radio" class="form-check-input">
+                                        <input id="id_discountTypePercent" v-model="order.discountType" value="percent" name="discount" type="radio" class="form-check-input">
                                         <label class="form-check-label mr-2">%</label>
-                                        <input v-model="order.discountType" value="peso" name="discount" type="radio" class="form-check-input">
+                                        <input id="id_discountTypePeso" v-model="order.discountType" value="peso" name="discount" type="radio" class="form-check-input">
                                         <label class="form-check-label">₱</label>
                                     </div>
                                 </div>
@@ -440,10 +440,12 @@
                     </div>
                 </div>
             </div>
-            <div @click="checkForm()" class="container-extend border container-extend btn-bottom">
-                Save
+            <div class="container-extend border btn-bottom border">
+                <button id="id_submitBtn" type="submit" class="btn-no-decor" style="width: 100%;">
+                    Save
+                </button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 

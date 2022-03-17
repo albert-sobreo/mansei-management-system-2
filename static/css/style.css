@@ -1092,8 +1092,8 @@ select.form-control{
 }
 
 .container-extend{
-    margin-left: -35px;
-    margin-right: -35px;
+    margin-left: -35px !important;
+    margin-right: -35px !important;
 }
 
 .container-extend-2{
@@ -1430,4 +1430,12 @@ select.form-control{
 .notification-delete:hover{
     background-color: rgb(255, 169, 169);
     color: rgb(230, 79, 79);
+}
+
+.btn-no-decor{
+    background: rgba(0,0,0,0);
+    outline: none;
+    border: 0;
+    color: #e2f3ff;
+    font-weight: 600;
 }
