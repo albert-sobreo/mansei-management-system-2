@@ -399,17 +399,16 @@
                                         <select @change="toggleMemorandum()" v-model="create.paymentMethod" name="" id="" class="form-control">
                                             <option value="" selected disabled>Choose Payment Method</option>
                                             <optgroup label="Cash">
-                                                <option value="{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}}">{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}}</option>
                                                 {% for item in request.user.branch.branchProfile.branchDefaultChildAccount.cashInBank.all%}
                                                 <option value="{{item.name}}">{{item.name}}</option>
                                                 {% endfor %}
                                             </optgroup>
-                                            <optgroup label="Cheque">
+                                            <!-- <optgroup label="Cheque">
                                                 <option value="Cheque">Cheque</option>
                                             </optgroup>
                                             <optgroup label="Non-Cash">
                                                 <option value="Memorandum">Memorandum</option>
-                                            </optgroup>
+                                            </optgroup> -->
                                         </select>
                                     </div>
                                 </div>

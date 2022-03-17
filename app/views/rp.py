@@ -58,6 +58,7 @@ class SaveReceivePayment(APIView):
         if receivePayment['rpType'] == 'Default':
 
             rp = ReceivePayment()
+            
             rp.code = receivePayment['code']
             rp.datetimeCreated = datetime.now()
             rp.remarks = receivePayment['description']
@@ -68,6 +69,28 @@ class SaveReceivePayment(APIView):
             if request.user.is_authenticated:
                 rp.createdBy = request.user
             rp.salesContract = SalesContract.objects.get(pk=receivePayment['sc']['code'])
+
+
+            for item in rp.salesContract.scitemsmerch.all():
+                wi = WarehouseItems.objects.get(merchInventory=item.merchInventory)
+                if rp.salesContract.salesOrder:
+                    if wi.salesWSO(item.qty):
+                        wi.save2()
+                    else:
+                        sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')                            
+                        return JsonResponse(0, safe=False)
+                else:
+                    if wi.salesWSO(item.qty):
+                        wi.save2()
+                    else:
+                        sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                        return JsonResponse(0, safe=False)
+                item.merchInventory = MerchandiseInventory.objects.get(pk=item.merchInventory.pk)
+                item.merchInventory.totalCost -= item.totalCost                
+                # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
+                item.merchInventory.save()
+
+
             rp.paymentMethod = receivePayment['paymentMethod']
             rp.paymentPeriod = receivePayment['paymentPeriod']
 
@@ -96,24 +119,7 @@ class SaveReceivePayment(APIView):
                 sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
                 return JsonResponse(0, safe=False)
 
-            for item in rp.salesContract.scitemsmerch.all():
-                wi = WarehouseItems.objects.get(merchInventory=item.merchInventory)
-                if rp.salesContract.salesOrder:
-                    if wi.salesWSO(item.qty):
-                        wi.save2()
-                    else:
-                        sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')                            
-                        return JsonResponse(0, safe=False)
-                else:
-                    if wi.salesWSO(item.qty):
-                        wi.save2()
-                    else:
-                        sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
-                        return JsonResponse(0, safe=False)
-                item.merchInventory = MerchandiseInventory.objects.get(pk=item.merchInventory.pk)
-                item.merchInventory.totalCost -= item.totalCost                
-                # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
-                item.merchInventory.save()
+            
 
             j = Journal()
             j.code = rp.code

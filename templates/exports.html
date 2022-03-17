@@ -158,16 +158,16 @@
         </div>
 
         <!-- EXPORTS -->
-        <div>
+        <form @submit.prevent="submit">
             <!-- REFERENCE NO AND DATES -->
             <div class="row">
                 <div class="col col-3 pr-2">
                     <label>Reference No.</label>
-                    <input v-model="order.code" type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
+                    <input required v-model="order.code" type="text" class="form-control" name="code" placeholder="Enter Reference No."a>
                 </div>
                 <div class="col col-2 px-2">
                     <label>Date</label>
-                    <input v-model="order.date" type="date" class="form-control" name="date">
+                    <input required v-model="order.date" type="date" class="form-control" name="date">
                 </div>
                 <div class="col col-2 px-2">
                     <label><span>Retroactive</span>&nbsp;<span class="font-size-10 gray">(optional)</span></label>
@@ -178,7 +178,7 @@
             <div class="row mt-2 mb-4">
                 <div class="col col-5 pr-2">
                     <label>Customer</label><button data-toggle="modal" data-target="#addCustomerModal" title="Add Customer" class="btn btn-warning btn-sm b-radius-5 ml-1 p-0 font-size-14" style="height: 18px; width: 18px">+</button>
-                    <select @change="checkCRTE(order.customer)" v-model="order.customer" class="form-control">
+                    <select required @change="checkCRTE(order.customer)" v-model="order.customer" class="form-control">
                         <option value="" selected disabled>Choose Customer</option>
                         <option v-for="customer in customers" :value="customer.id">[[customer.name]]</option>
                     </select>
@@ -189,7 +189,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">₱</span>
                         </div>
-                        <input type="text" v-model="order.exchangeRate" onkeypress="validate()" placeholder="USD to PHP - ex. 51.05" class="form-control box-shadow-off">
+                        <input required type="text" v-model="order.exchangeRate" onkeypress="validate()" placeholder="USD to PHP - ex. 51.05" class="form-control box-shadow-off">
                     </div>
                 </div>
             </div>
@@ -216,7 +216,7 @@
                         <label class="m-0">Vol.</label>
                     </div>
                     <div class="col px-1">
-                        <label for="order-quantity" class="m-0">Price Per Cubic</label>
+                        <label for="order-quantity" class="m-0">Selling Price</label>
                     </div>
                     <div class="col-2 px-1">
                         <label for="Total Cost" class="m-0">Total Cost</label>
@@ -226,7 +226,7 @@
                 <!-- V-FOR ITEMS -->
                 <div class="row" v-for="(item, index) in order.items">
                     <div class="col px-1">
-                        <select @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control">
+                        <select required @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control">
                             <option value="" selected disabled>Choose Merchandise Inventory</option>
                             <option v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]] --- [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
                         </select>
@@ -235,10 +235,10 @@
                         <input v-model="item.remaining" type="number" class="form-control" readonly>
                     </div>
                     <div class="col-1 px-1">
-                        <input v-model="item.quantity" @change="onForVol(index)" type="number" class="form-control" min="0">
+                        <input required v-model="item.quantity" @change="onForVol(index)" type="number" class="form-control" min="0">
                     </div>
                     <div class="col-1 px-1">
-                        <input v-model="item.pallet" type="number" class="form-control" min="0">
+                        <input required v-model="item.pallet" type="number" class="form-control" min="0">
                     </div>
                     <div class="col-1 px-1">
                         <select v-model="item.cbm" class="form-control">
@@ -253,7 +253,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">$</span>
                             </div>
-                            <input v-model="item.pricePerCubic" @change="onForTotalCost(index)" type="text" class="form-control box-shadow-off" min="0">
+                            <input required v-model="item.sellingPrice" @change="onForTotalCost(index)" type="text" class="form-control box-shadow-off" min="0">
                         </div>
                     </div>
                     <div class="col-2 pl-1">
@@ -261,7 +261,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">$</span>
                             </div>
-                            <input type="text" :value="formatPrice(item.totalCost)" class="form-control box-shadow-off" readonly>
+                            <input required type="text" :value="formatPrice(item.totalCost)" class="form-control box-shadow-off" readonly>
                         </div>
                     </div>
                     <i @click="remove(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
@@ -370,10 +370,12 @@
                     </div>
                 </div>
             </div>
-            <div @click="checkForm()" class="container-extend border container-extend btn-bottom">
-                Save
+            <div class="container-extend border btn-bottom border">
+                <button id="id_submitBtn" type="submit" class="btn-no-decor" style="width: 100%;">
+                    Save
+                </button>
             </div>
-        </div>
+        </form>
     </div>
 
 </div>
@@ -417,7 +419,7 @@
                     cbm: 'm3',
                     vol: null,
                     refVol: null,
-                    pricePerCubic: 0.00,
+                    sellingPrice: 0.00,
                     totalCost: null
                 }],
                 atc: [{
@@ -799,7 +801,7 @@
             getMerchRemaining(id, index){
                 item = this.merchandiseInventory.find(x=>x.id==id)
                 this.order.items[index].remaining = item.qtyA
-                this.order.items[index].pricePerCubic = Number(item.pricePerCubic).toFixed(2)
+                this.order.items[index].sellingPrice = Number(item.sellingPrice).toFixed(2)
                 this.order.items[index].vol = item.vol
                 this.order.items[index].refVol = item.vol
 
@@ -814,7 +816,7 @@
 
             onForTotalCost(index){
                 row = this.order.items[index]
-                row.totalCost = Number(row.pricePerCubic * row.vol).toFixed(4)
+                row.totalCost = Number(row.sellingPrice * row.vol).toFixed(4)
             },
 
             remove (index) {

@@ -315,19 +315,19 @@
                         </div>
 
                         <!-- DEFAULT INVOICE -->
-                        <div id="default">
+                        <form @submit.prevent="submit" id="default">
                             <!-- START -->
                             <div class="row">
                                 <div class="col col-3 pr-2">
                                     <div class="form-group">
                                         <label for="">Reference No.</label>
-                                        <input v-model="create.code" type="text" class="form-control" placeholder="Enter Reference No.">
+                                        <input required v-model="create.code" type="text" class="form-control" placeholder="Enter Reference No.">
                                     </div>
                                 </div>
                                 <div class="col col-3 px-2">
                                     <div class="form-group">
                                         <label for="">Date</label>
-                                        <input v-model="create.date" type="date" class="form-control" readonly>
+                                        <input required v-model="create.date" type="date" class="form-control" readonly>
                                     </div>
                                 </div>
                                 <div class="col col-3 px-2">
@@ -339,7 +339,7 @@
                                 <div class="col-3 pl-2">
                                     <div class="form-group">
                                         <label for="">Select SC</label>
-                                        <select @change="getSC(create.scCode)" v-model="create.scCode" class="form-control">
+                                        <select required @change="getSC(create.scCode)" v-model="create.scCode" class="form-control">
                                             <option value="" disabled selected>Select SC</option>
                                             {% for item in sc reversed %}
                                             <option value="{{item.pk}}">{{item.code}}</option>
@@ -377,7 +377,7 @@
                                 <div class="col-6 pr-2">
                                     <div class="form-group">
                                         <label for="">Payment Method</label>
-                                        <select @change="toggleMemorandum()" v-model="create.paymentMethod" name="" id="" class="form-control">
+                                        <select required @change="toggleMemorandum()" v-model="create.paymentMethod" name="" id="" class="form-control">
                                             <option value="" selected disabled>Choose Payment Method</option>
                                             <optgroup label="Cash">
                                                 <option value="{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}}">{{request.user.branch.branchProfile.branchDefaultChildAccount.cashOnHand.name}}</option>
@@ -396,11 +396,11 @@
                                     </div>
                                 </div>
                                 <div class="col ml-2 my-2 form-check form-check-inline">
-                                    <input v-model="create.paymentPeriod" value="Full Payment" name="radios" type="radio" class="form-check-input">
+                                    <input required v-model="create.paymentPeriod" value="Full Payment" name="radios" type="radio" class="form-check-input">
                                     <label class="form-check-label">Full Payment</label>
                                 </div>
                                 <div class="col my-2 form-check form-check-inline">
-                                    <input v-model=create.paymentPeriod value="Partial Payment" name="radios" type="radio" class="form-check-input">
+                                    <input required v-model=create.paymentPeriod value="Partial Payment" name="radios" type="radio" class="form-check-input">
                                     <label class="form-check-label">Partial Payment</label>
                                 </div>
 
@@ -462,7 +462,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">₱</span>
                                             </div>
-                                            <input v-model="create.amountPaid" type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Paid">
+                                            <input required v-model="create.amountPaid" type="text" class="form-control box-shadow-off" style="margin-top: 0px" onkeypress="validate()" placeholder="Enter Amount Paid">
                                         </div>
                                     </div>
                                 </div>
@@ -475,10 +475,10 @@
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <button @click="checkForm()" class="col btn btn-primary">Create</button>
+                                    <button type="submit" class="col btn btn-primary">Create</button>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -767,14 +767,24 @@
                     allowOutsideClick: false,
                     html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
                 })
-                axios.post('/save-received-payment/', this.create, this.config)
-                .then(res=>res.data==0?location.reload():'')
-                .catch(err=>{
-                    Swal.fire({
-                        title: "Something went wrong",
-                        html: err.message,
-                        icon: 'error',
-                    })
+                Swal.fire({
+                    title: 'Confirm Payment',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    showConfirmButton: true,
+                    confirmButtonText: 'Confirm Payment'
+                }).then(result=>{
+                    if(result.isConfirmed){
+                        axios.post('/save-received-payment/', this.create, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                        .catch(err=>{
+                            Swal.fire({
+                                title: "Something went wrong",
+                                html: err.message,
+                                icon: 'error',
+                            })
+                        })
+                    }
                 })
             },
 
