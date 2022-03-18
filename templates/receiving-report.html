@@ -25,269 +25,273 @@
 		<span class="font-size-18 font-bold mr-1">Receiving Report</span>
 		</div>
 
-		<div class="row">
-        	<div class="col col-3 pr-2">
-        	    <label>Reference No.</label>
-        	    <input v-model="purchaseOrder.code" type="text" class="form-control" name="code" placeholder="Enter Reference No.">
-        	</div>
-        	<div class="col col-2 px-2">
-				<label>Date</label>
-				<input v-model="purchaseOrder.datePurchased" type="date" class="form-control" name="date">
-			</div>
-        	<div class="col col-2 px-2">
-				<label><span>Retroactive</span>&nbsp;<span class="font-size-10 gray">(optional)</span></label>
-				<input v-model="purchaseOrder.retroactive" type="date" class="form-control" name="retroactiveDate">
-			</div>
-			<div class="col col-2 pl-2">
-				<label>Purchase Order</label>
-				<select @change="getPO(purchaseOrder.po)" v-model="purchaseOrder.po" name="pr" class="form-control">
-					<option value="">None</option>
-					{% for po in pos reversed %}
-					<option value="{{po.id}}">{{po.code}}</option>
-					{% endfor %}
-				</select>
-			</div>
-      	</div>
-		
-    	<!-- VENDOR -->
-		<div class="row mt-2 mb-4">
-			<div class="col col-5 pr-2">
-				<label>Vendor</label>
-				<select v-model="purchaseOrder.vendor" name="vendor" class="form-control">
-					<option value="" selected disabled>Choose Vendor</option>
-					<option v-for="v in vendor" :value="v.id" disabled>[[v.name]]</option>
-				</select>
-			</div>
-			<div class="col col-2 px-2">
-				<label>Tax Type</label>
-				<select v-model="purchaseOrder.taxType" class="form-control">
-					<option value="" selected disabled>Choose Tax Type</option>
-					<option value="VAT" disabled>VAT</option>
-					<option value="Percentage" disabled>Percentage</option>
-				</select>
-			</div>
-			<div class="col col-2 pl-2">
-				<label for="">Tax Rate</label>
-				<select v-model="purchaseOrder.taxRate" class="form-control">
-					<option value="" selected disabled>Choose Tax Rate</option>
-					<option value="0" disabled>0%</option>
-					<option value="1" disabled>1%</option>
-					<option value="3" disabled>3%</option>
-					<option value="12" disabled>12%</option>
-					<option value="30" disabled>30%</option>
-				</select>
-			</div>
-		</div>
-		<div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
+		<form @submit.prevent="submit">
 			<div class="row">
-				<div class="col-2 px-1">
-					<label for="code" class="m-0">Inventory</label>
+				<div class="col col-3 pr-2">
+					<label>Reference No.</label>
+					<input required v-model="purchaseOrder.code" type="text" class="form-control" name="code" placeholder="Enter Reference No.">
 				</div>
-				<div class="col px-1">
-					<label v-if="purchaseOrder.items[0].type == 'Merchandise'" class="m-0">Code - Name Type --- T x W x L mm <span class="gray font-size-12">format</span></label>
-					<label v-else class="m-0">Item Name</label>
+				<div class="col col-2 px-2">
+					<label>Date</label>
+					<input required v-model="purchaseOrder.datePurchased" type="date" class="form-control" name="date">
 				</div>
-				<div class="col-1 px-1">
-					<label for="remaining" class="m-0">Remaining</label>
+				<div class="col col-2 px-2">
+					<label><span>Retroactive</span>&nbsp;<span class="font-size-10 gray">(optional)</span></label>
+					<input v-model="purchaseOrder.retroactive" type="date" class="form-control" name="retroactiveDate">
 				</div>
-				<div class="col-1 px-1">
-					<label for="order-quantity" class="m-0">Received Qty</label>
-				</div>
-				<div class="col-2 px-1">
-					<label for="order-quantity" class="m-0">Purchasing Price <span class="font-size-10 gray">per qty</span></label>
-				</div>
-				<div class="col-2 px-1">
-					<label for="Total Cost" class="m-0">Total Cost</label>
-				</div>
-				<i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
-			</div>
-			<!-- V-FOR ITEMS -->
-			<div class="row" v-for="(item, index) in purchaseOrder.items">
-				<div class="col-2 px-1">
-					<select v-model="item.type" class="form-control">
-						<option value="" selected disabled>Choose Type</option>
-						<optgroup label="Inventory">
-							<option disabled v-for="type in inventoryTypes" :value="type">[[type]]</option>
-						</optgroup>
-						<optgroup label="Expenses">
-							<option disabled v-for="expense in expenseTypes" :value="expense[0]">[[expense[1] ]]</option>
-						</optgroup>
-					</select>
-				</div>
-				<div class="col px-1">
-					<!-- V-IF ELSE FOR DIFFERENT INVENTORY LIST -->
-					<select @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control" v-if="item.type == 'Merchandise'">
-						<option value="" selected disabled>Choose Merchandise Inventory</option>
-						<option disabled v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]] - [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
-					</select>
-					<input @blur="getMerchRemaining2(item.other, index)" placeholder="Type or select the item from the datalist" list="others" v-model="item.other" class="form-control" v-else-if="item.type!='Merchandise' && item.type!='Manufacturing' && item.type!=''">
-					<select class="form-control" v-else>
-						<option value="" selected disabled>Choose Inventory Type First</option>
-					</select>
-
-					<datalist id="others">
-						{% for item in request.user.branch.otherInventory.all %}
-						<option value="{{item.name}}"></option>
+				<div class="col col-2 pl-2">
+					<label>Purchase Order <span class="gray font-size-10">Required</span></label>
+					<select required @change="getPO(purchaseOrder.po)" v-model="purchaseOrder.po" name="pr" class="form-control">
+						<option value="">None</option>
+						{% for po in pos reversed %}
+						<option value="{{po.id}}">{{po.code}}</option>
 						{% endfor %}
-					</datalist>
-					<!-- END -->
+					</select>
 				</div>
-				<div class="col-1 px-1">
-					<input v-model="item.remaining" type="number" class="form-control" readonly>
+			  </div>
+			
+			<!-- VENDOR -->
+			<div class="row mt-2 mb-4">
+				<div class="col col-5 pr-2">
+					<label>Vendor</label>
+					<select required v-model="purchaseOrder.vendor" name="vendor" class="form-control">
+						<option value="" selected disabled>Choose Vendor</option>
+						<option v-for="v in vendor" :value="v.id" disabled>[[v.name]]</option>
+					</select>
 				</div>
-				<div class="col-1 px-1">
-					<div class="input-group">
-						<input v-model="item.quantity" @change="onForTotalCost(index)" type="text" class="form-control box-shadow-off" onkeypress="validate()">
-						<div @click="cycleUnit(index)" class="input-group-append bg-primary-2" style="cursor: pointer;" title="Click me to change unit">
-							<span class="input-group-text text-white noselect">[[units[item.unitCtr] ]]</span>
-						</div>
-					</div>
+				<div class="col col-2 px-2">
+					<label>Tax Type</label>
+					<select v-model="purchaseOrder.taxType" class="form-control">
+						<option value="" selected disabled>Choose Tax Type</option>
+						<option value="VAT" disabled>VAT</option>
+						<option value="Percentage" disabled>Percentage</option>
+					</select>
 				</div>
-				<div class="col-2 px-1">
-					<div class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text">₱</span>
-						</div>
-						<input v-model="item.vatable" @change="onForTotalCost(index)" type="number" step="0.01" class="form-control box-shadow-off" min="0">
-					</div>
-				</div>
-				<div class="col-2 pl-1">
-					<input type="text" :value="formatPrice(item.totalCost)" class="form-control" readonly>
-				</div>
-				<i @click="remove(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
-			</div>
-			<!-- ADD NEW LINE -->
-			<div class="row">
-				<div class="col px-1">
-					<button @click="addLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
-				</div>
-			</div>
-
-			<!-- ATC AND AMOUNT -->
-			<div class="row mt-2">
-				<!-- ATC AND MORE -->
-				<div class="col-6 pl-0">
-					<div class="p-4 order-card-darker b-radius-15">
-						<div class="row">
-							<div class="col-3 px-1">
-								<label>ATC Code</label>
-							</div>
-							<div class="col-3 px-1">
-								<label>Tax Base</label>
-							</div>
-							<div class="col-3 px-1">
-								<label>Tax Rate</label>
-							</div>
-							<div class="col-3 px-1">
-								<label>To be Withheld</label>
-							</div>
-						</div>
-						<div class="row" v-for="(line, index) in purchaseOrder.atc">
-							<div class="col-3 px-1">
-								<select v-model="line.code" class="form-control" @change="setATCRate(line.code, index)">
-									<optgroup v-for="atcGroup in formattedATCList" :label="atcGroup.name">
-										<option v-for="atc in atcGroup.list" :value="atc.id">[[atc.code]]</option>
-									</optgroup>
-								</select>
-							</div>
-							<div class="col-3 px-1">
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text">₱</span>
-									</div>
-									<input v-model="line.amount" type="number" step="0.02" class="form-control box-shadow-off" readonly>
-								</div>
-							</div>
-							<div class="col-3 px-1">
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text">%</span>
-									</div>
-									<input v-model="line.taxRate" type="number" step="0.02" class="form-control box-shadow-off" readonly>
-								</div>
-							</div>
-							<div class="col-3 px-1">
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text">₱</span>
-									</div>
-									<input :value="formatPrice(line.amountWithheld)" type="text" class="form-control box-shadow-off" readonly>
-								</div>
-							</div>
-						</div>
-						<!-- REMARKS -->
-						<div class="row mt-2">
-							<div class="col-12 px-1">
-								<label>Remarks</label>
-								<textarea v-model="purchaseOrder.remarks" cols="30" rows="2" class="form-control" placeholder="Enter Remarks (Optional)"></textarea>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- AMOUNT AND PAYMENT -->
-				<div class="col-6 pr-0">
-					<div class="p-4 order-card-darker b-radius-15">
-						<div class="row">
-							<div class="col px-1">
-								<label>Amount Due</label>
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text">₱</span>
-									</div>
-									<input type="text" :value="formatPrice(purchaseOrder.amountDue)" class="form-control box-shadow-off" readonly>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-6 px-1">
-								<label>Total Input VAT</label>
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text">₱</span>
-									</div>
-									<input :value="formatPrice(purchaseOrder.taxPeso)" type="text" class="form-control box-shadow-off" readonly>
-								</div>
-							</div>
-							<div class="col-6 px-1">
-								<label>Amount Withheld</label>
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text">₱</span>
-									</div>
-									<input :value="formatPrice(purchaseOrder.withholdingTax)" type="text" class="form-control box-shadow-off" readonly>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-12 px-1">
-								<label>Total Amount Due</label>
-								<div class="input-group">
-									<div class="input-group-prepend">
-										<span class="input-group-text">₱</span>
-									</div>
-									<input type="text" :value="formatPrice(purchaseOrder.amountTotal)" class="form-control box-shadow-off" readonly>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-12 px-1">
-								<label>Due Date</label>
-								<input v-model="purchaseOrder.dueDate" type="date" class="form-control">
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-12 px-1">
-								<label>Bank</label>
-								<input v-model="purchaseOrder.bank" type="text" class="form-control" placeholder="Leave blank if applicable">
-							</div>
-						</div>
-					</div>
+				<div class="col col-2 pl-2">
+					<label for="">Tax Rate</label>
+					<select v-model="purchaseOrder.taxRate" class="form-control">
+						<option value="" selected disabled>Choose Tax Rate</option>
+						<option value="0" disabled>0%</option>
+						<option value="1" disabled>1%</option>
+						<option value="3" disabled>3%</option>
+						<option value="12" disabled>12%</option>
+						<option value="30" disabled>30%</option>
+					</select>
 				</div>
 			</div>
-		</div>
-		<div @click="checkForm()" class="container-extend border container-extend btn-bottom">
-			Save
-		</div>
+			<div class="container-extend px-5 py-4 b-tr-radius-15 b-tl-radius-15 order-card mt-3">
+				<div class="row">
+					<div class="col-2 px-1">
+						<label for="code" class="m-0">Inventory</label>
+					</div>
+					<div class="col px-1">
+						<label v-if="purchaseOrder.items[0].type == 'Merchandise'" class="m-0">Code - Name Type --- T x W x L mm <span class="gray font-size-12">format</span></label>
+						<label v-else class="m-0">Item Name</label>
+					</div>
+					<div class="col-1 px-1">
+						<label for="remaining" class="m-0">Remaining</label>
+					</div>
+					<div class="col-1 px-1">
+						<label for="order-quantity" class="m-0">Received Qty</label>
+					</div>
+					<div class="col-2 px-1">
+						<label for="order-quantity" class="m-0">Purchasing Price <span class="font-size-10 gray">per qty</span></label>
+					</div>
+					<div class="col-2 px-1">
+						<label for="Total Cost" class="m-0">Total Cost</label>
+					</div>
+					<i class="fas fa-minus-circle stop" style="color:rgba(0,0,0,0)"></i>
+				</div>
+				<!-- V-FOR ITEMS -->
+				<div class="row" v-for="(item, index) in purchaseOrder.items">
+					<div class="col-2 px-1">
+						<select required v-model="item.type" class="form-control">
+							<option value="" selected disabled>Choose Type</option>
+							<optgroup label="Inventory">
+								<option disabled v-for="type in inventoryTypes" :value="type">[[type]]</option>
+							</optgroup>
+							<optgroup label="Expenses">
+								<option disabled v-for="expense in expenseTypes" :value="expense[0]">[[expense[1] ]]</option>
+							</optgroup>
+						</select>
+					</div>
+					<div class="col px-1">
+						<!-- V-IF ELSE FOR DIFFERENT INVENTORY LIST -->
+						<select required @change="getMerchRemaining(item.code, index)" v-model="item.code" class="form-control" v-if="item.type == 'Merchandise'">
+							<option value="" selected disabled>Choose Merchandise Inventory</option>
+							<option disabled v-for="item in merchandiseInventory" :value="item.id">[[item.code]] - [[item.classification]] [[item.type]] - [[roundNumber0(item.thickness)]] x [[roundNumber0(item.width)]] x [[roundNumber0(item.length)]] mm</option>
+						</select>
+						<input required @blur="getMerchRemaining2(item.other, index)" placeholder="Type or select the item from the datalist" list="others" v-model="item.other" class="form-control" v-else-if="item.type!='Merchandise' && item.type!='Manufacturing' && item.type!=''">
+						<select required class="form-control" v-else>
+							<option value="" selected disabled>Choose Inventory Type First</option>
+						</select>
+	
+						<datalist id="others">
+							{% for item in request.user.branch.otherInventory.all %}
+							<option value="{{item.name}}"></option>
+							{% endfor %}
+						</datalist>
+						<!-- END -->
+					</div>
+					<div class="col-1 px-1">
+						<input v-model="item.remaining" type="number" class="form-control" readonly>
+					</div>
+					<div class="col-1 px-1">
+						<div class="input-group">
+							<input required v-model="item.quantity" @change="onForTotalCost(index)" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+							<div @click="cycleUnit(index)" class="input-group-append bg-primary-2" style="cursor: pointer;" title="Click me to change unit">
+								<span class="input-group-text text-white noselect">[[units[item.unitCtr] ]]</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-2 px-1">
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text">₱</span>
+							</div>
+							<input required v-model="item.vatable" @change="onForTotalCost(index)" type="number" step="0.01" class="form-control box-shadow-off" min="0">
+						</div>
+					</div>
+					<div class="col-2 pl-1">
+						<input required type="text" :value="formatPrice(item.totalCost)" class="form-control" readonly>
+					</div>
+					<i @click="remove(index)" class="fas fa-minus-circle stop text-shadow-small" style="line-height: 30px;"></i>
+				</div>
+				<!-- ADD NEW LINE -->
+				<div class="row">
+					<div class="col px-1">
+						<button @click="addLine()" class="btn btn-warning my-1" type="button">+ Add New Line</button>
+					</div>
+				</div>
+	
+				<!-- ATC AND AMOUNT -->
+				<div class="row mt-2">
+					<!-- ATC AND MORE -->
+					<div class="col-6 pl-0">
+						<div class="p-4 order-card-darker b-radius-15">
+							<div class="row">
+								<div class="col-3 px-1">
+									<label>ATC Code</label>
+								</div>
+								<div class="col-3 px-1">
+									<label>Tax Base</label>
+								</div>
+								<div class="col-3 px-1">
+									<label>Tax Rate</label>
+								</div>
+								<div class="col-3 px-1">
+									<label>To be Withheld</label>
+								</div>
+							</div>
+							<div class="row" v-for="(line, index) in purchaseOrder.atc">
+								<div class="col-3 px-1">
+									<select required v-model="line.code" class="form-control" @change="setATCRate(line.code, index)">
+										<optgroup v-for="atcGroup in formattedATCList" :label="atcGroup.name">
+											<option v-for="atc in atcGroup.list" :value="atc.id">[[atc.code]]</option>
+										</optgroup>
+									</select>
+								</div>
+								<div class="col-3 px-1">
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">₱</span>
+										</div>
+										<input v-model="line.amount" type="number" step="0.02" class="form-control box-shadow-off" readonly>
+									</div>
+								</div>
+								<div class="col-3 px-1">
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">%</span>
+										</div>
+										<input v-model="line.taxRate" type="number" step="0.02" class="form-control box-shadow-off" readonly>
+									</div>
+								</div>
+								<div class="col-3 px-1">
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">₱</span>
+										</div>
+										<input :value="formatPrice(line.amountWithheld)" type="text" class="form-control box-shadow-off" readonly>
+									</div>
+								</div>
+							</div>
+							<!-- REMARKS -->
+							<div class="row mt-2">
+								<div class="col-12 px-1">
+									<label>Remarks</label>
+									<textarea v-model="purchaseOrder.remarks" cols="30" rows="2" class="form-control" placeholder="Enter Remarks (Optional)"></textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- AMOUNT AND PAYMENT -->
+					<div class="col-6 pr-0">
+						<div class="p-4 order-card-darker b-radius-15">
+							<div class="row">
+								<div class="col px-1">
+									<label>Amount Due</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">₱</span>
+										</div>
+										<input type="text" :value="formatPrice(purchaseOrder.amountDue)" class="form-control box-shadow-off" readonly>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-6 px-1">
+									<label>Total Input VAT</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">₱</span>
+										</div>
+										<input :value="formatPrice(purchaseOrder.taxPeso)" type="text" class="form-control box-shadow-off" readonly>
+									</div>
+								</div>
+								<div class="col-6 px-1">
+									<label>Amount Withheld</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">₱</span>
+										</div>
+										<input :value="formatPrice(purchaseOrder.withholdingTax)" type="text" class="form-control box-shadow-off" readonly>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-12 px-1">
+									<label>Total Amount Due</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">₱</span>
+										</div>
+										<input type="text" :value="formatPrice(purchaseOrder.amountTotal)" class="form-control box-shadow-off" readonly>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-12 px-1">
+									<label>Due Date</label>
+									<input v-model="purchaseOrder.dueDate" type="date" class="form-control">
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-12 px-1">
+									<label>Bank</label>
+									<input v-model="purchaseOrder.bank" type="text" class="form-control" placeholder="Leave blank if applicable">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="container-extend border btn-bottom border">
+                <button id="id_submitBtn" type="submit" class="btn-no-decor" style="width: 100%;">
+                    Save
+                </button>
+            </div>
+		</form>
   	</div> <!-- .container -->
 </div> <!-- #app -->
 

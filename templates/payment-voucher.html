@@ -148,7 +148,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row" v-if="!pvModal.approved">
+                        <div class="row" v-if="!pvModal.approved && Number('{{request.user.authLevel}}') < 2">
                             <div class="col">
                                 <button class="col btn btn-primary" @click="approvePV([[pvModal.id]])">Approve</button>
                             </div>
@@ -821,7 +821,7 @@
                     this.errors.push("Payment Method Required")
                 }
                 if(!this.create.paymentPeriod){
-                    this.errors.push("Payment Method Required")
+                    this.errors.push("Payment Period Required")
                 }
                 if(!this.create.amountPaid){
                     this.errors.push("Amount Paid Required")

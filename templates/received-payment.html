@@ -123,7 +123,7 @@
                                     <th><span class="font-bold gray">Code - Class - Type</span></th>
                                     <th><span class="font-bold gray">Vol</span></th>
                                     <th><span class="font-bold gray">Qty</span></th>
-                                    <th><span class="font-bold gray">Amount</span></th>
+                                    <th><span class="font-bold gray">Selling Price</span></th>
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
                                 <tbody>
@@ -132,7 +132,7 @@
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
                                         <td>[[item.vol]]</td>
                                         <td>[[item.qty]]</td>
-                                        <td>₱[[formatPrice(item.pricePerCubic)]]</td>
+                                        <td>₱[[formatPrice(item.sellingPrice)]]</td>
                                         <td>₱[[formatPrice(item.totalCost)]]</td>
                                     </tr>
                                 </tbody>
