@@ -793,10 +793,19 @@
                 axios.put(`/cr-transaction/${this.cr.id}/`, this.cr, this.configStandard)
                 .then(res=>res.data==0?location.reload():'')
                 .catch(err=>{
+                    indexOfExceptionLocation = err.response.data.search("Exception Location:")
+                    sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
+                    exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
+
+
+                    indexOfException = err.response.data.search("\"exception_value\"")
+                    sl = err.response.data.slice(indexOfException, indexOfException+200)
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                    
                     Swal.fire({
-                        title: 'Something went wrong.',
+                        title: "Something went wrong",
                         icon: "error",
-                        html: err.message
+                        html: exception
                     })
                 })
             },
@@ -805,10 +814,19 @@
                 axios.put(`/cr-incomplete/${this.cr.id}/`, this.cr, this.configStandard)
                 .then(res=>res.data==0?location.reload():'')
                 .catch(err=>{
+                    indexOfExceptionLocation = err.response.data.search("Exception Location:")
+                    sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
+                    exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
+
+
+                    indexOfException = err.response.data.search("\"exception_value\"")
+                    sl = err.response.data.slice(indexOfException, indexOfException+200)
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                    
                     Swal.fire({
-                        title: 'Something went wrong.',
+                        title: "Something went wrong",
                         icon: "error",
-                        html: err.message
+                        html: exception
                     })
                 })
             },
@@ -823,10 +841,19 @@
                 axios.put(`/cr-success/${this.cr.id}/`, formdata, this.config)
                 .then(res=>res.data==0?location.reload():'')
                 .catch(err=>{
+                    indexOfExceptionLocation = err.response.data.search("Exception Location:")
+                    sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
+                    exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
+
+
+                    indexOfException = err.response.data.search("\"exception_value\"")
+                    sl = err.response.data.slice(indexOfException, indexOfException+200)
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                    
                     Swal.fire({
-                        title: 'Something went wrong.',
+                        title: "Something went wrong",
                         icon: "error",
-                        html: err.message
+                        html: exception
                     })
                 })
             }

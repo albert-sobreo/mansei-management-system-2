@@ -375,8 +375,30 @@
             approveSO(id){
                 $("#poModal").modal('hide')
 
+                message = "Approving SO"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
                 axios.put(`/so-approval/${id}/`, '', this.config)
                 .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+                    indexOfExceptionLocation = err.response.data.search("Exception Location:")
+                    sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
+                    exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
+
+
+                    indexOfException = err.response.data.search("\"exception_value\"")
+                    sl = err.response.data.slice(indexOfException, indexOfException+200)
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                    
+                    Swal.fire({
+                        title: "Something went wrong",
+                        icon: "error",
+                        html: exception
+                    })
+                })
             },
 
             formatDate(value){

@@ -11,6 +11,8 @@ import re
 from .journalAPI import jeAPI
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
+from .checkers import *
+from django.http.response import HttpResponseServerError
 
 ################# PURCHASE REQUEST #################
 class PRapprovedView(View):
@@ -1141,7 +1143,7 @@ class SOApprovalAPI(APIView):
             if wi.resQty(element.qty):
                 wi.save2()
             else:
-                sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory stock', persistent='Dismiss')
                 return JsonResponse(0, safe=False)
             # element.merchInventory.qtyT -= element.qty
             # element.merchInventory.qtyR += element.qty
@@ -1169,7 +1171,7 @@ class SOVoid(APIView):
             if wi.resQty(element.qty):
                 wi.save2()
             else:
-                sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory stock', persistent='Dismiss')
                 return JsonResponse(0, safe=False)
             # element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
 
@@ -1209,6 +1211,16 @@ class SCApprovalAPI(APIView):
 
         sale = SalesContract.objects.get(pk=pk)
 
+        errors = scChecker(request, sale)
+
+        if errors:
+            print("\n".join(errors))
+            return HttpResponseServerError('\n'.join(errors))
+            
+        else:
+            print('nice')
+        return
+
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         
@@ -1218,7 +1230,7 @@ class SCApprovalAPI(APIView):
                 if wi.resQty(element.qty):
                     wi.save2()
                 else:
-                    sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                    sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory stock', persistent='Dismiss')
                     return JsonResponse(0, safe=False)
 
         sale.datetimeApproved = datetime.now()
@@ -1440,13 +1452,13 @@ class DeliveriesApprovalAPI(APIView):
                     #     if wi.salesWSO(element.qty):
                     #         wi.save2()
                     #     else:
-                    #         sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                    #         sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory stock', persistent='Dismiss')
                     #         return JsonResponse(0, safe=False)
                     # else:
                     #     if wi.salesWSO(element.qty):
                     #         wi.save2()
                     #     else:
-                    #         sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                    #         sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory stock', persistent='Dismiss')
                     #         return JsonResponse(0, safe=False)
                     # element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
                     # element.merchInventory.totalCost -= element.totalCost                
@@ -1523,7 +1535,7 @@ class DeliveriesVoid(APIView):
                         if wi.salesWSO(-element.qty):
                             wi.save2()
                         else:
-                            sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
+                            sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory stock', persistent='Dismiss')
                             return JsonResponse(0, safe=False)
                     else:
                         wi.addQty(element.qty)
