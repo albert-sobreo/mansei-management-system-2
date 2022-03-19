@@ -887,15 +887,21 @@
                 axios.post('/save-change-schedule/', this.changeScheduleModal, this.config)
                 .then(res=>res.data==0?location.reload():'')
                 .catch(err=>{
+
                     indexOfExceptionLocation = err.response.data.search("Exception Location:")
                     sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
                     exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
 
-
                     indexOfException = err.response.data.search("\"exception_value\"")
                     sl = err.response.data.slice(indexOfException, indexOfException+200)
-                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
                     
+                    axios.post('/error-logger/', {
+                        message: exception,
+                        line: exceptionLocation,
+                        url: window.location.href,
+                    }, this.config)
+
                     Swal.fire({
                         title: "Something went wrong",
                         icon: "error",
@@ -914,15 +920,21 @@
                 axios.post('/create-schedule/', this.createSchedule, this.config)
                 .then(res=>res.data==0?location.reload():'')
                 .catch(err=>{
+
                     indexOfExceptionLocation = err.response.data.search("Exception Location:")
                     sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
                     exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
 
-
                     indexOfException = err.response.data.search("\"exception_value\"")
                     sl = err.response.data.slice(indexOfException, indexOfException+200)
-                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
                     
+                    axios.post('/error-logger/', {
+                        message: exception,
+                        line: exceptionLocation,
+                        url: window.location.href,
+                    }, this.config)
+
                     Swal.fire({
                         title: "Something went wrong",
                         icon: "error",
@@ -954,15 +966,21 @@
                             icon: 'error'
                         }))
                         .catch(err=>{
+
                             indexOfExceptionLocation = err.response.data.search("Exception Location:")
                             sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
                             exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
         
-        
                             indexOfException = err.response.data.search("\"exception_value\"")
                             sl = err.response.data.slice(indexOfException, indexOfException+200)
-                            exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                            exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
                             
+                            axios.post('/error-logger/', {
+                                message: exception,
+                                line: exceptionLocation,
+                                url: window.location.href,
+                            }, this.config)
+        
                             Swal.fire({
                                 title: "Something went wrong",
                                 icon: "error",
@@ -1049,15 +1067,21 @@
                 axios.post('/ems-save-edit-leave/', this.editLeave, this.config)
                 .then(res=>res.data==0?location.reload():"")
                 .catch(err=>{
+
                     indexOfExceptionLocation = err.response.data.search("Exception Location:")
                     sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
                     exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
 
-
                     indexOfException = err.response.data.search("\"exception_value\"")
                     sl = err.response.data.slice(indexOfException, indexOfException+200)
-                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
                     
+                    axios.post('/error-logger/', {
+                        message: exception,
+                        line: exceptionLocation,
+                        url: window.location.href,
+                    }, this.config)
+
                     Swal.fire({
                         title: "Something went wrong",
                         icon: "error",
@@ -1076,15 +1100,21 @@
                 axios.post('/ems-save-edit-benefits/', this.editBenefits, this.config)
                 .then(res=>res.data==0?location.reload():"")
                 .catch(err=>{
+
                     indexOfExceptionLocation = err.response.data.search("Exception Location:")
                     sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
                     exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
 
-
                     indexOfException = err.response.data.search("\"exception_value\"")
                     sl = err.response.data.slice(indexOfException, indexOfException+200)
-                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
                     
+                    axios.post('/error-logger/', {
+                        message: exception,
+                        line: exceptionLocation,
+                        url: window.location.href,
+                    }, this.config)
+
                     Swal.fire({
                         title: "Something went wrong",
                         icon: "error",
@@ -1193,15 +1223,21 @@
                         axios.post('/ems-give-raise/', this.giveRaise, this.config)
                         .then(res=>res.data==0?location.reload():'')
                         .catch(err=>{
+
                             indexOfExceptionLocation = err.response.data.search("Exception Location:")
                             sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
                             exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
         
-        
                             indexOfException = err.response.data.search("\"exception_value\"")
                             sl = err.response.data.slice(indexOfException, indexOfException+200)
-                            exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                            exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
                             
+                            axios.post('/error-logger/', {
+                                message: exception,
+                                line: exceptionLocation,
+                                url: window.location.href,
+                            }, this.config)
+        
                             Swal.fire({
                                 title: "Something went wrong",
                                 icon: "error",
@@ -1231,15 +1267,21 @@
                 axios.post('/give-deminimis/', this.giveBenefits, this.config)
                 .then(res=>res.data==0?location.reload():'')
                 .catch(err=>{
+
                     indexOfExceptionLocation = err.response.data.search("Exception Location:")
                     sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
                     exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
 
-
                     indexOfException = err.response.data.search("\"exception_value\"")
                     sl = err.response.data.slice(indexOfException, indexOfException+200)
-                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
                     
+                    axios.post('/error-logger/', {
+                        message: exception,
+                        line: exceptionLocation,
+                        url: window.location.href,
+                    }, this.config)
+
                     Swal.fire({
                         title: "Something went wrong",
                         icon: "error",
@@ -1265,15 +1307,21 @@
                         axios.post('/ems-give-promotion/', this.givePromotion, this.config)
                         .then(res=>res.data==0?location.reload():'')
                         .catch(err=>{
+
                             indexOfExceptionLocation = err.response.data.search("Exception Location:")
                             sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
                             exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
         
-        
                             indexOfException = err.response.data.search("\"exception_value\"")
                             sl = err.response.data.slice(indexOfException, indexOfException+200)
-                            exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))} <br><br> ${exceptionLocation}`
+                            exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
                             
+                            axios.post('/error-logger/', {
+                                message: exception,
+                                line: exceptionLocation,
+                                url: window.location.href,
+                            }, this.config)
+        
                             Swal.fire({
                                 title: "Something went wrong",
                                 icon: "error",

@@ -2052,3 +2052,11 @@ class Announcement(models.Model):
     branch = models.ForeignKey(Branch, related_name="branchannouncement", on_delete=models.CASCADE)
 
 
+class ErrorLogs(models.Model):
+    err_message = models.TextField()
+    err_url = models.URLField()
+    err_line = models.TextField()
+    err_datetime = models.DateTimeField()
+
+    def __str__(self):
+        return str(f"{self.err_datetime} - {self.err_message}")

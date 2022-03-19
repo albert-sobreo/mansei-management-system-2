@@ -41,6 +41,9 @@ def scChecker(request, sc):
         }
     }
 
+    if len(err):
+        return err
+
     def customJeAPI(normally, account, amount):
         journal[normally]['accounts'].append({'name': account.name, 'amount': amount})
 
