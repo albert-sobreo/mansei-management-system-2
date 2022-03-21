@@ -12,14 +12,15 @@ def scVoidChecker(request, sc):
     # WITH SO AND W/O SO
 
     # REVERT QUANTITIES
-    # IF NO SO
+
+    # NO SALES ORDER
     if not sc.salesOrder:
         for element in sc.scitemsmerch.all():
             wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
             if not wi.salesWOSO(-element.qty):
                 err.append('Error in reverting Sales Contract without sales order')
 
-    # IF WITH SO
+    # WITH SALES ORDER
     else:
         for element in sc.scitemsmerch.all():
             wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
