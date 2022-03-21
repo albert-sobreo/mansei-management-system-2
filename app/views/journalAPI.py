@@ -33,7 +33,7 @@ def jeAPI(request, journal, normally, accountChild, amount):
         je.accountChild.accountSubGroup.accountGroup.save()
         je.balance = je.accountChild.amount
         if je.accountChild.me:
-            je.accountChild.me.amount += je.amount
+            je.accountChild.me.amount -= je.amount
             je.accountChild.me.save()
 
         if 'cash'.lower() in je.accountChild.accountSubGroup.name.lower():
@@ -67,6 +67,9 @@ def voidJournal(request, journal):
             je.accountChild.save()
             je.accountChild.accountSubGroup.save()
             je.accountChild.accountSubGroup.accountGroup.save()
+            if je.accountChild.me:
+                je.accountChild.me.amount -= je.amount
+                je.accountChild.me.save()
         else:
             je.accountChild.amount += je.amount
             je.accountChild.accountSubGroup.amount += je.amount
@@ -74,6 +77,9 @@ def voidJournal(request, journal):
             je.accountChild.save()
             je.accountChild.accountSubGroup.save()
             je.accountChild.accountSubGroup.accountGroup.save()
+            if je.accountChild.me:
+                je.accountChild.me.amount += je.amount
+                je.accountChild.me.save()
         print(journal.pk)
 
     journal.delete()

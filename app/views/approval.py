@@ -1359,6 +1359,15 @@ class SCVoid(APIView):
         if sale.taxPeso != 0.0:
             jeAPI(request, j, 'Debit', dChildAccount.outputVat, sale.taxPeso)
 
+        for item in sale.scitemsmerch.all():
+            jeAPI(request, j, 'Debit', item.merchInventory.childAccountSales, (item.totalCost)-(sale.discountPeso/sale.scitemsmerch.all().count())-(item.totalCost*(sale.taxRate/100)))
+
+        for element in sale.scitemsmerch.all():
+            jeAPI(request, j, 'Debit', element.merchInventory.childAccountInventory, element.merchInventory.purchasingPrice*element.qty)
+
+        for element in sale.scitemsmerch.all():
+            jeAPI(request, j, 'Credit', element.merchInventory.childAccountCostOfSales, element.merchInventory.purchasingPrice*element.qty)
+
 
 
         if sale.receivepayment.all():
@@ -1407,8 +1416,6 @@ class SCVoid(APIView):
                 jeAPI(request, j2, 'Credit', dChildAccount.cashInBank.get(name=key), Decimal(val))
             # if cashInBank != 0.0:
                 # jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), cashInBank)
-
-        jeAPI(request, j, 'Debit', dChildAccount.sales, sale.amountTotal - sale.taxPeso - totalFees)
 
         jeAPI(request, j, 'Credit', sale.party.accountChild.get(name__regex=r"[Rr]eceivable"), sale.amountTotal)
 

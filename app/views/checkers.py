@@ -170,16 +170,26 @@ def scChecker(request, sc):
     def customJeAPI(normally, account, amount):
         journal[normally]['accounts'].append({'name': account.name, 'amount': amount})
 
+
     customJeAPI('Credit', dChildAccount.otherIncome, totalFees)
     customJeAPI('Credit', dChildAccount.outputVat, sc.taxPeso)
+
+
     for item in sc.scitemsmerch.all():
         customJeAPI('Credit', item.merchInventory.childAccountSales, (item.totalCost)-(sc.discountPeso/sc.scitemsmerch.all().count())-(item.totalCost*(sc.taxRate/100)))
+    
+    
     for element in sc.scitemsmerch.all():
         customJeAPI('Credit', element.merchInventory.childAccountInventory, element.merchInventory.purchasingPrice*element.qty)
+    
+    
     for element in sc.scitemsmerch.all():
         customJeAPI('Debit', element.merchInventory.childAccountCostOfSales, element.merchInventory.purchasingPrice*element.qty)
+    
+    
     customJeAPI('Debit', sc.party.accountChild.get(name__regex=r"[Rr]eceivable"), sc.amountTotal) 
 
+    
     sumDebit = sum(i['amount'] for i in journal['Debit']['accounts'])
 
     sumCredit = sum(i['amount'] for i in journal['Credit']['accounts'])
