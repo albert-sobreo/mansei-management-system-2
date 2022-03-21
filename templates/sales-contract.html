@@ -1043,7 +1043,7 @@
                         quantity: 0,
                         cbm: 'm3',
                         vol: null,
-                        pricePerCubic: 0.00,
+                        sellingPrice: 0.00,
                         totalCost: null
                     }]
                     item.soitemsmerch.forEach((el,index)=>{
@@ -1053,7 +1053,7 @@
                             this.order.items[index].remaining = el.merchInventory.qtyA
                             this.order.items[index].quantity = el.qty
                             this.order.items[index].vol = el.merchInventory.vol
-                            this.order.items[index].pricePerCubic = el.pricePerCubic
+                            this.order.items[index].sellingPrice = el.sellingPrice
                             this.order.items[index].totalCost = el.totalCost
                         } else {
                             this.order.items.push({
@@ -1062,7 +1062,7 @@
                                 remaining: el.merchInventory.qtyA,
                                 quantity: el.qty,
                                 vol: el.merchInventory.vol,
-                                pricePerCubic: el.pricePerCubic,
+                                sellingPrice: el.sellingPrice,
                                 totalCost: el.totalCost,
                                 cbm: 'm3',
                             })

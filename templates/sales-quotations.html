@@ -885,7 +885,7 @@
                     quantity: 0,
                     cbm: 'm3',
                     vol: null,
-                    pricePerCubic: 0.00,
+                    sellingPrice: 0.00,
                     totalCost: null
                 })
             },
@@ -902,7 +902,7 @@
             getMerchRemaining(id, index){
                 item = this.merchandiseInventory.find(x=>x.id==id)
                 this.order.items[index].remaining = item.qtyA
-                this.order.items[index].pricePerCubic = Number(item.pricePerCubic).toFixed(2)
+                this.order.items[index].sellingPrice = Number(item.sellingPrice).toFixed(2)
                 this.order.items[index].vol = item.vol
                 this.order.items[index].refVol = item.vol
 

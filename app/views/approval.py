@@ -1133,6 +1133,15 @@ class SOApprovalAPI(APIView):
 
         salesOrder = SalesOrder.objects.get(pk=pk)
 
+        errors = soChecker(request, salesOrder)
+
+        if errors:
+            print("\n".join(errors))
+            return HttpResponseServerError('<br/>'.join(errors))
+            
+        else:
+            print('success')
+
         salesOrder.datetimeApproved = datetime.now()
         salesOrder.approved = True
         salesOrder.approvedBy = request.user
@@ -1168,10 +1177,10 @@ class SOVoid(APIView):
 
         for element in salesOrder.soitemsmerch.all():
             wi = WarehouseItems.objects.get(merchInventory = element.merchInventory)
-            if wi.resQty(element.qty):
+            if wi.resQty(-element.qty):
                 wi.save2()
             else:
-                sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory stock', persistent='Dismiss')
+                sweetify.sweetalert(request, icon='error', title='Error reverting', persistent='Dismiss')
                 return JsonResponse(0, safe=False)
             # element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
 
@@ -1218,19 +1227,24 @@ class SCApprovalAPI(APIView):
             return HttpResponseServerError('\n'.join(errors))
             
         else:
-            print('nice')
-        return
+            print('success')
 
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
-
-        
         if not sale.salesOrder:
+            for element in sale.scitemsmerch.all():
+                wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
+                if wi.salesWOSO(element.qty):
+                    wi.save2()
+                else:
+                    sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory reserves', persistent='Dismiss')
+                    return JsonResponse(0, safe=False)
+        else:
             for element in sale.scitemsmerch.all():
                 wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
                 if wi.resQty(element.qty):
                     wi.save2()
                 else:
-                    sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory stock', persistent='Dismiss')
+                    sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory reserves', persistent='Dismiss')
                     return JsonResponse(0, safe=False)
 
         sale.datetimeApproved = datetime.now()
@@ -1283,6 +1297,16 @@ class SCVoid(APIView):
             raise PermissionDenied()
         sale = SalesContract.objects.get(pk=pk)
 
+        errors = scVoidChecker(request, sale)
+
+        if errors:
+            print("\n".join(errors))
+            return HttpResponseServerError('\n'.join(errors))
+            
+        else:
+            print('success')
+
+
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         sale.datetimeVoided = datetime.now()
@@ -1296,12 +1320,31 @@ class SCVoid(APIView):
 
         sale.save()
 
+        if not sale.salesOrder:
+            for element in sale.scitemsmerch.all():
+                wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
+                if wi.salesWOSO(-element.qty):
+                    wi.save2()
+                else:
+                    sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory reserves', persistent='Dismiss')
+                    return JsonResponse(0, safe=False)
+
+        else:
+            for element in sale.scitemsmerch.all():
+                wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
+                if wi.resQty(-element.qty):
+                    wi.save2()
+                else:
+                    sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory reserves', persistent='Dismiss')
+                    return JsonResponse(0, safe=False)
+
         j = Journal()
 
         j.code = sale.code
         j.datetimeCreated = sale.datetimeApproved
         j.createdBy = sale.createdBy
         j.journalDate = datetime.now()
+        j.remarks = 'SC VOID'
         j.save()
         request.user.branch.journal.add(j)
 
