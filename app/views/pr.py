@@ -73,7 +73,7 @@ class SavePurchaseRequest(APIView):
             if item['type'] == "Merchandise":
                 pritemsmerch = PRItemsMerch()
                 pritemsmerch.purchaseRequest = pr
-                pritemsmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['code'])
+                pritemsmerch.merchInventory = request.user.branch.merchInventory.objects.get(pk=item['code'])
                 pritemsmerch.remaining = item['remaining']
                 pritemsmerch.qty = item['qty']
                 pritemsmerch.unit = item['unitCtr']
@@ -86,13 +86,13 @@ class SavePurchaseRequest(APIView):
                 pritemsother.purchaseRequest = pr
                 pritemsother.type = item['type']
                 try: 
-                    pritemsother.otherInventory = OtherInventory.objects.get(name=item['other'])
+                    pritemsother.otherInventory = request.user.branch.otherInventory.objects.get(name=item['other'])
                 except:
                     otherInv = OtherInventory()
                     otherInv.name = item['other']
                     otherInv.qty = 0
                     otherInv.purchasingPrice = Decimal(0.0)
-                    otherInv.accountChild = AccountChild.objects.get(pk=item['type'])
+                    otherInv.accountChild = request.user.branch.accountChild.objects.get(pk=item['type'])
                     otherInv.save()
                     request.user.branch.otherInventory.add(otherInv)
 
@@ -110,7 +110,7 @@ class SavePurchaseRequest(APIView):
             if item['type'] == 'Merchandise':
                 vqmerch  = VendorQuotesMerch()
                 vqmerch.purchaseRequest = pr
-                vqmerch.merchInventory = MerchandiseInventory.objects.get(pk=item['item'])
+                vqmerch.merchInventory = request.user.branch.merchInventory.objects.get(pk=item['item'])
 
                 vqmerch.save()
                 request.user.branch.vendorQuotesMerch.add(vqmerch)
@@ -119,7 +119,7 @@ class SavePurchaseRequest(APIView):
                         vqitemsmerch = VendorQuotesItemsMerch()
                         vqitemsmerch.vendorquotesmerch = vqmerch
                         vqitemsmerch.price = info['purchasingPrice']
-                        vqitemsmerch.party = Party.objects.get(name=info['name'])
+                        vqitemsmerch.party = request.user.branch.party.objects.get(name=info['name'])
 
                         vqitemsmerch.save()
                         request.user.branch.vendorQuotesItemsMerch.add(vqitemsmerch)
