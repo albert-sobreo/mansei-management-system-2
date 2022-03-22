@@ -571,6 +571,15 @@ class PVApprovalAPI(APIView):
 
         #### FUNCTION FOR PO MERCH INVENTORY ####
         def poMerch():
+            errors = pvPoMerchChecker(request, voucher)
+
+            if errors:
+                print("\n".join(errors))
+                return HttpResponseServerError('\n'.join(errors))
+
+            else:
+                print('success')
+
             j = Journal()
             j.code = voucher.code
             j.datetimeCreated = datetime.now()
