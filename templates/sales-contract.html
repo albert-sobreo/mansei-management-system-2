@@ -938,6 +938,7 @@
                 row = this.order.items[index]
                 row.vol = Number(row.refVol * row.quantity)
                 this.onForTotalCost(index)
+                console.log(typeof row.refVol, typeof row.quantity)
             },
 
             onForTotalCost(index){
@@ -1042,29 +1043,32 @@
                         remaining: null,
                         quantity: 0,
                         cbm: 'm3',
-                        vol: null,
+                        vol: 0,
                         sellingPrice: 0.00,
-                        totalCost: null
+                        totalCost: 0,
+                        refVol: 0
                     }]
                     item.soitemsmerch.forEach((el,index)=>{
                         if (index==0){
                             this.order.items[index].type = el.type = 'Merchandise'
                             this.order.items[index].code = el.merchInventory.id
                             this.order.items[index].remaining = el.merchInventory.qtyA
-                            this.order.items[index].quantity = el.qty
-                            this.order.items[index].vol = el.merchInventory.vol
-                            this.order.items[index].sellingPrice = el.sellingPrice
-                            this.order.items[index].totalCost = el.totalCost
+                            this.order.items[index].refVol = el.merchInventory.vol
+                            this.order.items[index].quantity = Number(el.qty)
+                            this.order.items[index].vol = Number(el.vol)
+                            this.order.items[index].sellingPrice = Number(el.sellingPrice)
+                            this.order.items[index].totalCost = Number(el.totalCost)
                         } else {
                             this.order.items.push({
                                 type: 'Merchandise',
                                 code: el.merchInventory.id,
                                 remaining: el.merchInventory.qtyA,
-                                quantity: el.qty,
-                                vol: el.merchInventory.vol,
-                                sellingPrice: el.sellingPrice,
-                                totalCost: el.totalCost,
+                                quantity: Number(el.qty),
+                                vol: Number(el.vol),
+                                sellingPrice: Number(el.sellingPrice),
+                                totalCost: Number(el.totalCost),
                                 cbm: 'm3',
+                                refVol: el.merchInventory.vol
                             })
                         }
                     })

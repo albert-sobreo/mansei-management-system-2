@@ -448,6 +448,16 @@ class ExportSO(APIView):
 
             ctr+=1
 
+        ctr = 0
+        for i in so.sootherfees.all():
+            feeName = ws.cell(row=29-ctr, column=2)
+            feeAmount = ws.cell(row=29-ctr, column=10)
+
+            feeName.value=f"{i.description}"
+            feeAmount.value= i.fee
+
+            gTotalAmount.value += feeAmount.value
+
         wb.save(response)
         return response
 

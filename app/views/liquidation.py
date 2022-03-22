@@ -43,10 +43,11 @@ class LiquidationView(View):
 
         context = {
             'administrative': request.user.branch.accountGroup.filter(name__regex=r"[Aa]dministrative"),
-            'operational': request.user.branch.accountGroup.filter(name__regex=r"[Oo]perational"),
+            'operational': request.user.branch.accountGroup.filter(name__regex=r"[Oo]perat"),
             'new_code': new_code,
             'vendors': request.user.branch.party.filter(type="Vendor")
         }
+        print(context['operational'])
         return render(request, 'liquidation-form.html', context)
 
 class LiquidationListView(View):

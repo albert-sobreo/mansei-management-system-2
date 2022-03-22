@@ -52,6 +52,8 @@ class SavePurchaseRequest(APIView):
         purchaseRequest = request.data['0']
         vendorQuotes = request.data['1']
 
+        print(vendorQuotes)
+
         pr = PurchaseRequest()
 
         pr.code = purchaseRequest['code']
@@ -104,6 +106,7 @@ class SavePurchaseRequest(APIView):
                 request.user.branch.prItemsOther.add(pritemsother)
 
         for item in vendorQuotes:
+            print(item)
             if item['type'] == 'Merchandise':
                 vqmerch  = VendorQuotesMerch()
                 vqmerch.purchaseRequest = pr

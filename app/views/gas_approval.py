@@ -200,10 +200,21 @@ class LiquidationApprovalAPI(APIView):
                     jeAPI(request, j, 'Credit', lqd.createdBy.employeeAccounts.get(name__regex=r"[Pp]ayable"), lqd.payable)
                 except:
                     emploAcc = AccountChild()
-                    emploAcc.me = AccountChild.objects.get(name='Payables to Employee')
+                    try:
+                        emploAcc.me = AccountChild.objects.get(name='Payables to Employee')
+                    except:
+                        payToEmployee = AccountChild()
+                        payToEmployee.name = 'Payables to Employee'
+                        payToEmployee.accountSubGroup = request.user.branch.subGroup.get(name="Accounts Payables")
+                        payToEmployee.amount = Decimal(0)
+                        payToEmployee.save()
+                        request.user.branch.accountChild.add(payToEmployee)
+                        emploAcc.me = payToEmployee
                     emploAcc.name = 'Payables to Employee - ' + lqd.createdBy.first_name + ' ' + lqd.createdBy.last_name
                     emploAcc.accountSubGroup = request.user.branch.subGroup.get(name="Accounts Payables")
                     emploAcc.amount = Decimal(0)
+                    emploAcc.save()
+                    request.user.branch.accountChild.add(emploAcc)
                     jeAPI(request, j, 'Credit', emploAcc, lqd.payable)
                 lqd.advancement.balance = 0
                 lqd.advancement.closed = True
@@ -217,6 +228,8 @@ class LiquidationApprovalAPI(APIView):
             for l in lqd.liquidationentries.all():
                 jeAPI(request, j, 'Debit', l.expense, l.amount)
             jeAPI(request, j, 'Credit', dChildAccount.pettyCash, lqd.totalAmount)
+
+        lqd.save()
 
         notify(request, 'Liquidation approved', lqd.code, '/lqd-approved/', 1)
         
