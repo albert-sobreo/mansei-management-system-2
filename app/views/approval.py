@@ -1269,7 +1269,7 @@ class SCApprovalAPI(APIView):
         else:
             for element in sale.scitemsmerch.all():
                 wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
-                if wi.resQty(element.qty):
+                if wi.salesWSO(element.qty):
                     wi.save2()
                 else:
                     sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory reserves', persistent='Dismiss')

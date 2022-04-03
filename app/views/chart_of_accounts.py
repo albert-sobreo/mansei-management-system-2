@@ -17,6 +17,12 @@ class ChartOfAccountsView(View):
             raise PermissionDenied()
         return render(request, 'chart_of_accounts.html')
 
+class ChartOfAccountsView2(View):
+    def get(self, request):
+        if request.user.authLevel == '2' or request.user.authLevel == '1':
+            raise PermissionDenied()
+        return render(request, 'chart_of_accounts_2.html')
+
 class ImportChartOfAccounts(View):
     def post(self, request):
         if request.user.authLevel == '2' or request.user.authLevel == '1':

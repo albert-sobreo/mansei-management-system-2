@@ -92,7 +92,7 @@ class SavePurchaseRequest(APIView):
                     otherInv.name = item['other']
                     otherInv.qty = 0
                     otherInv.purchasingPrice = Decimal(0.0)
-                    otherInv.accountChild = request.user.branch.accountChild.objects.get(pk=item['type'])
+                    otherInv.accountChild = request.user.branch.accountChild.get(pk=item['type'])
                     otherInv.save()
                     request.user.branch.otherInventory.add(otherInv)
 

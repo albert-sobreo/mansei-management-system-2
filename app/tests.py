@@ -40,7 +40,7 @@ class TestLogin(StaticLiveServerTestCase):
         password.send_keys('1234')
         loginBtn.click()
 
-    def test_if_welcome_in_dashboard(self):
+    def test1_if_welcome_in_dashboard(self):
         assert "Welcome" in self.driver.page_source
         self.driver.close()
 
@@ -117,7 +117,7 @@ class TestQuotations(StaticLiveServerTestCase):
         password.send_keys('1234')
         loginBtn.click()
     
-    def test_create_quotations(self):
+    def test_create_and_approve_quotations(self):
         d = self.driver
         d.get('%s%s'%(self.live_server_url, '/sales-quotations/'))
 
@@ -146,13 +146,22 @@ class TestQuotations(StaticLiveServerTestCase):
 
         assert "Success" in d.page_source
 
-    def test_approve_qq(self):
+        ##### APPROVING #####
+
         d = self.driver
         d.get('%s%s'%(self.live_server_url, '/qq-nonapproved/'))
 
         for td in d.find_element_by_tag_name('table').find_elements_by_tag_name('td'):
             td.click()
             break
+
+        sleep(1)
+
+        d.find_element_by_id('btn-approved').click()
+
+        sleep(1)
+
+        assert "Success" in d.page_source
 
 
 ####################################################################################
@@ -236,9 +245,8 @@ class TestSalesContract(StaticLiveServerTestCase):
 
         print('---------------------------\n')
 
-        
+        ##### APPROVALS #####
 
-    def test2_approve_sc_2(self):
         d = self.driver
         d.get('%s%s'%(self.live_server_url, '/sc-nonapproved/'))
 
@@ -249,7 +257,7 @@ class TestSalesContract(StaticLiveServerTestCase):
         sleep(2)
 
         d.find_element_by_id('id_approve').click()
-
+        sleep(2)
         d.get('%s%s'%(self.live_server_url, '/journal/'))
 
         sleep(5)
@@ -264,3 +272,12 @@ class TestSalesContract(StaticLiveServerTestCase):
         print(dChildAccount.merchInventory.amount)
         print(AccountChild.objects.get(name="Trade Receivable", branch=self.branch).amount)
         print(dChildAccount.costOfSales.amount)
+
+
+        print('---------------------------\n')
+
+        print(abs(Decimal(self.initOtherIncome.amount) - Decimal(dChildAccount.otherIncome.amount)))
+        print(abs(Decimal(self.initOutputVat.amount) - Decimal(dChildAccount.outputVat.amount)))
+        print(abs(Decimal(self.initSales.amount) - Decimal(dChildAccount.sales.amount)))
+        print(abs(Decimal(self.initMerchInventory.amount) - Decimal(dChildAccount.merchInventory.amount)))
+        print(abs(Decimal(self.initCostOfSales.amount) - Decimal(dChildAccount.costOfSales.amount)))

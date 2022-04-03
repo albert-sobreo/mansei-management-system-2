@@ -1,0 +1,307 @@
+{% extends "base-template.html" %}
+{% block title %}Chart of Accounts{% endblock %}
+
+{% block body %}
+
+<div id="app" v-cloak>
+    <!-- NAVIGATION BAR -->
+    <navbar-gas active="nav-accounts" photo="/static/media/{{request.user.image}}"></navbar-gas>
+    <profile-card branch="{{request.user.branch.name}}" first_name="{{request.user.first_name}}" last_name="{{request.user.last_name}}" position="{{request.user.position}}" auth_level="{{request.user.authLevel}}" photo="/media/{{request.user.image}}/"></profile-card>
+    <app-card></app-card>
+    <notification-card></notification-card>
+
+    <!-- MAIN BODY -->
+    <div class="container">
+        <!-- NAV 2 -->
+        <div class="d-flex font-semibold mb-2 justify-content-center">
+            <div class="justify-content-center c-nav-links imps-gas">
+                <a href="/chart-of-accounts/" class="active-gas mx-2">Child Accounts</a>
+                <a href="/chart-of-accounts-subgroup/" class="mx-2">Sub-Group Accounts</a>
+                <a href="/chart-of-accounts-group/" class="mx-2">Group Accounts</a>
+            </div>
+        </div>
+
+        <!-- TITLE AND BUTTONS -->
+        <div class="d-flex align-items-center mb-3">
+            <span class="font-size-18 font-bold mr-1">Chart of Accounts</span>
+            <button type="button" class="btn btn-primary mx-1" data-toggle="modal" data-target="#addAccountModal">Add Account</button>
+            <button type="button" class="btn btn-primary mx-1" data-toggle="modal" data-target="#addSubGroupModal">Add Sub-group</button>
+            <button type="button" class="btn btn-success mx-1" data-toggle="modal" data-target="#importModal">Import Chart of Accounts</button>
+            <button type="button" class="btn btn-secondary mx-1" @click="roundingToggler()">Round Numbers</button>
+        </div>
+
+        <!-- TABLES -->
+        <div>
+            {% for group in request.user.branch.accountGroup.all %}
+            <table class="table table-striped table-borderless table-hover box-shadow-medium b-radius-15 mt-2 mb-5">
+                <thead class="thead-dark">
+                    <th colspan="99" class="font-size-18">{{group.name}}</th>
+                </thead>
+                <thead>
+                    <th>Code</th>
+                    <th>Account Name</th>
+                    <th>Linked Account</th>
+                    <th>Sub Group</th>
+                    <th>Balance</th>
+                </thead>
+                <tbody>
+                    {% for subgroup in group.accountsubgroup.all %}
+                    {% for child in subgroup.accountchild.all %}
+                    <tr>
+                        <td @click="viewChildmodal({{child.pk}})" class="link" data-toggle="modal" data-target="#viewChildModal">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}}</td>
+                        <td>{{child.name}}</td>
+                        {% if child.me == 'None' %}
+                        <td></td>
+                        {% else %}
+                        <td>{{child.me.name}}</td>
+                        {% endif %}
+                        <td>{{child.accountSubGroup.name}}</td>
+                        <td>₱[[formatPrice('{{child.amount}}')]]</td>
+                    </tr>
+                    {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+
+        data:{
+            config:{
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                }
+            },
+            accountModal:{
+                accountSubGroup: '',
+                code: null,
+                name: null,
+                description: null,
+                contra: false,
+                linkToAccount: false,
+                me: null,
+                groupCode: ''
+            },
+            subGroupModal:{
+                accountGroup: '',
+                code: null,
+                name: null,
+                description: null,
+                groupCode: ''
+            },
+            viewChildModal: {
+                accountSubGroup: {
+                    accountGroup: {
+                        code: null,
+                        name: null,
+                    },
+                    code: null,
+                    name: null,
+                },
+                amount: 0,
+                code: null,
+                name: null,
+            },
+            editChild: {
+                accountSubGroup: '',
+                code: null,
+                name: null,
+                description: null,
+                contra: false,
+                linkToAccount: false,
+                me: null,
+                groupCode: ''
+            },
+            accounts: [],
+            subGroup: [],
+            group: [],
+            child: [],
+            toggle: false,
+
+        },
+        computed:{
+            linkToAccount(){
+                return this.accountModal.linkToAccount
+            },
+            linkToAccount2(){
+                return this.editChild.linkToAccount
+            },
+            groupCodeAccount(){
+                return this.accountModal.accountSubGroup
+            },
+            groupCodeSub(){
+                return this.subGroupModal.accountGroup
+            },
+        },
+        watch:{
+            linkToAccount(){
+                var x = document.getElementById('linkToAccountContainer')
+                if(this.accountModal.linkToAccount == false){
+                    x.style.display = 'none'
+                    this.accountModal.me = null
+                } else {
+                    x.style.display = 'block'
+                }
+            },
+            linkToAccount2(){
+                var x = document.getElementById('linkToAccountContainer2')
+                if(this.editChild.linkToAccount == false){
+                    x.style.display = 'none'
+                    this.editChild.me = null
+                } else {
+                    x.style.display = 'block'
+                }
+            },
+            groupCodeAccount(id){
+                subGroupObject = this.subGroup.find(x=>x.id==id)
+                groupObject = this.group.find(x=>x.id==subGroupObject.accountGroup)
+
+                this.accountModal.groupCode = `${groupObject.code}-${subGroupObject.code}-`
+            },
+            groupCodeSub(id){
+                object = this.group.find(x=>x.id==id)
+                this.subGroupModal.groupCode = `${object.code}-`
+            },
+        },
+        methods:{
+            copyChildAccount(id){
+                axios.get(`/api/child-nested/${id}`)
+                .then(res=>{
+                    this.editChild = {...res.data}
+                    this.editChild.accountSubGroup = res.data.accountSubGroup.id
+                    this.editChild.groupCode = `${res.data.accountSubGroup.accountGroup.code}-${res.data.accountSubGroup.code}-`
+                })
+                
+            },
+            submitEditAccount(id){
+                axios.put(`/edit-account-child/${id}/`, this.editChild, this.config)
+                .then(res=>{
+                    res.data==0?location.reload():0
+                })
+            },
+            loadData(){
+                axios.get('/api/group/').then(res=>this.group=res.data)
+                axios.get('/api/sub-group').then(res=>this.subGroup=res.data)
+                axios.get('/api/child/').then(res=>this.child=res.data)
+            },
+            viewChildmodal(id){
+                axios.get(`/api/child-nested-2/${id}/`)
+                .then(res=>{
+                    this.viewChildModal = res.data
+                })
+            },
+            accountModalInitial(){
+                return{
+                    accountSubGroup: '',
+                    code: null,
+                    name: null,
+                    description: null,
+                    contra: false,
+                    linkToAccount: false,
+                    me: null,
+                    groupCode: ''
+                }
+            },
+            subGroupModalInitial(){
+                return{
+                    accountGroup: '',
+                    code: null,
+                    name: null,
+                    description: null,
+                    groupCode: ''
+                }
+            },
+            formatPrice(value) {
+                if (this.toggle){
+                    return value
+                } else {
+                    let val = (value/1).toFixed(2).replace(',', '.')
+                    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+            },
+            roundingToggler(){
+                this.toggle = !this.toggle
+            },
+            submitAccount(){
+                message = "Saving Child Account"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.post('/save-account-child/', this.accountModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+
+                    indexOfExceptionLocation = err.response.data.search("Exception Location:")
+                    sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
+                    exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
+
+                    indexOfException = err.response.data.search("\"exception_value\"")
+                    sl = err.response.data.slice(indexOfException, indexOfException+200)
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
+                    
+                    axios.post('/error-logger/', {
+                        message: exception,
+                        line: exceptionLocation,
+                        url: window.location.href,
+                    }, this.config)
+
+                    Swal.fire({
+                        title: "Something went wrong",
+                        icon: "error",
+                        html: exception
+                    })
+                })
+            },
+            submitSubGroup(){
+                message = "Saving Account Group"
+                Swal.fire({
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                })
+                axios.post('/save-account-group/', this.subGroupModal, this.config)
+                .then(res=>res.data==0?location.reload():'')
+                .catch(err=>{
+
+                    indexOfExceptionLocation = err.response.data.search("Exception Location:")
+                    sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
+                    exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
+
+                    indexOfException = err.response.data.search("\"exception_value\"")
+                    sl = err.response.data.slice(indexOfException, indexOfException+200)
+                    exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
+                    
+                    axios.post('/error-logger/', {
+                        message: exception,
+                        line: exceptionLocation,
+                        url: window.location.href,
+                    }, this.config)
+
+                    Swal.fire({
+                        title: "Something went wrong",
+                        icon: "error",
+                        html: exception
+                    })
+                })
+                
+            }
+        },
+        mounted(){
+            this.loadData()
+        }
+    })
+</script>
+
+{% endblock %}

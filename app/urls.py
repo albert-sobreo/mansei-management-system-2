@@ -174,6 +174,7 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view()),
     path('', login_required(views.DashboardView.as_view())),
     path('chart-of-accounts/', login_required(views.ChartOfAccountsView.as_view())),
+    path('chart-of-accounts-2/', login_required(views.ChartOfAccountsView2.as_view())),
     path('journal/', login_required(views.JournalView.as_view())),
     path('save-journal/', login_required(views.SaveJournal.as_view())),
     path('ledger/', login_required(views.LedgerView.as_view())),

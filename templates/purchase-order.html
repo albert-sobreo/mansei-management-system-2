@@ -1044,14 +1044,16 @@
                             this.purchaseOrder.items[0].quantity = item.qty
                             this.purchaseOrder.items[0].remaining = item.otherInventory.qty
                             this.purchaseOrder.items[0].unitCtr = item.unit
-                            console.log(item.otherInventory.unit)
+                            this.purchaseOrder.items[0].vatable = 0
                         } else {
                             this.purchaseOrder.items.push({
                                 type: item.type,
                                 other: item.otherInventory.name,
                                 quantity: item.qty,
                                 remaining: item.otherInventory.qty,
-                                unitCtr: item.unit
+                                unitCtr: item.unit,
+                                vatable: 0,
+                                totalCost: null,
                             })
                         }
                     })
