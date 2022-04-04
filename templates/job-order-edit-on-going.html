@@ -403,8 +403,12 @@
                 this.jobOrder.jobOrderCost = Number(totalMaterialsCost) + Number(totalOverheadCost) + Number(directLaborCost)
                 if (this.jobOrder.method == 'direct'){
                     this.jobOrder.finalproduct[0].totalCost = this.jobOrder.jobOrderCost
+                    row = this.jobOrder.finalproduct[0]
+                    row.unitCost = Number(row.totalCost / row.qty).toFixed(2)
                 } else {
                     this.jobOrder.finalproduct[0].totalCost = this.jobOrder.jobOrderCost + totalLossesCost
+                    row = this.jobOrder.finalproduct[0]
+                    row.unitCost = Number(row.totalCost / row.qty).toFixed(2)
                 }
             },
             submit(){

@@ -176,14 +176,14 @@
                                     <tr v-for="item in poModal.poitemsmerch">
                                         <td>Merchandise</td>
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
-                                        <td>[[item.qty]] [[unit[item.unit] ]]</td>
+                                        <td>[[item.qty]] [[units[item.unit] ]]</td>
                                         <td>₱[[formatPrice(item.purchasingPrice)]]</td>
                                         <td>₱[[formatPrice(item.totalPrice)]]</td>
                                     </tr>
                                     <tr v-for="item in poModal.poitemsother">
                                         <td>[[item.type]]</td>
                                         <td>[[item.otherInventory.name]]</td>
-                                        <td>[[item.qty]] [[unit[item.unit] ]]</td>
+                                        <td>[[item.qty]] [[units[item.unit] ]]</td>
                                         <td>₱[[formatPrice(item.purchasingPrice)]]</td>
                                         <td>₱[[formatPrice(item.totalPrice)]]</td>
                                     </tr>
@@ -287,25 +287,26 @@
             ],
 
             poModal: {
-                voided: null,
                 code: null,
                 createdBy: null,
                 datetimeCreated: null,
                 party: null,
                 approvedBy: null,
                 datetimeApproved: null,
+                runningBalance: null,
+
+                purchaseRequest:[{
+                    code: null,
+                }],
 
                 amountDue: null,
-                runningBalance: null,
+                amountPaid: null,
                 amountTotal: null,
                 paymentMethod: null,
                 paymentPeriod: null,
                 chequeNo: null,
                 dueDate: null,
                 remarks: null,
-
-                atcCode: null,
-                amountWithheld: null,
 
                 poatc: [{
                     amountWithheld: null,

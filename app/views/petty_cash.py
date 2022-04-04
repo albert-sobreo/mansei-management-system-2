@@ -96,6 +96,10 @@ class PettyCashReplenish(APIView):
         normalAmount = request.user.branch.pettyCashReplenish
         paymentMethod = AccountChild.objects.get(pk=request.data['id'])
 
+        if (normalAmount - currentAmount) > paymentMethod.amount:
+            sweetify.sweetalert(request, icon='warning', title='Warning!', text="Replinishing petty cash more than the source.", persistent='Dismiss')
+            return JsonResponse(0, safe=False)
+
         j = Journal()
 
         j.code = 'Petty-Cash-01-0001'

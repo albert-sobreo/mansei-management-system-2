@@ -70,27 +70,6 @@ class SaveReceivePayment(APIView):
                 rp.createdBy = request.user
             rp.salesContract = SalesContract.objects.get(pk=receivePayment['sc']['code'])
 
-
-            for item in rp.salesContract.scitemsmerch.all():
-                wi = WarehouseItems.objects.get(merchInventory=item.merchInventory)
-                if rp.salesContract.salesOrder:
-                    if wi.salesWSO(item.qty):
-                        wi.save2()
-                    else:
-                        sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')                            
-                        return JsonResponse(0, safe=False)
-                else:
-                    if wi.salesWSO(item.qty):
-                        wi.save2()
-                    else:
-                        sweetify.sweetalert(request, icon='error', title='n < 0', persistent='Dismiss')
-                        return JsonResponse(0, safe=False)
-                item.merchInventory = MerchandiseInventory.objects.get(pk=item.merchInventory.pk)
-                item.merchInventory.totalCost -= item.totalCost                
-                # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
-                item.merchInventory.save()
-
-
             rp.paymentMethod = receivePayment['paymentMethod']
             rp.paymentPeriod = receivePayment['paymentPeriod']
 
@@ -102,7 +81,7 @@ class SaveReceivePayment(APIView):
             request.user.branch.receivePayment.add(rp)
 
             if rp.paymentMethod == "Memorandum":
-                        rp.transaction = PurchaseOrder.objects.get(pk=receivePayment['transactionID'])
+                rp.transaction = PurchaseOrder.objects.get(pk=receivePayment['transactionID'])
 
             if rp.paymentMethod == "Cheque":
                 cheque = Cheques()

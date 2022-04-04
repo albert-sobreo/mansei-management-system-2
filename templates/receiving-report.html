@@ -444,7 +444,7 @@
                 // this.purchaseOrder.withholdingTax = (this.purchaseOrder.atc[0].amountWithheld * (1-(this.purchaseOrder.amountDue - this.purchaseOrder.amountPaid)/this.purchaseOrder.amountDue))
 
                 //this.purchaseOrder.withholdingTax = Number(this.purchaseOrder.atc[0].amountWithheld) * (1-((Number(this.purchaseOrder.amountDue) - ((Number(this.purchaseOrder.amountPaid)/(1-(((this.purchaseOrder.atc[0].taxRate)/100)/(1+(this.purchaseOrder.taxRate/100)))))))/Number(this.purchaseOrder.amountDue)))
-                this.purchaseOrder.withholdingTax = Number(this.purchaseOrder.amountPaid/((1+(this.purchaseOrder.taxRate/100)-(this.purchaseOrder.atc[0].taxRate)/100))) * (this.purchaseOrder.atc[0].taxRate)/100
+                //this.purchaseOrder.withholdingTax = Number(this.purchaseOrder.amountPaid/((1+(this.purchaseOrder.taxRate/100)-(this.purchaseOrder.atc[0].taxRate)/100))) * (this.purchaseOrder.atc[0].taxRate)/100
             },
 
             loadData(){
@@ -765,7 +765,7 @@
 						}
 					})
 					this.purchaseOrder.taxPeso = po.taxPeso
-					this.purchaseOrder.withholdingTax = this.purchaseOrder.atc[0].amountWithheld
+					this.purchaseOrder.withholdingTax = po.poatc[0].amountWithheld
 					this.purchaseOrder.remarks = po.remarks
 					this.purchaseOrder.amountDue = po.amountDue
 					this.purchaseOrder.amountTotal = po.amountTotal

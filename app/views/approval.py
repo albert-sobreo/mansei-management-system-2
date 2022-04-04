@@ -108,7 +108,17 @@ class POApprovalAPI(APIView):
         purchase.approved = True
         purchase.approvedBy = request.user
 
+        try:
+            purchase.purchaseRequest.poed = False
+            purchase.purchaseRequest.save()
+            purchase.purchaseRequest = None
+            
+        except:
+            pass
+
         purchase.save()
+
+        
         
         if purchase.poitemsother.all():
             if purchase.needsRR == False:
@@ -117,7 +127,7 @@ class POApprovalAPI(APIView):
                 j.code = purchase.code
                 j.datetimeCreated = datetime.now()
                 j.createdBy = purchase.createdBy
-                j.journalDate = purchase.dataPurchased
+                j.journalDate = purchase.datePurchased
                 j.save()
                 request.user.branch.journal.add(j)
 
@@ -571,6 +581,15 @@ class PVApprovalAPI(APIView):
 
         #### FUNCTION FOR PO MERCH INVENTORY ####
         def poMerch():
+
+            errors = pvPOMerchChecker(request, voucher)
+
+            if errors:
+                print("\n".join(errors))
+                return HttpResponseServerError('<br/>'.join(errors))
+
+            else:
+                print('success')
 
             j = Journal()
             j.code = voucher.code
@@ -1128,6 +1147,20 @@ class QQApprovalAPI(APIView):
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
+class QQVoidAPI(APIView):
+    def put(self, request, pk, format = None):
+        if request.uesr.authLevel == '2' or request.uesr.authLevel == '1':
+            raise PermissionDenied()
+        quotes = Quotations.objects.get(pk=pk)
+
+        quotes.datetimeVoided = datetime.now()
+        quotes.voided = True
+        quotes.voidedBy = request.user
+        quotes.save()
+
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
 ################# SALES ORDER #################
 class SOapprovedView(View):
     def get(self, request, format=None):
@@ -1299,7 +1332,7 @@ class SCApprovalAPI(APIView):
             jeAPI(request, j, 'Credit', dChildAccount.outputVat, sale.taxPeso)
 
         for item in sale.scitemsmerch.all():
-            jeAPI(request, j, 'Credit', item.merchInventory.childAccountSales, (item.totalCost)-(sale.discountPeso/sale.scitemsmerch.all().count())-(item.totalCost*(sale.taxRate/100)))
+            jeAPI(request, j, 'Credit', item.merchInventory.childAccountSales, (item.totalCost)-(sale.discountPeso/sale.scitemsmerch.all().count())-((item.totalCost-(sale.discountPeso/sale.scitemsmerch.all().count()))*(sale.taxRate/100)))
         
         for element in sale.scitemsmerch.all():
             jeAPI(request, j, 'Credit', element.merchInventory.childAccountInventory, element.merchInventory.purchasingPrice*element.qty)
@@ -1781,26 +1814,29 @@ class BankReconApprovalAPI(APIView):
         j.journalDate = datetime.now()
         j.save()
 
-        cheque.receivePayment.journal = j
-        cheque.receivePayment.save()
+        c = cheque.receivepayment.all()[0]
+
+        c.journal = j
+        c.save()
         request.user.branch.journal.add(j)
 
         ################# CREDIT SIDE #################
-        jeAPI(request, j, 'Credit', cheque.receivePayment.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (cheque.receivePayment.amountPaid + cheque.receivePayment.wep))
+        jeAPI(request, j, 'Credit', c.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (c.amountPaid + c.wep))
 
         ################# DEBIT SIDE #################
-        if cheque.receivePayment.wep != 0.0:
-            jeAPI(request, j, 'Debit', dChildAccount.cwit, cheque.receivePayment.wep)
+        if c.wep != 0.0:
+            jeAPI(request, j, 'Debit', dChildAccount.cwit, c.wep)
 
 
-        jeAPI(request, j, 'Debit', cheque.accountChild, cheque.receivePayment.amountPaid)
+        jeAPI(request, j, 'Debit', cheque.accountChild, c.amountPaid)
 
-        cheque.receivePayment.salesContract.runningBalance -= (cheque.receivePayment.amountPaid + cheque.receivePayment.wep)
-        if cheque.receivePayment.salesContract.runningBalance == 0:
-            cheque.receivePayment.salesContract.fullyPaid = True
-        cheque.receivePayment.salesContract.save()
+        c.salesContract.runningBalance -= (c.amountPaid + c.wep)
+        if c.salesContract.runningBalance == 0:
+            c.salesContract.fullyPaid = True
+        print(c.salesContract, c.salesContract.runningBalance, c.amountPaid + c.wep)
+        c.salesContract.save()
 
-        notify(request, 'Bank Recon approved', cheque.code, '/br-approved/', 1)
+        notify(request, 'Bank Recon approved', cheque.chequeNo, '/br-approved/', 1)
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

@@ -4,7 +4,9 @@ import sweetify
 from ..models import WarehouseItems
 import re 
 import pprint
+import copy
 
+##### THIS CHECKER IS OBSOLETE ######
 def pvPoMerchChecker(request, voucher):
     # INIT ERR
     err = []
@@ -88,7 +90,8 @@ def pvPoMerchChecker(request, voucher):
         return 0
 
 
-def scVoidChecker(request, sc):
+def scVoidChecker(request, salesContract):
+    sc = copy.deepcopy(salesContract)
     # INIT ERROR LIST
     err = []
 
@@ -210,7 +213,8 @@ def soChecker(request, so):
         return 0
 
 
-def scChecker(request, sc):
+def scChecker(request, salesContract):
+    sc = copy.deepcopy(salesContract)
     # INIT ERROR LIST
     err = []
 
@@ -261,7 +265,8 @@ def scChecker(request, sc):
 
 
     for item in sc.scitemsmerch.all():
-        customJeAPI('Credit', item.merchInventory.childAccountSales, (item.totalCost)-(sc.discountPeso/sc.scitemsmerch.all().count())-(item.totalCost*(sc.taxRate/100)))
+        customJeAPI('Credit', item.merchInventory.childAccountSales, (item.totalCost)-(sc.discountPeso/sc.scitemsmerch.all().count())-((item.totalCost-(sc.discountPeso/sc.scitemsmerch.all().count()))*(sc.taxRate/100)))
+        print(item.totalCost, sc.discountPeso/sc.scitemsmerch.all().count(), item.totalCost*(sc.taxRate/100))
     
     
     for element in sc.scitemsmerch.all():
@@ -273,6 +278,8 @@ def scChecker(request, sc):
     
     
     customJeAPI('Debit', sc.party.accountChild.get(name__regex=r"[Rr]eceivable"), sc.amountTotal) 
+
+    pprint.pprint(journal)
 
     
     sumDebit = sum(i['amount'] for i in journal['Debit']['accounts'])
@@ -290,7 +297,7 @@ def scChecker(request, sc):
 
 
 def pvPOMerchChecker(request, pv):
-    voucher = pv
+    voucher = copy.deepcopy(pv)
     # INIT ERROR LIST
     err = []
 
