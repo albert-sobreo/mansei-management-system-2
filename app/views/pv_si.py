@@ -39,7 +39,7 @@ class PaymentVoucherView(View):
 
         context = {
             'new_code': new_code,
-            'po': request.user.branch.purchaseOrder.filter(approved=True, fullyPaid=False).exclude(runningBalance=Decimal(0)),
+            'po': request.user.branch.purchaseOrder.filter(approved=True, fullyPaid=False).exclude(runningBalance__lte=Decimal(0)),
             'ii': request.user.branch.inwardInventory.filter(approved=True, fullyPaid=False),
             'sc': request.user.branch.salesContract.filter(approved=True, fullyPaid=False),
             "vendors": request.user.branch.party.filter(type="Vendor")

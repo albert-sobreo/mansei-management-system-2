@@ -1083,6 +1083,14 @@
                     this.order.withholdingTax = item.wep
                     this.order.amountDue = item.amountDue
                     this.order.amountTotal = item.amountTotal
+                    if (item.discountPeso){
+                        this.order.discount = item.discountPeso
+                        this.order.discountType = 'peso'
+                    }
+                    else if (item.discountPercent){
+                        this.order.discount = item.discountPercent
+                        this.order.discountType = 'peso'
+                    }
                 })
             }
         },

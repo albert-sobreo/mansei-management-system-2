@@ -496,6 +496,15 @@ class ExportSC(APIView):
             sellingPrice.value=round(i.sellingPrice, 2)
 
             ctr+=1
+
+        ctr = 0
+        for i in sc.scotherfees.all():
+            feeName = ws.cell(row=30-ctr, column=2)
+            feeAmount = ws.cell(row=30-ctr, column=11)
+
+            feeName.value=f"{i.description}"
+            feeAmount.value= i.fee
+
         
         wb.save(response)
         return response

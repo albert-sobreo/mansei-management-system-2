@@ -571,14 +571,6 @@ class PVApprovalAPI(APIView):
 
         #### FUNCTION FOR PO MERCH INVENTORY ####
         def poMerch():
-            errors = pvPoMerchChecker(request, voucher)
-
-            if errors:
-                print("\n".join(errors))
-                return HttpResponseServerError('\n'.join(errors))
-
-            else:
-                print('success')
 
             j = Journal()
             j.code = voucher.code
@@ -591,6 +583,7 @@ class PVApprovalAPI(APIView):
             ################# DEBIT SIDE #################
             ################# IF FIRST PAYMENT #################
             if voucher.purchaseOrder.runningBalance == voucher.purchaseOrder.amountTotal:
+                print("VOUCHER @")
                 voucher.first = True
                 voucher.save()
                 ################# IF RR WAS DONE BEFORE PV #################
@@ -607,6 +600,7 @@ class PVApprovalAPI(APIView):
 
                 ################# IF PV IS DONE BEFORE RR #################
                 else:
+                    print('VOUCHER')
                     jeAPI(request, j, 'Debit', dChildAccount.inputVat, voucher.purchaseOrder.taxPeso)
 
                     jeAPI(request, j, 'Debit', dChildAccount.prepaidExpense, (voucher.purchaseOrder.amountDue - voucher.purchaseOrder.taxPeso))
@@ -663,6 +657,7 @@ class PVApprovalAPI(APIView):
 
 
             if voucher.paymentMethod == "Memorandum":
+                print('MEMORANDUM')
                 if voucher.purchaseOrder.runningBalance <= voucher.transaction.runningBalance:
                     voucher.transaction.runningBalance -= voucher.purchaseOrder.runningBalance
                     voucher.purchaseOrder.runningBalance = Decimal(0.0)
@@ -673,6 +668,7 @@ class PVApprovalAPI(APIView):
                     voucher.transaction.fullyPaid == True
                 voucher.transaction.save()
             else:
+                print('MEMORANDUM ELSE')
                 voucher.purchaseOrder.runningBalance -= voucher.amountPaid
                 if voucher.purchaseOrder.runningBalance == 0:
                     voucher.purchaseOrder.fullyPaid == True
@@ -846,7 +842,7 @@ class PVApprovalAPI(APIView):
 
         if voucher.purchaseOrder.poitemsother.all():
             poExpense()
-        elif voucher.purchaseOrder:
+        elif voucher.purchaseOrder.poitemsmerch.all():
             poMerch()
         else:
             inwardInv()

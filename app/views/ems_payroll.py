@@ -103,7 +103,7 @@ class EMS_GeneratePayroll(APIView):
                 payroll.previousPayroll = previousPayroll
             payroll.save()
             request.user.branch.payroll.add(payroll)
-            rates = request.user.branch.ratesGroup.get(name='DOLE Standard')
+            rates = RatesGroup.objects.get(name='DOLE Standard')
 
             # INIT FOR BASIC PAY #
             bp = Decimal(0)
@@ -371,6 +371,7 @@ class EMS_GeneratePayroll(APIView):
             untaxableBenefit = 0
             
             for benefitOfUser in user.deminimisofuser.all():
+                print(benefitOfUser.user)
                 if benefitOfUser.amount > DeMinimis.objects.get(name__iexact=benefitOfUser.name).limit:
                     taxedBenefit = DeMinimisPay()
                     taxedBenefit.user = request.user

@@ -73,7 +73,7 @@ class SavePurchaseRequest(APIView):
             if item['type'] == "Merchandise":
                 pritemsmerch = PRItemsMerch()
                 pritemsmerch.purchaseRequest = pr
-                pritemsmerch.merchInventory = request.user.branch.merchInventory.objects.get(pk=item['code'])
+                pritemsmerch.merchInventory = request.user.branch.merchInventory.get(pk=item['code'])
                 pritemsmerch.remaining = item['remaining']
                 pritemsmerch.qty = item['qty']
                 pritemsmerch.unit = item['unitCtr']
@@ -86,7 +86,7 @@ class SavePurchaseRequest(APIView):
                 pritemsother.purchaseRequest = pr
                 pritemsother.type = item['type']
                 try: 
-                    pritemsother.otherInventory = request.user.branch.otherInventory.objects.get(name=item['other'])
+                    pritemsother.otherInventory = request.user.branch.otherInventory.get(name=item['other'])
                 except:
                     otherInv = OtherInventory()
                     otherInv.name = item['other']
@@ -110,7 +110,7 @@ class SavePurchaseRequest(APIView):
             if item['type'] == 'Merchandise':
                 vqmerch  = VendorQuotesMerch()
                 vqmerch.purchaseRequest = pr
-                vqmerch.merchInventory = request.user.branch.merchInventory.objects.get(pk=item['item'])
+                vqmerch.merchInventory = request.user.branch.merchInventory.get(pk=item['item'])
 
                 vqmerch.save()
                 request.user.branch.vendorQuotesMerch.add(vqmerch)
@@ -119,7 +119,7 @@ class SavePurchaseRequest(APIView):
                         vqitemsmerch = VendorQuotesItemsMerch()
                         vqitemsmerch.vendorquotesmerch = vqmerch
                         vqitemsmerch.price = info['purchasingPrice']
-                        vqitemsmerch.party = request.user.branch.party.objects.get(name=info['name'])
+                        vqitemsmerch.party = request.user.branch.party.get(name=info['name'])
 
                         vqitemsmerch.save()
                         request.user.branch.vendorQuotesItemsMerch.add(vqitemsmerch)
@@ -140,7 +140,7 @@ class VendorQuotes(APIView):
             'type': items.type
         }]
         
-        for party in Party.objects.filter(type = 'Vendor'):
+        for party in request.user.branch.party.filter(type = 'Vendor'):
             element = items.poitemsmerch.filter(purchaseOrder__party = party.pk)
             if element.count():
                 jsonItems.append({

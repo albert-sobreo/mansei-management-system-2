@@ -29,7 +29,7 @@ Vue.component('profile-card', {
             My Profile
         </div>
         <div class="mt-2 flex flex-row profile-card-container logout py-2 px-4 b-radius-5 justify-content-center align-items-center " onclick="location.href='/branches/'">
-            Branch Profile
+            Branch Settings
         </div>
         <div class="mt-2 flex flex-row profile-card-container logout py-2 px-4 b-radius-5 justify-content-center align-items-center " onclick="location.href='/logout/'">
             <i class="fas fa-sign-out-alt" style="color:#696969"></i><span>&nbsp;Logout</span>

@@ -3,6 +3,7 @@ from decimal import Decimal
 import sweetify
 from ..models import WarehouseItems
 import re 
+import pprint
 
 def pvPoMerchChecker(request, voucher):
     # INIT ERR
@@ -72,19 +73,6 @@ def pvPoMerchChecker(request, voucher):
         else:
             customJeAPI('Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.amountPaid)
             customJeAPI('Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
-    if voucher.paymentMethod == "Memorandum":
-        if voucher.purchaseOrder.runningBalance <= voucher.transaction.runningBalance:
-            voucher.transaction.runningBalance -= voucher.purchaseOrder.runningBalance
-            voucher.purchaseOrder.runningBalance = Decimal(0.0)
-            voucher.purchaseOrder.fullyPaid == True
-        else:
-            voucher.purchaseOrder.runningBalance -= voucher.transaction.runningBalance
-            voucher.transaction.runningBalance = Decimal(0.0)
-            voucher.transaction.fullyPaid == True
-    else:
-        voucher.purchaseOrder.runningBalance -= voucher.amountPaid
-        if voucher.purchaseOrder.runningBalance == 0:
-            voucher.purchaseOrder.fullyPaid == True
 
     sumDebit = sum(i['amount'] for i in journal['Debit']['accounts'])
 
@@ -286,6 +274,129 @@ def scChecker(request, sc):
     
     customJeAPI('Debit', sc.party.accountChild.get(name__regex=r"[Rr]eceivable"), sc.amountTotal) 
 
+    
+    sumDebit = sum(i['amount'] for i in journal['Debit']['accounts'])
+
+    sumCredit = sum(i['amount'] for i in journal['Credit']['accounts'])
+
+    if not round(sumDebit, 3) == round(sumCredit, 3):
+        err.append('Journal did not balance')
+
+    
+    if len(err):
+        return err
+    else:
+        return 0
+
+
+def pvPOMerchChecker(request, pv):
+    voucher = pv
+    # INIT ERROR LIST
+    err = []
+
+    # CHECK IF RELEVANT DCHILDACCOUNT HAS VALUE
+    dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
+    if not dChildAccount.inputVat: err.append('inputVat Account missing')
+    if not dChildAccount.prepaidExpense: err.append('prepaidExpense Account missing')
+    if not dChildAccount.ewp: err.append('ewp Account missing')
+    if not dChildAccount.cashOnHand: err.append('cashOnHand Account missing')
+    if not dChildAccount.pettyCash: err.append('pettyCash Account missing')
+
+    journal = {
+        'Debit': {
+            'accounts': []
+        },
+        'Credit': {
+            'accounts': []
+        }
+    }
+
+    if len(err):
+        return err
+
+    def customJeAPI(normally, account, amount):
+        journal[normally]['accounts'].append({'name': account.name, 'amount': amount})
+
+
+
+    ########################################
+    ########## TESTING OF JOURNAL ##########
+    ########################################
+
+
+    ################# DEBIT SIDE #################
+    ################# IF FIRST PAYMENT #################
+    if voucher.purchaseOrder.runningBalance == voucher.purchaseOrder.amountTotal:
+        ################# IF RR WAS DONE BEFORE PV #################
+        if voucher.purchaseOrder.receivingreport.first():
+            ################# IF RR IS APPROVED #################
+            if voucher.purchaseOrder.receivingreport.first().approved == True:
+
+                customJeAPI('Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+            ################# IF RR IS NOT APPROVED UPON PV #################
+            else:
+                customJeAPI('Debit', dChildAccount.inputVat, voucher.purchaseOrder.taxPeso)
+
+                customJeAPI('Debit', dChildAccount.prepaidExpense, (voucher.purchaseOrder.amountDue - voucher.purchaseOrder.taxPeso))
+
+        ################# IF PV IS DONE BEFORE RR #################
+        else:
+            customJeAPI('Debit', dChildAccount.inputVat, voucher.purchaseOrder.taxPeso)
+
+            customJeAPI('Debit', dChildAccount.prepaidExpense, (voucher.purchaseOrder.amountDue - voucher.purchaseOrder.taxPeso))
+
+    ################# IF NOT FIRST PAYMENT #################
+    else:
+        customJeAPI('Debit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+
+
+    ### I DUNNO WHATS THIS FOR ###
+    voucher.purchaseOrder.wep += voucher.wep
+    customJeAPI('Credit', dChildAccount.ewp, voucher.wep)
+
+
+    if voucher.paymentPeriod == 'Full Payment':
+        if voucher.paymentMethod == dChildAccount.cashOnHand.name:
+            customJeAPI('Credit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+            
+        elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+            customJeAPI('Credit', dChildAccount.pettyCash, voucher.amountPaid)
+
+        elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
+            customJeAPI('Credit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
+        elif voucher.paymentMethod == "Cheque":
+            customJeAPI('Credit', voucher.cheque.accountChild, voucher.amountPaid)
+            
+    elif voucher.paymentPeriod == 'Partial Payment':
+        print('b0ss plis')
+        if voucher.paymentMethod == dChildAccount.cashOnHand.name:
+            customJeAPI('Credit', dChildAccount.cashOnHand, voucher.amountPaid)
+
+            customJeAPI('Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+
+        elif voucher.paymentMethod == dChildAccount.pettyCash.name:
+            customJeAPI('Credit', dChildAccount.pettyCash, voucher.amountPaid)
+
+            customJeAPI('Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+
+        elif re.search('[Cc]ash [Ii]n [Bb]ank', voucher.paymentMethod):
+            customJeAPI('Credit', dChildAccount.cashInBank.get(name=voucher.paymentMethod), voucher.amountPaid)
+
+            customJeAPI('Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+        elif voucher.paymentMethod == "Cheque":
+            customJeAPI('Credit', voucher.cheque.accountChild, voucher.amountPaid)
+
+            customJeAPI('Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+    if voucher.paymentMethod == "Memorandum":
+        if voucher.purchaseOrder.runningBalance <= voucher.amountPaid:
+            customJeAPI('Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.purchaseOrder.runningBalance)
+        else:
+            customJeAPI('Credit', voucher.transaction.party.accountChild.get(name__regex=r"[Rr]eceivable"), voucher.amountPaid)
+            customJeAPI('Credit', voucher.purchaseOrder.party.accountChild.get(name__regex=r"[Pp]ayable"), ((voucher.purchaseOrder.runningBalance - voucher.amountPaid) + (voucher.purchaseOrder.poatc.first().amountWithheld - voucher.purchaseOrder.wep)))
+
+    pprint.pprint(journal)
     
     sumDebit = sum(i['amount'] for i in journal['Debit']['accounts'])
 

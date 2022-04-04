@@ -119,10 +119,11 @@
                             </div>
                         </div>
                         <!-- 3 -->
+                        <form @submit.prevent="submit">
                         <div class="row py-2 order-card">
                             <div class="col pr-1">
                                 <label for="">Loan Type</label>
-                                <input v-model="createModal.loanType" type="text" class="form-control" placeholder="Enter Loan Type">
+                                <input required v-model="createModal.loanType" type="text" class="form-control" placeholder="Enter Loan Type">
                             </div>
                             <div class="col pl-1">
                                 <label for="">Loan Amount</label>
@@ -130,7 +131,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input v-model="createModal.loanAmount" placeholder="Enter Loan Amount" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                    <input required v-model="createModal.loanAmount" placeholder="Enter Loan Amount" type="text" class="form-control box-shadow-off" onkeypress="validate()">
                                 </div>
                             </div>
                         </div>
@@ -139,7 +140,7 @@
                             <div class="col pr-1">
                                 <label for="">Service Fee Rate</label>
                                 <div class="input-group">
-                                    <input v-model="createModal.serviceFeeRate" placeholder="Enter Service Fee Rate" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                    <input required v-model="createModal.serviceFeeRate" placeholder="Enter Service Fee Rate" type="text" class="form-control box-shadow-off" onkeypress="validate()">
                                     <div class="input-group-append">
                                         <span class="input-group-text">%</span>
                                     </div>
@@ -151,7 +152,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input v-model="createModal.serviceFee" type="text" class="form-control box-shadow-off" placeholder="Enter Service Fee Amount" onkeypress="validate()">
+                                    <input required v-model="createModal.serviceFee" type="text" class="form-control box-shadow-off" placeholder="Enter Service Fee Amount" onkeypress="validate()">
                                 </div>
                             </div>
                         </div>
@@ -163,7 +164,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input v-model="createModal.netProceeds" type="text" class="form-control box-shadow-off" placeholder="Enter Net Proceeds" onkeypress="validate()">
+                                    <input required v-model="createModal.netProceeds" type="text" class="form-control box-shadow-off" placeholder="Enter Net Proceeds" onkeypress="validate()">
                                 </div>
                             </div>
                         </div>
@@ -172,7 +173,7 @@
                             <div class="col pr-1">
                                 <label for="">Interest Rate</label>
                                 <div class="input-group">
-                                    <input v-model="createModal.interestRate" placeholder="Enter Interest Rate" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                    <input required v-model="createModal.interestRate" placeholder="Enter Interest Rate" type="text" class="form-control box-shadow-off" onkeypress="validate()">
                                     <div class="input-group-append">
                                         <span class="input-group-text">%</span>
                                     </div>
@@ -184,7 +185,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input v-model="createModal.interestAmount" placeholder="Enter Interest Amount" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                    <input required v-model="createModal.interestAmount" placeholder="Enter Interest Amount" type="text" class="form-control box-shadow-off" onkeypress="validate()">
                                 </div>
                             </div>
                         </div>
@@ -195,7 +196,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input v-model="createModal.totalWithInterest" placeholder="Enter Total Amount With Interest" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                    <input required v-model="createModal.totalWithInterest" placeholder="Enter Total Amount With Interest" type="text" class="form-control box-shadow-off" onkeypress="validate()">
                                 </div>
                             </div>
                         </div>
@@ -203,11 +204,11 @@
                         <div class="row py-2 order-card mt-3">
                             <div class="col pr-1">
                                 <label for="">Start of Amortization</label>
-                                <input v-model="createModal.startOfAmortization" type="date" class="form-control">
+                                <input required v-model="createModal.startOfAmortization" type="date" class="form-control">
                             </div>
                             <div class="col pl-1">
                                 <label for="">End of Amortization</label>
-                                <input v-model="createModal.endOfAmortization" type="date" class="form-control">
+                                <input required v-model="createModal.endOfAmortization" type="date" class="form-control">
                             </div>
                         </div>
                         <!-- 8 -->
@@ -218,16 +219,17 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">₱</span>
                                     </div>
-                                    <input v-model="createModal.monthlyAmortization" placeholder="Enter Monthly Amortization" type="text" class="form-control box-shadow-off" onkeypress="validate()">
+                                    <input required v-model="createModal.monthlyAmortization" placeholder="Enter Monthly Amortization" type="text" class="form-control box-shadow-off" onkeypress="validate()">
                                 </div>
                             </div>
                         </div>
                         <!-- 9 -->
                         <div class="row pt-2">
                             <div class="col">
-                                <button class="btn btn-primary col" @click="submit()">Create Loan</button>
+                                <button class="btn btn-primary col" type="submit">Create Loan</button>
                             </div>
                         </div>
+                        </form>
                     </div>
                 </div>
             </div>
