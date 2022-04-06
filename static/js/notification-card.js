@@ -9,6 +9,7 @@ Vue.component('notification-card', {
                 url: null,
                 read: null,
                 authLevel: null,
+                datetimeCreated: null
             }],
 
             config: {
@@ -35,12 +36,56 @@ Vue.component('notification-card', {
             axios.get('/api/notifications/')
             .then(res=>{
                 this.notifications = res.data
+                console.log(res.data)
             })
         },
         deleteNoti(id){
             axios.delete(`/api/notifications/${id}/`, this.config)
             .then(res=>this.fetchNoti())
-        }
+        },
+
+        formatDateTime(value){
+            const months = [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec'
+            ]
+
+            const days = [
+                'Sun',
+                'Mon',
+                'Tue',
+                'Wed',
+                'Thu',
+                'Fri',
+                'Sat'
+            ]
+
+            value = new Date(value)
+            year = value.getFullYear()
+            month = months[value.getMonth()]
+            date = value.getDate()
+            hour = (value.getHours() + 24) % 12 || 12; 
+            minute = (value.getMinutes()<10?'0':'') + value.getMinutes()
+            day = days[value.getDay()]
+            meridian = value.getHours() >= 12 ? 'pm' : 'am'
+            formatted = `${month}. ${date}, ${year} - ${hour}:${minute} ${meridian}`
+
+            return formatted
+        },
+
+        timeSince(date){
+            return moment(date).fromNow(true)
+        },
     },
 
     template: /*javascript*/`
@@ -67,6 +112,7 @@ Vue.component('notification-card', {
                     <div class="my-1" v-on:click="onclick(item.id)">
                         <span class="font-bold soft-text">[[item.title]]</span><br>
                         <span class="font-regular softer-text">[[item.subject]]</span><br>
+                        <span class="font-regular softer-text font-size-10">[[timeSince(item.datetimeCreated)]]</span>
                     </div>
                     <div v-on:click="deleteNoti(item.id)" style="width:20px" class="notification-delete b-tr-radius-5 b-br-radius-5 d-flex justify-content-center align-items-center">
                         <span><i class="fas fa-trash-alt"></i></span>

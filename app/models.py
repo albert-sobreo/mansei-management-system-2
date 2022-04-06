@@ -76,6 +76,7 @@ class Notifications(models.Model):
     url = models.URLField()
     read = models.BooleanField(default=False)
     authLevel = models.CharField(max_length=2, null=True, blank=True)
+    datetimeCreated = models.DateTimeField(null=True, blank=True, auto_now_add=True)
 
     def __str__(self):
         return self.title
