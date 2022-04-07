@@ -3,6 +3,7 @@ from urllib import request
 from venv import create
 
 from h11 import Request
+from urllib3 import Retry
 from ..models import *
 import datetime
 from django.http.response import HttpResponseServerError
@@ -91,34 +92,35 @@ def voidJournal(request, journal):
 
 
 class JournalAPI:
-    # CLASS ATTRIBUTES
-    journal = {
-        'Debit': {
-            'accounts': []
-        },
-        'Credit': {
-            'accounts': []
-        }
-    }
-
-    request = None
-    code: str = None
-    createdBy: str = None
-    journalDate  = None
-
-    # END ATTRIBUTES
-
     # INIT
+    def __init__(self, request, code, createdBy, journalDate, remarks=None) -> None:
+        # CLASS ATTRIBUTES
+        self.journal = {
+            'Debit': {
+                'accounts': []
+            },
+            'Credit': {
+                'accounts': []
+            }
+        }
 
-    def __init__(self, request, code, createdBy, journalDate) -> None:
+        self.request = None
+        self.code: str = None
+        self.createdBy: str = None
+        self.journalDate  = None
+        self.remarks: str = None
+
         self.request = request
         self.code = code
         self.createdBy = createdBy
         self.journalDate = journalDate
+        self.remarks = remarks
 
+    # ADDS TEMPORARY JOURNAL ENTRIES TO SELF.JOURNAL
     def addJE(self, normally, account, amount):
         self.journal[normally]['accounts'].append({'name': account, 'amount': amount})
     
+    # CHECKS INTEGRITY OF THE JOURNAL
     def checker(self):
         sumDebit = sum(i['amount'] for i in self.journal['Debit']['accounts'])
         sumCredit = sum(i['amount'] for i in self.journal['Credit']['accounts'])
@@ -127,7 +129,8 @@ class JournalAPI:
             return 0
         else:
             return 1
-
+    
+    # RESETS ATTRIBUTES ### (OBSOLETE)
     def reset(self):
         self.journal = {
             'Debit': {
@@ -143,7 +146,9 @@ class JournalAPI:
         self.createdBy = None
         self.journalDate  = None
 
+    # SAVES THE JOURNAL AS JOURNAL OBJECT. CALLS REAL JEAPI
     def save(self):
+        print(self.journal)
         if not self.checker(): raise Exception("Journal did not balance.")
 
         j = Journal()
@@ -151,6 +156,7 @@ class JournalAPI:
         j.datetimeCreated = datetime.datetime.now()
         j.createdBy = self.createdBy
         j.journalDate = self.journalDate
+        j.remarks = self.remarks
         j.save()
         self.request.user.branch.journal.add(j)
 
@@ -161,3 +167,5 @@ class JournalAPI:
             jeAPI(self.request, j, 'Credit', account['name'], account['amount'])
 
         self.reset()
+
+        return True
