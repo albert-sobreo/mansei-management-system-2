@@ -1,4 +1,8 @@
 
+from urllib import request
+from venv import create
+
+from h11 import Request
 from ..models import *
 import datetime
 from django.http.response import HttpResponseServerError
@@ -87,6 +91,7 @@ def voidJournal(request, journal):
 
 
 class JournalAPI:
+    # CLASS ATTRIBUTES
     journal = {
         'Debit': {
             'accounts': []
@@ -95,6 +100,21 @@ class JournalAPI:
             'accounts': []
         }
     }
+
+    request = None
+    code: str = None
+    createdBy: str = None
+    journalDate  = None
+
+    # END ATTRIBUTES
+
+    # INIT
+
+    def __init__(self, request, code, createdBy, journalDate) -> None:
+        self.request = request
+        self.code = code
+        self.createdBy = createdBy
+        self.journalDate = journalDate
 
     def addJE(self, normally, account, amount):
         self.journal[normally]['accounts'].append({'name': account, 'amount': amount})
@@ -108,19 +128,36 @@ class JournalAPI:
         else:
             return 1
 
-    def save(self, request, code, createdBy, journalDate):
-        if not self.checker(): return HttpResponseServerError('Journal did not balance.')
+    def reset(self):
+        self.journal = {
+            'Debit': {
+                'accounts': []
+            },
+            'Credit': {
+                'accounts': []
+            }
+        }
+
+        self.request = None
+        self.code = None
+        self.createdBy = None
+        self.journalDate  = None
+
+    def save(self):
+        if not self.checker(): raise Exception("Journal did not balance.")
 
         j = Journal()
-        j.code = code
+        j.code = self.code
         j.datetimeCreated = datetime.datetime.now()
-        j.createdBy = createdBy
-        j.journalDate = journalDate
+        j.createdBy = self.createdBy
+        j.journalDate = self.journalDate
         j.save()
-        request.user.branch.journal.add(j)
+        self.request.user.branch.journal.add(j)
 
         for account in self.journal['Debit']['accounts']:
-            jeAPI(request, j, 'Debit', account['name'], account['amount'])
+            jeAPI(self.request, j, 'Debit', account['name'], account['amount'])
 
         for account in self.journal['Credit']['accounts']:
-            jeAPI(request, j, 'Credit', account['name'], account['amount'])
+            jeAPI(self.request, j, 'Credit', account['name'], account['amount'])
+
+        self.reset()

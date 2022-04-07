@@ -116,22 +116,55 @@ class POApprovalAPI(APIView):
         except:
             pass
 
-        purchase.save()
+        
 
+        ############################
+        ##### ORIGINAL JOURNAL #####
+        ############################
         
-        
+        # if purchase.poitemsother.all():
+        #     if purchase.needsRR == False:
+        #         j = Journal()
+
+        #         j.code = purchase.code
+        #         j.datetimeCreated = datetime.now()
+        #         j.createdBy = purchase.createdBy
+        #         j.journalDate = purchase.datePurchased
+        #         j.save()
+        #         request.user.branch.journal.add(j)
+
+        #         jeAPI(request, j, 'Credit', purchase.party.accountChild.get(name__regex=r"[Pp]ayable"), purchase.runningBalance)
+
+        #         expenseType = {}
+        #         for element in purchase.poitemsother.all():
+        #             if expenseType.get(element.type):
+        #                 expenseType[element.type] += element.totalPrice
+        #             else:
+        #                 expenseType[element.type] = element.totalPrice
+
+        #         for key, val in expenseType.items():
+        #             jeAPI(request, j, "Debit", AccountChild.objects.get(pk = key), (val/(1+(purchase.taxRate/100))))
+
+        #         if purchase.taxPeso != 0:
+        #             jeAPI(request, j, "Debit", dChildAccount.inputVat, purchase.taxPeso)
+
+        ##########################
+        ##### END OF JOURNAL #####
+        ##########################
+
+
+        ##---------------------------##
+
+
+        #############################
+        ##### PROTOTYPE JOURNAL #####
+        #############################
+
         if purchase.poitemsother.all():
             if purchase.needsRR == False:
-                j = Journal()
+                j = JournalAPI(request, purchase.code, purchase.createdBy, purchase.datePurchased)
 
-                j.code = purchase.code
-                j.datetimeCreated = datetime.now()
-                j.createdBy = purchase.createdBy
-                j.journalDate = purchase.datePurchased
-                j.save()
-                request.user.branch.journal.add(j)
-
-                jeAPI(request, j, 'Credit', purchase.party.accountChild.get(name__regex=r"[Pp]ayable"), purchase.runningBalance)
+                j.addJE('Credit', purchase.party.accountChild.get(name__regex=r"[Pp]ayable"), purchase.runningBalance)
 
                 expenseType = {}
                 for element in purchase.poitemsother.all():
@@ -141,10 +174,17 @@ class POApprovalAPI(APIView):
                         expenseType[element.type] = element.totalPrice
 
                 for key, val in expenseType.items():
-                    jeAPI(request, j, "Debit", AccountChild.objects.get(pk = key), (val/(1+(purchase.taxRate/100))))
+                    j.addJE("Debit", AccountChild.objects.get(pk = key), (val/(1+(purchase.taxRate/100))))
 
                 if purchase.taxPeso != 0:
-                    jeAPI(request, j, "Debit", dChildAccount.inputVat, purchase.taxPeso)
+                    j.addJE("Debit", dChildAccount.inputVat, purchase.taxPeso)
+
+                j.save()
+
+        ############################
+        ##### END OF PROTOTYPE #####
+        ############################
+        purchase.save()
 
         notify(request, 'Purchase Order approved', purchase.code, '/po-approved/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
@@ -158,9 +198,12 @@ class POVoid(APIView):
         purchase.voided = True
         purchase.voidedBy = request.user
         purchase.datetimeVoided = datetime.now()
-        purchase.save()
 
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+
+        ############################
+        ##### ORIGINAL JOURNAL #####
+        ############################
 
         if purchase.poitemsother.all():
             if purchase.needsRR == False:
@@ -187,6 +230,17 @@ class POVoid(APIView):
 
                 if purchase.taxPeso != 0:
                     jeAPI(request, j, "Credit/", dChildAccount.inputVat, purchase.taxPeso)
+
+        ##########################
+        ##### END OF JOURNAL #####
+        ##########################
+
+
+        #################################
+        ##### JOURNAL API PROTOTYPE #####
+        #################################
+        
+        purchase.save()
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)
 
@@ -1307,11 +1361,7 @@ class SCApprovalAPI(APIView):
                     sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory reserves', persistent='Dismiss')
                     return JsonResponse(0, safe=False)
 
-        sale.datetimeApproved = datetime.now()
-        sale.approved = True
-        sale.approvedBy = request.user
-
-        sale.save()
+        
 
         ##################################
         ###### JOURNAL PORTION OF SC #####
@@ -1357,7 +1407,7 @@ class SCApprovalAPI(APIView):
         ###### JOURNAL API PROTOTYPE ######
         ###################################
 
-        j = JournalAPI()
+        j = JournalAPI(request, sale.code, sale.createdBy, sale.dateSold)
         totalFees = Decimal(0.0)
         for fees in sale.scotherfees.all():
             totalFees += fees.fee
@@ -1380,11 +1430,17 @@ class SCApprovalAPI(APIView):
             j.addJE('Debit', element.merchInventory.childAccountCostOfSales, element.merchInventory.purchasingPrice*element.qty)
 
 
-        j.save(request, sale.code, sale.createdBy, sale.dateSold)
+        j.save()
 
         ##############################
         ###### END OF PROTOTYPE ######
         ##############################
+
+        sale.datetimeApproved = datetime.now()
+        sale.approved = True
+        sale.approvedBy = request.user
+
+        sale.save()
 
         notify(request, "Sales Contract approved", sale.code, '/sc-approved/', 1)
 
