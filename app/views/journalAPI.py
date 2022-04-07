@@ -1,6 +1,7 @@
 
 from ..models import *
 import datetime
+from django.http.response import HttpResponseServerError
 
 def jeAPI(request, journal, normally, accountChild, amount):
     if not amount:
@@ -83,3 +84,43 @@ def voidJournal(request, journal):
         print(journal.pk)
 
     journal.delete()
+
+
+class JournalAPI:
+    journal = {
+        'Debit': {
+            'accounts': []
+        },
+        'Credit': {
+            'accounts': []
+        }
+    }
+
+    def addJE(self, normally, account, amount):
+        self.journal[normally]['accounts'].append({'name': account, 'amount': amount})
+    
+    def checker(self):
+        sumDebit = sum(i['amount'] for i in self.journal['Debit']['accounts'])
+        sumCredit = sum(i['amount'] for i in self.journal['Credit']['accounts'])
+
+        if not round(sumDebit, 3) == round(sumCredit, 3):
+            return 0
+        else:
+            return 1
+
+    def save(self, request, code, createdBy, journalDate):
+        if not self.checker(): return HttpResponseServerError('Journal did not balance.')
+
+        j = Journal()
+        j.code = code
+        j.datetimeCreated = datetime.datetime.now()
+        j.createdBy = createdBy
+        j.journalDate = journalDate
+        j.save()
+        request.user.branch.journal.add(j)
+
+        for account in self.journal['Debit']['accounts']:
+            jeAPI(request, j, 'Debit', account['name'], account['amount'])
+
+        for account in self.journal['Credit']['accounts']:
+            jeAPI(request, j, 'Credit', account['name'], account['amount'])

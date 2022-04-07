@@ -451,6 +451,7 @@ class WarehouseItems(models.Model):
         self.merchInventory.qtyS += qty
 
         if self.qtyA < 0 or self.qtyS < 0 or self.merchInventory.qtyA < 0 or self.merchInventory.qtyS < 0:
+            print(self.qtyA, self.qtyS, self.merchInventory.qtyA, self.merchInventory.qtyS)
             return 0
 
         return 1

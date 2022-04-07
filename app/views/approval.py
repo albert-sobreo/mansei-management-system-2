@@ -8,7 +8,7 @@ import sweetify
 from decimal import Decimal
 from datetime import datetime
 import re
-from .journalAPI import jeAPI
+from .journalAPI import jeAPI, JournalAPI
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
 from .checkers import *
@@ -1288,8 +1288,10 @@ class SCApprovalAPI(APIView):
 
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         if not sale.salesOrder:
+            print(sale.salesOrder)
             for element in sale.scitemsmerch.all():
-                wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
+                wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory).order_by('pk')[0]
+                print(wi.warehouse)
                 if wi.salesWOSO(element.qty):
                     wi.save2()
                 else:
@@ -1297,7 +1299,8 @@ class SCApprovalAPI(APIView):
                     return JsonResponse(0, safe=False)
         else:
             for element in sale.scitemsmerch.all():
-                wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
+                wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory).order_by('pk')[0]
+                print(wi.warehouse)
                 if wi.salesWSO(element.qty):
                     wi.save2()
                 else:
@@ -1310,38 +1313,78 @@ class SCApprovalAPI(APIView):
 
         sale.save()
 
-        j = Journal()
+        ##################################
+        ###### JOURNAL PORTION OF SC #####
+        ##################################
 
-        j.code = sale.code
-        j.datetimeCreated = datetime.now()
-        j.createdBy = sale.createdBy
-        j.journalDate = sale.dateSold
-        j.save()
-        request.user.branch.journal.add(j)
+        # j = Journal()
+
+        # j.code = sale.code
+        # j.datetimeCreated = datetime.now()
+        # j.createdBy = sale.createdBy
+        # j.journalDate = sale.dateSold
+        # j.save()
+        # request.user.branch.journal.add(j)
 
         
+        # totalFees = Decimal(0.0)
+        # num = 0
+        # for fees in sale.scotherfees.all():
+        #     totalFees += fees.fee
+
+        # if totalFees != 0.0:
+        #     jeAPI(request, j, 'Credit', dChildAccount.otherIncome, totalFees)
+
+        # if sale.taxPeso != 0.0:
+        #     jeAPI(request, j, 'Credit', dChildAccount.outputVat, sale.taxPeso)
+
+        # for item in sale.scitemsmerch.all():
+        #     jeAPI(request, j, 'Credit', item.merchInventory.childAccountSales, (item.totalCost)-(sale.discountPeso/sale.scitemsmerch.all().count())-((item.totalCost-(sale.discountPeso/sale.scitemsmerch.all().count()))*(sale.taxRate/100)))
+        
+        # for element in sale.scitemsmerch.all():
+        #     jeAPI(request, j, 'Credit', element.merchInventory.childAccountInventory, element.merchInventory.purchasingPrice*element.qty)
+
+        # jeAPI(request, j, 'Debit', sale.party.accountChild.get(name__regex=r"[Rr]eceivable"), sale.amountTotal)
+        
+        # for element in sale.scitemsmerch.all():
+        #     jeAPI(request, j, 'Debit', element.merchInventory.childAccountCostOfSales, element.merchInventory.purchasingPrice*element.qty)
+        
+        ############################
+        ###### END OF JOURNAL ######
+        ############################
+        
+        ###################################
+        ###### JOURNAL API PROTOTYPE ######
+        ###################################
+
+        j = JournalAPI()
         totalFees = Decimal(0.0)
-        num = 0
         for fees in sale.scotherfees.all():
             totalFees += fees.fee
 
         if totalFees != 0.0:
-            jeAPI(request, j, 'Credit', dChildAccount.otherIncome, totalFees)
+            j.addJE('Credit', dChildAccount.otherIncome, totalFees)
 
         if sale.taxPeso != 0.0:
-            jeAPI(request, j, 'Credit', dChildAccount.outputVat, sale.taxPeso)
+            j.addJE('Credit', dChildAccount.outputVat, sale.taxPeso)
 
         for item in sale.scitemsmerch.all():
-            jeAPI(request, j, 'Credit', item.merchInventory.childAccountSales, (item.totalCost)-(sale.discountPeso/sale.scitemsmerch.all().count())-((item.totalCost-(sale.discountPeso/sale.scitemsmerch.all().count()))*(sale.taxRate/100)))
+            j.addJE('Credit', item.merchInventory.childAccountSales, (item.totalCost)-(sale.discountPeso/sale.scitemsmerch.all().count())-((item.totalCost-(sale.discountPeso/sale.scitemsmerch.all().count()))*(sale.taxRate/100)))
         
         for element in sale.scitemsmerch.all():
-            jeAPI(request, j, 'Credit', element.merchInventory.childAccountInventory, element.merchInventory.purchasingPrice*element.qty)
+            j.addJE('Credit', element.merchInventory.childAccountInventory, element.merchInventory.purchasingPrice*element.qty)
 
-        jeAPI(request, j, 'Debit', sale.party.accountChild.get(name__regex=r"[Rr]eceivable"), sale.amountTotal)
+        j.addJE('Debit', sale.party.accountChild.get(name__regex=r"[Rr]eceivable"), sale.amountTotal)
         
         for element in sale.scitemsmerch.all():
-            jeAPI(request, j, 'Debit', element.merchInventory.childAccountCostOfSales, element.merchInventory.purchasingPrice*element.qty)
+            j.addJE('Debit', element.merchInventory.childAccountCostOfSales, element.merchInventory.purchasingPrice*element.qty)
 
+
+        j.save(request, sale.code, sale.createdBy, sale.dateSold)
+
+        ##############################
+        ###### END OF PROTOTYPE ######
+        ##############################
 
         notify(request, "Sales Contract approved", sale.code, '/sc-approved/', 1)
 
