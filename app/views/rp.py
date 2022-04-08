@@ -9,7 +9,7 @@ import sweetify
 from datetime import date as now
 from decimal import Decimal
 from datetime import datetime
-from .journalAPI import jeAPI
+from .journalAPI import jeAPI, JournalAPI
 import re
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
@@ -100,33 +100,27 @@ class SaveReceivePayment(APIView):
 
             
 
-            j = Journal()
-            j.code = rp.code
-            j.datetimeCreated = rp.datetimeCreated
-            j.createdBy = rp.createdBy
-            j.journalDate = datetime.now()
-            j.save()
-            rp.journal = j
-            rp.save()
-            request.user.branch.journal.add(j)
+            j = JournalAPI(request, rp.code, rp.createdBy, rp.datetimeCreated, 'Received Payment Journal')
             ################# CREDIT SIDE #################
             # jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
             ################# DEBIT SIDE #################
             if rp.wep!= 0.0:
-                jeAPI(request, j, 'Debit', dChildAccount.cwit, rp.wep)
+                j.addJE('Debit', dChildAccount.cwit, rp.wep)
             if rp.paymentMethod == dChildAccount.cashOnHand.name:
-                jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
-                jeAPI(request, j, 'Debit', dChildAccount.cashOnHand, rp.amountPaid)
+                j.addJE('Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+                j.addJE('Debit', dChildAccount.cashOnHand, rp.amountPaid)
             elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
-                jeAPI(request, j, 'Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
-                jeAPI(request, j, 'Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
+                j.addJE('Credit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+                j.addJE('Debit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
             elif rp.paymentMethod == "Memorandum":
                 if rp.salesContract.runningBalance <= rp.transaction.runningBalance:
-                    jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.salesContract.runningBalance)
-                    jeAPI(request, j, 'Credit', rp.transaction.party.accountChild.get(name__regex=r"[Pp]ayable"), rp.salesContract.runningBalance)
+                    j.addJE('Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.salesContract.runningBalance)
+                    j.addJE('Credit', rp.transaction.party.accountChild.get(name__regex=r"[Pp]ayable"), rp.salesContract.runningBalance)
                 else:
-                    jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.transaction.runningBalance)
-                    jeAPI(request, j, 'Credit', rp.transaction.party.accountChild.get(name__regex=r"[Pp]ayable"), rp.transaction.runningBalance)
+                    j.addJE('Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), rp.transaction.runningBalance)
+                    j.addJE('Credit', rp.transaction.party.accountChild.get(name__regex=r"[Pp]ayable"), rp.transaction.runningBalance)
+
+            j.save()
             rp.salesContract.runningBalance -= (rp.amountPaid + rp.wep)
             if rp.salesContract.runningBalance == 0:
                 rp.salesContract.fullyPaid = True
@@ -187,26 +181,20 @@ class RPVoid(APIView):
         rp.datetimeVoided = datetime.now()
         rp.voidedBy = request.user
 
-        j = Journal()
-        j.code = rp.code
-        j.datetimeCreated = rp.datetimeCreated
-        j.createdBy = rp.createdBy
-        j.journalDate = datetime.now()
-        j.save()
-        rp.journal = j
-        rp.save()
-        request.user.branch.journal.add(j)
+        j = JournalAPI(request, rp.code, rp.createdBy, rp.datetimeCreated, 'Received Payment Void')
         ################# DEBIT SIDE #################
-        jeAPI(request, j, 'Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
+        j.addJE('Debit', rp.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (rp.amountPaid + rp.wep))
         ################# CREDIT SIDE #################
         if rp.wep!= 0.0:
-            jeAPI(request, j, 'Credit', dChildAccount.cwit, rp.wep)
+            j.addJE('Credit', dChildAccount.cwit, rp.wep)
         if rp.paymentMethod == dChildAccount.cashOnHand.name:
-            jeAPI(request, j, 'Credit', dChildAccount.cashOnHand, rp.amountPaid)
+            j.addJE('Credit', dChildAccount.cashOnHand, rp.amountPaid)
         elif re.search('[Cc]ash [Ii]n [Bb]ank', rp.paymentMethod):
-            jeAPI(request, j, 'Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
+            j.addJE('Credit', dChildAccount.cashInBank.get(name=rp.paymentMethod), rp.amountPaid)
         elif rp.paymentMethod == "Cheque":
-            jeAPI(request, j, 'Credit', rp.cheque.accountChild, rp.amountPaid)
+            j.addJE('Credit', rp.cheque.accountChild, rp.amountPaid)
+
+        j.save()
         
         rp.salesContract.runningBalance += (rp.amountPaid + rp.wep)
         if rp.salesContract.runningBalance == 0:
