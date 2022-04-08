@@ -29,7 +29,11 @@
             </thead>
             <tbody>
                 {% for item in request.user.branch.paymentVoucher.all %}
+                {% if item.voided %}
+                <tr class="voided">
+                {% else %}
                 <tr>
+                {% endif %}
                     <td @click="getPO2({{item.pk}})" class="link" data-toggle="modal" data-target="#pvModal">{{item.code}}</td>
                     {% if item.purchaseOrder %}
                     <td>{{item.purchaseOrder.party.name}}</td>
@@ -38,7 +42,9 @@
                     {% endif %}
                     <td>₱[[formatPrice({{item.amountPaid}})]]</td>
                     <td>{{item.createdBy.first_name}} {{item.createdBy.last_name}}</td>
-                    {% if item.approved %}
+                    {% if item.voided %}
+                    <td><span class="text-danger">Voided</span></td>
+                    {% elif item.approved %}
                     <td><span class="approved">Approved</span></td>
                     {% else %}
                     <td><span class="pending">Pending</span></td>
@@ -137,7 +143,7 @@
                                     <th><span class="font-bold gray">Amount</span></th>
                                     <th><span class="font-bold gray">Total Amount</span></th>
                                 </thead>
-                                <tbody v-if="pvModal.purchaseOrder != null">
+                                <tbody v-if="pvModal.purchaseOrder.poitemsmerch.length > 0">
                                     <tr v-for="item in pvModal.purchaseOrder.poitemsmerch">
                                         <td>Merchandise</td>
                                         <td>[[item.merchInventory.code]] - [[item.merchInventory.classification]] [[item.merchInventory.type]]</td>
@@ -146,9 +152,20 @@
                                         <td>₱[[formatPrice(item.totalPrice)]]</td>
                                     </tr>
                                 </tbody>
+                                <tbody v-else-if="pvModal.purchaseOrder.poitemsother.length > 0">
+                                    <tr v-for="item in pvModal.purchaseOrder.poitemsother">
+                                        <td>Expense</td>
+                                        <td>[[item.otherInventory.name]]</td>
+                                        <td>[[item.qty]]</td>
+                                        <td>₱[[formatPrice(item.purchasingPrice)]]</td>
+                                        <td>₱[[formatPrice(item.totalPrice)]]</td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
-                        <div class="row" v-if="!pvModal.approved && Number('{{request.user.authLevel}}') < 2">
+                        <div class="row" v-if="pvModal.voided && Number('{{request.user.authLevel}}') < 2">
+                        </div>
+                        <div class="row" v-else-if="!pvModal.approved && Number('{{request.user.authLevel}}') < 2">
                             <div class="col">
                                 <button class="col btn btn-primary" @click="approvePV([[pvModal.id]])">Approve</button>
                             </div>
@@ -573,7 +590,8 @@
                     party: {
                         name: null,
                     },
-                    poitemsmerch: []
+                    poitemsmerch: [],
+                    poitemsother: []
                 },
                 amountPaid: null,
                 paymentMethod: null,
@@ -783,9 +801,7 @@
             getPO(id){
                 axios.get(`/api/purchase-order/${id}/`)
                 .then(res=>{
-                    console.log(res.data)
                     var item = res.data
-                    console.log(item.party.name)
                     this.create.po.code = item.id
                     this.create.po.runningBalance = item.runningBalance
                     this.create.po.wep = item.poatc[0].amountWithheld
@@ -886,7 +902,9 @@
             },
             getPO2(id){
                 axios.get(`/api/payment-voucher/${id}/`)
-                .then(res=>this.pvModal=res.data)
+                .then(res=>{
+                    this.pvModal=res.data
+                })
             },
             approvePV(id){
                 axios.put(`/pv-approval/${id}/`, this.create, this.config)
@@ -922,7 +940,6 @@
                 }
     
                 if(this.pvType == "Default"){
-                    console.log('help')
                     body.custom.style.display = "none"
                     body.default.style.display = "block"
                 } else {

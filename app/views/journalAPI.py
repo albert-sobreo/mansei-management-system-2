@@ -168,4 +168,4 @@ class JournalAPI:
 
         self.reset()
 
-        return True
+        return j
