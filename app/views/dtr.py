@@ -379,6 +379,9 @@ class DTRProcess(APIView):
 
             nd -= ndot
 
+            # OT CORRECTION
+            ot -= ndot
+
             holidays = dtr.dtrdaycategory.all()
             
             restDayMarker = False
@@ -467,6 +470,9 @@ class DTRProcess(APIView):
             bh += Decimal(bhDuration.seconds/3600)
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
+
+            # OT CORRECTION
+            ot -= ndot
 
             holidays = dtr.dtrdaycategory.all()
             
@@ -571,6 +577,9 @@ class DTRProcess(APIView):
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
 
+            # OT CORRECTION
+            ot -= ndot
+
             holidays = dtr.dtrdaycategory.all()
             
             restDayMarker = False
@@ -657,6 +666,9 @@ class DTRProcess(APIView):
             bh += Decimal(bhDuration.seconds/3600)
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
+
+            # OT CORRECTION
+            ot -= ndot
 
             holidays = dtr.dtrdaycategory.all()
             

@@ -37,9 +37,9 @@
                 {% for cheque in cheques %}
                 <tr>
                     <td>{{cheque.chequeNo}}</td>
-                    <td>{{cheque.receivePayment.code}}</td>
-                    <td>{{cheque.receivePayment.amountPaid}}</td>
-                    <td>{{cheque.receivePayment.salesContract.party.name}}</td>
+                    <td>{{cheque.receivepayment.all.0.code}}</td>
+                    <td>{{cheque.receivepayment.all.0.amountPaid}}</td>
+                    <td>{{cheque.receivepayment.all.0.salesContract.party.name}}</td>
                 </tr>
                 {% endfor %}
             </tbody>

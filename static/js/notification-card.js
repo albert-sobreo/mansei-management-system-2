@@ -36,7 +36,6 @@ Vue.component('notification-card', {
             axios.get('/api/notifications/')
             .then(res=>{
                 this.notifications = res.data
-                console.log(res.data)
             })
         },
         deleteNoti(id){

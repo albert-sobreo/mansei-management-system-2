@@ -181,7 +181,7 @@ class TestSalesContract(StaticLiveServerTestCase):
     def setUp(self):
         chrome_options = Options()
         chrome_options.add_experimental_option("detach", True)
-        self.driver = webdriver.Chrome(executable_path='/home/albert/Documents/Mansei/mms2/chromedriver', chrome_options=chrome_options)
+        self.driver = webdriver.Chrome(executable_path='/home/albert/Documents/Mansei/mms2/chromedriver100', chrome_options=chrome_options)
         self.driver.get('%s%s'%(self.live_server_url, '/login/'))
         username = self.driver.find_element_by_name('username')
         password = self.driver.find_element_by_name('password')
@@ -239,9 +239,14 @@ class TestSalesContract(StaticLiveServerTestCase):
                 option.click()
                 break
 
+        d.find_element_by_id('discount-percent-id').click()
+        d.find_element_by_id('id-discount').send_keys(10)
+
+        input()
+
         d.find_element_by_id('id_submitBtn').click()
 
-        sleep(5)
+        sleep(2)
 
         print('---------------------------\n')
 
@@ -260,7 +265,7 @@ class TestSalesContract(StaticLiveServerTestCase):
         sleep(2)
         d.get('%s%s'%(self.live_server_url, '/journal/'))
 
-        sleep(5)
+        sleep(2)
 
 
         self.branch = Branch.objects.get(name='Test2')
@@ -281,3 +286,4 @@ class TestSalesContract(StaticLiveServerTestCase):
         print(abs(Decimal(self.initSales.amount) - Decimal(dChildAccount.sales.amount)))
         print(abs(Decimal(self.initMerchInventory.amount) - Decimal(dChildAccount.merchInventory.amount)))
         print(abs(Decimal(self.initCostOfSales.amount) - Decimal(dChildAccount.costOfSales.amount)))
+        input()

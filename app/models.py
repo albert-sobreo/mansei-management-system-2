@@ -427,6 +427,10 @@ class WarehouseItems(models.Model):
         self.merchInventory.qtyA -= qty
 
         if self.qtyR < 0 or self.qtyA < 0 or self.merchInventory.qtyR < 0 or self.merchInventory.qtyA < 0:
+            print(self.qtyR)
+            print(self.qtyA)
+            print(self.merchInventory.qtyR)
+            print(self.merchInventory.qtyA < 0)
             return 0
 
         return 1
@@ -463,6 +467,8 @@ class Cheques(models.Model):
     approvedBy = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank = True , related_name="cheApprovedBy")
     datetimeApproved = models.DateTimeField(null = True, blank = True)
     dueDate = models.DateField(null = True, blank = False)
+    transactionCode = models.CharField(max_length=64, null=True, blank=True)
+    party = models.ForeignKey(Party, on_delete=models.SET_NULL, null=True, blank=True)
 
 class PurchaseRequest(models.Model):
     code = models.CharField(max_length=50)
@@ -1810,8 +1816,8 @@ class ManufacturingInventory(models.Model):
     jobOrder = models.ForeignKey(JobOrder, related_name="manufacturinginventory", on_delete=models.CASCADE, null=True, blank=True)
     
     class Meta:
-        verbose_name = "Merchandise Inventory"
-        verbose_name_plural = "Merchandise Inventories"
+        verbose_name = "Manufacturing Inventory"
+        verbose_name_plural = "Manufacturing Inventories"
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####

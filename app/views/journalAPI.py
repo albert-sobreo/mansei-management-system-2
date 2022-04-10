@@ -7,6 +7,7 @@ from urllib3 import Retry
 from ..models import *
 import datetime
 from django.http.response import HttpResponseServerError
+import pprint
 
 def jeAPI(request, journal, normally, accountChild, amount):
     if not amount:
@@ -124,10 +125,16 @@ class JournalAPI:
     def checker(self):
         sumDebit = sum(i['amount'] for i in self.journal['Debit']['accounts'])
         sumCredit = sum(i['amount'] for i in self.journal['Credit']['accounts'])
+        print('SUMS OF DEBIT AND CREDIT: ', round(sumDebit, 3), round(sumCredit, 3))
 
-        if not round(sumDebit, 3) == round(sumCredit, 3):
+        print(((round(Decimal(sumDebit), 3)) == (round(Decimal(sumCredit), 3))))
+        print(round(Decimal(sumDebit), 3))
+        print(round(Decimal(sumCredit), 3))
+        if not ((round(Decimal(sumDebit), 3)) == (round(Decimal(sumCredit), 3))):
+            print('journal is not balanced')
             return 0
         else:
+            print('journal is balanced')
             return 1
     
     # RESETS ATTRIBUTES ### (OBSOLETE)
@@ -148,7 +155,7 @@ class JournalAPI:
 
     # SAVES THE JOURNAL AS JOURNAL OBJECT. CALLS REAL JEAPI
     def save(self):
-        print(self.journal)
+        pprint.pprint(self.journal)
         if not self.checker(): raise Exception("Journal did not balance.")
 
         j = Journal()
@@ -161,11 +168,31 @@ class JournalAPI:
         self.request.user.branch.journal.add(j)
 
         for account in self.journal['Debit']['accounts']:
-            jeAPI(self.request, j, 'Debit', account['name'], account['amount'])
+            jeAPI(self.request, j, 'Debit', account['name'], Decimal(account['amount']))
 
         for account in self.journal['Credit']['accounts']:
-            jeAPI(self.request, j, 'Credit', account['name'], account['amount'])
+            jeAPI(self.request, j, 'Credit', account['name'], Decimal(account['amount']))
 
         self.reset()
 
         return j
+
+def getNewJournalCode(request):
+    try:
+        j = request.user.branch.journal.filter(code__regex=r'J-')
+        j = j.latest('pk')
+        listed_code = j.code.split('-')
+        listed_date = str(datetime.date.today()).split('-')
+        current_code = int(listed_code[3])
+        
+        if listed_code[1] == listed_date[0] and listed_code[2] == listed_date[1]:
+            current_code += 1
+            new_code = 'J-{}-{}-{}'.format(listed_date[0], listed_date[1], str(current_code).zfill(4))
+        else:
+            new_code = 'J-{}-{}-0001'.format(listed_date[0], listed_date[1])
+    except Exception as e:
+        print(e)
+        listed_date = str(datetime.date.today()).split('-')
+        new_code = 'J-{}-{}-0001'.format(listed_date[0], listed_date[1])
+
+    return new_code

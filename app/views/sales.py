@@ -91,10 +91,10 @@ class SaveSalesContract(APIView):
         if request.user.is_authenticated:
             sc.createdBy = request.user
 
-        if salesContract['discountType'] == 'percent':
-            sc.discountPercent = salesContract['totalDiscount']
-        elif salesContract['discountType'] == 'peso':
-            sc.discountPeso = salesContract['totalDiscount']
+        # if salesContract['discountType'] == 'percent':
+        sc.discountPercent = salesContract['totalDiscount']
+        # elif salesContract['discountType'] == 'peso':
+        sc.discountPeso = salesContract['totalDiscount']
 
         sc.save()
         request.user.branch.salesContract.add(sc)

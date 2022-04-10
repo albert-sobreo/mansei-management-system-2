@@ -36,13 +36,25 @@
             </thead>
             <tbody>
                 {% for cheque in cheques %}
+                {% if cheque.receivepayment.all.0 %}
                 <tr>
                     <td>{{cheque.chequeNo}}</td>
-                    <td>{{cheque.receivePayment.code}}</td>
-                    <td>{{cheque.receivePayment.amountPaid}}</td>
-                    <td>{{cheque.receivePayment.salesContract.party.name}}</td>
-                    <td><button @click="approveBR({{cheque.pk}})">Approve</button></td>
+                    <td>{{cheque.receivepayment.all.0.code}}</td>
+                    <td>{{cheque.receivepayment.all.0.amountPaid}}</td>
+                    <td>{{cheque.receivepayment.all.0.salesContract.party.name}}</td>
+                    <td><button class="btn btn-primary" @click="approveBR({{cheque.pk}})">Approve</button></td>
                 </tr>
+                {% else %}
+
+                <tr>
+                    <td>{{cheque.chequeNo}}</td>
+                    <td>{{cheque.paymentvoucher.all.0.code}}</td>
+                    <td>{{cheque.paymentvoucher.all.0.amountPaid}}</td>
+                    <td>{{cheque.paymentvoucher.all.0.purchaseOrder.party.name}}</td>
+                    <td><button class="btn btn-primary" @click="approveBR({{cheque.pk}})">Approve</button></td>
+                </tr>
+
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>

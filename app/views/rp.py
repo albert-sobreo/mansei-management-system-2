@@ -87,7 +87,8 @@ class SaveReceivePayment(APIView):
                 cheque = Cheques()
                 cheque.chequeNo = receivePayment['chequeNo']
                 cheque.accountChild = AccountChild.objects.get(pk=receivePayment['bank'])
-                print(receivePayment['bank'])
+                cheque.transactionCode = rp.code
+                cheque.party = rp.party
                 cheque.dueDate = receivePayment['dueDate']
                 cheque.save()
                 request.user.branch.cheque.add(cheque)

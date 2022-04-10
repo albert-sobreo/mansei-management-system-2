@@ -11,7 +11,7 @@ import json
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
-from .journalAPI import jeAPI
+from .journalAPI import jeAPI, JournalAPI, getNewJournalCode
 
 class MerchInventoryView(View):
     def get(self, request, format=None):
@@ -73,11 +73,43 @@ class ImportMerchandiseInventory(View):
             raise PermissionDenied()
         df = pd.read_excel(request.FILES['excel'])
         jsonDF = json.loads(df.to_json(orient='records'))
+
+        j = JournalAPI(request, getNewJournalCode(request), request.user, datetime.now(), 'Inventory Initialization')
+        journalCounter = Decimal(0)
+
+        equity = request.user.branch.accountGroup.get(name='Equity')
+        if request.user.branch.subGroup.filter(name="Temporary Capital").exists():
+            subtempCap = request.user.branch.subGroup.get(name="Temporary Capital")
+        else:
+            subtempCap = AccountSubGroup()
+            subtempCap.code = "##"
+            subtempCap.name = 'Temporary Capital'
+            subtempCap.accountGroup = equity
+            subtempCap.description = ''
+            subtempCap.amount = Decimal(0)
+            subtempCap.save()
+            request.user.branch.subGroup.add(subtempCap)
+
+        if request.user.branch.accountChild.filter(name="Temporary Capital").exists():
+             tempCap = request.user.branch.accountChild.get(name="Temporary Capital")
+        else:
+            tempCap = AccountChild()
+            tempCap.code = "##"
+            tempCap.name = 'Temporary Capital'
+            tempCap.accountSubGroup = subtempCap
+            tempCap.description = ''
+            tempCap.amount = Decimal(0)
+            tempCap.save()
+            request.user.branch.accountChild.add(tempCap)
+
+        # INIT TEMPORARY DEBIT SIDE
+        debit = {}
         
         for item in jsonDF:
             merch = MerchandiseInventory()
-
+            print(item)
             if request.user.branch.merchInventory.filter(code=item['Code']):
+                
                 continue
             merch.code = item['Code']
             merch.name = item['Name']
@@ -111,6 +143,11 @@ class ImportMerchandiseInventory(View):
             merch.invAccounts(request, merch.name, merch.classification)
 
             merch.save()
+            try:
+                debit[merch.childAccountInventory] += merch.totalCost
+            except:
+                debit[merch.childAccountInventory] = merch.totalCost
+            journalCounter += Decimal(merch.totalCost)
             
             wi = WarehouseItems()
             wi.merchInventory = merch
@@ -128,6 +165,12 @@ class ImportMerchandiseInventory(View):
             wi.save()
             request.user.branch.warehouseItems.add(wi)
             request.user.branch.merchInventory.add(merch)
+
+        for key, val in debit.items():
+            j.addJE('Debit', key, val)
+
+        j.addJE('Credit', tempCap, journalCounter)
+        j.save()
 
         sweetify.sweetalert(request, icon="success", title="Success!", persistent="Dismiss")
         return redirect('/merchinventory/')

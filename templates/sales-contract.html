@@ -425,12 +425,12 @@
                                             <span class="input-group-text" v-if="order.discountType=='peso'">₱</span>
                                     <span class="input-group-text" v-else>%</span>
                                         </div>
-                                        <input v-model="order.discount" type="text" class="form-control box-shadow-off">
+                                        <input id="id-discount" v-model="order.discount" type="text" class="form-control box-shadow-off">
                                     </div>
                                     <div class="ml-2 form-check form-check-inline">
-                                        <input v-model="order.discountType" value="percent" name="discount" type="radio" class="form-check-input">
+                                        <input id="discount-percent-id" v-model="order.discountType" value="percent" name="discount" type="radio" class="form-check-input">
                                         <label class="form-check-label mr-2">%</label>
-                                        <input v-model="order.discountType" value="peso" name="discount" type="radio" class="form-check-input">
+                                        <input id="discount-peso-id" v-model="order.discountType" value="peso" name="discount" type="radio" class="form-check-input">
                                         <label class="form-check-label">₱</label>
                                     </div>
                                 </div>

@@ -1314,15 +1314,6 @@ class SCApprovalAPI(APIView):
 
         sale = SalesContract.objects.get(pk=pk)
 
-        errors = scChecker(request, sale)
-
-        if errors:
-            print("\n".join(errors))
-            return HttpResponseServerError('\n'.join(errors))
-            
-        else:
-            print('success')
-
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
         if not sale.salesOrder:
             print(sale.salesOrder)
@@ -1436,16 +1427,6 @@ class SCVoid(APIView):
             raise PermissionDenied()
         sale = SalesContract.objects.get(pk=pk)
 
-        errors = scVoidChecker(request, sale)
-
-        if errors:
-            print("\n".join(errors))
-            return HttpResponseServerError('\n'.join(errors))
-            
-        else:
-            print('success')
-
-
         dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
 
         sale.datetimeVoided = datetime.now()
@@ -1471,7 +1452,7 @@ class SCVoid(APIView):
         else:
             for element in sale.scitemsmerch.all():
                 wi = WarehouseItems.objects.filter(merchInventory = element.merchInventory)[0]
-                if wi.resQty(-element.qty):
+                if wi.salesWSO(-element.qty):
                     wi.save2()
                 else:
                     sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory reserves', persistent='Dismiss')
@@ -1491,7 +1472,7 @@ class SCVoid(APIView):
             j.addJE('Debit', dChildAccount.outputVat, sale.taxPeso)
 
         for item in sale.scitemsmerch.all():
-            j.addJE('Debit', item.merchInventory.childAccountSales, (item.totalCost)-(sale.discountPeso/sale.scitemsmerch.all().count())-(item.totalCost*(sale.taxRate/100)))
+            j.addJE('Debit', item.merchInventory.childAccountSales, (item.totalCost)-(sale.discountPeso/sale.scitemsmerch.all().count())-((item.totalCost-(sale.discountPeso/sale.scitemsmerch.all().count()))*(sale.taxRate/100)))
 
         for element in sale.scitemsmerch.all():
             j.addJE('Debit', element.merchInventory.childAccountInventory, element.merchInventory.purchasingPrice*element.qty)
@@ -1875,28 +1856,36 @@ class BankReconApprovalAPI(APIView):
 
         j = JournalAPI(request, 'CHQ', cheque.approvedBy, cheque.datetimeApproved, 'Bank Reconciliation Journal')
 
-        c = cheque.receivepayment.all()[0]
+        # CHEQUE FROM SALES
+        try:
+            c = cheque.receivepayment.all()[0]
+
+            ################# CREDIT SIDE #################
+            j.addJE('Credit', c.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (c.amountPaid + c.wep))
+
+            ################# DEBIT SIDE #################
+            if c.wep != 0.0:
+                j.addJE('Debit', dChildAccount.cwit, c.wep)
+
+
+            j.addJE('Debit', cheque.accountChild, c.amountPaid)
+
+            c.salesContract.runningBalance -= (c.amountPaid + c.wep)
+            if c.salesContract.runningBalance == 0:
+                c.salesContract.fullyPaid = True
+            print(c.salesContract, c.salesContract.runningBalance, c.amountPaid + c.wep)
+            c.salesContract.save()
+
+            c.journal = j.save()
+            c.save()
+
+        # CHEQUE FROM PURCHASE
+        except:
+            c = cheque.paymentvoucher.all()[0]
 
         
 
-        ################# CREDIT SIDE #################
-        j.addJE('Credit', c.salesContract.party.accountChild.get(name__regex=r"[Rr]eceivable"), (c.amountPaid + c.wep))
-
-        ################# DEBIT SIDE #################
-        if c.wep != 0.0:
-            j.addJE('Debit', dChildAccount.cwit, c.wep)
-
-
-        j.addJE('Debit', cheque.accountChild, c.amountPaid)
-
-        c.salesContract.runningBalance -= (c.amountPaid + c.wep)
-        if c.salesContract.runningBalance == 0:
-            c.salesContract.fullyPaid = True
-        print(c.salesContract, c.salesContract.runningBalance, c.amountPaid + c.wep)
-        c.salesContract.save()
-
-        c.journal = j.save()
-        c.save()
+        
 
         notify(request, 'Bank Recon approved', cheque.chequeNo, '/br-approved/', 1)
 
