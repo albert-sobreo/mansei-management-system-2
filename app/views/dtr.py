@@ -375,12 +375,12 @@ class DTRProcess(APIView):
 
             nd += getND(scheduleTimeIn, scheduleTimeOut)
 
-            ndot += getNDOT(scheduleTimeIn, scheduleTimeOut, scheduleTimeIn, scheduleTimeOut)
+            # ndot += getNDOT(scheduleTimeIn, scheduleTimeOut, scheduleTimeIn, scheduleTimeOut)
 
-            nd -= ndot
+            # nd -= ndot
 
             # OT CORRECTION
-            ot -= ndot
+            # ot -= ndot
 
             holidays = dtr.dtrdaycategory.all()
             
@@ -463,16 +463,16 @@ class DTRProcess(APIView):
                 otDuration = abs(dtr.dateTimeOut - otMark)
 
             nd += getND(dtr.dateTimeIn, dtr.dateTimeOut)
-            ndot += getNDOT(dtr.dateTimeIn, dtr.dateTimeOut, scheduleTimeIn, scheduleTimeOut)
+            # ndot += getNDOT(dtr.dateTimeIn, dtr.dateTimeOut, scheduleTimeIn, scheduleTimeOut)
 
-            nd -= ndot
+            # nd -= ndot
 
             bh += Decimal(bhDuration.seconds/3600)
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
 
             # OT CORRECTION
-            ot -= ndot
+            # ot -= ndot
 
             holidays = dtr.dtrdaycategory.all()
             
@@ -571,14 +571,14 @@ class DTRProcess(APIView):
             nd += getND(scheduleTimeIn, dtr.dateTimeOut)
             ndot += getNDOT(scheduleTimeIn, dtr.dateTimeOut, scheduleTimeIn, scheduleTimeOut)
 
-            nd -= ndot
+            # nd -= ndot
 
             bh += Decimal(bhDuration.seconds/3600)
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
 
             # OT CORRECTION
-            ot -= ndot
+            # ot -= ndot
 
             holidays = dtr.dtrdaycategory.all()
             
@@ -659,16 +659,16 @@ class DTRProcess(APIView):
                 otDuration = abs(scheduleTimeOut - otMark)
 
             nd += getND(dtr.dateTimeIn, scheduleTimeOut)
-            ndot += getNDOT(dtr.dateTimeIn, scheduleTimeOut, dtr.dateTimeIn, scheduleTimeOut)
+            # ndot += getNDOT(dtr.dateTimeIn, scheduleTimeOut, dtr.dateTimeIn, scheduleTimeOut)
 
-            nd -= ndot
+            # nd -= ndot
 
             bh += Decimal(bhDuration.seconds/3600)
             ot += Decimal(otDuration.seconds/3600)
             ut += Decimal(utDuration.seconds/3600)
 
             # OT CORRECTION
-            ot -= ndot
+            # ot -= ndot
 
             holidays = dtr.dtrdaycategory.all()
             
