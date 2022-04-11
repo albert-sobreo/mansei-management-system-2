@@ -35,6 +35,19 @@
 
         <form action="#" method="POST">{% csrf_token %}
             <div class="form-group">
+                <label for="">Default Cash in Bank for Payroll</label>
+                <select v-model="daccount.cashInBankForPayroll" class="form-control">
+                    <option value="">None</option>
+                    {% for subgroup in sg %}
+                    <optgroup label="{{subgroup.name}}">
+                        {% for child in subgroup.accountchild.all %}
+                        <option value="{{child.pk}}">{{child.accountSubGroup.accountGroup.code}}-{{child.accountSubGroup.code}}-{{child.code}} --- {{child.name}}</option>
+                        {% endfor %}
+                    </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="">Repair and Maintenance Account</label>
                 <select v-model="daccount.rm" class="form-control">
                     <option value="">None</option>

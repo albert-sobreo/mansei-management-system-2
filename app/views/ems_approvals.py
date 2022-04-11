@@ -8,9 +8,10 @@ import sweetify
 from decimal import Decimal
 from datetime import datetime, date
 import re
-from .journalAPI import jeAPI
+from .journalAPI import JournalAPI, jeAPI
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
+from contextlib import suppress
 
 class EMS_OvertimePendingView(View):
     def get(self, request):
@@ -236,15 +237,22 @@ class EMS_PayrollApprovalAll(APIView):
                     bonus += b.amount
             except Exception as e:
                 print(e)
-            hdmfER += payroll.pagibigemployeededuction.amount
-            phicER += payroll.phicemployeededuction.er
-            sssER += payroll.sssemployeededuction.er
-            sssPayable += (payroll.sssemployeededuction.er + payroll.sssemployeededuction.ee)
-            phicPayable += (payroll.phicemployeededuction.er + payroll.phicemployeededuction.ee)
-            hdmfPayable += (2*payroll.pagibigemployeededuction.amount)
-            withholdingTax += payroll.employeetaxdeduction.amount
-
             
+            with suppress(Exception):
+                hdmfER += payroll.pagibigemployeededuction.amount
+            with suppress(Exception):
+                phicER += payroll.phicemployeededuction.er
+            with suppress(Exception):
+                sssER += payroll.sssemployeededuction.er
+            with suppress(Exception):
+                sssPayable += (payroll.sssemployeededuction.er + payroll.sssemployeededuction.ee)
+            with suppress(Exception):
+                phicPayable += (payroll.phicemployeededuction.er + payroll.phicemployeededuction.ee)
+            with suppress(Exception):
+                hdmfPayable += (2*payroll.pagibigemployeededuction.amount)
+            with suppress(Exception):
+                withholdingTax += payroll.employeetaxdeduction.amount
+
 
             payslip = Payslip()
             payslip.payroll = payroll
@@ -254,28 +262,24 @@ class EMS_PayrollApprovalAll(APIView):
             request.user.branch.payslip.add(payslip)
             payroll.save()
 
-        j = Journal()
+        j = JournalAPI(request, 'PYRL' + ": " + str(dateEnd), request.user, datetime.now(), 'Payroll Journal')
 
-        j.code = 'PYRL' + ": " + str(dateEnd) + 'test'
-        j.datetimeCreated = datetime.now()
-        j.createdBy = request.user
-        j.journalDate = datetime.now()
-        j.save()
-        request.user.branch.journal.add(j)
         ########## DEBIT ##########
-        jeAPI(request, j, "Debit", dChildAccount.salariesExpense, salariesExpense)
-        jeAPI(request, j, "Debit", dChildAccount.bonus, bonus)
-        jeAPI(request, j, "Debit", dChildAccount.deminimisBenefit, deminimis)
-        jeAPI(request, j, "Debit", dChildAccount.hdmfShare, hdmfER)
-        jeAPI(request, j, "Debit", dChildAccount.phicERShare, phicER)
-        jeAPI(request, j, "Debit", dChildAccount.sssERShare, sssER)
+        j.addJE("Debit", dChildAccount.salariesExpense, salariesExpense)
+        j.addJE("Debit", dChildAccount.bonus, bonus)
+        j.addJE("Debit", dChildAccount.deminimisBenefit, deminimis)
+        j.addJE("Debit", dChildAccount.hdmfShare, hdmfER)
+        j.addJE("Debit", dChildAccount.phicERShare, phicER)
+        j.addJE("Debit", dChildAccount.sssERShare, sssER)
         ########## CREDIT ##########
-        jeAPI(request, j, "Credit", dChildAccount.salariesPayable, salariesPayable)
-        jeAPI(request, j, "Credit", dChildAccount.sssPayable, sssPayable)
-        jeAPI(request, j, "Credit", dChildAccount.phicPayable, phicPayable)
-        jeAPI(request, j, "Credit", dChildAccount.hdmfPayable, hdmfPayable)
-        jeAPI(request, j, "Credit", dChildAccount.withholdingTaxPayable, withholdingTax)
+        j.addJE("Credit", dChildAccount.salariesPayable, salariesPayable)
+        j.addJE("Credit", dChildAccount.sssPayable, sssPayable)
+        j.addJE("Credit", dChildAccount.phicPayable, phicPayable)
+        j.addJE("Credit", dChildAccount.hdmfPayable, hdmfPayable)
+        j.addJE("Credit", dChildAccount.withholdingTaxPayable, withholdingTax)
 
-        notify(request, 'Payroll Approved', f'Payroll for the period {dateStart} - {dateEnd} has been approved', '/payroll/', 1)
+        j.save()
+
+        notify(request, 'Payroll Approved', f'Payroll for the period {dateStart} - {dateEnd} has been approved', '/ems-payroll/', 1)
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return redirect('/ems-payroll/?year={}&period=semi&dateRange={}%20{}'.format(y, dateStart, dateEnd))

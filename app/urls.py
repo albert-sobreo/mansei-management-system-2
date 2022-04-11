@@ -505,5 +505,7 @@ urlpatterns = [
     path('create-schedule/', login_required(views.CreateScheduleAPI.as_view())),
     path('inventory-summary/', login_required(views.InventorySummaryView.as_view())),
     path('inventory-summary-api/', login_required(views.InventorySummaryAPI.as_view())),
-    path('error-logger/', login_required(views.ErrorLoggerAPI.as_view()))
+    path('error-logger/', login_required(views.ErrorLoggerAPI.as_view())),
+
+    path('ems-receive-payslip-solo/', login_required(views.ReceivePayslipSolo.as_view())),
 ]   

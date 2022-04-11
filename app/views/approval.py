@@ -1681,35 +1681,35 @@ class DeliveriesVoid(APIView):
         d.truck.save()
         d.save()
 
-        for item in d.deliveryitemsgroup.all():
-            if item.deliveryType == 'Sales Contract':
-                sc = SalesContract.objects.get(pk=item.referenceNo)
-                for element in sc.scitemsmerch.all():
-                    # element.merchInventory.qtyA -= element.qty
-                    # element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
+        # for item in d.deliveryitemsgroup.all():
+        #     if item.deliveryType == 'Sales Contract':
+        #         sc = SalesContract.objects.get(pk=item.referenceNo)
+        #         for element in sc.scitemsmerch.all():
+        #             # element.merchInventory.qtyA -= element.qty
+        #             # element.merchInventory.qtyT = element.merchInventory.qtyA - element.merchInventory.qtyR
 
-                    wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
-                    if sc.salesOrder:
-                        if wi.salesWSO(-element.qty):
-                            wi.save2()
-                        else:
-                            sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory stock', persistent='Dismiss')
-                            return JsonResponse(0, safe=False)
-                    else:
-                        wi.addQty(element.qty)
-                        wi.save2()
-                    element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
-                    element.merchInventory.totalCost += element.totalCost                
-                    # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
-                    element.merchInventory.save()
+        #             wi = WarehouseItems.objects.get(merchInventory=element.merchInventory)
+        #             if sc.salesOrder:
+        #                 if wi.salesWSO(-element.qty):
+        #                     wi.save2()
+        #                 else:
+        #                     sweetify.sweetalert(request, icon='error', title='Selling qty more than inventory stock', persistent='Dismiss')
+        #                     return JsonResponse(0, safe=False)
+        #             else:
+        #                 wi.addQty(element.qty)
+        #                 wi.save2()
+        #             element.merchInventory = MerchandiseInventory.objects.get(pk=element.merchInventory.pk)
+        #             element.merchInventory.totalCost += element.totalCost                
+        #             # element.merchInventory.purchasingPrice = (Decimal(element.merchInventory.totalCost / element.merchInventory.qtyT))
+        #             element.merchInventory.save()
 
-        j = JournalAPI(request, d.code, d.createdBy, d.datetimeApproved, 'Deliveries Void')
+        # j = JournalAPI(request, d.code, d.createdBy, d.datetimeApproved, 'Deliveries Void')
 
-        j.addJE('Debit', dChildAccount.merchInventory, d.amountTotal)
+        # j.addJE('Debit', dChildAccount.merchInventory, d.amountTotal)
 
-        j.addJE('Credit', dChildAccount.costOfSales, d.amountTotal)
+        # j.addJE('Credit', dChildAccount.costOfSales, d.amountTotal)
 
-        j.save()
+        # j.save()
 
         sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
         return JsonResponse(0, safe=False)

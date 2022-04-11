@@ -1644,6 +1644,7 @@ class TaxableDeMinimisPay(models.Model):
 class Payslip(models.Model):
     payroll = models.ForeignKey(Payroll, on_delete=models.CASCADE, related_name='payslip')
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="payslip")
+    received = models.BooleanField(default=False)
 
 class Raise(models.Model):
     user = models.ForeignKey(User, related_name='raisse', on_delete=models.SET_NULL, null=True, blank=True)
@@ -1821,6 +1822,7 @@ class ManufacturingInventory(models.Model):
 
 class BranchDefaultChildAccount(models.Model):
     ##### CASH AND CASH EQUIVALENTS #####
+    cashInBankForPayroll = models.ForeignKey(AccountChild, related_name='branchcashinbankforpayroll', on_delete=models.CASCADE, blank=True, null=True)
     rm = models.ForeignKey(AccountChild, related_name="branchdefaultrm", on_delete=models.CASCADE, null=True, blank=True)
     defaultWarehouse = models.ForeignKey(Warehouse, related_name = 'branchdefaultwarehouse', on_delete=models.CASCADE, blank = True, null = True)
     cashOnHand = models.ForeignKey(AccountChild, related_name='branchcashonhand', on_delete=models.CASCADE, blank=True, null=True)

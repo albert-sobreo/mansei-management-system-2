@@ -29,6 +29,11 @@ class SaveDefaultAccounts(APIView):
         items = request.data
         print(items['pettyCash'])
         bdacct = BranchDefaultChildAccount.objects.get(pk=items['id'])
+        try: 
+            bdacct.cashInBankForPayroll = AccountChild.objects.get(pk=items['cashInBankForPayroll'])
+        except:
+            print(e)
+            bdacct.cashInBankForPayroll = None
         try:
             bdacct.rm = AccountChild.objects.get(pk=items['rm'])
         except Exception as e:

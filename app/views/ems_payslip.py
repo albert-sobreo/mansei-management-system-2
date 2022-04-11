@@ -11,6 +11,7 @@ import json
 from datetime import datetime
 from django.core.exceptions import PermissionDenied
 from .notificationCreate import *
+from .journalAPI import JournalAPI, getNewJournalCode
 
 class EMS_MyPayslipView(View):
     def get(self, request):
@@ -64,3 +65,38 @@ class EMS_EmployeePayslipView(View):
                 'payslips': 0
             }
         return render(request, 'ems-employee-payslip.html', context)
+
+class ReceivePayslipSolo(APIView):
+    def post(self, request):
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+        payslip = Payslip.objects.get(pk=request.data['id'])
+        if payslip.received == True:
+            sweetify.sweetalert(request, icon='warning', title='Payslip has been received already!', persistent='Dismiss')
+            return JsonResponse(0, safe=False)
+        else:
+            payslip.received = True
+            j = JournalAPI(request, getNewJournalCode(request), request.user, datetime.now())
+            j.addJE('Credit', dChildAccount.cashInBankForPayroll, payslip.payroll.netPayAfterTaxes)
+            j.addJE('Debit', dChildAccount.salariesPayable, payslip.payroll.netPayAfterTaxes)
+            payslip.save()
+            j.save()
+
+        notify(request, 'Payslip Received', f'Payslip of {payslip.payroll.user.first_name} {payslip.payroll.user.first_name} for the period {payslip.payroll.dateStart} - {payslip.payroll.dateEnd} has been approved', '/ems-payslip/', 1)
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+
+
+        # DATA SENT FROM FRONTEND
+        # user pk
+        # year
+        # dateStart
+        # dateEnd
+        
+        # OR
+        # FRONTEND WILL SEND PAYROLL/PAYSLIP OBJECT ID
+
+class ReceivePayslipBulk(APIView):
+    pass
