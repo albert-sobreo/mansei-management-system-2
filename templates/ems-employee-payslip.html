@@ -27,15 +27,32 @@
 
         <!-- PERIOD -->
         <div class="d-flex align-items-center justify-content-between">
-            <div class="form-inline">
-                <div class="form-group">
-                    <label for="" class="mx-1">Employee</label>
-                    <select v-model='user' class="form-control mx-1">
-                        <option value='' selected disabled>Select Employee</option>
-                        {% for employee in employees %}
-                        <option value="{{employee.pk}}">{{employee.first_name}} {{employee.last_name}}</option>
-                        {% endfor %}
-                    </select>
+            <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="form-inline mr-2">
+                        <div class="form-group">
+                            <label for="" class="mx-1">Employee</label>
+                            <select v-model='user' class="form-control mx-1">
+                                <option value='' selected disabled>Select Employee</option>
+                                {% for employee in employees %}
+                                <option value="{{employee.pk}}">{{employee.first_name}} {{employee.last_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mr-2">
+                    <span class="font-size-14 font-bold gray">Payslip ID </span><span class="font-size-14 font-bold">{{payslips.pk}}</span>
+                </div>
+
+                <div class="mr-2">
+                    <span class="font-size-14 font-bold gray">Status </span>
+                    {% if payslips.received %}
+                    <span class="font-size-14 font-bold text-success">Received</span>
+                    {% else %}
+                    <span class="font-size-14 font-bold pending">Not yet received</span>
+                    {% endif %}
                 </div>
             </div>
             <div class="form-inline">
@@ -59,6 +76,15 @@
                         Set
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center mb-2">
+            <div class="mr-2">
+                <button @click="receivePayslipSolo('{{payslips.pk}}')" class="btn-success btn">Receive Payslip for this employee</button>
+            </div>
+            <div class="mr-2">
+                <button @click="receivePayslipBulk()" class="btn-warning btn">Receive Payslip For all Employees</button>
             </div>
         </div>
 
@@ -407,6 +433,11 @@
         el: "#app",
         
         data: {
+            config: {
+				headers: {
+                    "X-CSRFToken": getCookie('csrftoken'),
+                }
+			},
             user: '',
             year: '',
             period: '',
@@ -488,6 +519,114 @@
                     allowOutsideClick: false,
                     html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
                 })
+            }, 
+            receivePayslipSolo(id){
+                if(!id){
+                    Swal.fire({
+                        title: "No Payslip Selected",
+                        html: "Please Select an Employee and Time Period",
+                        icon: 'error'
+                    })
+                    return
+                }
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    html: "Are you sure you want to receive this payslip?",
+                    icon: 'warning',
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'I am sure.'
+                }).then(results=>{
+                    if(results.isConfirmed){
+                        message = "Receiving Payslip"
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
+                        axios.post('/ems-receive-payslip-solo/', {id:id}, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                        .catch(err=>{
+
+                            indexOfExceptionLocation = err.response.data.search("Exception Location:")
+                            sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
+                            exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
+        
+                            indexOfException = err.response.data.search("\"exception_value\"")
+                            sl = err.response.data.slice(indexOfException, indexOfException+200)
+                            exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
+                            
+                            axios.post('/error-logger/', {
+                                message: exception,
+                                line: exceptionLocation,
+                                url: window.location.href,
+                            }, this.config)
+        
+                            Swal.fire({
+                                title: "Something went wrong",
+                                icon: "error",
+                                html: exception
+                            })
+                        })
+                    }
+                })
+            },
+
+            receivePayslipBulk(){
+                if(!this.dateRange){
+                    Swal.fire({
+                        title: "No Payslip Selected",
+                        html: "Please Select a Time Period",
+                        icon: 'error'
+                    })
+                    return
+                }
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    html: "Are you sure you want to receive all payslip for this period?",
+                    icon: 'warning',
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'I am sure.'
+                }).then(results=>{
+                    if(results.isConfirmed){
+                        message = "Receiving Payslip"
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            html: `<div class="spinner-grow text-warning" role="status"></div> <div class="spinner-grow text-warning delay-1" role="status"></div> <div class="spinner-grow text-warning delay-2" role="status"></div> <br><br> <span class="font-bold font-size-18">${message} . . .</span> <br> <span class="font-size-12 gray font-medium">Press F12 to check if something went wrong.</span>`
+                        })
+
+                        axios.post('/ems-receive-payslip-bulk/', {dateRange: this.dateRange}, this.config)
+                        .then(res=>res.data==0?location.reload():'')
+                        .catch(err=>{
+                        
+                            indexOfExceptionLocation = err.response.data.search("Exception Location:")
+                            sli = err.response.data.slice(indexOfExceptionLocation, indexOfExceptionLocation+200)
+                            exceptionLocation = `${sli.slice(0, sli.search('</td>'))}`
+                        
+                            indexOfException = err.response.data.search("\"exception_value\"")
+                            sl = err.response.data.slice(indexOfException, indexOfException+200)
+                            exception = `SERVER ERROR: ${sl.slice(18, sl.search('</pre>'))?sl.slice(18, sl.search('</pre>')):err.response.data} <br><br> ${exceptionLocation}`
+
+                            axios.post('/error-logger/', {
+                                message: exception,
+                                line: exceptionLocation,
+                                url: window.location.href,
+                            }, this.config)
+                        
+                            Swal.fire({
+                                title: "Something went wrong",
+                                icon: "error",
+                                html: exception
+                            })
+                        })
+                    }
+                })
+
+                
             }
         },
         mounted(){

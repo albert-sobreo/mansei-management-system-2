@@ -99,4 +99,49 @@ class ReceivePayslipSolo(APIView):
         # FRONTEND WILL SEND PAYROLL/PAYSLIP OBJECT ID
 
 class ReceivePayslipBulk(APIView):
-    pass
+    def post(self, request):
+        dChildAccount = request.user.branch.branchProfile.branchDefaultChildAccount
+        dateRange = request.data['dateRange']
+        dateStart = dateRange.split(' ')[0]
+        dateEnd = dateRange.split(' ')[1]
+
+        
+
+        if request.user.authLevel == '2':
+            raise PermissionDenied()
+
+        payslips = request.user.branch.payslip.filter(payroll__dateStart = dateStart, payroll__dateEnd = dateEnd)
+
+        debit = {}
+        credit = {}
+
+        j = JournalAPI(request, getNewJournalCode(request), request.user, datetime.now(), 'Received Payslip Journal')
+
+        for payslip in payslips:
+            if payslip.received != True:
+                payslip.received = True
+
+                try: credit[dChildAccount.cashInBankForPayroll] += payslip.payroll.netPayAfterTaxes
+                except: credit[dChildAccount.cashInBankForPayroll] = payslip.payroll.netPayAfterTaxes
+
+                try: debit[dChildAccount.salariesPayable] += payslip.payroll.netPayAfterTaxes
+                except: debit[dChildAccount.salariesPayable] = payslip.payroll.netPayAfterTaxes
+                
+                payslip.save()
+        
+        for key, val in debit.items():
+            j.addJE('Debit', key, val)
+
+        for key, val in credit.items():
+            j.addJE('Credit', key, val)
+
+        if bool(debit) or bool(credit):
+            j.save()
+
+        notify(request, 'Payslip Received', f'Payslip of {payslip.payroll.user.first_name} {payslip.payroll.user.first_name} for the period {payslip.payroll.dateStart} - {payslip.payroll.dateEnd} has been approved', '/ems-payslip/', 1)
+        sweetify.sweetalert(request, icon='success', title='Success!', persistent='Dismiss')
+        return JsonResponse(0, safe=False)
+
+        # VARS NEEDED
+        # YEAR
+        # DATERANGE

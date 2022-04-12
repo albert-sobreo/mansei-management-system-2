@@ -497,10 +497,16 @@ class ExportSC(APIView):
 
             ctr+=1
 
+        discount = ws.cell(row=30, column=2)
+        discountAmount = ws.cell(row=30, column=11)
+
+        discount.value='Discount'
+        discountAmount.value = -sc.discountPeso
+
         ctr = 0
         for i in sc.scotherfees.all():
-            feeName = ws.cell(row=30-ctr, column=2)
-            feeAmount = ws.cell(row=30-ctr, column=11)
+            feeName = ws.cell(row=29-ctr, column=2)
+            feeAmount = ws.cell(row=29-ctr, column=11)
 
             feeName.value=f"{i.description}"
             feeAmount.value= i.fee

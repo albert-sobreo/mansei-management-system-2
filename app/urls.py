@@ -508,4 +508,5 @@ urlpatterns = [
     path('error-logger/', login_required(views.ErrorLoggerAPI.as_view())),
 
     path('ems-receive-payslip-solo/', login_required(views.ReceivePayslipSolo.as_view())),
-]   
+    path('ems-receive-payslip-bulk/', login_required(views.ReceivePayslipBulk.as_view()))
+]
